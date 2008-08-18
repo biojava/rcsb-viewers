@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="edu/sdsc/protein_workshop/joglViewerApp/" kind="src" path="Structure Model"/>
+	<classpathentry excluding="edu/sdsc/mbt/ui/views/SequenceViewer.java|edu/sdsc/mbt/ui/views/SequenceViewerPanel.java|org/rcsb/mbt/ui/views/SequenceViewer.java|org/rcsb/mbt/ui/views/SequenceViewerPanel.java" kind="src" path="UI"/>
+	<classpathentry kind="src" path="GL Scene"/>
+	<classpathentry excluding="edu/sdsc/mbt/app_controller/MBTModel.java|edu/sdsc/mbt/app_controller/ImageSaver.java|org/rcsb/mbt/views_controller/ViewsController.java" kind="src" path="Controllers"/>
+	<classpathentry kind="src" path="Structure Loader"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/3rd Party Libs/jogl/gluegen-rt.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="3rd Party Libs/jogl/jnilibs"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/3rd Party Libs/jogl/jogl.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="3rd Party Libs/jogl/jnilibs"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

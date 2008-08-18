@@ -1,0 +1,19 @@
+<!-- ?xml version="1.0" encoding="utf-8"? -->
+<!--
+ |  Create Javadoc
+ |
+ |  This takes a bit more control of the javadoc generation process for this project.
+ |
+ -->
+<project name="DoJavaDoc" default="all" basedir=".">
+  <target name="all">
+    <javadoc packagenames="org.rcsb.mbt.*"
+					   overview="./doc-in/overview.html"
+		         sourcepath="./Structure Model:./UI:./GL Scene:./Controllers:./Structure Loader"
+             destdir="./doc/reference"
+             windowtitle="RCSB PDB">
+      <doctitle><![CDATA[<h1>RCSB MBT Libs</h1>]]></doctitle>
+		  <bottom><![CDATA[<em>Copyright &#169; 2008 Regents of the University of California, All rights reserved.</em>]]></bottom>
+    </javadoc>
+  </target>
+</project>

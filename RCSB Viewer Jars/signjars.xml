@@ -1,0 +1,36 @@
+<!-- ?xml version="1.0" encoding="utf-8"? -->
+<!--
+ |  Sign the jars prior to exporting to the website.
+ |
+ |  Jars have to be created, first - use the jar descriptor files in this project to do that.
+ |  (select them all in the package explorer under 'JarsDesc Files', then right click and
+ |   select 'Create Jar' in the popup menu.)
+ |
+ |  (They can't be created here, because of the structure in MBT libs...)
+ |
+ -->
+<project name="SignJars" default="all" basedir="/">
+	<property name="PDB" location="Users/Shared/dev/PDB" />
+	<property name="VIEWERS_HEAD" location="${PDB}/pdb-viewers-head" />
+	<property name="DSTROOT" location="${VIEWERS_HEAD}/RCSB Viewer Jars" />
+	
+	<macrodef name="dosign">
+		<attribute name="subdir" />
+		<sequential>
+			<signjar 
+		    	alias="PDB" keystore="${PDB}/pdbkeys"
+		    	storepass="RCSB-PDB"
+		    	preservelastmodified="true">
+				<path>
+					<fileset dir="${DSTROOT}/@{subdir}" includes="**/*.jar" />
+				</path>
+			</signjar>
+		</sequential>
+	</macrodef>
+		
+	 <target name="all" >
+	 	<dosign subdir="RCSBSupport" />
+		<dosign subdir="RCSBViewers" />
+		<dosign subdir="3rdParty" />
+	</target>
+</project>

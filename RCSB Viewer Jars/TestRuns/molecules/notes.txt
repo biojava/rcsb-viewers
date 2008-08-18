@@ -1,0 +1,6 @@
+
+1STP - example of 'biological unit' model, made up of four asymmetrical units.  See 'MODEL' and 'MDLEND' records.
+
+2FTE - virus 'biological unit' model.  Huge model, once it's expanded.
+
+1x7b - contains ligands - use for Ligand Explorer

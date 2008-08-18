@@ -1,0 +1,30 @@
+RCSB Viewer Jars
+rickb
+14-Jul-08
+----------
+This directory is a staging area for production.  It's used to coalesce
+all the jars before signing, and to provide a quick-run test
+environment.
+
+Summary Jar Locations:
+----------------------
+3rd Party - these are done by hand as needed.
+RCSBSupport - MBT and Viewer Framework jars
+RCSBViewers - viewers jars
+
+Some notes:
+-----------
+To run the canned tests, cd down to TestRuns.  Run one of the following:
+
+ -lxtest - Ligand Explorer
+ -svtest - Simple Viewer
+ -pwtest - Protein Workshop Viewer
+ -kstest - Kiosk Viewer
+
+A 'tcsh' and '.bat' file are provided for each viewer, so you can run on
+unix/mac and windows.
+
+svtest points to a huge biological unit, and is dog slow.  This will be a
+good target to work on for performance enhancements.
+
+enjoy.

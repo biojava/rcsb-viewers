@@ -1,0 +1,6 @@
+#! /bin/tcsh
+set MOL="1STP.xml.gz"
+if ( "$1" != "" ) then
+  set MOL="$1"
+endif
+java -D"java.library.path=../3rdParty/jnilibs" -jar ../RCSBViewers/RCSB-ProteinWorkshop.jar -standalone -log_folder ./temp -structure_url molecules/$MOL $2

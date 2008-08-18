@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="MacRoman"?>
+<jardesc>
+<jar path="RCSB Viewer Jars/RCSBSupport/RCSB-MBT-StructureLoader.jar"/>
+<options buildIfNeeded="true" compress="true" descriptionLocation="/RCSB Viewer Jars/JarDesc Files/RCSB-MBT-StructureLoader.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+<storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+<selectedProjects/>
+<manifest generateManifest="false" manifestLocation="/RCSB Viewer Jars/Manifests/RCSB-Kiosk.mf" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+<sealing sealJar="false">
+<packagesToSeal/>
+<packagesToUnSeal/>
+</sealing>
+</manifest>
+<selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+<javaElement handleIdentifier="=RCSB MBT Libs/Structure Loader"/>
+</selectedElements>
+<fatjar builder="org.eclipse.jdt.ui.plain_jar_builder" launchConfig=""/>
+</jardesc>

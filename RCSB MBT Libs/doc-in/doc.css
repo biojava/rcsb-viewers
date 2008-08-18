@@ -1,0 +1,51 @@
+/* Technical css file
+ *
+ * Use this for tech docs and notes.
+ * Expand as needed.
+ */
+#ext {background-color:#333; padding:0; margin:0; }
+
+#ext #main {font-family:verdana,helvetica,sans-serif; font-size:14px;
+					  width:80%;margin:0 auto;padding:20px;padding-top:40px;
+						background-color:white;color:#333; border:thin solid black;}
+
+#ext #title-block{ font-family:arial,helvetica,sans-serif;font-weight:bold;
+									 text-align:right;padding:20px;
+					   			 background-color:black; color:red; }
+
+#title-block #title {font-size:300%;}
+#title-block .sub-info {color:blue;font-size:130%; }
+
+#ext h1,h2,h3,h4,h5 { font-family:arial,helvetica,sans-serif; font-weight:100; color:green;
+											border-bottom:thin solid green; padding:0; margin-top:20px; margin-bottom:10px;}
+
+#ext h1 { font-size:200%; }
+#ext h2 { font-size:150%; }
+
+#ext img { border:none; margin:20px auto; text-align:center; display:block; }
+
+#ext ul { padding-left:44px; }
+#ext p,ul,ol,dl { margin-left:150px; padding-right:80px;}
+#ext p,li,dd,.abstract { line-height:1.3em;text-align:justify; }
+
+#ext .abstract, .abstract-header { font-family:Times-New-Roman, serif; font-size:90%; font-style:italic; }
+#ext .abstract { margin-left:250px; margin-right:180px; }
+#ext .abstract-header { text-align:center; }
+
+#ext .abstract,#ext .abstract-header + .abstract { margin-top: 8px; }
+.abstract em { font-style:normal; }
+
+#ext dl ul { margin-left:10px; }
+
+#ext ul { margin-top:12px; margin-bottom:12px; }
+
+#ext li + li { margin-top: 2px; }
+#ext dd + dd { margin-top: 8px; }
+
+#ext dt { font-weight:bold; }
+
+#ext dd + dt { margin-top: 12px; }
+
+#ext #notes { font-size:80%; }
+
+#ext sup { font-family:Times-New-Roman; }

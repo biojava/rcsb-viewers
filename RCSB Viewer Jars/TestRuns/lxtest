@@ -1,0 +1,13 @@
+#! /bin/tcsh
+set MOL="1x7b.xml.gz"
+set LIG="041"
+if ( "$1" != "" ) then
+  if ( "$2" != "" ) then
+    set LIG="$2"
+  else
+    echo ERROR: Ligand required if molecule specified.
+    goto Done
+  endif
+  set MOL="$1"
+endif
+java -D"java.library.path=../3rdParty/jnilibs" -jar ../RCSBViewers/RCSB-LigandExplorer.jar -standalone -log_folder ./temp -structure_url molecules/$MOL -ligand $LIG

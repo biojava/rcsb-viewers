@@ -1,0 +1,25 @@
+#! /bin/tcsh -v
+rm *.*
+rm -rf jogl-*
+
+foreach NM ( dists/*.zip )
+  unzip $NM
+end
+
+set FIRST=1
+foreach DIRNAME (`ls -1d jogl-*`)
+  if ( $FIRST ) then
+    cp $DIRNAME/lib/jogl.jar ../
+    cp $DIRNAME/lib/gluegen-rt.jar ../
+    set FIRST=0
+  endif
+  set JARNAME=`echo $DIRNAME | sed -E 's/-[0-9\.]+//'`.jar
+  rm $DIRNAME/lib/*.jar
+  pushd $DIRNAME/lib
+  jar -cvf ../../$JARNAME *.*
+  if ( `echo $DIRNAME | sed 's/^.*amd64.*/yes/'` != "yes") then
+    echo moving lib bins up for $DIRNAME
+    mv *.* ../..
+  endif
+  popd
+end
