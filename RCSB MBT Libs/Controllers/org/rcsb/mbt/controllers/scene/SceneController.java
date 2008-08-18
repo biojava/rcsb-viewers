@@ -1,4 +1,4 @@
-package org.rcsb.mbt.glscene.controller;
+package org.rcsb.mbt.controllers.scene;
 
 import java.util.ArrayList;
 import java.util.Hashtable;

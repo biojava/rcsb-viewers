@@ -1,6 +1,6 @@
 package org.rcsb.pw.controllers.scene;
 
-import org.rcsb.mbt.glscene.controller.SceneController;
+import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.glscene.jogl.GvPickEvent;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;

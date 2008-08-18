@@ -2,7 +2,7 @@ package org.rcsb.lx.controllers.scene;
 
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.glscene.jogl.LXSceneNode;
-import org.rcsb.mbt.glscene.controller.SceneController;
+import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;

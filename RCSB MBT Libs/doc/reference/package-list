@@ -2,6 +2,7 @@ org.rcsb.mbt.controllers.app
 org.rcsb.mbt.controllers.doc
 org.rcsb.mbt.controllers.scene
 org.rcsb.mbt.controllers.update
+org.rcsb.mbt.glscene.controller
 org.rcsb.mbt.glscene.data_types
 org.rcsb.mbt.glscene.geometry
 org.rcsb.mbt.glscene.jogl

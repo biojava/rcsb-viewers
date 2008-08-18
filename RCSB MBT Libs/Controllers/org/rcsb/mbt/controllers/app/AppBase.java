@@ -4,8 +4,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import org.rcsb.mbt.controllers.doc.DocController;
+import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.controllers.update.UpdateController;
-import org.rcsb.mbt.glscene.controller.SceneController;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.StructureModel;
@@ -101,7 +101,7 @@ public abstract class AppBase
 	 * @see org.rcsb.mbt.appController.ViewsController
 	 * @see org.rcsb.mbt.appController.UpdateViewController
 	 * @see org.rcsb.mbt.appController.DocController
-	 * @see org.rcsb.mbt.glscene.controller.appController.SceneController
+	 * @see org.rcsb.mbt.controllers.scene.appController.SceneController
 	 */
 	public static AppModuleFactory sgetAppModuleFactory() { return _theJApp.appModuleFactory; }
 	public static DocumentFrameBase sgetActiveFrame() { return _theJApp.activeFrame; }

@@ -96,7 +96,7 @@ import java.util.Properties;
 
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.doc.DocController;
-import org.rcsb.mbt.glscene.controller.SceneController;
+import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 import org.rcsb.vf.controllers.doc.VFDocController;
 import org.rcsb.vf.glscene.jogl.VFGlGeometryViewer;
