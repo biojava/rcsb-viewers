@@ -1,7 +1,7 @@
 package org.rcsb.vf.controllers.doc;
 
 import org.rcsb.mbt.controllers.doc.DocController;
-import org.rcsb.mbt.controllers.scene.SceneController;
+import org.rcsb.mbt.glscene.controller.SceneController;
 import org.rcsb.mbt.glscene.jogl.TransformationMatrix;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;

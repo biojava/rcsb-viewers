@@ -164,9 +164,9 @@ import javax.swing.JPanel;
 
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
-import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
+import org.rcsb.mbt.glscene.controller.SceneController;
 import org.rcsb.mbt.glscene.jogl.tiles.TileRenderer;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;

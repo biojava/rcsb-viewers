@@ -6,7 +6,7 @@ import java.util.Vector;
 
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.scene.PickLevel;
-import org.rcsb.mbt.controllers.scene.SceneController;
+import org.rcsb.mbt.glscene.controller.SceneController;
 import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.Atom;

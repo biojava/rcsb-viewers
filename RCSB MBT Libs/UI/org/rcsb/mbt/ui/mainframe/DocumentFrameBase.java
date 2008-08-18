@@ -9,8 +9,8 @@ import javax.swing.WindowConstants;
 
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.doc.DocController;
-import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.controllers.update.UpdateController;
+import org.rcsb.mbt.glscene.controller.SceneController;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.ui.dialogs.ProgressPanel;

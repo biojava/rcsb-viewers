@@ -9,7 +9,7 @@ import javax.media.opengl.glu.GLU;
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.model.Interaction;
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.SceneController;
+import org.rcsb.mbt.glscene.controller.SceneController;
 import org.rcsb.mbt.glscene.jogl.Constants;
 import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
