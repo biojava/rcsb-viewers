@@ -7,6 +7,7 @@ import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.glscene.jogl.AtomGeometry;
 import org.rcsb.mbt.glscene.jogl.BondGeometry;
+import org.rcsb.mbt.glscene.jogl.DisplayListGeometry;
 import org.rcsb.mbt.glscene.jogl.DisplayLists;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.glscene.jogl.GvPickEvent;
@@ -58,7 +59,7 @@ public class SceneController implements GvPickEventListener, IUpdateListener
 //			public final float[][] JITTER_ARRAY = {{0.375f, 0.25f}, {0.125f, 0.75f}, {0.875f, 0.25f}, {0.625f, 0.75f}};
 	}
 	
-    private Hashtable defaultGeometry = null;
+    private Hashtable<String, DisplayListGeometry> defaultGeometry = null;
 //	    private ArrayListStateOrganizer stateOrganizer = new ArrayListStateOrganizer();
     
     private boolean isBatchMode = false;	// otherwise, immediate mode.
@@ -102,11 +103,11 @@ public class SceneController implements GvPickEventListener, IUpdateListener
 		this.areSelectionsEnabled = areSelectionsEnabled;
 	}
 
-	public Hashtable getDefaultGeometry() {
+	public Hashtable<String, DisplayListGeometry> getDefaultGeometry() {
 		return this.defaultGeometry;
 	}
 
-	public void setDefaultGeometry(final Hashtable defaultGeometry) {
+	public void setDefaultGeometry(final Hashtable<String, DisplayListGeometry> defaultGeometry) {
 		this.defaultGeometry = defaultGeometry;
 	}
 

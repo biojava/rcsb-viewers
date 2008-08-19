@@ -86,7 +86,7 @@ public class BondGeometry
 	extends DisplayListGeometry
 {
 	// Shared display lists: key="form:quality" value=Integer(displayList)
-	public static Hashtable sharedDisplayLists = new Hashtable( );
+	public static HashMap<String, DisplayLists> sharedDisplayLists = new HashMap<String, DisplayLists>( );
 
 	// Attributes used to bound the quality setting.
 	private static final int minSlices = 6;
@@ -185,7 +185,7 @@ public class BondGeometry
 		DisplayLists cylinderList = (DisplayLists) BondGeometry.sharedDisplayLists.get( dlKey );
 //		int cylinderDl = -1;
 
-		final Vector allLists = new Vector();
+		final ArrayList<DisplayLists> allLists = new ArrayList<DisplayLists>();
 		
 		if ( cylinderList == null )
 		{
@@ -508,15 +508,14 @@ public class BondGeometry
 		}
 
 //		gl.glPopMatrix( );
-//		gl.glEndList( );
-
-		final DisplayLists[] allListsOb = new DisplayLists[allLists.size()];
-		final Iterator allListsIt = allLists.iterator();
-		for(int i = 0; allListsIt.hasNext(); i++) {
-			allListsOb[i] = (DisplayLists)allListsIt.next();
-		}
+//		gl.glEndList( );	
 		
-		return allListsOb;
+		DisplayLists displayLists[] = new DisplayLists[allLists.size()];
+		for (int ix = 0; ix < allLists.size(); ix++)
+			displayLists[ix] = allLists.get(ix);
+							// Interesting - 'toArray()' doesn't.  We get a bad cast exception...
+		
+		return displayLists;
 	}
 
 

@@ -464,14 +464,14 @@ public class StructureMap
 	protected Structure structure;
 
 	// Primary StructureMap containers.
-	protected Vector atoms = null;      // All Atoms in the Stucture.
-	protected Vector residues = null;   // All Residues in the Stucture.
-	protected Vector fragments = null;  // All Fragments in the Stucture.
-	protected Vector chains = null;     // All Chains in the Stucture.
-	protected Vector ligands = null;    // Only Ligand Residues.
-	protected Vector bonds = null;      // All Bond objects added to this StructureMap.
-	protected Hashtable bondUniqueness = null;  // Make sure Bond objects are unique.
-	protected Hashtable atomToBonds = null;  // Find all Bonds connected to each Atom.
+	protected Vector<Atom> atoms = null;      // All Atoms in the Stucture.
+	protected Vector<Residue> residues = null;   // All Residues in the Stucture.
+	protected Vector<Fragment> fragments = null;  // All Fragments in the Stucture.
+	protected Vector<Chain> chains = null;     // All Chains in the Stucture.
+	protected Vector<Residue> ligands = null;    // Only Ligand Residues.
+	protected Vector<Bond> bonds = null;      // All Bond objects added to this StructureMap.
+	protected Set<Bond> bondUniqueness = null;  // Make sure Bond objects are unique.
+	protected Hashtable<Atom, Vector<Bond>> atomToBonds = null;  // Find all Bonds connected to each Atom.
 	
 	protected UnitCell unitCell = null;
 	protected BiologicUnitTransforms BUTransforms = null;
@@ -494,14 +494,14 @@ public class StructureMap
 	protected final JoglSceneNode sceneNode;
 
 	// Stores Chain object references by atom.chain_id value.
-	protected Hashtable chainById = null;
+	protected Hashtable<String, Chain> chainById = null;
 
 	// Stores Residue object references by atom.chain_id+atom_residue_id value.
-	protected Hashtable residueByChainAndResidueId = null;
+	protected Hashtable<String, Residue> residueByChainAndResidueId = null;
 
 	protected PdbToNdbConverter pdbToNdbConverter = null;
-	protected HashMap nonproteinChainIds = null;
-	protected Vector pdbTopLevelElements = null;
+	protected Set<String> nonproteinChainIds = null;
+	protected Vector<StructureComponent> pdbTopLevelElements = null;
 	
 	// If a chain_id in the data is every empty, use this value instead
 	public static final String defaultChainId = "_";
@@ -555,41 +555,41 @@ public class StructureMap
 		final int atomCount = this.structure.getStructureComponentCount(
 			StructureComponentRegistry.TYPE_ATOM );
 		if ( atomCount > 0 ) {
-			this.atoms = new Vector( atomCount );
+			this.atoms = new Vector<Atom>( atomCount );
 		} else {
-			this.atoms = new Vector( );
+			this.atoms = new Vector<Atom>( );
 		}
 
 		// All Residues in the Stucture.
 		final int residueCount = this.structure.getStructureComponentCount(
 			StructureComponentRegistry.TYPE_RESIDUE );
 		if ( residueCount > 0 ) {
-			this.residues = new Vector( residueCount );
+			this.residues = new Vector<Residue>( residueCount );
 		} else {
-			this.residues = new Vector( );
+			this.residues = new Vector<Residue>( );
 		}
-		this.ligands = new Vector( ); // Only Ligand Residues.
+		this.ligands = new Vector<Residue>( ); // Only Ligand Residues.
 		// Residue object references by atom.chain_id+atom_residue_id value.
 		// Maps each Atom record to the appropriate Residue.
-		this.residueByChainAndResidueId = new Hashtable( );
+		this.residueByChainAndResidueId = new Hashtable<String, Residue>( );
 
 		// All Bonds in the Structure.
 		final int bondCount = this.structure.getStructureComponentCount(
 			StructureComponentRegistry.TYPE_BOND );
 		if ( bondCount > 0 ) {
-			this.bonds = new Vector( bondCount );
+			this.bonds = new Vector<Bond>( bondCount );
 		} else {
-			this.bonds = new Vector( );
+			this.bonds = new Vector<Bond>( );
 		}
-		this.bondUniqueness = new Hashtable( ); // Ensure Bonds are unique.
-		this.atomToBonds = new Hashtable( );    // All Bonds connected to each Atom.
+		this.bondUniqueness = new HashSet<Bond>( ); // Ensure Bonds are unique.
+		this.atomToBonds = new Hashtable<Atom, Vector<Bond>>( );    // All Bonds connected to each Atom.
 
 		// All Chains in the Stucture.
-		this.chains = new Vector( );
-		this.chainById = new Hashtable( ); // Chains by atom.chain_id.
+		this.chains = new Vector<Chain>( );
+		this.chainById = new Hashtable<String, Chain>( ); // Chains by atom.chain_id.
 
 		// All Fragments in the Stucture.
-		this.fragments = new Vector( );
+		this.fragments = new Vector<Fragment>( );
 
 		//
 		// Process the Structure to populate this map.
@@ -602,6 +602,8 @@ public class StructureMap
 			this.generateFragments( );
 			this.extractLigands( );
 			this.generateBonds( );
+								// Debugging tip: This is a good place to isolate problems - comment out
+								// a function or two to see where the problems lie
 		}
 		else if ( residueCount > 0 )
 		{
@@ -644,7 +646,7 @@ public class StructureMap
 			}
 
 			boolean newChain = false;
-			Chain chain = (Chain) this.chainById.get( atom.chain_id );
+			Chain chain = this.chainById.get( atom.chain_id );
 			if ( chain == null )
 			{
 				chain = new Chain( );
@@ -655,7 +657,7 @@ public class StructureMap
 			}
 
 			final String chainAndResidueId = atom.chain_id + atom.residue_id;
-			Residue residue = (Residue) this.residueByChainAndResidueId.get( chainAndResidueId );
+			Residue residue = this.residueByChainAndResidueId.get( chainAndResidueId );
 			if ( residue == null )
 			{
 				residue = new Residue( );
@@ -856,7 +858,7 @@ public class StructureMap
 		final int chainCount = this.getChainCount( );
 		for ( int c=0; c<chainCount; c++ )
 		{
-			final Chain chain = (Chain) this.chains.elementAt( c );
+			final Chain chain = this.chains.elementAt( c );
 			final int residueCount = chain.getResidueCount( );
 			chain.setFragment( 0, residueCount-1, Conformation.TYPE_UNDEFINED );
 		}
@@ -880,10 +882,10 @@ public class StructureMap
 			if ( conformation.start_chain.length() > 0 ) {
 				chain_id = conformation.start_chain;
 			}
-			final Chain chain = (Chain) this.chainById.get( chain_id );
+			final Chain chain = this.chainById.get( chain_id );
 
 			final String res = chain_id + conformation.start_residue;
-			final Residue startResidue = (Residue) this.residueByChainAndResidueId.get( res );
+			final Residue startResidue = this.residueByChainAndResidueId.get( res );
 			if ( startResidue == null ) {
 				continue;
 			}
@@ -918,10 +920,10 @@ public class StructureMap
 			if ( conformation.start_chain.length() > 0 ) {
 				chain_id = conformation.start_chain;
 			}
-			final Chain chain = (Chain) this.chainById.get( chain_id );
+			final Chain chain = this.chainById.get( chain_id );
 
 			final String res = chain_id + conformation.start_residue;
-			final Residue startResidue = (Residue) this.residueByChainAndResidueId.get( res );
+			final Residue startResidue = this.residueByChainAndResidueId.get( res );
 			if ( startResidue == null ) {
 				continue;
 			}
@@ -956,10 +958,10 @@ public class StructureMap
 			if ( conformation.start_chain.length() > 0 ) {
 				chain_id = conformation.start_chain;
 			}
-			final Chain chain = (Chain) this.chainById.get( chain_id );
+			final Chain chain = this.chainById.get( chain_id );
 
 			final String res = chain_id + conformation.start_residue;
-			final Residue startResidue = (Residue) this.residueByChainAndResidueId.get( res );
+			final Residue startResidue = this.residueByChainAndResidueId.get( res );
 			if ( startResidue == null ) {
 				continue;
 			}
@@ -994,10 +996,10 @@ public class StructureMap
 			if ( conformation.start_chain.length() > 0 ) {
 				chain_id = conformation.start_chain;
 			}
-			final Chain chain = (Chain) this.chainById.get( chain_id );
+			final Chain chain = this.chainById.get( chain_id );
 
 			final String res = chain_id + conformation.start_residue;
-			final Residue startResidue = (Residue) this.residueByChainAndResidueId.get( res );
+			final Residue startResidue = this.residueByChainAndResidueId.get( res );
 			if ( startResidue == null ) {
 				continue;
 			}
@@ -1027,7 +1029,7 @@ public class StructureMap
 
 		for ( int c=0; c<chainCount; c++ )
 		{
-			final Chain chain = (Chain) this.chains.elementAt( c );
+			final Chain chain = this.chains.elementAt( c );
 			final int residueCount = chain.getResidueCount( );
 
 			// Skip chains that have no real fragments and <2 residues.
@@ -1278,7 +1280,7 @@ public class StructureMap
 		final int residueCount = this.residues.size();
 		for ( int r=0; r<residueCount; r++ )
 		{
-			final Residue residue = (Residue) this.residues.elementAt( r );
+			final Residue residue = this.residues.elementAt( r );
 			final String classification = residue.getClassification( );
 			if ( classification == Residue.COMPOUND_LIGAND ) {
 				this.ligands.add( residue );
@@ -1358,12 +1360,12 @@ public class StructureMap
 	 *  the vector contains only references to the exsting Atom objects).
 	 *  <P>
 	 */
-	public Vector getAtoms( )
+	public Vector<Atom> getAtoms( )
 	{
 		if ( this.atoms == null ) {
 			return null;
 		}
-		return new Vector( this.atoms );
+		return new Vector<Atom>( this.atoms );
 	}
 
 	/**
@@ -1375,7 +1377,7 @@ public class StructureMap
 		if ( this.atoms == null ) {
 			return null;
 		}
-		return (Atom) this.atoms.elementAt( atomIndex );
+		return this.atoms.elementAt( atomIndex );
 	}
 
 
@@ -1398,7 +1400,7 @@ public class StructureMap
 		while ( low <= high )
 		{
 			final int mid = (low + high) / 2;
-			Atom atom2 = (Atom) this.atoms.elementAt( mid );
+			Atom atom2 = this.atoms.elementAt( mid );
 
 			// If the atom matches, return the index.
 			if ( atom == atom2 )
@@ -1416,7 +1418,7 @@ public class StructureMap
 						// do a linear search of the residue
 						for ( int a=low; a<=high; a++ )
 						{
-							atom2 = (Atom) this.atoms.elementAt( a );
+							atom2 = this.atoms.elementAt( a );
 							if ( atom == atom2 ) {
 								return a;
 							}
@@ -1450,7 +1452,7 @@ public class StructureMap
 		final int atomCount = this.atoms.size();
 		for ( int a=0; a<atomCount; a++ )
 		{
-			final Atom atom2 = (Atom) this.atoms.elementAt( a );
+			final Atom atom2 = this.atoms.elementAt( a );
 			if ( atom == atom2 ) {
 				return a;
 			}
@@ -1476,7 +1478,7 @@ public class StructureMap
 
 		final String chainAndResidue = atom.chain_id + atom.residue_id;
 
-		return (Residue) this.residueByChainAndResidueId.get( chainAndResidue );
+		return this.residueByChainAndResidueId.get( chainAndResidue );
 	}
 
 
@@ -1497,7 +1499,7 @@ public class StructureMap
 		}
 
 		final String chainAndResidue = chainId + residueId;
-		return (Residue) this.residueByChainAndResidueId.get( chainAndResidue );
+		return this.residueByChainAndResidueId.get( chainAndResidue );
 	}
 
 
@@ -1514,7 +1516,7 @@ public class StructureMap
 			return null;
 		}
 
-		return (Chain) this.chainById.get( atom.chain_id );
+		return this.chainById.get( atom.chain_id );
 	}
 
 	/**
@@ -1530,7 +1532,7 @@ public class StructureMap
 			return null;
 		}
 
-		return (Chain) this.chainById.get( chainId );
+		return this.chainById.get( chainId );
 	}
 
 	/**
@@ -1547,7 +1549,7 @@ public class StructureMap
 	 */
 	public Bond getBond( final int bondIndex )
 	{
-		return (Bond) this.bonds.elementAt( bondIndex );
+		return this.bonds.elementAt( bondIndex );
 	}
 
 
@@ -1628,18 +1630,17 @@ public class StructureMap
 		}
 
 		// Make sure Bond is unique (note: Bond has custom hashCode method)
-		if ( this.bondUniqueness.put( bond, bond ) != null ) {
+		if ( bondUniqueness.contains( bond ))
 			return;
-		}
 
 		// Keep track of the atom-to-bonds relationship.
 		for ( int a=0; a<=1; a++ )  // Examine both atoms of the bond
 		{
 			final Atom atom = bond.getAtom( a );
-			Vector atomBonds = (Vector) this.atomToBonds.get( atom );
+			Vector<Bond> atomBonds = this.atomToBonds.get( atom );
 			if ( atomBonds == null )
 			{
-				atomBonds = new Vector( );
+				atomBonds = new Vector<Bond>( );
 				this.atomToBonds.put( atom, atomBonds );
 			}
 			atomBonds.add( bond );
@@ -1694,7 +1695,7 @@ public class StructureMap
 	 *  Add a vector of Bond objects to the StructureMap.
 	 *  <P>
 	 */
-	public void addBonds( final Vector bondVector )
+	public void addBonds( final Vector<Bond> bondVector )
 	{
 		if ( bondVector == null ) {
 			return;
@@ -1702,7 +1703,7 @@ public class StructureMap
 		final int bvCount = bondVector.size( );
 		for ( int i=0; i<bvCount; i++ )
 		{
-			this.addBond( (Bond) bondVector.elementAt( i ) );
+			this.addBond( bondVector.elementAt( i ) );
 		}
 	}
 
@@ -1728,7 +1729,7 @@ public class StructureMap
 		if ( bondIndex < 0 ) {
 			return;
 		}
-		final Bond bond = (Bond) this.bonds.elementAt( bondIndex );
+		final Bond bond = this.bonds.elementAt( bondIndex );
 		if ( bond == null ) {
 			return;
 		}
@@ -1742,7 +1743,7 @@ public class StructureMap
 		for ( int a=0; a<=1; a++ )  // Examine both atoms of the bond
 		{
 			final Atom atom = bond.getAtom( a );
-			final Vector atomBonds = (Vector) this.atomToBonds.get( atom );
+			final Vector<Bond> atomBonds = atomToBonds.get( atom );
 			// Does the atom have any Bond objects connected to it?
 			if ( atomBonds != null )
 			{
@@ -1773,43 +1774,40 @@ public class StructureMap
 	 *  so DO NOT MODIFY THE VECTOR!
 	 *  <P>
 	 */
-	public Vector getBonds( final Atom atom )
+	public Vector<Bond> getBonds( final Atom atom )
 	{
-		return (Vector) this.atomToBonds.get( atom );
+		return atomToBonds.get( atom );
 	}
 
 	/**
 	 *  Return a Vector of all Bond objects connected to the given Atom objects.
 	 *  <P>
 	 */
-	public Vector getBonds( final Vector atomVector )
+	public Vector<Bond> getBonds( final Vector<Atom> atomVector )
 	{
-		final Hashtable uniqueBonds = new Hashtable( );
+		final Set<Bond> uniqueBonds = new HashSet<Bond>( );
 
 		final int atomCount = atomVector.size( );
 		for ( int a=0; a<atomCount; a++ )
 		{
-			final Atom atom = (Atom) atomVector.elementAt( a );
-			final Vector aBonds = this.getBonds( atom );
+			final Atom atom = atomVector.elementAt( a );
+			final Vector<Bond> aBonds = this.getBonds( atom );
 			if ( aBonds != null )
 			{
 				final int bondCount = aBonds.size( );
 				for ( int b=0; b<bondCount; b++ )
 				{
-					final Bond bond = (Bond) aBonds.elementAt( b );
-					uniqueBonds.put( bond, bond );
+					final Bond bond = aBonds.elementAt( b );
+					uniqueBonds.add( bond );
 				}
 			}
 		}
 
 		final int uniqueBondCount = uniqueBonds.size();
-		final Vector atomBonds = new Vector( uniqueBondCount );
+		final Vector<Bond> atomBonds = new Vector<Bond>( uniqueBondCount );
 
-		final Enumeration bondEnum = uniqueBonds.keys( );
-		while ( bondEnum.hasMoreElements() )
-		{
-			atomBonds.add( bondEnum.nextElement() );
-		}
+		for (Bond uniqueBond : uniqueBonds)
+			atomBonds.add( uniqueBond );
 
 		return atomBonds;
 	}
@@ -1927,7 +1925,7 @@ public class StructureMap
 		if ( this.ligands == null ) {
 			return null;
 		}
-		return (Residue) this.ligands.elementAt( ligandIndex );
+		return this.ligands.elementAt( ligandIndex );
 	}
 
 	/**
@@ -1950,7 +1948,7 @@ public class StructureMap
 		if ( this.residues == null ) {
 			return null;
 		}
-		return (Residue) this.residues.elementAt( residueIndex );
+		return this.residues.elementAt( residueIndex );
 	}
 
 	/**
@@ -1973,7 +1971,7 @@ public class StructureMap
 		while ( low <= high )
 		{
 			final int mid = (low + high) / 2;
-			final Residue residue2 = (Residue) this.residues.elementAt( mid );
+			final Residue residue2 = this.residues.elementAt( mid );
 
 			// If the residue matches, return the index.
 			if ( residue == residue2 )
@@ -2026,7 +2024,7 @@ public class StructureMap
 		final int residueCount = this.residues.size();
 		for ( int i=0; i<residueCount; i++ )
 		{
-			final Residue residue2 = (Residue) this.residues.elementAt( i );
+			final Residue residue2 = this.residues.elementAt( i );
 			if ( residue == residue2 ) {
 				return i;
 			}
@@ -2056,7 +2054,7 @@ public class StructureMap
 		if ( this.fragments == null ) {
 			return null;
 		}
-		return (Fragment) this.fragments.elementAt( fragmentIndex );
+		return this.fragments.elementAt( fragmentIndex );
 	}
 
 	/**
@@ -2075,7 +2073,7 @@ public class StructureMap
 		final int fragmentCount = this.fragments.size( );
 		for ( int f=0; f<fragmentCount; f++ )
 		{
-			final Fragment fragment2 = (Fragment) this.fragments.elementAt( f );
+			final Fragment fragment2 = this.fragments.elementAt( f );
 			if ( fragment2 == fragment ) {
 				return f;
 			}
@@ -2111,7 +2109,7 @@ public class StructureMap
 	/**
 	 * Return the chains from the Structure.
 	 */
-	public Vector getChains( )
+	public Vector<Chain> getChains( )
 	{
 		return this.chains;
 	}
@@ -2213,11 +2211,14 @@ public class StructureMap
 	/**
 	 * Return the StructureComponent parent objects.
 	 * Atom->Residue->Fragment->Chain->Structure->null, or,
-	 * Bond->{Atom,Atom}->null, or,
-	 * null.
+	 * Bond->{Atom,Atom}->null, or null
+	 * 
+	 * Typing complication - would like to return an array of
+	 * 'StructureComponent' types, but this can return 'Structure',
+	 * as well, which does not derive from 'StructureComponent'.
 	 * <P>
 	 */
-	public Vector getParents( final Object object )
+	public Vector<Object> getParents( final Object object )
 	{
 		if ( object == null ) {
 			return null;
@@ -2233,34 +2234,34 @@ public class StructureMap
 
 		final StructureComponent sc = (StructureComponent) object;
 		final String type = sc.getStructureComponentType( );
-		Vector parents = null;
+		Vector<Object> parents = null;
 
 		if ( type == StructureComponentRegistry.TYPE_ATOM )
 		{
-			parents = new Vector( );
+			parents = new Vector<Object>( );
 			parents.add( this.getResidue( (Atom) sc ) );
 		}
 		else if ( type == StructureComponentRegistry.TYPE_BOND )
 		{
-			parents = new Vector( );
+			parents = new Vector<Object>( );
 			final Bond bond = (Bond) sc;
 			parents.add( bond.getAtom(0) );
 			parents.add( bond.getAtom(1) );
 		}
 		else if ( type == StructureComponentRegistry.TYPE_RESIDUE )
 		{
-			parents = new Vector( );
+			parents = new Vector<Object>( );
 			parents.add( ((Residue)sc).getFragment() );
 		}
 		else if ( type == StructureComponentRegistry.TYPE_FRAGMENT )
 		{
-			parents = new Vector( );
+			parents = new Vector<Object>( );
 			parents.add( ((Fragment)sc).getChain() );
 		}
 		else if ( type == StructureComponentRegistry.TYPE_CHAIN )
 		{
-			parents = new Vector( );
-			parents.add( this.structure );
+			parents = new Vector<Object>( );
+			parents.add( structure );
 		}
 
 		return parents;
@@ -2273,14 +2274,14 @@ public class StructureMap
 	 * Bond->null.
 	 * <P>
 	 */
-	public Vector getChildren( final Object object )
+	public Vector<?> getChildren( final Object object )
 	{
 		if ( object == null ) {
 			return null;
 		}
 
 		if ( object instanceof Structure ) {
-			return this.getChains( );
+			return getChains( );
 		}
 
 		if ( ! (object instanceof StructureComponent) ) {
@@ -2411,9 +2412,9 @@ public class StructureMap
          *      value: Vector residues <= Residue
          *  }
          */
-        final TreeMap byPdbId = new TreeMap();
-        final Vector waterResidues = new Vector();
-        final Vector nonProteinResidues = new Vector();
+        final TreeMap<String, Vector<Residue>> byPdbId = new TreeMap<String, Vector<Residue>>();
+        final Vector<Residue> waterResidues = new Vector<Residue>();
+        final Vector<Residue> nonProteinResidues = new Vector<Residue>();
         
         for(int i = this.getResidueCount() - 1; i >= 0; i--) {
             final Residue r = this.getResidue(i);
@@ -2431,29 +2432,26 @@ public class StructureMap
                 continue;
             }
             
-            Vector residues = (Vector)byPdbId.get(pdbChainId);
+            Vector<Residue> residues = byPdbId.get(pdbChainId);
             if(residues == null) {
-                residues = new Vector();
+                residues = new Vector<Residue>();
                 byPdbId.put(pdbChainId, residues);
             }
             
             residues.add(r);
         }
         
-        this.pdbTopLevelElements = new Vector();
+        pdbTopLevelElements = new Vector<StructureComponent>();
         
-        final Comparator residueComparitor = new Comparator() {
-            public int compare(Object o1, Object o2) {
-                return ((Residue)o1).getResidueId() - ((Residue)o2).getResidueId();
+        final Comparator<Residue> residueComparitor = new Comparator<Residue>() {
+            public int compare(Residue r1, Residue r2) {
+                return (r1.getResidueId() - r2.getResidueId());
             }
         };
         
-        final Iterator keyIt = byPdbId.keySet().iterator();
-        final Iterator valIt = byPdbId.values().iterator();
-        while(keyIt.hasNext()) {
-            final String pdbId = (String)keyIt.next();
-            final Vector residues = (Vector)valIt.next();
-            
+        for (String pdbId : byPdbId.keySet())
+        {
+        	Vector<Residue> residues = byPdbId.get(pdbId);
             if(pdbId != null && pdbId.length() != 0) {
                 final PdbChain c = new PdbChain();
                 c.pdbChainId = pdbId;
@@ -2463,13 +2461,11 @@ public class StructureMap
                 
                 Collections.sort(residues, residueComparitor);
                 residues.trimToSize();
-            } else {
-                final Iterator resIt = residues.iterator();
-                while(resIt.hasNext()) {
-                    final Residue r = (Residue)resIt.next();
-                    this.pdbTopLevelElements.add(r);
-                }
             }
+            
+            else
+                for (Residue r : residues)
+                    this.pdbTopLevelElements.add(r);
         }
         
         Collections.sort(waterResidues, residueComparitor);
@@ -2499,7 +2495,7 @@ public class StructureMap
      * @return Returns the nonproteinChainIds.
      */
     public boolean isNonproteinChainId( final String chainId) {
-        return this.nonproteinChainIds.containsKey(chainId);
+        return this.nonproteinChainIds.contains(chainId);
     }
 
 
@@ -2511,16 +2507,16 @@ public class StructureMap
     		return;
     	}
     	
-        this.nonproteinChainIds = new HashMap();
+        this.nonproteinChainIds = new HashSet<String>();
         for(int i = 0; i < nonproteinChainIds.length; i++) {
-            this.nonproteinChainIds.put(nonproteinChainIds[i], null);
+            this.nonproteinChainIds.add(nonproteinChainIds[i]);
         }
     }
     
-    public StructureComponent getTopPdbComponent(final Residue r) {
-		final Iterator it = this.pdbTopLevelElements.iterator();
-		while(it.hasNext()) {
-			final StructureComponent next = (StructureComponent)it.next();
+    public StructureComponent getTopPdbComponent(final Residue r)
+    {
+		for (StructureComponent next : pdbTopLevelElements)
+		{
 			if(next instanceof PdbChain) {
 				final PdbChain next_ = (PdbChain)next;
 				if(next_.contains(r)) {
@@ -2550,11 +2546,11 @@ public class StructureMap
 		this.pdbId = pdbId;
 	}
 
-	public Vector getPdbTopLevelElements() {
+	public Vector<StructureComponent> getPdbTopLevelElements() {
 		return this.pdbTopLevelElements;
 	}
 
-	public void setPdbTopLevelElements(final Vector pdbTopLevelElements) {
+	public void setPdbTopLevelElements(final Vector<StructureComponent> pdbTopLevelElements) {
 		this.pdbTopLevelElements = pdbTopLevelElements;
 	}
 

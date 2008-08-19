@@ -148,7 +148,7 @@ public class BondFactory
 	 *  using the default covalentBondLimit as the cut-off distance.
 	 *  <P>
 	 */
-	public static Vector generateBonds( final Structure structure )
+	public static Vector<Bond> generateBonds( final Structure structure )
 	{
 		return BondFactory.generateBonds( structure, BondFactory.covalentBondLimit);
 	}
@@ -159,7 +159,7 @@ public class BondFactory
 	 *  The algorithm uses fixed-size cells to "bucket" the atom neighbors.
 	 *  <P>
 	 */
-	public static Vector generateBonds( final Structure structure, final float bondLimit)
+	public static Vector<Bond> generateBonds( final Structure structure, final float bondLimit)
 	{
 		final double coordinateBounds[][] =
 			AtomStats.getAtomCoordinateBounds( structure );
@@ -233,7 +233,7 @@ public class BondFactory
 		// Extract the bonds.
 		//
 
-		final Vector bondList = new Vector( );
+		final Vector<Bond> bondList = new Vector<Bond>( );
 
 		for ( int i=0; i<atomCount; i++ )
 		{
@@ -302,9 +302,9 @@ public class BondFactory
 	 *  The algorithm uses an octree to find atom neighbors.
 	 *  <P>
 	 */
-	public static Vector generateBonds( final Vector atoms, final float cutOffDistance, final boolean useCovalentRestrictions )
+	public static Vector<Bond> generateBonds( final Vector<Atom> atoms, final float cutOffDistance, final boolean useCovalentRestrictions )
 	{
-		Vector result = null;
+		Vector<Bond> result = null;
 
 		// Create an octree and and populate it with Atom coordinates.
 		try
@@ -379,7 +379,7 @@ public class BondFactory
 	 *  The algorithm uses an octree to find atom neighbors.
 	 *  <P>
 	 */
-	public static Vector generateCovalentBonds( final Vector atoms )
+	public static Vector<Bond> generateCovalentBonds( final Vector<Atom> atoms )
 	{
 		return BondFactory.generateBonds( atoms, BondFactory.covalentBondLimit, true );
 	}

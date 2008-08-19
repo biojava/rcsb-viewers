@@ -146,11 +146,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.Vector;
 
 import javax.media.opengl.DebugGL;
@@ -172,7 +172,6 @@ import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Fragment;
-import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
@@ -231,39 +230,19 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 	GLAutoDrawable drawable = null;
 
-	public List renderablesToDestroy = Collections
-			.synchronizedList(new Vector());
+	public List<DisplayListRenderable> renderablesToDestroy = Collections.synchronizedList(new ArrayList<DisplayListRenderable>());
 
-	public List simpleDisplayListsToDestroy = Collections
-			.synchronizedList(new Vector());
+	public List<Integer> simpleDisplayListsToDestroy = Collections.synchronizedList(new ArrayList<Integer>());
 
 	// Default geometry for new Renderables defaultGeometry{scType} = Geometry
-	public static Hashtable defaultGeometry = new Hashtable();
+	public static Hashtable<String, DisplayListGeometry> defaultGeometry = new Hashtable<String, DisplayListGeometry>();
 
 	// Mouse state
 	protected int prevMouseX, prevMouseY;
 
-	private final TreeMap pickedItemsMap = new TreeMap();
-
-	// Picking
 	private ByteBuffer rgbaBuffer = null;
 
 	private final Color3b tempColor = new Color3b();
-
-	// private final int PICK_BUFFER_SIZE = 256;
-
-	// private final double pickSize[] = { 1.0, 1.0 };
-
-	private final GvPickEvent pickEvent = new GvPickEvent();
-
-	// Viewing and camera state
-	// private final double viewEye[] = { 0.0f, 0.0f, 1.0f };
-	//
-	// private final double viewCenter[] = { 0.0f, 0.0f, 0.0f };
-	//
-	// private final double viewUp[] = { 0.0f, 1.0f, 0.0f };
-	//
-	// private final double rotationCenter[] = { 0.0f, 0.0f, 0.0f };
 
 	private final int viewport[] = new int[4];
 
@@ -639,6 +618,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		this.glCapabilities.setSampleBuffers(true);
 
 		this.glCanvas = new GLCanvas(this.glCapabilities) {
+			private static final long serialVersionUID = 293707014622741877L;
+
 			@Override
 			public void addNotify() {
 				super.setVisible(true);
@@ -657,6 +638,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		// If not used, the glCanvas causes the JSplitPane to resize strangely.
 		// Not sure why the bug occurs or why this fixes it.
 		final JPanel wrapperPanel = new JPanel() {
+			private static final long serialVersionUID = 7973626073594754645L;
+
 			{
 				this.setLayout(new BorderLayout());
 				this.setMinimumSize(new Dimension(100, 100));
@@ -1109,15 +1092,10 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			 * be displayed."); } }
 			 */
 
-			final Iterator renderablesToDestroyIt = this.renderablesToDestroy
-					.iterator();
-			while (renderablesToDestroyIt.hasNext())
-			{
-				final DisplayListRenderable renderable = (DisplayListRenderable) renderablesToDestroyIt
-						.next();
+			for (DisplayListRenderable renderable : renderablesToDestroy)
 				renderable.destroy(gl, glu, glut);
-			}
-			this.renderablesToDestroy.clear();
+
+			renderablesToDestroy.clear();
 		}
 
 		synchronized (this.simpleDisplayListsToDestroy)
@@ -1130,13 +1108,9 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			 * renderables. " + this.renderables.size() + " renderables still to
 			 * be displayed."); } }
 			 */
-
-			final Iterator displayListsToDestroyIt = this.simpleDisplayListsToDestroy.iterator();
-			while (displayListsToDestroyIt.hasNext())
-			{
-				final Integer list = (Integer) displayListsToDestroyIt.next();
+			for (Integer list : simpleDisplayListsToDestroy)
 				gl.glDeleteLists(list.intValue(), 1);
-			}
+
 			this.simpleDisplayListsToDestroy.clear();
 		}
 
@@ -1816,11 +1790,6 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				v3d[1] = this.viewCenter[1] - this.viewEye[1];
 				v3d[2] = this.viewCenter[2] - this.viewEye[2];
 	
-				final double length = Algebra.vectorLength(v3d); // Get
-				// length
-				// before
-				// normalize!
-	
 				Algebra.normalizeVector(v3d);
 	
 				// Compute a deltaZ that provides a nice motion speed,
@@ -1860,10 +1829,6 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				v3d2[0] = this.viewCenter[0] - this.viewEye[0];
 				v3d2[1] = this.viewCenter[1] - this.viewEye[1];
 				v3d2[2] = this.viewCenter[2] - this.viewEye[2];
-				final double length = Algebra.vectorLength(v3d2); // Get
-				// length
-				// before
-				// norm!
 				Algebra.normalizeVector(v3d2);
 	
 				// Compute left-right direction vector (v3d2 x viewUp).
@@ -1928,7 +1893,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			this.requestRepaint();
 	}
 
-	private final Vector pickListeners = new Vector();
+	private final ArrayList<GvPickEventListener> pickListeners = new ArrayList<GvPickEventListener>();
 
 	/**
 	 * Add a pick event listener.
@@ -1956,13 +1921,10 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	/**
 	 * Fire a pick event to all listeners.
 	 */
-	public void firePickEvent(final GvPickEvent pickEvent) {
-		final int count = this.pickListeners.size();
-		for (int i = 0; i < count; i++) {
-			final GvPickEventListener listener = (GvPickEventListener) this.pickListeners
-					.elementAt(i);
+	public void firePickEvent(final GvPickEvent pickEvent)
+	{
+		for (GvPickEventListener listener : pickListeners)
 			listener.processPickEvent(pickEvent);
-		}
 
 		this.requestRepaint();
 	}
