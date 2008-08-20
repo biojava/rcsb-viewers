@@ -718,9 +718,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	 * GLEventListener interface - init method: Initialize the GlGeometryViewer
 	 * class.
 	 */
-	public void init(final GLAutoDrawable drawable) {
-		System.err.println("GlGeometryViewer.init");
-
+	public void init(final GLAutoDrawable drawable)
+	{
 		this.drawable = drawable;
 
 		drawable.setGL(new DebugGL(drawable.getGL()));
@@ -814,7 +813,6 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			final double w = width;
 			final double h = height;
 
-			System.err.println("GlGeometryViewer.reshape");
 			final GL gl = drawable.getGL();
 
 			gl.glGetIntegerv(GL.GL_VIEWPORT, this.viewport, 0);
@@ -1160,7 +1158,6 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				{
 					gl.glUseProgram(0);
 					GlGeometryViewer.currentProgram = 0;
-					System.err.println("Shader turned off for picking");
 				}
 				
 			}
@@ -1192,7 +1189,6 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 					{
 						gl.glUseProgram(GlGeometryViewer.shaderProgram);
 						GlGeometryViewer.currentProgram = GlGeometryViewer.shaderProgram;
-						System.err.println("Shader turned on for rendering");
 					}
 
 					// if one or more steps for creating the shader failed,
@@ -1254,10 +1250,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				// pick cycles do not need to finish, and paints get
 				// priority.
 				if (isPick && !continuePick)
-				{
-					System.err.println("Pick interrupted.");
 					return;
-				}
+
 				// gl.glFlush();
 			}
 		}
@@ -1325,6 +1319,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			System.err.flush();
 		}
 
+/* ** DEBUGGING - Compute and output frames per second
 		//
 		// Compute frames per second.
 		//
@@ -1342,6 +1337,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		// }
 		// System.out.println("Extrusion vertex count: " +
 		// Extrusion.VERTEX_COUNT);
+* **/
 	}
 
 	// private boolean resizeFinished = false;
@@ -1526,9 +1522,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	 * GLEventListener interface - displayChanged method:
 	 */
 	public void displayChanged(final GLAutoDrawable drawable,
-			final boolean modeChanged, final boolean deviceChanged) {
-		System.err.println("GlGeometryViewer.displayChanged");
-
+			final boolean modeChanged, final boolean deviceChanged)
+	{
 		// the new display's driver may not support shaders. Not likely, but
 		// possible.		
 		checkSetShaderSupport();
@@ -2284,10 +2279,13 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		buf.rewind();
 		gl.glGetShaderiv(GlGeometryViewer.vertexShader, GL.GL_COMPILE_STATUS, buf);
 		final int status = buf.get(0);
+
+/* ** DEBUGGING - output shader information
 		System.err.println("Vertex shader creation...");
 		System.err.println("\tstatus: " + (status == GL.GL_TRUE));
 		System.err.println("\tlog length: " + logLength + "\n");
 		System.err.println("Log:");
+* **/
 
 		logLength += 10;
 
@@ -2299,8 +2297,11 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		for (int i = 0; i < length[0]; i++) {
 			s.append((char) bufArray[i]);
 		}
+		
 		final String log = s.toString();
+/* ** DEBUGGING - output shader information
 		System.err.println(log + "\n-------------------\n");
+* **/
 
 		// if the shader was not created, or if it would be run in software,
 		// bail.
@@ -2338,17 +2339,18 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		buf.rewind();
 		gl.glGetShaderiv(GlGeometryViewer.fragmentShader, GL.GL_COMPILE_STATUS, buf);
 		final int status = buf.get(0);
+/* ** DEBUGGING - output fragment shader informaiton
 		System.err.println("Fragment shader creation...");
 		System.err.println("\tstatus: " + (status == GL.GL_TRUE));
 		System.err.println("\tlog length: " + logLength + "\n");
 		System.err.println("Log:");
+* **/
 
 		logLength += 10;
 
 		final int[] length = new int[1];
 		final byte[] bufArray = new byte[logLength];
-		gl
-				.glGetShaderInfoLog(GlGeometryViewer.fragmentShader, logLength, length, 0,
+		gl.glGetShaderInfoLog(GlGeometryViewer.fragmentShader, logLength, length, 0,
 						bufArray, 0);
 
 		final StringBuffer s = new StringBuffer();
@@ -2356,7 +2358,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			s.append((char) bufArray[i]);
 		}
 		final String log = s.toString();
-		System.err.println(log + "\n-------------------\n");
+// DEBUGGING		System.err.println(log + "\n-------------------\n");
 
 		// if the shader was not created, or if it would be run in software,
 		// bail.
@@ -2392,10 +2394,12 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		buf.rewind();
 		gl.glGetProgramiv(GlGeometryViewer.shaderProgram, GL.GL_LINK_STATUS, buf);
 		final int status = buf.get(0);
+/* ** DEBUGGING - output shader program information
 		System.err.println("Shader program creation...");
 		System.err.println("\tstatus: " + (status == GL.GL_TRUE));
 		System.err.println("\tlog length: " + logLength + "\n");
 		System.err.println("Log:");
+* **/
 
 		logLength += 10;
 
@@ -2410,7 +2414,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			s.append((char) bufArray[i]);
 		}
 		final String log = s.toString();
-		System.err.println(log + "\n-------------------\n");
+// DEBUGGING		System.err.println(log + "\n-------------------\n");
 
 		// if the shader was not created, or if it would be run in software,
 		// bail.
