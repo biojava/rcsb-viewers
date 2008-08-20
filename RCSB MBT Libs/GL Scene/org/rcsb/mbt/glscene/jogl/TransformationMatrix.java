@@ -887,28 +887,31 @@ public class TransformationMatrix {
 		this.printMatrix(fullSymmetryOperation);
 	}
 
-	public void printMatrix(final String fullSymmetryOperation) {
-		System.err
-				.println("Generated transformation matrix from full symmetry "
+	public void printMatrix(final String fullSymmetryOperation)
+	{
+/* ** DEBUGGING - printMatrix
+		System.err.println("Generated transformation matrix from full symmetry "
 						+ fullSymmetryOperation + ", chain id "
 						+ this.ndbChainId + ": ");
-		for (int row = 0; row < 4; row++) {
-			for (int column = 0; column < 4; column++) {
+		
+		for (int row = 0; row < 4; row++)
+		{
+			for (int column = 0; column < 4; column++)
 				System.err.print(this.transformationMatrix
 						.get(column * 4 + row)
 						+ "\t");
-			}
+
 			System.err.println();
 		}
 		System.err.println();
+* **/
 	}
 
 	public void init() {
-		if (this.transformationMatrix == null) {
+		if (this.transformationMatrix == null)
 			this.transformationMatrix = BufferUtil.newFloatBuffer(16);
-		} else {
+		else
 			this.transformationMatrix.rewind();
-		}
 	}
 
 	private static final IntReference tmpReference = new IntReference();
