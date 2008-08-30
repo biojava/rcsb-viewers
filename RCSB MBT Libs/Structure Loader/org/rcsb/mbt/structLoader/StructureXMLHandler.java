@@ -646,8 +646,12 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureXML
    protected class XMLRunnable__code__End extends XMLRunnable
    {
 		public void run() {
-			final String trim = buf.trim();			
-			currentBUTransform.code = trim;
+			final String trim = buf.trim();
+			
+			if (getCurrentParsingFlag() == eIsParsing.LEGACY_BIOLOGIC_UNIT_OPERATIONS)
+				currentBUTransform.code = trim;
+			else if (getCurrentParsingFlag() == eIsParsing.NON_CRYSTALLOGRAPHIC_OPERATIONS)
+				currentNcsTranslation.code = trim;
 		}
    }
    protected XMLRunnable__code__End createXMLRunnable__code__End() { return new XMLRunnable__code__End(); }
