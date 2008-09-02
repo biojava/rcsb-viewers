@@ -211,14 +211,13 @@ public class SceneController implements GvPickEventListener, IUpdateListener
 		for(Structure s : AppBase.sgetModel().getStructures())
 		{
 			final StructureMap sm = s.getStructureMap();
-			int chainCount = 0;
+			int chainCount = sm.getChainCount();
 			BiologicalUnitGenerationMapByChain transformMatricesMap = null;
 			TransformationList globalTransforms = null;
 			
 			if (sm.hasBiologicUnitTransforms())
 			{
 				final BiologicUnitTransforms bu = s.getStructureMap().getBiologicUnitTransforms();
-				chainCount = sm.getChainCount();
 				transformMatricesMap = bu.getBiologicalUnitGenerationMatricesByChain();
 				globalTransforms = bu.getBiologicalUnitGenerationMatrixVector();
 			}
