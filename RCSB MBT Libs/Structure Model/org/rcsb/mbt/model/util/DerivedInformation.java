@@ -1947,7 +1947,7 @@ public class DerivedInformation implements IUpdateListener
 	 * 
 	 * @see org.rcsb.mbt.app_controller.IViewUpdateListener#handleModelChangedEvent(org.rcsb.mbt.app_controller.ViewUpdateEvent)
 	 */
-	public void handleUpdateEvent(UpdateEvent evt)
+	public void handleModelChangedEvent(UpdateEvent evt)
 	{
 		if (evt.action == UpdateEvent.Action.CLEAR_ALL ||
 			(evt.action == UpdateEvent.Action.STRUCTURE_REMOVED && evt.structure == structureMap.getStructure()))
