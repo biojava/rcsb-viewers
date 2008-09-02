@@ -203,7 +203,7 @@ public class DerivedInformation implements IUpdateListener
 
 		resCount = this.structureMap.getResidueCount();
 		// char[] ssFlags = null;
-		this.ssFlags = new char[resCount];
+		this.ssFlags = new char[Math.max(resCount, 2)];
 		beta1 = new int[resCount];
 		beta2 = new int[resCount];
 
@@ -1947,7 +1947,7 @@ public class DerivedInformation implements IUpdateListener
 	 * 
 	 * @see org.rcsb.mbt.app_controller.IViewUpdateListener#handleModelChangedEvent(org.rcsb.mbt.app_controller.ViewUpdateEvent)
 	 */
-	public void handleModelChangedEvent(UpdateEvent evt)
+	public void handleUpdateEvent(UpdateEvent evt)
 	{
 		if (evt.action == UpdateEvent.Action.CLEAR_ALL ||
 			(evt.action == UpdateEvent.Action.STRUCTURE_REMOVED && evt.structure == structureMap.getStructure()))
