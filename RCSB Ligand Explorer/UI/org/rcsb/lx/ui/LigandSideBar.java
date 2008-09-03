@@ -291,9 +291,7 @@ public class LigandSideBar extends JPanel implements IUpdateListener
 				catch (final Exception e)
 				{
 					e.printStackTrace();
-					Status
-							.progress(1.0f,
-									"Error while processing your options...Please select different options");
+					Status.progress(100, "Error while processing your options...Please select different options");
 				}
 				// }
 				// };
@@ -757,7 +755,7 @@ public class LigandSideBar extends JPanel implements IUpdateListener
 		return ligandList;
 	}
 
-	public void handleModelChangedEvent(final UpdateEvent evt) 
+	public void handleUpdateEvent(final UpdateEvent evt) 
 	{
 		LXDocumentFrame mainFrame = LigandExplorer.sgetActiveFrame();
 
