@@ -5,6 +5,8 @@ import java.awt.GraphicsConfiguration;
 import java.awt.HeadlessException;
 
 import javax.swing.JFrame;
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import org.rcsb.mbt.controllers.app.AppBase;
@@ -13,27 +15,43 @@ import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.controllers.update.UpdateController;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.StructureModel;
-import org.rcsb.mbt.ui.dialogs.ProgressPanel;
+import org.rcsb.mbt.model.util.Status;
 
 
 /**
+ * <p>
  * We introduce the notion of an 'Document Frame'.  The Document Frame contains a complete
- * document representation, with views (3d view, UI panel) related to that document.
- * 
+ * document representation, with views (3d view, UI panel) related to that document.</p>
+ * <p>
  * Note MDI functionality isn't currently supported - this is just a design implementation
  * with an eye towards facilitating that, should we desire.  Things like the menubar
  * and statusbar creation and maintaince would have to be broken out as makes sense for
- * that kind of architecture.
- * 
+ * that kind of architecture.</p>
+ * <p>
  * In the normal context, this would be the 'MainFrame'.  However, should we wish to support
  * multiple documents in multiple frames (i.e. MS 'MDI' mode, the Active Frame would be derived
- * from an MDI Frame equivalent.
+ * from an MDI Frame equivalent.</p>
  * 
  * @author rickb
  *
  */
 public abstract class DocumentFrameBase extends JFrame
 {
+	private static final long serialVersionUID = 682613576170299667L;
+	private JProgressBar progressBar = null;
+	private ProgressBarRunner progressRunner = null;
+	
+	protected class ProgressBarRunner implements Runnable
+	{		
+		public void run()
+		{
+			progressBar = new JProgressBar();
+			
+			progressBar.setIndeterminate(true);
+			progressBar.setString("");
+		}
+	}
+
 	/**
 	 * This is a swing runnable - it is invoked to build the ActiveFrame UI at the appropriate
 	 * moment.  Derived frames will derive from this, as well, and override 'run()'.
@@ -54,6 +72,7 @@ public abstract class DocumentFrameBase extends JFrame
 			{
 				if (AppBase.getApp().isApplication())
 				{
+					Status.progress(-1, "Creating UI...");
 					//////////////////////////////////////////////////////////////////////
 					setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 				}
@@ -106,12 +125,6 @@ public abstract class DocumentFrameBase extends JFrame
 		if (_updateController == null) _updateController = AppBase.sgetAppModuleFactory().createUpdateController();
 		return _updateController;
 	}
-
-	
-	/**
-	 * Shared progress panel
-	 */
-	protected ProgressPanel progress = null;
 	
 	protected Dimension curSize;
 	
@@ -151,5 +164,15 @@ public abstract class DocumentFrameBase extends JFrame
 	{
 		_showFrame = showFrame;
 		AppBase.sgetAppModuleFactory().createGlGeometryViewer();
+	}
+	
+	public void startProgressBar()
+	{
+		progressRunner = new ProgressBarRunner();
+		SwingUtilities.invokeLater(progressRunner);
+	}
+	
+	public void endProgressBar()
+	{
 	}
 }

@@ -180,7 +180,7 @@ public class PdbStructureLoader
 	// be re-used for the next load request. This is not thread-safe
 	// but there doesn't seem to be any other way to enable an
 	// anonymous class to be handed state (asside from parameters).
-	protected Hashtable passComponents = null;
+	protected Hashtable<String, Vector<StructureComponent>> passComponents = null;
 
 	// Container for any general meta-data that describes the structure.
 	protected StructureInfo structureInfo = null;
@@ -423,17 +423,17 @@ public class PdbStructureLoader
 			return null;
 		}
 		
-		final Vector pdbChainIds = new Vector();
-		final Vector pdbResidueIds = new Vector();
-		final Vector ndbChainIds = new Vector();
-		final Vector ndbResidueIds = new Vector();
+		final Vector<String> pdbChainIds = new Vector<String>();
+		final Vector<String> pdbResidueIds = new Vector<String>();
+		final Vector<String> ndbChainIds = new Vector<String>();
+		final Vector<Object> ndbResidueIds = new Vector<Object>();
 		String previousResidueIdRaw = "";	// the untouched residue id.
 		int previousResidueIdInt = Integer.MIN_VALUE;	// the residue id which was assigned to the Atom.residue_id field
 		int previousResidueIdIntSimple = Integer.MIN_VALUE;	// the simple int conversion of the file's residue id, minus any letters.  
 
 		SharedObjects sharedStrings = new SharedObjects( );
 
-		this.passComponents = new Hashtable( );
+		this.passComponents = new Hashtable<String, Vector<StructureComponent>>( );
 		final long expectedBytes = this.expectedInputBytes;
 		// System.err.println( "PdbStructureLoader.load: expectedBytes = " + expectedBytes );
 
@@ -446,15 +446,15 @@ public class PdbStructureLoader
 			onePercent = 1;
 		}
 		// System.err.println( "PdbStructureLoader.load: onePercent = " + onePercent );
-		float percentDone = 0.0f;
+		int percentDone = 0;
 
 		Status.progress( percentDone, "Loading " + this.urlString );
 
 		// Create a hash for atom numbers that we can use
 		// later if we need to process CONECT records.
 		// We'll free memory when we're done with it.
-		Hashtable atomNumberHash = new Hashtable( );
-		Vector conectRecords = new Vector( );
+		Hashtable<Integer, Atom> atomNumberHash = new Hashtable<Integer, Atom>( );
+		Vector<int[]> conectRecords = new Vector<int[]>( );
 		
 		int linePos = 0;
 		int bytesRead = 0;
@@ -481,7 +481,7 @@ public class PdbStructureLoader
 				readCount++;
 				if ( readCount % onePercent == 0 )
 				{
-					percentDone = (float) bytesRead / (float) expectedBytes;
+					percentDone = (int)((bytesRead * 100L)/ expectedBytes);
 					Status.progress( percentDone, "Loading " + this.urlString );
 				}
 	
@@ -642,11 +642,11 @@ public class PdbStructureLoader
 								atom.bfactor = Float.parseFloat( str );
 							}
 	
-							Vector records = (Vector) this.passComponents.get(
+							Vector<StructureComponent> records = this.passComponents.get(
 								StructureComponentRegistry.TYPE_ATOM );
 							if ( records == null )
 							{
-								records = new Vector( );
+								records = new Vector<StructureComponent>( );
 								this.passComponents.put(
 									StructureComponentRegistry.TYPE_ATOM, records );
 							}
@@ -953,10 +953,6 @@ public class PdbStructureLoader
 							(line[4] == 'L')
 						)
 						{
-							final int modelNumber = Integer.parseInt(
-								(new String( line, 10, 4 )).trim()
-							);
-
 							modelCount++; // How many models have we seen?
 
 							if ( !this.shouldRecordMoreModels(modelCount) ) {
@@ -1000,13 +996,13 @@ public class PdbStructureLoader
 		final int conectCount = conectRecords.size( );
 		if ( conectCount > 0 )
 		{
-			final Vector bonds = new Vector( );
+			final Vector<StructureComponent> bonds = new Vector<StructureComponent>( );
 			this.passComponents.put( StructureComponentRegistry.TYPE_BOND, bonds );
 
 			for ( int i=0; i<conectCount; i++ )
 			{
 				final int conect[] = (int[]) conectRecords.elementAt( i );
-				final Atom atom0 = (Atom) atomNumberHash.get( new Integer( conect[0] ) );
+				final Atom atom0 = atomNumberHash.get( new Integer( conect[0] ) );
 				for ( int j=1; j<conect.length; j++ )
 				{
 					if ( conect[j] < 0 ) {
@@ -1030,7 +1026,7 @@ public class PdbStructureLoader
 			// A hashtable of vectors where
 			// each hash KEY is the StructureComponent type String.
 			// each hash VALUE is a Vector of StructureComponent objects.
-			protected Hashtable structureComponents = null;
+			protected Hashtable<String, Vector<StructureComponent>> structureComponents = null;
 
 			// To free up the global state for another load call.
 			private String localUrlString;
@@ -1057,7 +1053,7 @@ public class PdbStructureLoader
 			
 			public int getStructureComponentCount( String scType )
 			{
-				Vector records = (Vector) this.structureComponents.get( scType );
+				Vector<StructureComponent> records = this.structureComponents.get( scType );
 				if ( records == null ) {
 					return 0;
 				} else {
@@ -1069,7 +1065,7 @@ public class PdbStructureLoader
 				int index )
 				throws IndexOutOfBoundsException, IllegalArgumentException
 			{
-				Vector records = (Vector) this.structureComponents.get( type );
+				Vector<StructureComponent> records = this.structureComponents.get( type );
 				if ( records == null ) {
 					throw new IllegalArgumentException( "no records of type " + type );
 				}
@@ -1089,7 +1085,7 @@ public class PdbStructureLoader
 		this.converter.append(pdbChainIds, ndbChainIds, pdbResidueIds, ndbResidueIds);
 		
 		// Progress is done.
-		Status.progress( 1.0f, null );
+		Status.progress( 100, null );
 
 		return structure;
 	}

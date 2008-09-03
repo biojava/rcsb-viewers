@@ -1,117 +1,171 @@
-//  $Id: ProgressPanel.java,v 1.1 2007/02/08 02:38:52 jbeaver Exp $
-//
-//  Copyright 2000-2004 The Regents of the University of California.
-//  All Rights Reserved.
-//
-//  Permission to use, copy, modify and distribute any part of this
-//  Molecular Biology Toolkit (MBT)
-//  for educational, research and non-profit purposes, without fee, and without
-//  a written agreement is hereby granted, provided that the above copyright
-//  notice, this paragraph and the following three paragraphs appear in all
-//  copies.
-//
-//  Those desiring to incorporate this MBT into commercial products
-//  or use for commercial purposes should contact the Technology Transfer &
-//  Intellectual Property Services, University of California, San Diego, 9500
-//  Gilman Drive, Mail Code 0910, La Jolla, CA 92093-0910, Ph: (858) 534-5815,
-//  FAX: (858) 534-7345, E-MAIL:invent@ucsd.edu.
-//
-//  IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR
-//  DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING
-//  LOST PROFITS, ARISING OUT OF THE USE OF THIS MBT, EVEN IF THE
-//  UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-//  THE MBT PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND THE
-//  UNIVERSITY OF CALIFORNIA HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
-//  UPDATES, ENHANCEMENTS, OR MODIFICATIONS. THE UNIVERSITY OF CALIFORNIA MAKES
-//  NO REPRESENTATIONS AND EXTENDS NO WARRANTIES OF ANY KIND, EITHER IMPLIED OR
-//  EXPRESS, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-//  MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, OR THAT THE USE OF THE
-//  MBT WILL NOT INFRINGE ANY PATENT, TRADEMARK OR OTHER RIGHTS.
-//
-//  For further information, please see:  http://mbt.sdsc.edu
-//
-//  History:
-//  $Log: ProgressPanel.java,v $
-//  Revision 1.1  2007/02/08 02:38:52  jbeaver
-//  version 1.50
-//
-//  Revision 1.1  2006/09/20 16:50:43  jbeaver
-//  first commit - branched from ProteinWorkshop
-//
-//  Revision 1.2  2006/09/02 18:52:28  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/08/24 17:39:03  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/03/09 00:18:55  jbeaver
-//  Initial commit
-//
-//  Revision 1.3  2004/04/09 00:06:11  moreland
-//  Updated copyright to new UCSD wording.
-//
-//  Revision 1.2  2004/01/29 18:12:52  moreland
-//  Updated copyright and class comment block.
-//
-//  Revision 1.1  2003/04/03 23:07:00  moreland
-//  Added an "as-needed" ProgressPanel to the StatusPanel.
-//
-//  Revision 1.0  2003/01/22 01:16:31  moreland
-//  First verision.
-//
-
-
 package org.rcsb.mbt.ui.dialogs;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.lang.reflect.InvocationTargetException;
 
-// Core
-import java.awt.*;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 
+import org.rcsb.mbt.model.util.StatusEvent;
+import org.rcsb.mbt.model.util.StatusListener;
 
 /**
- *  Provides a GUI component to display a simple progress meter.
- *  <P>
- *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.util.Status
+ * UI to show progress.
+ * Controlled by org.rcsb.mbt.ui.Controllers.ProgressPanelController,
+ * registered with org.rcsb.mbt.model.util.Status
+ *<p>
+ * We want this to be updated either from within our outside the SDT, so we test the update
+ * mechanisms (and create and destroy, as well) to determine whether or no we are in the SDT,
+ * and act accordingly.</p>
+ * <p>
+ * If updated from the SDT, we lose the animations (on some systems - Mac, most notably), so
+ * updates should be presented frequently.</p>
+ * 
+ * <b>Notes</b>
+ * <ul>
+ * <li>You can interchange between determinate or indeterminate at will.</li>
+ * <li>You can interchange between SDT or non-SDT threads at will.</li>
+ * </ul>
  */
-public class ProgressPanel
-	extends JLabel
+@SuppressWarnings("serial")
+public class ProgressPanel extends JDialog implements StatusListener
 {
+	private JProgressBar progressBar;
+	private JLabel taskOutput;
+	private Integer progress = 0;
+	public int getProgress() { return progress; }
+	private String info = new String();
+	private Boolean indeterminate = false;
+			
 	/**
-	 * 
+	 * Constructor - shouldn't be called from the application.
+	 * Use 'StartProgress()' to get a progress dialog.
 	 */
-	private static final long serialVersionUID = 2260051629214919273L;
-	private float percent = 0.0f;
-
-	public void setPercent( final float percent )
+	public ProgressPanel(JFrame parent)
 	{
-		this.percent = percent;
-		this.repaint();
+		super(parent, false);
+		
+		Dimension mySize = new Dimension(300, 100);
+		Dimension parentSize = (parent == null)? Toolkit.getDefaultToolkit().getScreenSize() :
+											     parent.getSize();
+		Point parentLoc = (parent == null)? new Point(0, 0) : parent.getLocation();
+		Point myLoc = new Point(parentLoc.x + ((parentSize.width - mySize.width) / 2),
+								   parentLoc.y + ((parentSize.height - mySize.height) / 2));
+
+		progressBar = new JProgressBar(0, 100);
+		progressBar.setValue(0);
+		progressBar.setStringPainted(true);
+
+		taskOutput = new JLabel();
+		
+		this.setBackground(Color.gray);
+
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(progressBar, BorderLayout.PAGE_START);
+		panel.add(taskOutput, BorderLayout.CENTER);
+		panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+		add(panel);
+		
+		setSize(mySize);
+		setLocation(myLoc);
+		
+		this.setAlwaysOnTop(true);
+		setTitle("Progress");
+		
+		setVisible(true);
 	}
-
 	
-	protected void paintComponent( final Graphics graphics )
+	/*
+ 	 * if indeterminate, don't show a progress value (varies according to system.)
+ 	 * 
+	 * @param flag
+	 */
+	private void setIndeterminate(boolean flag)
 	{
-		// First, paint the background.
-		super.paintComponent( graphics );
-
-		// Second, paint our background.
-		if ( graphics != null )
+		synchronized(indeterminate) { indeterminate = flag; }
+		if (SwingUtilities.isEventDispatchThread())
 		{
-			final int height = this.getHeight( );
-			final int width = this.getWidth( );
-			final int prog = (int) (width * this.percent);
-			graphics.setColor( Color.blue );
-			graphics.fillRect( 0, 0, prog, height );
-			graphics.setColor( Color.lightGray );
-			graphics.fillRect( prog, 0, width-prog, height );
-			graphics.setColor( Color.white );
-			final int perc = (int) (100.0f * this.percent);
-			final String msg = " (" + perc + "%) " + this.getText();
-			graphics.drawString( msg, 0, height-2 );
+			internalSetIndeterminate();
+			update(getGraphics());
+		} else
+			try {
+				SwingUtilities.invokeAndWait(
+					new Runnable()
+					{
+						public void run() { internalSetIndeterminate(); }
+					});
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+			
+	}
+	
+	/*
+	 * Do the actual work
+	 */
+	private void internalSetIndeterminate()
+	{
+		if (progressBar.isIndeterminate() != indeterminate)
+			progressBar.setIndeterminate(indeterminate);
+	}
+	
+	/*
+	 * Progress update.  If in_progress < 0 ( -1 ), put the progress bar in
+	 * 'indeterminate' mode.
+	 */
+	private void updateProgress(int in_progress, String in_info)
+	{
+		synchronized(progress) { progress = in_progress; }	
+		synchronized(info){ info = in_info == null? "" : in_info; }
+		
+		if (SwingUtilities.isEventDispatchThread())
+		{
+			internalUpdateProgress();
+			update(getGraphics());
+		} else
+			try {
+				SwingUtilities.invokeAndWait(
+					new Runnable()
+					{
+						public void run() { internalUpdateProgress(); }
+					});
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+	}
+	
+	/*
+	 * Do the actual work.
+	 */
+	private void internalUpdateProgress()
+	{
+		progressBar.setValue(progress);
+		taskOutput.setText(info);
+	}
+	
+	/**
+	 * Implementation of StatusListener interface.
+	 */
+	public void processStatusEvent(StatusEvent statusEvent)
+	{
+		if (statusEvent.type == StatusEvent.TYPE_PROGRESS)
+		{
+			setIndeterminate(statusEvent.percent < 0);
+			updateProgress(statusEvent.percent, statusEvent.message);
 		}
 	}
 }
-
+	

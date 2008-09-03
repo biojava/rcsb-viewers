@@ -112,6 +112,8 @@ public class DocController
 					final SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
 	
 					BufferedReader reader = null;
+					
+					Status.progress(-1, "Reading XML file: " + dataset);
 	
 					// if this is a url (starts with protocol://)
 					if (isUrl)
@@ -189,6 +191,7 @@ public class DocController
 					|| dataset.endsWith(".ent"))
 			{
 				final PdbStructureLoader loader = new PdbStructureLoader();
+				Status.progress(0, "Reading PDB file: " + dataset);
 				if (isUrl)
 				{
 					try
@@ -208,6 +211,10 @@ public class DocController
 				residueConverter = loader.getConverter();
 				nonProteinChainIds = new String[] {};
 						// **JB don't worry about this for now...
+				
+				new StructureMap(structureTmp, AppBase.sgetAppModuleFactory().createSceneNode());
+								// TODO: this should call 'finalizeNewStructure' to set this up and
+								// 		 check for biological units, nct's ,etc.
 			}
 			
 			else

@@ -106,6 +106,6 @@ public class StatusEvent
 	/**
 	 * The progress percentage (0.0-1.0).
 	 */
-	public float percent = 0.0f;
+	public int percent = 0;
 }
 

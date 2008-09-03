@@ -82,7 +82,6 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import org.rcsb.mbt.model.util.*;
-import org.rcsb.mbt.ui.dialogs.ProgressPanel;
 
 import java.awt.event.*;
 
@@ -110,10 +109,6 @@ public class StatusPanel
 	// The scroll-pane for the message area.
 	private JScrollPane jScrollPane = null;
 	private JLabel statusButton = null;
-
-	// The progress display widget.
-	private final ProgressPanel progressPanel = new ProgressPanel( );
-	private boolean progressVisible = false;
 
 	//
 	// Constructor
@@ -329,30 +324,7 @@ public class StatusPanel
 		{
 			this.textArea.setText( statusEvent.message );
 			this.showLastLine( );
-		}
-		else if ( statusEvent.type == StatusEvent.TYPE_PROGRESS )
-		{
-			if ( statusEvent.message != null )
-			{
-				if ( ! this.progressVisible )
-				{
-					this.progressVisible = true;
-					this.add( java.awt.BorderLayout.NORTH, this.progressPanel );
-					this.getParent().validate( ); // Force parent to resize us.
-				}
 
-				this.progressPanel.setText( statusEvent.message );
-				this.progressPanel.setPercent( statusEvent.percent );
-			}
-			else
-			{
-				if ( this.progressVisible )
-				{
-					this.progressVisible = false;
-					this.remove( this.progressPanel );
-					this.getParent().validate( ); // Force parent to resize us.
-				}
-			}
 		}
 	}
 
