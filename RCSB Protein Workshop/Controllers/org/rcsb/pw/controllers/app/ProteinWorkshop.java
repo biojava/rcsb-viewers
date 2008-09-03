@@ -2,6 +2,7 @@ package org.rcsb.pw.controllers.app;
 
 
 import org.rcsb.mbt.controllers.app.AppBase;
+import org.rcsb.mbt.controllers.app.ProgressPanelController;
 import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.StructureModel;
@@ -85,7 +86,10 @@ public class ProteinWorkshop extends VFAppBase
 		final StructureModel model = sgetModel();
 
 		if (structureUrlParam != null)	
+		{
+			ProgressPanelController.StartProgress();
 			model.setStructures(sgetDocController().readStructuresFromUrl(structureUrlParam));
+		}
 		
 		if (!model.hasStructures())
 		{
@@ -94,6 +98,7 @@ public class ProteinWorkshop extends VFAppBase
 			// System.exit( 1 );
 		}
 		
-		activeFrame.initialize(true);		
+		activeFrame.initialize(true);
+		ProgressPanelController.EndProgress();
 	}
 }

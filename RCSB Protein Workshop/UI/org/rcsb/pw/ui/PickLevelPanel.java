@@ -121,7 +121,7 @@ public class PickLevelPanel extends JPanel implements ActionListener, IUpdateLis
 	/* (non-Javadoc)
 	 * @see edu.sdsc.mbt.views_controller.IViewUpdateListener#handleModelChangedEvent(edu.sdsc.mbt.views_controller.ViewUpdateEvent)
 	 */
-	public void handleModelChangedEvent(UpdateEvent evt)
+	public void handleUpdateEvent(UpdateEvent evt)
 	{
 		if (evt.action == UpdateEvent.Action.VIEW_RESET)
 			reset();

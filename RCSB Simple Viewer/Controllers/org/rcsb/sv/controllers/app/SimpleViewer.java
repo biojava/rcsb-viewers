@@ -1,5 +1,6 @@
 package org.rcsb.sv.controllers.app;
 
+import org.rcsb.mbt.controllers.app.ProgressPanelController;
 import org.rcsb.mbt.controllers.doc.DocController;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.util.PickUtils;
@@ -83,8 +84,11 @@ public class SimpleViewer extends VFAppBase
 	
 		final String structureUrlParam = this.properties.getProperty("structure_url");
 	
-		if (structureUrlParam != null)	
+		if (structureUrlParam != null)
+		{
+			ProgressPanelController.StartProgress();
 			getActiveFrame().getModel().setStructures(getActiveFrame().getDocController().readStructuresFromUrl(structureUrlParam));
+		}
 		
 		if (!getActiveFrame().getModel().hasStructures())
 		{
@@ -93,8 +97,7 @@ public class SimpleViewer extends VFAppBase
 			// System.exit( 1 );
 		}
 		
-		activeFrame.initialize(true);		
+		activeFrame.initialize(true);
+		ProgressPanelController.EndProgress();
 	}
-
-
 }

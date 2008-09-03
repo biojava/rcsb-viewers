@@ -373,7 +373,7 @@ public abstract class Mutator implements IUpdateListener
 	/* (non-Javadoc)
 	 * @see edu.sdsc.mbt.views_controller.IViewUpdateListener#handleModelChangedEvent(edu.sdsc.mbt.views_controller.ViewUpdateEvent)
 	 */
-	public void handleModelChangedEvent(UpdateEvent evt)
+	public void handleUpdateEvent(UpdateEvent evt)
 	{
 		switch (evt.action)
 		{
