@@ -2472,7 +2472,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	 * If you override this, just intercept the actions you need to intercept - pass the rest through
 	 * in your 'default' case (by calling the super and passing the evt on through).
 	 */
-	public void handleModelChangedEvent(UpdateEvent evt)
+	public void handleUpdateEvent(UpdateEvent evt)
 	{
 		switch(evt.action)
 		{

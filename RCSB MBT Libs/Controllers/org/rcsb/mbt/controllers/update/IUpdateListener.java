@@ -94,6 +94,6 @@ public interface IUpdateListener
 	/**
 	 * Process a StructureDocumentEvent message.
 	 */
-	public void handleModelChangedEvent( UpdateEvent evt );
+	public void handleUpdateEvent( UpdateEvent evt );
 }
 

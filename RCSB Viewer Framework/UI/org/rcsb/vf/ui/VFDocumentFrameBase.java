@@ -30,6 +30,8 @@ import org.rcsb.vf.glscene.jogl.VFGlGeometryViewer;
 
 public abstract class VFDocumentFrameBase extends DocumentFrameBase
 {
+	private static final long serialVersionUID = 1761606139608488229L;
+
 	public VFGlGeometryViewer getGlGeometryViewer() { return (VFGlGeometryViewer)super.getGlGeometryViewer(); }
 	public VFDocController getDocController() { return (VFDocController)super.getDocController(); }
 

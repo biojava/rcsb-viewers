@@ -104,6 +104,7 @@ import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
 import org.rcsb.lx.glscene.jogl.LXSceneNode;
 import org.rcsb.lx.model.LXModel;
 import org.rcsb.lx.ui.LXDocumentFrame;
+import org.rcsb.mbt.controllers.app.ProgressPanelController;
 import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.controllers.update.UpdateController;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
@@ -245,9 +246,14 @@ public class LigandExplorer extends VFAppBase
 		final String structureUrlParam = this.properties.getProperty("structure_url");
 		
 		if (structureUrlParam != null)
+		{
+			ProgressPanelController.StartProgress();
 			model.setStructures(activeFrame.getDocController().readStructuresFromUrl(structureUrlParam));
+		}
 
 		activeFrame.initialize(true);
+		
+		ProgressPanelController.EndProgress();
 	}
 	
 

@@ -188,7 +188,7 @@ public class StructureComponentInspector
 	/**
 	 * Process in incoming StructureDocumentEvent.
 	 */
-	public void handleModelChangedEvent( final UpdateEvent evt )
+	public void handleUpdateEvent( final UpdateEvent evt )
 	{
 		switch (evt.action)
 		{

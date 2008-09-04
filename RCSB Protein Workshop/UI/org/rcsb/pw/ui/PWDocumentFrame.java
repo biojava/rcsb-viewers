@@ -16,6 +16,7 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
 import org.rcsb.mbt.controllers.app.AppBase;
+import org.rcsb.mbt.controllers.app.ProgressPanelController;
 import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.StructureModel;
@@ -98,6 +99,8 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 				PWDocumentFrame.this.horizontalSplitPane.setOneTouchExpandable(true);
 				getContentPane().add(PWDocumentFrame.this.horizontalSplitPane);
 
+				Status.progress(-1, "Creating Sidebar...");
+				
 				// Create the sidebar
 				PWDocumentFrame.this.sidebar = new Sidebar();
 				PWDocumentFrame.this.horizontalSplitPane
@@ -145,6 +148,7 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 
 			GlGeometryViewer glViewer = getGlGeometryViewer();
 			
+			Status.progress(-1, "Creating Scene...");
 			for (Structure structure : getModel().getStructures())
 			{
 				// get the pdb id from the structure's url.

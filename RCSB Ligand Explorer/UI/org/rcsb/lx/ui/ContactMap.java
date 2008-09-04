@@ -222,7 +222,7 @@ public class ContactMap extends JPanel implements IUpdateListener
 		this.newStructureAdded(null);
 	}
 	
-	public void handleModelChangedEvent(UpdateEvent evt)
+	public void handleUpdateEvent(UpdateEvent evt)
 	{
 		boolean transitory = false;
 		

@@ -81,11 +81,13 @@ import java.util.Vector;
 
 
 /**
- *  Provides a toolkit-wide static status message output mechanism.
+ *  Provides a toolkit-wide (non-UI) static status message output mechanism.
  *  This should be used to produce textual status messages to the user.
+ *  
  *  By default, messages are printed to the current terminal, but
- *  authors may elect to add StatusListener objects in order to capture
- *  the output for display in scrolling status GUIs, output logs, etc.
+ *  authors may elect to add StatusListener objects (such as a StatusPanel)
+ *  in order to capture the output for display in scrolling status GUIs,
+ *  output logs, etc.
  *  <P>
  *  @author	John L. Moreland
  *  @see	org.rcsb.mbt.model.util.StatusListener
@@ -196,7 +198,7 @@ public class Status
 	//
 
 	/**
-	 *  Add a StatusListener object in order to start recieving StatusEvent
+	 *  Add a StatusListener object in order to start receiving StatusEvent
 	 *  messages. If one or more StatusListener objects are registered, then
 	 *  no messages are printed to the terminal by the output method.
 	 *  <P>
@@ -321,7 +323,7 @@ public class Status
 				Status.statusEvent.type = StatusEvent.TYPE_OUTPUT;
 				Status.statusEvent.level = level;
 				Status.statusEvent.message = message + "\n";
-				Status.statusEvent.percent = 1.0f;
+				Status.statusEvent.percent = 100;
 				for ( int i=0; i<Status.statusListeners.size(); i++ )
 				{
 					final StatusListener statusListener =
@@ -339,19 +341,13 @@ public class Status
 	 *  If there are no listeners, don't print progress.
 	 *  <P>
 	 */
-	public static void progress( final float percent_, final String message )
+	public static void progress( final int percent_, final String message )
 	{
-		float percent = percent_;
+		int percent = Math.min(percent_, 100);
 		if ( Status.statusListeners == null ) {
 			return; // Don't print progress.
 		}
-		if ( percent < 0.0f ) {
-			percent = 0.0f;
-		}
-		if ( percent > 1.0f ) {
-			percent = 1.0f;
-		}
-
+		
 		if ( (message != null) && (Status.statusEvent == null) || (Status.statusListeners == null) )
 		{
 			if ( Status.output_level == Status.LEVEL_REMARK ) {
@@ -367,7 +363,7 @@ public class Status
 			if ( message == null ) {
 				Status.statusEvent.message = null;
 			} else {
-				Status.statusEvent.message = message + "\n";
+				Status.statusEvent.message = message;
 			}
 			Status.statusEvent.percent = percent;
 

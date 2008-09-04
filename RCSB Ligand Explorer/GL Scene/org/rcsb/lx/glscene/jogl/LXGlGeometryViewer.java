@@ -684,7 +684,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 			break;
 			
 		default:
-			super.handleModelChangedEvent(evt);
+			super.handleUpdateEvent(evt);
 		}
 	}
 	

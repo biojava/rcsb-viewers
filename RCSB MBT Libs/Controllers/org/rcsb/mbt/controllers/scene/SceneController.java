@@ -346,7 +346,7 @@ public class SceneController implements GvPickEventListener, IUpdateListener
 	/* (non-Javadoc)
 	 * @see org.rcsb.mbt.views_controller.IUpdateListener#handleModelChangedEvent(org.rcsb.mbt.views_controller.UpdateEvent)
 	 */
-	public void handleModelChangedEvent(UpdateEvent evt)
+	public void handleUpdateEvent(UpdateEvent evt)
 	{
 		if (evt.action == UpdateEvent.Action.CLEAR_ALL)
 			clearMemory();

@@ -248,6 +248,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase
 				simpleViewerFrameContainer.add(verticalSplitPane);
 				verticalSplitPane.setBottomComponent(horizontalSplitPane);
 
+				Status.progress(-1, "Creating sequence viewer...");
 				// create a sequence viewer
 				sequenceViewer = new SequenceTabbedPane();
 //				JoglViewer.this.sequenceViewer.setComponents();
@@ -274,6 +275,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase
 										+ Constants.pdbFileExtension;
 								LigandExplorer.sgetDocController().loadStructure(url, pdbId);
 	
+								Status.progress(-1, "Creating side bar...");
 								sidebar = new LigandSideBar(LXDocumentFrame.this);
 								LXDocumentFrame.this
 										.displaySideBar(sidebar);

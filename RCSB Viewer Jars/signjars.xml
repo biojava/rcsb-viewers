@@ -9,20 +9,16 @@
  |  (They can't be created here, because of the structure in MBT libs...)
  |
  -->
-<project name="SignJars" default="all" basedir="/">
-	<property name="PDB" location="Users/Shared/dev/PDB" />
-	<property name="VIEWERS_HEAD" location="${PDB}/pdb-viewers-head" />
-	<property name="DSTROOT" location="${VIEWERS_HEAD}/RCSB Viewer Jars" />
-	
+<project name="SignJars" default="all" basedir=".">	
 	<macrodef name="dosign">
 		<attribute name="subdir" />
 		<sequential>
 			<signjar 
-		    	alias="PDB" keystore="${DSTROOT}/pdbkeys"
+		    	alias="PDB" keystore="pdbkeys"
 		    	storepass="RCSB-PDB"
 		    	preservelastmodified="true">
 				<path>
-					<fileset dir="${DSTROOT}/@{subdir}" includes="**/*.jar" />
+					<fileset dir="@{subdir}" includes="**/*.jar" />
 				</path>
 			</signjar>
 		</sequential>

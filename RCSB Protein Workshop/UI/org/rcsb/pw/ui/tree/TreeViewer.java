@@ -673,7 +673,7 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 	/**
 	 * Process a StructureDocumentEvent message.
 	 */
-	public void handleModelChangedEvent(
+	public void handleUpdateEvent(
 			final UpdateEvent evt)
 	{
 		switch (evt.action)

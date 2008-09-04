@@ -69,7 +69,7 @@ public class SequenceTabbedPane extends JTabbedPane implements IUpdateListener
 	/* (non-Javadoc)
 	 * @see edu.sdsc.mbt.views_controller.IViewUpdateListener#handleModelChangedEvent(edu.sdsc.mbt.views_controller.ViewUpdateEvent)
 	 */
-	public void handleModelChangedEvent(UpdateEvent evt)
+	public void handleUpdateEvent(UpdateEvent evt)
 	{
 		boolean transitory = false;
 		

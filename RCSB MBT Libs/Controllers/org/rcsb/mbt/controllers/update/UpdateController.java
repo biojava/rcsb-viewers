@@ -104,7 +104,7 @@ public class UpdateController
 	protected void fireUpdateViewEvent( final UpdateEvent evt )
 	{
 		for (IUpdateListener view : views)
-			view.handleModelChangedEvent(evt);
+			view.handleUpdateEvent(evt);
 					// what!!!  This isn't firing an event!!
 					// this is just an interface call!!!
 					//
