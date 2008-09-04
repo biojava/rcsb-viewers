@@ -12,6 +12,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
@@ -27,6 +28,8 @@ import org.rcsb.mbt.ui.mainframe.StatusPanel;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.controllers.doc.VFDocController;
 import org.rcsb.vf.glscene.jogl.VFGlGeometryViewer;
+
+import com.sun.corba.se.impl.copyobject.JavaStreamObjectCopierImpl;
 
 
 
@@ -91,6 +94,7 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 					final JMenuItem openFileItem = new JMenuItem("Open File...");
 					final JMenuItem openUrlItem = new JMenuItem("Open URL...");
 					final JMenuItem openPdbIdItem = new JMenuItem("Open PDB ID...");
+					final JMenuItem exitItem = new JMenuItem("Exit");
 
 					openFileItem.addActionListener(
 						new ActionListener()
@@ -194,10 +198,27 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 						}
 
 					});
+					
+					exitItem.addActionListener(
+						new ActionListener()
+						{
+							public void actionPerformed(final ActionEvent e)
+							{
+								System.exit(0);
+											// I don't think there are any complications from doing this here -
+											// an alternative is to spawn a thread and do it from there, maybe wait
+											// for this thread to process all its events, and then invoke the exit.
+											//
+											// 04-Sep-08 - rickb
+							}
+						}
+					);
 
 					fileMenu.add(openFileItem);
 					fileMenu.add(openUrlItem);
 					fileMenu.add(openPdbIdItem);
+					fileMenu.add(new JSeparator());
+					fileMenu.add(exitItem);
 					menuBar.add(fileMenu);
 
 					VFDocumentFrameBase.this.setJMenuBar(menuBar);
