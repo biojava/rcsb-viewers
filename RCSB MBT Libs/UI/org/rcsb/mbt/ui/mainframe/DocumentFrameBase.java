@@ -37,21 +37,7 @@ import org.rcsb.mbt.model.util.Status;
  */
 public abstract class DocumentFrameBase extends JFrame
 {
-	private static final long serialVersionUID = 682613576170299667L;
-	private JProgressBar progressBar = null;
-	private ProgressBarRunner progressRunner = null;
-	
-	protected class ProgressBarRunner implements Runnable
-	{		
-		public void run()
-		{
-			progressBar = new JProgressBar();
-			
-			progressBar.setIndeterminate(true);
-			progressBar.setString("");
-		}
-	}
-
+	private static final long serialVersionUID = 682613576170299667L;	
 	/**
 	 * This is a swing runnable - it is invoked to build the ActiveFrame UI at the appropriate
 	 * moment.  Derived frames will derive from this, as well, and override 'run()'.
@@ -61,6 +47,7 @@ public abstract class DocumentFrameBase extends JFrame
 	 * @author rickb
 	 *
 	 */
+	
 	protected class UIBuilder implements Runnable
 	{
 		/**
@@ -164,15 +151,5 @@ public abstract class DocumentFrameBase extends JFrame
 	{
 		_showFrame = showFrame;
 		AppBase.sgetAppModuleFactory().createGlGeometryViewer();
-	}
-	
-	public void startProgressBar()
-	{
-		progressRunner = new ProgressBarRunner();
-		SwingUtilities.invokeLater(progressRunner);
-	}
-	
-	public void endProgressBar()
-	{
 	}
 }
