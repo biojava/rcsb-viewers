@@ -69,14 +69,17 @@ public class DocController
 			; // stick up an error message box.
 		
 		Structure[] structure = readStructuresFromUrl(url);
-		if (pdbId != null && structure.length == 1)
-			structure[0].getStructureMap().setPdbId(pdbId);
-		
-		AppBase.sgetModel().setStructures(structure);
-		
-		AppBase.sgetUpdateController().fireUpdateViewEvent(
-				UpdateEvent.Action.STRUCTURE_ADDED,
-				AppBase.sgetModel().getStructures().get(0));
+		if (structure != null)
+		{
+			if (pdbId != null && structure.length == 1)
+				structure[0].getStructureMap().setPdbId(pdbId);
+
+			AppBase.sgetModel().setStructures(structure);
+
+			AppBase.sgetUpdateController().fireUpdateViewEvent(
+					UpdateEvent.Action.STRUCTURE_ADDED,
+					AppBase.sgetModel().getStructures().get(0));
+		}
 	}
 
 	/**
@@ -223,8 +226,8 @@ public class DocController
 	
 			if (structureTmp == null)
 			{
-				System.out.println("Could not load: " + dataset);
-				System.exit(1);
+				Status.output(Status.LEVEL_ERROR, "Could not load: " + dataset);
+				return null;
 			}
 			
 			else

@@ -18,7 +18,9 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
 import org.rcsb.mbt.controllers.app.AppBase;
+import org.rcsb.mbt.controllers.app.ProgressPanelController;
 import org.rcsb.mbt.glscene.jogl.Constants;
+import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.util.Status;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 import org.rcsb.mbt.ui.mainframe.StatusPanel;
@@ -41,6 +43,37 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 		protected JMenu fileMenu;		
 		protected StatusPanel statusPanel = null;
 
+		/**
+		 * Once the action decides to load a structure, we need to get out of the SWT so the
+		 * progress bar will work properly (more properly, anyway.)
+		 * 
+		 * Actions create and start this thread to load the requested structure.
+		 * 
+		 * @author rickb
+		 *
+		 */
+		class LoadThread extends Thread
+		{
+			private String _url, _pdbid;
+			
+			public LoadThread(String url, String pdbid)
+			{ _url = url; _pdbid = pdbid; }
+			
+			public void run()
+			{
+				ProgressPanelController.StartProgress();
+				getModel().clear();
+
+				getDocController().loadStructure(_url, _pdbid);
+				getUpdateController().resetEverything();
+				if (getModel().hasStructures())
+					setTitle(getModel().getStructures().get(0).getStructureMap().getPdbId());
+				ProgressPanelController.EndProgress();
+				if (!getModel().hasStructures())
+					JOptionPane.showMessageDialog(null, "Structure not found: " + _pdbid + "\nPlease check file/url specification and try again.", "Error", JOptionPane.ERROR_MESSAGE); 
+			}
+		};
+		
 		public void run()
 		{
 			super.run();
@@ -93,12 +126,9 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 								if (dialog.showOpenDialog(VFDocumentFrameBase.this) == JFileChooser.APPROVE_OPTION)
 								{
 									final File selectedFile = dialog.getSelectedFile();
-
-									getModel().clear();
-									getDocController().loadStructure(
-													selectedFile.getAbsolutePath(),
-													selectedFile.getName());
-									getUpdateController().resetEverything();
+									LoadThread loadIt = new LoadThread(selectedFile.getAbsolutePath(),
+											selectedFile.getName().substring(0, selectedFile.getName().indexOf('.')));										
+									loadIt.start();
 								}
 							}
 						});
@@ -121,12 +151,9 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 								{
 									if (pdbId.length() == 4)
 									{
-										final String url = Constants.pdbFileBase
-												+ pdbId
-												+ Constants.pdbFileExtension;
-										getModel().clear();
-										getDocController().loadStructure(url, pdbId);
-										getUpdateController().resetEverything();
+										final String url = Constants.pdbFileBase + pdbId + Constants.pdbFileExtension;
+										LoadThread loadIt = new LoadThread(url, pdbId);										
+										loadIt.start();
 									}
 									
 									else
@@ -155,14 +182,13 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 								{
 									if (url.indexOf("://") >= 0)
 									{
-										getModel().clear();
-										getDocController().loadStructure(url, url);
-										getUpdateController().resetEverything();
+										String pdbspec = url.substring(url.lastIndexOf('/') + 1);										
+										LoadThread loadIt = new LoadThread(url, pdbspec.substring(0, pdbspec.indexOf('.')));										
+										loadIt.start();
 									}
 									
 									else
-										Status.output(Status.LEVEL_ERROR,
-													  "The URL you entered did not contain a protocol (http://, etc.)");
+										JOptionPane.showMessageDialog(null, "The URL you entered did not contain a protocol (http://, etc.)", "Error", JOptionPane.ERROR_MESSAGE);
 								}
 							}
 						}

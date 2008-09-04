@@ -57,6 +57,8 @@ import org.rcsb.vf.ui.VFDocumentFrameBase;
 
 public class LXDocumentFrame extends VFDocumentFrameBase
 {
+	private static final long serialVersionUID = 8096107058379203682L;
+	
 	public LXModel getModel() { return (LXModel)super.getModel(); }
 	public LXGlGeometryViewer getGlGeometryViewer() { return (LXGlGeometryViewer)super.getGlGeometryViewer(); }
 	public LXUpdateController getUpdateController() { return (LXUpdateController)super.getUpdateController(); }
@@ -351,15 +353,8 @@ public class LXDocumentFrame extends VFDocumentFrameBase
 
 			if (!LigandExplorer.backgroundScreenshotOnly)
 			{
-				StructureModel model = getModel();
-				String id = "";
-				if (model.hasStructures())
-					id = ": " + model.getStructures().get(0).getStructureMap().getPdbId();
-
-				LXDocumentFrame.this
-						.setTitle("RCSB PDB Ligand Explorer "
-								+ LXVersionInformation.version()
-								+ " (powered by the MBT)" + id);
+				if (getModel().hasStructures())
+					setTitle(getModel().getStructures().get(0).getStructureMap().getPdbId());
 			}
 
 			if (_showFrame)
@@ -519,5 +514,12 @@ public class LXDocumentFrame extends VFDocumentFrameBase
 				}
 			}
 		}
+	}
+	@Override
+	public void setTitle(String title)
+	{
+		super.setTitle("RCSB PDB Ligand Explorer "
+				+ LXVersionInformation.version()
+				+ " (powered by the MBT): " + title);
 	}
 }

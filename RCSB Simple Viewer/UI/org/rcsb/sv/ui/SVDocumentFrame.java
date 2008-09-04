@@ -120,14 +120,7 @@ public class SVDocumentFrame extends VFDocumentFrameBase
 			if (!AppBase.backgroundScreenshotOnly)
 			{
 				if (model.hasStructures())
-				{
-					setTitle("PDB SimpleViewer "
-									+ SVVersionInformation.version()
-									+ " (powered by the MBT): "
-									+ model.getStructures().get(0)
-											.getStructureMap()
-											.getPdbId());
-				}
+					setTitle(model.getStructures().get(0).getStructureMap().getPdbId());
 			}
 			// progress.setProgress(0.90f);
 			// progress.setNote("Displaying Main Frame...");
@@ -209,6 +202,12 @@ public class SVDocumentFrame extends VFDocumentFrameBase
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	public void setTitle(String title)
+	{
+		super.setTitle("PDB SimpleViewer " + SVVersionInformation.version() + " (powered by the MBT): " + title);
 	}
 
 }

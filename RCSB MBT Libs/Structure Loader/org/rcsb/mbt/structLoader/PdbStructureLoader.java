@@ -484,12 +484,18 @@ public class PdbStructureLoader
 					percentDone = (int)((bytesRead * 100L)/ expectedBytes);
 					Status.progress( percentDone, "Loading " + this.urlString );
 				}
-	
+
+/* XXX_DBUG */
+				String strLine  = "";
+/**/
 				// Process the buffer
 				for ( int bufPos=0; bufPos<lastRead; bufPos++ )
 				{
 					// Copy a byte from the input buffer into the line buffer
 					line[linePos] = buf[bufPos];
+/* XXX DEBUG */
+					strLine += (char)buf[bufPos];
+/**/
 					if ( buf[bufPos] == '\n' )
 					{
 						// line[0-linePos] now has a complete line.
@@ -966,6 +972,9 @@ public class PdbStructureLoader
 
 						// Reset linePos to the start of the line buffer.
 						linePos = 0;
+/* XXX_DEBUG */
+						strLine = "";
+/**/
 					}
 					else
 					{

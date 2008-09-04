@@ -186,15 +186,10 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 			{
 				StructureModel model = AppBase.sgetModel();
 				if (model.hasStructures())
-				{
-					PWDocumentFrame.this
-							.setTitle("PDB ProteinWorkshop "
-									+ PWVersionInformation.version()
-									+ " (powered by the MBT): "
-									+ model.getStructures().get(0)
+					setTitle(
+									model.getStructures().get(0)
 											.getStructureMap()
 											.getPdbId());
-				}
 			}
 
 
@@ -328,5 +323,11 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 
 	}
 
+	@Override
+	public void setTitle(String title)
+	{
+		super.setTitle("PDB ProteinWorkshop " + PWVersionInformation.version() +
+					   " (powered by the MBT): " + title);
+	}
 
 }

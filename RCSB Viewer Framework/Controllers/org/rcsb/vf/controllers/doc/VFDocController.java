@@ -30,105 +30,107 @@ public class VFDocController extends DocController
 	{
 		Structure[] structures = super.readStructuresFromUrl(structureUrlParam);
 		
-		String globalTranslationVectors = VFAppBase.getApp().properties.getProperty("global_translation_vectors");
-		String globalRotationMatrices = VFAppBase.getApp().properties.getProperty("global_rotation_matrices");
-		boolean error = false;
-		if (globalTranslationVectors != null)
+		if (structures != null)
 		{
-			if (globalRotationMatrices == null)
-				error = true;
-			
-			else
+			String globalTranslationVectors = VFAppBase.getApp().properties.getProperty("global_translation_vectors");
+			String globalRotationMatrices = VFAppBase.getApp().properties.getProperty("global_rotation_matrices");
+			boolean error = false;
+			if (globalTranslationVectors != null)
 			{
-				String[] transSplit = globalTranslationVectors.split("\\s*;\\s*");
-				String[] rotSplit = globalRotationMatrices.split("\\s*;\\s*");
+				if (globalRotationMatrices == null)
+					error = true;
 
-				if (transSplit != null && rotSplit != null
-						&& transSplit.length == structures.length
-						&& rotSplit.length == structures.length) {
-					float[][] globalTranslationVectorsFl = new float[transSplit.length][3];
-					for (int i = 0; i < transSplit.length; i++)
-					{
-						String[] transSplit2 = transSplit[i].split("\\s++");
+				else
+				{
+					String[] transSplit = globalTranslationVectors.split("\\s*;\\s*");
+					String[] rotSplit = globalRotationMatrices.split("\\s*;\\s*");
 
-						if (transSplit2 == null || transSplit2.length != 3)
-							error = true;
-						
-						else
+					if (transSplit != null && rotSplit != null
+							&& transSplit.length == structures.length
+							&& rotSplit.length == structures.length) {
+						float[][] globalTranslationVectorsFl = new float[transSplit.length][3];
+						for (int i = 0; i < transSplit.length; i++)
 						{
-							try
-							{
-								for (int j = 0; j < 3; j++)
-									globalTranslationVectorsFl[i][j] = Float.parseFloat(transSplit2[j]);
-							}
-							
-							catch (Exception e)
-							{
+							String[] transSplit2 = transSplit[i].split("\\s++");
+
+							if (transSplit2 == null || transSplit2.length != 3)
 								error = true;
+
+							else
+							{
+								try
+								{
+									for (int j = 0; j < 3; j++)
+										globalTranslationVectorsFl[i][j] = Float.parseFloat(transSplit2[j]);
+								}
+
+								catch (Exception e)
+								{
+									error = true;
+								}
 							}
 						}
-					}
 
-					float[][] globalRotationMatricesFl = new float[rotSplit.length][9];
-					for (int i = 0; i < rotSplit.length; i++)
-					{
-						String[] rotSplit2 = rotSplit[i].split("\\s++");
-
-						if (rotSplit2 == null || rotSplit2.length != 9)
-							error = true;
-						
-						else
+						float[][] globalRotationMatricesFl = new float[rotSplit.length][9];
+						for (int i = 0; i < rotSplit.length; i++)
 						{
-							try 
-							{
-								for (int j = 0; j < 9; j++)
-									globalRotationMatricesFl[i][j] = Float.parseFloat(rotSplit2[j]);
-							}
-							
-							catch (Exception e)
-							{
+							String[] rotSplit2 = rotSplit[i].split("\\s++");
+
+							if (rotSplit2 == null || rotSplit2.length != 9)
 								error = true;
+
+							else
+							{
+								try 
+								{
+									for (int j = 0; j < 9; j++)
+										globalRotationMatricesFl[i][j] = Float.parseFloat(rotSplit2[j]);
+								}
+
+								catch (Exception e)
+								{
+									error = true;
+								}
 							}
 						}
-					}
 
-					if (!error)
-					{
-						for (int i = 0; i < structures.length; i++)
+						if (!error)
 						{
-							Structure s = (Structure) structures[i];
-							StructureMap sm = s.getStructureMap();
-							if (sm.hasBiologicUnitTransforms())
+							for (int i = 0; i < structures.length; i++)
 							{
-								StructureMap.BiologicUnitTransforms bu = sm.getBiologicUnitTransforms();
-								bu.generateGlobalTransformationMatrixHACK();
-								TransformationMatrix t = bu.getFirstGlobalTransformationMatrixHACK();
-								t.setTransformationMatrix(
-										globalRotationMatricesFl[i][0],
-										globalRotationMatricesFl[i][1],
-										globalRotationMatricesFl[i][2],
-										globalRotationMatricesFl[i][3],
-										globalRotationMatricesFl[i][4],
-										globalRotationMatricesFl[i][5],
-										globalRotationMatricesFl[i][6],
-										globalRotationMatricesFl[i][7],
-										globalRotationMatricesFl[i][8],
-										globalTranslationVectorsFl[i][0],
-										globalTranslationVectorsFl[i][1],
-										globalTranslationVectorsFl[i][2]);
+								Structure s = (Structure) structures[i];
+								StructureMap sm = s.getStructureMap();
+								if (sm.hasBiologicUnitTransforms())
+								{
+									StructureMap.BiologicUnitTransforms bu = sm.getBiologicUnitTransforms();
+									bu.generateGlobalTransformationMatrixHACK();
+									TransformationMatrix t = bu.getFirstGlobalTransformationMatrixHACK();
+									t.setTransformationMatrix(
+											globalRotationMatricesFl[i][0],
+											globalRotationMatricesFl[i][1],
+											globalRotationMatricesFl[i][2],
+											globalRotationMatricesFl[i][3],
+											globalRotationMatricesFl[i][4],
+											globalRotationMatricesFl[i][5],
+											globalRotationMatricesFl[i][6],
+											globalRotationMatricesFl[i][7],
+											globalRotationMatricesFl[i][8],
+											globalTranslationVectorsFl[i][0],
+											globalTranslationVectorsFl[i][1],
+											globalTranslationVectorsFl[i][2]);
+								}
 							}
 						}
 					}
 				}
-			}
-		} 
-		
-		else if (globalRotationMatrices != null)
-			error = true;
+			} 
 
-		if (error)
-			System.err.println("Error: if you choose to specify translation vectors and rotation matrices, you must specify both for each structure.");
-		
+			else if (globalRotationMatrices != null)
+				error = true;
+
+			if (error)
+				System.err.println("Error: if you choose to specify translation vectors and rotation matrices, you must specify both for each structure.");
+		}
 		return structures;
 	}
 }
