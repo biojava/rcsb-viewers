@@ -199,6 +199,18 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 
 					});
 					
+					final JMenuItem saveImageItem = new JMenuItem("Save Image...");					
+					/**
+					 * Save Image Item Listener
+					 */
+					saveImageItem.addActionListener(
+						new ActionListener()
+							{
+							public void actionPerformed(ActionEvent arg0) {
+								getDocController().saveImage();
+							}
+						});
+
 					exitItem.addActionListener(
 						new ActionListener()
 						{
@@ -217,6 +229,7 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 					fileMenu.add(openFileItem);
 					fileMenu.add(openUrlItem);
 					fileMenu.add(openPdbIdItem);
+					fileMenu.add(saveImageItem);
 					fileMenu.add(new JSeparator());
 					fileMenu.add(exitItem);
 					menuBar.add(fileMenu);

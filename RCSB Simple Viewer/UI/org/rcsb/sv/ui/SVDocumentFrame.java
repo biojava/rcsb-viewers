@@ -41,20 +41,6 @@ public class SVDocumentFrame extends VFDocumentFrameBase
 
 			if (!AppBase.backgroundScreenshotOnly)
 			{
-				final JMenuItem saveImageItem = new JMenuItem("Save Image...");					
-				/**
-				 * Save Image Item Listener
-				 */
-				saveImageItem.addActionListener(
-					new ActionListener()
-						{
-						public void actionPerformed(ActionEvent arg0) {
-							getDocController().saveImage();
-						}
-					});
-
-				fileMenu.add(saveImageItem);
-
 				Container viewerFrameContainer = getContentPane();
 				
 				// Create a pane for the structure viewer and the
