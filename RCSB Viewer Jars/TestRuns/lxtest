@@ -10,4 +10,4 @@ if ( "$1" != "" ) then
   endif
   set MOL="$1"
 endif
-java -D"java.library.path=../3rdParty/jnilibs" -jar ../RCSBViewers/RCSB-LigandExplorer.jar -standalone -log_folder ./temp -structure_url molecules/$MOL -ligand $LIG
+java -D"java.library.path=../3rdParty/jnilibs" -jar ../RCSBViewers/RCSB-LigandExplorer.jar -standalone -structure_url molecules/$MOL -ligand $LIG
