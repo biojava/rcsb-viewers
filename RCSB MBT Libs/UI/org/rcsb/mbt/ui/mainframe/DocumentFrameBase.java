@@ -3,6 +3,8 @@ package org.rcsb.mbt.ui.mainframe;
 import java.awt.Dimension;
 import java.awt.GraphicsConfiguration;
 import java.awt.HeadlessException;
+import java.awt.Toolkit;
+import java.net.URL;
 
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
@@ -119,33 +121,13 @@ public abstract class DocumentFrameBase extends JFrame
 	 * Constructor
 	 * @throws HeadlessException
 	 */
-	public DocumentFrameBase() throws HeadlessException {
-		super();
-	}
-
-	/**
-	 * Constructor
-	 * @throws HeadlessException
-	 */
-	public DocumentFrameBase(GraphicsConfiguration gc) {
-		super(gc);
-	}
-
-	/**
-	 * Constructor
-	 * @throws HeadlessException
-	 */
-	public DocumentFrameBase(String title) throws HeadlessException {
+	public DocumentFrameBase(String title, URL iconUrl) throws HeadlessException
+	{
 		super(title);
+		if (iconUrl != null)
+			this.setIconImage(Toolkit.getDefaultToolkit().createImage(iconUrl));
 	}
 
-	/**
-	 * Constructor
-	 * @throws HeadlessException
-	 */
-	public DocumentFrameBase(String title, GraphicsConfiguration gc) {
-		super(title, gc);
-	}
 
 	public void initialize(boolean showFrame)
 	{

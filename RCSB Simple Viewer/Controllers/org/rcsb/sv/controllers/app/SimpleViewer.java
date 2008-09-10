@@ -1,5 +1,7 @@
 package org.rcsb.sv.controllers.app;
 
+import java.net.URL;
+
 import org.rcsb.mbt.controllers.app.ProgressPanelController;
 import org.rcsb.mbt.controllers.doc.DocController;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
@@ -35,8 +37,8 @@ public class SimpleViewer extends VFAppBase
 		 * @see edu.sdsc.mbt.app_controller.JAppBase.AppModuleFactory#createDocFrame()
 		 */
 		@Override
-		public DocumentFrameBase createDocFrame(final String title)
-		    { activeFrame =  new SVDocumentFrame(title); return activeFrame; }
+		public DocumentFrameBase createDocFrame(final String title, URL iconUrl)
+		    { activeFrame =  new SVDocumentFrame(title, iconUrl); return activeFrame; }
 		
 	}
 	
@@ -76,7 +78,8 @@ public class SimpleViewer extends VFAppBase
 	public void initialize(final boolean isApplication, final boolean showFrame)
 	{
 		appModuleFactory = new SVAppModuleFactory();
-		activeFrame = new SVDocumentFrame("PDB SimpleViewer (Powered by the MBT)");
+		activeFrame = new SVDocumentFrame("PDB SimpleViewer (Powered by the MBT)",
+										  SimpleViewer.class.getResource("images/icon_128_SV.png"));
 
 		super.initialize(isApplication);
 		

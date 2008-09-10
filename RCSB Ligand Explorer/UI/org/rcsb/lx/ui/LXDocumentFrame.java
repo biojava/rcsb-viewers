@@ -16,6 +16,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -462,9 +463,9 @@ public class LXDocumentFrame extends VFDocumentFrameBase
 		return this.displayDialog;
 	}
 
-	public LXDocumentFrame(final String title)
+	public LXDocumentFrame(final String title, URL iconUrl)
 	{
-		super(title);
+		super(title, iconUrl);
 	}
 	
 	

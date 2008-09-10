@@ -97,6 +97,7 @@ package org.rcsb.lx.controllers.app;
 // CORE JAVA
 
 import java.awt.image.BufferedImage;
+import java.net.URL;
 
 import org.rcsb.lx.controllers.scene.LXSceneController;
 import org.rcsb.lx.controllers.update.LXUpdateController;
@@ -141,9 +142,9 @@ public class LigandExplorer extends VFAppBase
 		 * @see edu.sdsc.mbt.app_controller.JAppBase.AppModuleFactory#createDocFrame(java.lang.String)
 		 */
 		@Override
-		public DocumentFrameBase createDocFrame(String name)
+		public DocumentFrameBase createDocFrame(String name, URL iconUrl)
 		{
-			return new LXDocumentFrame(name);
+			return new LXDocumentFrame(name, iconUrl);
 		}
 
 		/* (non-Javadoc)
@@ -222,7 +223,8 @@ public class LigandExplorer extends VFAppBase
 	public void initialize(final boolean isApplication)
 	{
 		appModuleFactory = new LXAppModuleFactory();
-		activeFrame = appModuleFactory.createDocFrame("PDB LIgand Explorer (Powered by the MBT)");
+		activeFrame = appModuleFactory.createDocFrame("PDB LIgand Explorer (Powered by the MBT)",
+												      LigandExplorer.class.getResource("images/icon_128_LX.png"));
 	
 		super.initialize(true);
 		

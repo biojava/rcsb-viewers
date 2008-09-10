@@ -1,6 +1,8 @@
 package org.rcsb.pw.controllers.app;
 
 
+import java.net.URL;
+
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.app.ProgressPanelController;
 import org.rcsb.mbt.controllers.scene.SceneController;
@@ -37,7 +39,7 @@ public class ProteinWorkshop extends VFAppBase
 		 * @see edu.sdsc.mbt.app_controller.JAppBase.AppModuleFactory#createDocFrame(java.lang.String)
 		 */
 		@Override
-		public DocumentFrameBase createDocFrame(String name) {return new PWDocumentFrame(name); }
+		public DocumentFrameBase createDocFrame(String name, URL iconUrl) {return new PWDocumentFrame(name, iconUrl); }
 
 		/* (non-Javadoc)
 		 * @see edu.sdsc.mbt.app_controller.JAppBase.AppModuleFactory#createGlGeometryViewer()
@@ -75,7 +77,8 @@ public class ProteinWorkshop extends VFAppBase
 	public void initialize(final boolean isApplication, final boolean showFrame)
 	{
 		appModuleFactory = new PWAppModuleFactory();
-		activeFrame = appModuleFactory.createDocFrame("PDB SimpleViewer (Powered by the MBT)");
+		activeFrame = appModuleFactory.createDocFrame("PDB SimpleViewer (Powered by the MBT)",
+													  ProteinWorkshop.class.getResource("images/icon_128_PW.png"));
 		
 		super.initialize(isApplication);
 		

@@ -9,6 +9,7 @@ import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -62,7 +63,7 @@ public class KSDocumentFrame extends DocumentFrameBase
 	 * 
 	 * @param name
 	 */
-	public KSDocumentFrame(String name) { super(); }
+	public KSDocumentFrame(String name, URL iconUrl) { super(name, iconUrl); }
 	
 	@Override
 	public void setVisible(boolean _value) {

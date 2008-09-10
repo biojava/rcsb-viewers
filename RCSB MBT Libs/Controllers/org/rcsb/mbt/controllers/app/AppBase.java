@@ -2,6 +2,7 @@ package org.rcsb.mbt.controllers.app;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.URL;
 
 import org.rcsb.mbt.controllers.doc.DocController;
 import org.rcsb.mbt.controllers.scene.SceneController;
@@ -76,7 +77,7 @@ public abstract class AppBase
 		/**
 		 * DocumentFrameBase <em>has</em> to be derived.  The rest *may* be derived
 		 */
-		public abstract DocumentFrameBase createDocFrame(final String name);
+		public abstract DocumentFrameBase createDocFrame(final String name, URL iconUrl);
 		public DocController createDocController() { return new DocController(); }
 		public UpdateController createUpdateController() { return new UpdateController(); }
 		public SceneController createSceneController() { return new SceneController(); }

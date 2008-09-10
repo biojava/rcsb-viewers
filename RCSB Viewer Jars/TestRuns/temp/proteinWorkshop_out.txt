@@ -1,1 +1,1 @@
-Could not load: molecules/2FTE
+Data set loaded: molecules/1STP.xml.gz

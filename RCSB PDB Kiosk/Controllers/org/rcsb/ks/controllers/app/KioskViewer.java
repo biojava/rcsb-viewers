@@ -63,6 +63,8 @@ package org.rcsb.ks.controllers.app;
 
 // package edu.sdsc.vis.viewers;
 
+import java.net.URL;
+
 import org.rcsb.ks.controllers.doc.KSDocController;
 import org.rcsb.ks.controllers.doc.KSStructureXMLHandler;
 import org.rcsb.ks.glscene.jogl.KSGlGeometryViewer;
@@ -108,9 +110,9 @@ public class KioskViewer extends AppBase implements IUpdateListener
 		 * @see edu.sdsc.mbt.app_controller.JAppBase.AppModuleFactory#createDocFrame(java.lang.String)
 		 */
 		@Override
-		public DocumentFrameBase createDocFrame(String name)
+		public DocumentFrameBase createDocFrame(String name, URL iconUrl)
 		{
-			return new KSDocumentFrame(name);
+			return new KSDocumentFrame(name, iconUrl);
 		}
 
 		/* (non-Javadoc)
@@ -133,7 +135,7 @@ public class KioskViewer extends AppBase implements IUpdateListener
 	private void initialize()
 	{
 		appModuleFactory = new KSAppModuleFactory();
-		activeFrame = appModuleFactory.createDocFrame("PDB Kiosk (Powered by the MBT)");
+		activeFrame = appModuleFactory.createDocFrame("PDB Kiosk (Powered by the MBT)", null);
 	
 		((KSDocumentFrame)activeFrame).initialize(true, true);
 		activeFrame.getUpdateController().registerListener(this);

@@ -1,1 +1,0 @@
-Status(1): Could not open file: the file must have an extension of .xml, xml.gz, .pdb, .pdb.gz, .ent, or .ent.gz.

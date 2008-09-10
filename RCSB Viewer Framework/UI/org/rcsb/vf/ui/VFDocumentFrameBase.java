@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
@@ -30,8 +31,6 @@ import org.rcsb.vf.controllers.doc.VFDocController;
 import org.rcsb.vf.glscene.jogl.VFGlGeometryViewer;
 
 import com.sun.corba.se.impl.copyobject.JavaStreamObjectCopierImpl;
-
-
 
 public abstract class VFDocumentFrameBase extends DocumentFrameBase
 {
@@ -247,9 +246,9 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 		}				
 	}
 	
-	public VFDocumentFrameBase(String title)
+	public VFDocumentFrameBase(String title, URL iconURL)
 	{
-		super(title);
+		super(title, iconURL);
 		
 		try
 		{

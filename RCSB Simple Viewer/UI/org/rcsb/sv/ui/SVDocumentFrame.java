@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.prefs.Preferences;
 
 import javax.swing.JMenuItem;
@@ -122,9 +123,9 @@ public class SVDocumentFrame extends VFDocumentFrameBase
 	
 	final static long serialVersionUID = 0x43518477;
 	
-	public SVDocumentFrame(String title)
+	public SVDocumentFrame(String title, URL iconUrl)
 	{
-		super(title);
+		super(title, iconUrl);
 						// let the super create the glviewer
 				
 		try

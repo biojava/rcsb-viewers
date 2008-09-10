@@ -8,6 +8,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
@@ -290,9 +291,9 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 	 * Constructor
 	 * @param title - main window title
 	 */
-	public PWDocumentFrame(String title)
+	public PWDocumentFrame(String title, URL iconUrl)
 	{
-		super(title);
+		super(title, iconUrl);
 	}
 
 	public void initialize(boolean showFrame)
