@@ -54,7 +54,7 @@ public class ProgressPanel extends JDialog implements StatusListener
 	{
 		super(parent, false);
 		
-		Dimension mySize = new Dimension(300, 100);
+		Dimension mySize = new Dimension(300, 130);
 		Dimension parentSize = (parent == null)? Toolkit.getDefaultToolkit().getScreenSize() :
 											     parent.getSize();
 		Point parentLoc = (parent == null)? new Point(0, 0) : parent.getLocation();
