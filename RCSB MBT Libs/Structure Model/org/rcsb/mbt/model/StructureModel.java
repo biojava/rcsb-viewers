@@ -171,11 +171,14 @@ public class StructureModel
 	
 	public void setStructures(Structure[] structure_array)
 	{
-		for (Structure struc : structure_array)
-		  this.structures.add(struc);
-		
-		UpdateController update = AppBase.sgetUpdateController();
-		update.fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE);
+		if (structure_array != null)
+		{
+			for (Structure struc : structure_array)
+			  this.structures.add(struc);
+			
+			UpdateController update = AppBase.sgetUpdateController();
+			update.fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE);
+		}
 	}
 
 	/**
