@@ -92,6 +92,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
+import org.rcsb.mbt.glscene.geometry.UnitCell;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Conformation;
 import org.rcsb.mbt.model.Helix;
@@ -112,6 +114,8 @@ import org.rcsb.mbt.model.StructureComponentRegistry;
 public class TestStructureLoader
 	implements IFileStructureLoader, IBatchStructureLoader
 {
+	private Structure structure = null;
+	
 	/**
 	 * Returns the common name for the loader implementation.
 	 * This is the string that might appear in a user-selectable menu.
@@ -137,7 +141,7 @@ public class TestStructureLoader
 	public Structure load( final String name )
 	{
 		// JLM DEBUG - TEST CODE
-		final Structure structure = new Structure()
+		structure = new Structure()
 		{
 			private int sc_count = 50; // How many test objects to deliver
 			private java.util.Random random = new java.util.Random( );
@@ -333,6 +337,22 @@ public class TestStructureLoader
 	public boolean canLoad( final URL url )
 	{
 		return true; // DEBUG
+	}
+
+	public PdbToNdbConverter getIDConverter() {
+		return null;
+	}
+
+	public String[] getNonProteinChainIds() {
+		return null;
+	}
+
+	public Structure getStructure() {
+		return structure;
+	}
+
+	public UnitCell getUnitCell() {
+		return null;
 	}
 }
 

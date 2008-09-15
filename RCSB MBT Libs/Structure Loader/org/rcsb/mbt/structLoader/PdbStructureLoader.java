@@ -148,6 +148,7 @@ import java.util.zip.*;
 
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
+import org.rcsb.mbt.glscene.geometry.UnitCell;
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.util.*;
 
@@ -170,6 +171,7 @@ public class PdbStructureLoader
 	protected String urlString = null;
 	private long expectedInputBytes = 1;
 	private PdbToNdbConverter converter = null;
+	private Structure structure;
 	
 	// A hashtable of vectors where
 	// each hash KEY is the StructureComponent type String.
@@ -214,7 +216,7 @@ public class PdbStructureLoader
 	 */
 	public Structure load( final String name )
 	{
-		Structure structure = null;
+		structure = null;
 		try
 		{	
 			final File file = new File( name );
@@ -464,18 +466,13 @@ public class PdbStructureLoader
 		int modelCount = 0; // How many models have we seen?
 		try
 		{
-			while ( bufferedInputStream.available() > 0 )
+			while ( true )
 			{
 				// Re-fill the raw data buffer.
-				try
-				{
-					lastRead = bufferedInputStream.read( buf, 0, buf.length );
-				}
-				catch( final IOException e )
-				{
-					Status.output( Status.LEVEL_ERROR, "PdbStructureLoader.load( stream ): " + e );
-					return null;
-				}
+
+				lastRead = bufferedInputStream.read( buf, 0, buf.length );
+				if (lastRead == -1) break;
+
 				bytesRead += lastRead;
 
 				readCount++;
@@ -1030,7 +1027,7 @@ public class PdbStructureLoader
 		//
 		// Create the Structure object
 		//
-		final Structure structure = new Structure()
+		structure = new Structure()
 		{
 			// A hashtable of vectors where
 			// each hash KEY is the StructureComponent type String.
@@ -1100,12 +1097,28 @@ public class PdbStructureLoader
 	}
 
 
-	public PdbToNdbConverter getConverter() {
+	public PdbToNdbConverter getIDConverter() {
 		return this.converter;
 	}
 	
 	private boolean shouldRecordMoreModels(final int modelCount) {
 		return AppBase.sgetSceneController().shouldTreatModelsAsSubunits() || modelCount < 2;
 	}
+	
+	/**
+	 * get the completed structure.
+	 * @return
+	 */
+    public Structure getStructure() { return structure; }
+
+	/**
+	 */
+	public String[] getNonProteinChainIds() { return null; }
+	
+	/**
+	 * get the unit cell for biological units
+	 * @return
+	 */
+	public UnitCell getUnitCell() { return null; };
 }
 

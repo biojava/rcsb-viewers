@@ -10,7 +10,7 @@ import org.rcsb.mbt.controllers.update.UpdateController;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.StructureModel;
-import org.rcsb.mbt.structLoader.IStructureXMLHandler;
+import org.rcsb.mbt.structLoader.IStructureLoader;
 import org.rcsb.mbt.structLoader.StructureXMLHandler;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 
@@ -84,7 +84,7 @@ public abstract class AppBase
 		public StructureModel createModel() { return new StructureModel(); }
 		public GlGeometryViewer createGlGeometryViewer() { return new GlGeometryViewer(); }
 		public JoglSceneNode createSceneNode() { return new JoglSceneNode(); }
-		public IStructureXMLHandler createStructureXMLHandler(String dataset) { return new StructureXMLHandler(dataset); }
+		public IStructureLoader createStructureXMLHandler(String dataset) { return new StructureXMLHandler(dataset); }
 
 	}
 

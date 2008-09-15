@@ -2,7 +2,7 @@ package org.rcsb.ks.controllers.doc;
 
 import org.rcsb.ks.controllers.app.KioskViewer;
 import org.rcsb.mbt.controllers.doc.DocController;
-import org.rcsb.mbt.structLoader.IStructureXMLHandler;
+import org.rcsb.mbt.structLoader.IStructureLoader;
 
 
 public class KSDocController extends DocController
@@ -13,7 +13,7 @@ public class KSDocController extends DocController
 	 * @param dataset
 	 * @return
 	 */
-	protected IStructureXMLHandler createStructureXMLHandler(String dataset)
+	protected IStructureLoader createStructureXMLHandler(String dataset)
 	{
 		return new KSStructureXMLHandler(dataset);
 	}

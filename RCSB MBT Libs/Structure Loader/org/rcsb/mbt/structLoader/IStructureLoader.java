@@ -61,6 +61,8 @@
 package org.rcsb.mbt.structLoader;
 
 
+import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
+import org.rcsb.mbt.glscene.geometry.UnitCell;
 import org.rcsb.mbt.model.Structure;
 
 
@@ -68,7 +70,7 @@ import org.rcsb.mbt.model.Structure;
  *  Defines the standard interface for classes which know how to load
  *  Structure objects. While a StructureLoader sub-class can
  *  be instantiated and used directly to load Structure objects, the
- *  StructureFactory class provides a wrapper to enable an application
+ *  StructureFactory class provides a wrapper to enable an application£
  *  to make calls to a single common interface which provides the logic
  *  to determine which loader is capable of loading a given named structure.
  *  <P>
@@ -102,9 +104,29 @@ public interface IStructureLoader
 	/**
 	 * Returns true if the loader is capable of loading the structure,
 	 * or false otherwise. This enables higher-level code to be able
-	 * to build a context sensative menu of only the loaders that can
+	 * to build a context sensitive menu of only the loaders that can
 	 * load a given structure name.
 	 */
 	public boolean canLoad( String name );
+	
+	/**
+	 * get the completed structure.
+	 * @return
+	 */
+    public abstract Structure getStructure();
+
+    /**
+     */
+	public abstract PdbToNdbConverter getIDConverter();
+
+	/**
+	 */
+	public abstract String[] getNonProteinChainIds();
+	
+	/**
+	 * get the unit cell for biological units
+	 * @return
+	 */
+	public abstract UnitCell getUnitCell();
 }
 

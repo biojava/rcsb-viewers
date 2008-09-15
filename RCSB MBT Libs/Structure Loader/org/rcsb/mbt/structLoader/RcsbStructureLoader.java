@@ -76,6 +76,8 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 
+import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
+import org.rcsb.mbt.glscene.geometry.UnitCell;
 import org.rcsb.mbt.glscene.jogl.Constants;
 import org.rcsb.mbt.model.*;
 
@@ -99,6 +101,7 @@ public class RcsbStructureLoader
 		"ftp://beta.rcsb.org/pub/pdb/uniformity/data/mmCIF.gz/all/";
 	private final String rcsbSitePostfix =
 		".cif.gz";
+	private Structure structure = null;
 
 	/**
 	 * Returns the names of all structures which are available to the
@@ -212,7 +215,8 @@ public class RcsbStructureLoader
 			throw new IllegalArgumentException( "bad PDB ID" );
 		}
 
-		return this.cifStructureLoader.load( url );
+		structure = cifStructureLoader.load(url);
+		return structure;
 	}
 
 	/**
@@ -241,6 +245,22 @@ public class RcsbStructureLoader
 //		}
 
 		return true;
+	}
+
+	public PdbToNdbConverter getIDConverter() {
+		return null;
+	}
+
+	public String[] getNonProteinChainIds() {
+		return null;
+	}
+
+	public Structure getStructure() {
+		return structure;
+	}
+
+	public UnitCell getUnitCell() {
+		return null;
 	}
 }
 

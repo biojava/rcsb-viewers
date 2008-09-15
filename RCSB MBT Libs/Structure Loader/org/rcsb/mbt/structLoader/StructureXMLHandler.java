@@ -55,7 +55,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author John Beaver, Jeff Milton
  * @author (revised) rickb
  */
-public class StructureXMLHandler extends DefaultHandler implements IStructureXMLHandler
+public class StructureXMLHandler extends DefaultHandler implements IStructureLoader
 {
 	/**
 	 * Base class for all XML Parser Runnables declared here
@@ -1254,6 +1254,23 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureXML
     ///
     /// END Overrideable Runnables
     ///
+
+	public boolean canLoad(String name) {
+		return true;
+	}
+	
+	public String getLoaderName() {
+		return null;
+	}
+	
+	/**
+	 * XML is handled differently (but I'm not sure why....)
+	 * So, 'load' doesn't do anything.
+	 * This may change...
+	 */
+	public Structure load(String name) {
+		return null;
+	}
 }
 
 class CustomStructure extends Structure {

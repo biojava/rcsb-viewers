@@ -156,6 +156,8 @@ package org.rcsb.mbt.structLoader;
 // MBT
 
 // OpenMMS
+import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
+import org.rcsb.mbt.glscene.geometry.UnitCell;
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.util.*;
 import org.rcsb.mbt.structLoader.CifStructureLoaderImpl.MbtBuilder;
@@ -182,6 +184,7 @@ public class CifStructureLoader
 	protected CifDictionary cifDictionary = null;
 	protected CifParser cifParser = null;
 	protected MbtBuilder mbtBuilder = null;
+	protected Structure structure = null;
 
 	// Tells the loader to use "label" fields instead of "auth" fields.
 	// The "auth" values are old PDB style mappings for chain IDs,
@@ -333,12 +336,6 @@ public class CifStructureLoader
 			Status.output( Status.LEVEL_ERROR, "CifStructureLoader.load, error " + oome );
 			return null;
 		}
-
-		//
-		// Create a new structure object.
-		//
-
-		Structure structure = null;
 
 		try
 		{
@@ -907,7 +904,7 @@ public class CifStructureLoader
 	 */
 	public Structure load( final File file )
 	{
-		Structure structure = null;
+		structure = null;
 		try
 		{
 			structure = this.load( file.toURL().toExternalForm() );
@@ -948,7 +945,7 @@ public class CifStructureLoader
 	 */
 	public Structure load( final URL url )
 	{
-		Structure structure = null;
+		structure = null;
 		try
 		{
 			structure = this.load( url.toExternalForm() );
@@ -974,6 +971,26 @@ public class CifStructureLoader
 	public boolean canLoad( final URL url )
 	{
 		return this.canLoad( url.toExternalForm( ) );
+	}
+
+
+	public PdbToNdbConverter getIDConverter() {
+		return null;
+	}
+
+
+	public String[] getNonProteinChainIds() {
+		return null;
+	}
+
+
+	public Structure getStructure() {
+		return structure;
+	}
+
+
+	public UnitCell getUnitCell() {
+		return null;
 	}
 }
 

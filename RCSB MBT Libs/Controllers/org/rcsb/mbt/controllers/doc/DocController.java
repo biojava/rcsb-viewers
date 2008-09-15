@@ -28,7 +28,7 @@ import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.util.Status;
-import org.rcsb.mbt.structLoader.IStructureXMLHandler;
+import org.rcsb.mbt.structLoader.IStructureLoader;
 import org.rcsb.mbt.structLoader.PdbStructureLoader;
 import org.rcsb.mbt.structLoader.StructureXMLHandler;
 import org.rcsb.mbt.ui.dialogs.ImageFileManager;
@@ -111,7 +111,7 @@ public class DocController
 				try
 				{
 					// long time = System.currentTimeMillis();
-					final IStructureXMLHandler handler = AppBase.sgetAppModuleFactory().createStructureXMLHandler(dataset);
+					final IStructureLoader handler = AppBase.sgetAppModuleFactory().createStructureXMLHandler(dataset);
 					final SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
 	
 					BufferedReader reader = null;
@@ -211,7 +211,7 @@ public class DocController
 				else 
 					structureTmp = loader.load(new File(dataset));
 	
-				residueConverter = loader.getConverter();
+				residueConverter = loader.getIDConverter();
 				nonProteinChainIds = new String[] {};
 						// **JB don't worry about this for now...
 				
@@ -395,7 +395,7 @@ public class DocController
 	 * @param handler - the active XML handler
 	 * @param structureTmp - the newly created structure
 	 */
-	public void finalizeNewStructure(IStructureXMLHandler handler, Structure structureTmp)
+	public void finalizeNewStructure(IStructureLoader handler, Structure structureTmp)
 	{
 		StructureMap structureMap = new StructureMap(structureTmp, AppBase.sgetAppModuleFactory().createSceneNode());
 		// explicitly create a structureMap for the struc

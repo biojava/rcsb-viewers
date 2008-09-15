@@ -84,6 +84,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
+import org.rcsb.mbt.glscene.geometry.UnitCell;
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.util.*;
 
@@ -100,6 +102,7 @@ public class FastaStructureLoader
 	implements IFileStructureLoader
 {
 	protected String urlString;
+	private Structure structure = null;
 
 	//
 	// StructureLoader interface methods
@@ -134,7 +137,7 @@ public class FastaStructureLoader
 			return null;
 		}
 
-		Structure structure = null;
+		structure = null;
 		try
 		{	
 			final File file = new File( name );
@@ -332,7 +335,7 @@ public class FastaStructureLoader
 			}
 		}
 
-		final Structure structure = new Structure()
+		structure = new Structure()
 		{
 			String urlStr = FastaStructureLoader.this.urlString;
 			byte data[] = rawData;
@@ -393,6 +396,26 @@ public class FastaStructureLoader
 		};
 
 		return structure;
+	}
+
+
+	public PdbToNdbConverter getIDConverter() {
+		return null;
+	}
+
+
+	public String[] getNonProteinChainIds() {
+		return null;
+	}
+
+
+	public Structure getStructure() {
+		return null;
+	}
+
+
+	public UnitCell getUnitCell() {
+		return null;
 	}
 
 }
