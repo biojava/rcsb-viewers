@@ -5,7 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
@@ -705,10 +707,14 @@ public class StateBase
 		return title;
 	}
 
-	protected Document createDocument() throws ParserConfigurationException {
-		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		final Document doc = factory.newDocumentBuilder().newDocument();
+	protected Document createDocument() throws ParserConfigurationException
+	{
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setNamespaceAware(true);
+				// apparently a 'gotcha' when reading - the writer/reader
+				// can error out if this not set (according to jdk1.6 doc.)
 		
+		Document doc = factory.newDocumentBuilder().newDocument();
 		return doc;
 	}
 	
@@ -726,7 +732,9 @@ public class StateBase
 		
 		return child;
 	}
-		public void captureCurrentState(final String title) {
+	
+	public void captureCurrentState(final String title)
+	{
 		try {
 	    	document = createDocument();
 			root = appendRoot(document);
@@ -772,18 +780,30 @@ public class StateBase
 	{
 	}
 	
-	public void loadState(final File file)
+	public boolean loadState(final File file)
 	{
 		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		try {
 			document = factory.newDocumentBuilder().parse(new FileInputStream(file));
 			
 			// find the title.
-			final NodeList titles = document.getElementsByTagName("Title");
-			if(titles.getLength() > 0) {
-				final Element titleElement = (Element)titles.item(0);
-				title = titleElement.getAttribute("value");
+			NodeList nodes = document.getElementsByTagName("Structure");
+			Structure activeStruct = AppBase.sgetModel().getStructures().get(0);
+			String nodeUrl = nodes.item(0).getAttributes().getNamedItem("url").getTextContent();
+			if (activeStruct.getUrlString().equalsIgnoreCase(nodeUrl))
+			{
+				nodes = document.getElementsByTagName("Title");
+				if(nodes.getLength() > 0)
+				{
+					final Element titleElement = (Element)nodes.item(0);
+					title = titleElement.getAttribute("value");
+					return true;
+				}
 			}
+			
+			else
+				Status.output(Status.LEVEL_ERROR, "State file does not match active structure URL");
+
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (final SAXException e) {
@@ -793,6 +813,8 @@ public class StateBase
 		} catch (final ParserConfigurationException e) {
 			e.printStackTrace();
 		}
+		
+		return false;
 	}
 	
 	protected void setViewerInfo()
@@ -905,7 +927,8 @@ public class StateBase
 
         // Write the DOM document to the file
         Transformer xformer;
-		try {
+		try
+		{
 			xformer = TransformerFactory.newInstance().newTransformer();
 			xformer.transform(source, result);
 		} catch (final TransformerConfigurationException e) {
@@ -1200,7 +1223,11 @@ public class StateBase
 			{
 				synchronized(glViewer.renderablesToDestroy)
 				{
-					for (StructureComponent comp : renderables.keySet())
+					Set<StructureComponent> renderablesKeys = new HashSet<StructureComponent>(renderables.keySet());
+								// clone this, because the following loop expects to be able to
+								// modify the 'renderables' collection
+					
+					for (StructureComponent comp : renderablesKeys)
 					{
 						final DisplayListRenderable renderable = renderables.get(comp);
 						
@@ -1216,7 +1243,7 @@ public class StateBase
 								glViewer.renderablesToDestroy.add(renderable);
 								renderables.remove(comp);
 							}
-						} if(comp.getStructureComponentType() == StructureComponentRegistry.TYPE_CHAIN) {
+						} else if(comp.getStructureComponentType() == StructureComponentRegistry.TYPE_CHAIN) {
 							final Chain c = (Chain)comp;
 							
 							final int residueCount = c.getResidueCount();

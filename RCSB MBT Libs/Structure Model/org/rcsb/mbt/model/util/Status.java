@@ -162,6 +162,9 @@ public class Status
 	//
 	// Private variables.
 	//
+	
+	private static String lastMessage = "";
+	public static String getLastMessage() { return lastMessage; }
 
 	/**
 	 * A Vector of human-readable level names corresponding to level numbers.
@@ -308,6 +311,8 @@ public class Status
 	 */
 	public static void output( final int level, final String message )
 	{
+		lastMessage = message;
+		
 		if ( level <= Status.output_level )
 		{
 			if ( (Status.statusEvent == null) || (Status.statusListeners == null) )

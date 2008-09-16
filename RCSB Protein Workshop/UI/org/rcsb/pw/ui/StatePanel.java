@@ -14,6 +14,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -23,6 +24,7 @@ import javax.swing.event.ListSelectionListener;
 
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.doc.DocController;
+import org.rcsb.mbt.model.util.Status;
 import org.rcsb.pw.controllers.app.PWState;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 
@@ -145,17 +147,31 @@ public class StatePanel extends JPanel implements LayoutManager, ActionListener,
 			final PWState state = new PWState();
 			state.captureCurrentState(this.titleField.getText());
 			this.listModel.addElement(state);
-		} else if(source == this.loadStateButton) {
+		}
+		
+		else if(source == this.loadStateButton)
+		{
 			final File file = docController.askUserForXmlFile("Load");
 			final PWState state = new PWState();
-			state.loadState(file);
-			this.listModel.addElement(state);
-		} else if(source == this.removeButton) {
+			if (state.loadState(file))
+				this.listModel.addElement(state);
+			
+			else
+				JOptionPane.showMessageDialog(null, Status.getLastMessage(),
+											  Status.getLevelName(Status.LEVEL_ERROR),
+											  JOptionPane.ERROR_MESSAGE);
+		}
+		
+		else if(source == this.removeButton)
+		{
 			final int selectedIndex = this.stateList.getSelectedIndex();
-			if(selectedIndex >= 0) {
+			if(selectedIndex >= 0)
 				this.listModel.removeElementAt(selectedIndex);
-			}
-		} else if(source == this.writeButton) {
+			
+		}
+		
+		else if(source == this.writeButton)
+		{
 			final PWState state = (PWState)this.stateList.getSelectedValue();
 			if(state != null) {
 				File file = docController.askUserForXmlFile("Write");
@@ -168,6 +184,8 @@ public class StatePanel extends JPanel implements LayoutManager, ActionListener,
 				}
 			}
 		}
+		
+		AppBase.sgetGlGeometryViewer().requestRepaint();
 	}
 
 	public void valueChanged(final ListSelectionEvent e) {
