@@ -20,6 +20,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
@@ -32,7 +34,7 @@ import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.util.Status;
 
 
-public class LigandSideBar extends JPanel implements IUpdateListener
+public class LigandSideBar extends JPanel
 {
 	private final class InteractionListener implements ActionListener {
 		private final JCheckBox box;
@@ -364,6 +366,16 @@ public class LigandSideBar extends JPanel implements IUpdateListener
 			this.ligandJList = new JList(this.ligandList);
 			this.ligandJList
 					.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			ligandJList.getSelectionModel().addListSelectionListener(
+				new ListSelectionListener()
+				{
+
+					public void valueChanged(ListSelectionEvent e)
+					{
+						applyButton.doClick();
+					}					
+				});
+			
 			final JScrollPane ligandScroller = new JScrollPane(this.ligandJList);
 
 			if (this.ligandList.size() > 0) {
@@ -754,19 +766,4 @@ public class LigandSideBar extends JPanel implements IUpdateListener
 		}
 		return ligandList;
 	}
-
-	public void handleUpdateEvent(final UpdateEvent evt) 
-	{
-		LXDocumentFrame mainFrame = LigandExplorer.sgetActiveFrame();
-
-		switch (evt.action)
-		{
-		case STRUCTURE_ADDED:
-		case STRUCTURE_REMOVED:
-			mainFrame.sidebar = new LigandSideBar(mainFrame);
-			mainFrame.displaySideBar(mainFrame.sidebar);
-			break;
-		}
-	}
-
 }

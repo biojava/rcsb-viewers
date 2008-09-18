@@ -54,7 +54,7 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 		 * @author rickb
 		 *
 		 */
-		class LoadThread extends Thread
+		protected class LoadThread extends Thread
 		{
 			private String _url, _pdbid;
 			
@@ -73,6 +73,7 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 				ProgressPanelController.EndProgress();
 				if (!getModel().hasStructures())
 					JOptionPane.showMessageDialog(null, "Structure not found: " + _pdbid + "\nPlease check file/url specification and try again.", "Error", JOptionPane.ERROR_MESSAGE); 
+				getGlGeometryViewer().updateUI();
 			}
 		};
 		

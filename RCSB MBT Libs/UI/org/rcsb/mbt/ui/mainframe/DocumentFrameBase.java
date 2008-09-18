@@ -132,6 +132,7 @@ public abstract class DocumentFrameBase extends JFrame
 	public void initialize(boolean showFrame)
 	{
 		_showFrame = showFrame;
-		AppBase.sgetAppModuleFactory().createGlGeometryViewer();
+		AppBase.sgetGlGeometryViewer();
+						// force the geometryviewer creation
 	}
 }

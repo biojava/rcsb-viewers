@@ -27,9 +27,13 @@ public class UpdateController
 	 * @author rickb
 	 *
 	 */
-	public class UpdateListenerVec extends Vector<IUpdateListener>{};	
+	public class UpdateListenerVec extends Vector<IUpdateListener>{};
 
 	private UpdateListenerVec views = new UpdateListenerVec();
+	private UpdateListenerVec pending = null;
+	private UpdateListenerVec blockedListeners = new UpdateListenerVec();
+	
+	private boolean inUpdate = false;
 	
 	public void clear()
 	{
@@ -50,12 +54,47 @@ public class UpdateController
 	public void registerListener( final IUpdateListener listener )
 		throws IllegalArgumentException
 	{
-		assert (listener != null );
-		assert (!views.contains(listener));
-
-		this.views.add( listener );
+		if (!views.contains(listener))
+		{
+			if (inUpdate)
+						// oops - modifying during an update...
+						// can't put on views queue.
+						// put in temporary 'pending' queue
+			{
+				if (pending == null)
+					pending = new UpdateListenerVec();
+				if (!pending.contains(listener))
+					pending.add(listener);
+			}
 		
-		fireUpdateViewEvent(UpdateEvent.Action.VIEW_ADDED, listener);
+			else
+			{
+				this.views.add( listener );
+				fireUpdateViewEvent(UpdateEvent.Action.VIEW_ADDED, listener);
+			}
+		}
+	}
+	
+	/**
+	 * Prevent a listener from receiving events
+	 * 
+	 * @param listener
+	 */
+	public void blockListener( final IUpdateListener listener)
+	{
+		if (views.contains(listener) && !blockedListeners.contains(listener))
+			blockedListeners.add(listener);
+	}
+	
+	/**
+	 * Listener can resume receiving events
+	 * 
+	 * @param listener
+	 */
+	public void unblockListener( final IUpdateListener listener)
+	{
+		if (blockedListeners.contains(listener))
+			blockedListeners.remove(listener);
 	}
 
 	/**
@@ -103,12 +142,64 @@ public class UpdateController
 	
 	protected void fireUpdateViewEvent( final UpdateEvent evt )
 	{
-		for (IUpdateListener view : views)
-			view.handleUpdateEvent(evt);
+		boolean first = true;
+		
+		inUpdate = true;
+		
+		do
+		{
+			for (IUpdateListener view : views)
+			{
+				if (blockedListeners.contains(view)) continue;
+					// ignore blocked listeners
+				
+				if (first)
+					view.handleUpdateEvent(evt);
 					// what!!!  This isn't firing an event!!
 					// this is just an interface call!!!
 					//
 					// it would be better if it *were* an event, though...
 					// think about that...
+				
+				else
+					// new components may have been registered as a result of
+					// an update.  They will have been put on the 'pending' queue
+					// (otherwise, if they're put on the 'views' queue, we get a
+					// 'concurrent modification' exception.)
+					//
+					// after the first pass, the main queue is updated from the
+					// pending queue and the next pass initiated.  So, we only
+					// want to send the update event to new registrants.  We
+					// use the 'pending.contains' function to check that.
+					//
+					// if more views register in subsequent passes, that's ok -
+					// they'll get pushed on to the pending queue (which we aren't
+					// traversing) and get handled on the next pass.
+					//
+					if (pending.contains(view))
+					{
+						view.handleUpdateEvent(evt);
+						pending.removeElement(view);
+								// now we can remove the view
+					}
+			}
+			
+			// update the pending queue
+			//
+			if (pending != null)
+				if (pending.isEmpty())
+					pending = null;
+				else
+					for (IUpdateListener view : pending)
+						views.add(view);
+							// transfer references to the views list
+							// for the next go round.  Don't remove, yet...
+			
+			first = false;
+							// subsequent passes...
+			
+		} while (pending != null);
+		
+		inUpdate = false;
 	}
 }

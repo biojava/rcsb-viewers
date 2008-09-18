@@ -13,6 +13,13 @@ public class LXModel extends StructureModel
 	private final InteractionMap interactionMap = new InteractionMap();
     private ContactMap contactMap = null;
     
+    @Override
+    public void clear()
+    {
+    	super.clear();
+    	initialLigand = null;
+    }
+    
     /**
      * Gets the residue name and id from the residue and atom.  Used primarily in the
      * ligandJList in the sidebar

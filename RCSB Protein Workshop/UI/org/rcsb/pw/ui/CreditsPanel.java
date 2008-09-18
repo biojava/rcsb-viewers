@@ -42,7 +42,9 @@ public class CreditsPanel extends JPanel implements ActionListener, ClipboardOwn
 							"<body>" +
 								"Online documentation: [<a href=\"http://www.pdb.org/robohelp/viewers/proteinworkshop.htm\">here</a>]<br>" +
 								"Flash tutorial: [<a href=\"http://www.pdb.org/pdbstatic/tutorials/viewers/pw.swf\">here</a>]" +
-								"<p>Written by John Beaver, with contributions from Philipp Steeger, based on a specification provided by Phil Bourne and using the molecular biology toolkit (MBT).</p>" +
+								"<p>Scientific Lead: <u>Dr. Peter Rose, Dr. Phil Bourne</u></p>" +
+								"<p>Original implementation: John Beaver, with contributions from Philipp Steeger, based on a specification provided by Phil Bourne and using the molecular biology toolkit (MBT).</p>" +
+								"<p>Version 3 re-architect: Garrick Berger</p>" +
 								"<p>Published figures using this tool should cite:</p>" +
 								"<p>" +
 									this.citation + " [<a href=\"http://www.biomedcentral.com/1471-2105/6/21\">paper here</a>]" +

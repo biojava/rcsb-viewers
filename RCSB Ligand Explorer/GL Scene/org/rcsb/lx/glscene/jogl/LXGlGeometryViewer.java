@@ -25,6 +25,7 @@ import org.rcsb.lx.ui.LigandSideBar;
 import org.rcsb.lx.ui.dialogs.IPickInfoReceiver;
 import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
+import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.glscene.jogl.AtomGeometry;
 import org.rcsb.mbt.glscene.jogl.BondGeometry;
 import org.rcsb.mbt.glscene.jogl.ChainGeometry;
@@ -70,6 +71,18 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 					//
 					// 	rickb - 23-May-08
 	}
+
+	/**
+	 * Initial ligand has been reset - request it to be redrawn
+	 * 
+	 * We have to do this because of the staged way displays take place -
+	 * once numberTimesDisplay gets to 3, displayInitialLigand is locked out.
+	 */
+	public void requestRedrawInitialLigand()
+	{
+		this.numberTimesDisplayed = 0;
+		requestRepaint();
+	}
 	
 	private void displayInitialLigand()
 	{
@@ -77,22 +90,24 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		LXModel model = LigandExplorer.sgetModel();
 		LigandSideBar sidebar = activeFrame.getLigandSideBar();
 		Vector ligandList = sidebar.getLigandList();
-		final int ligSize = ligandList.size();
-		final String initialLigand = model.getInitialLigand();
-		
-		if(initialLigand != null)
+		if (ligandList != null)
 		{
-			for(int i = 0; i < ligSize; i++)
+			final int ligSize = ligandList.size();
+			final String initialLigand = model.getInitialLigand();
+			
+			if(initialLigand != null)
 			{
-				Residue r = (Residue)ligandList.get(i);
-				if(r.toString().toLowerCase().indexOf(initialLigand.toLowerCase()) >= 0)
+				for(int i = 0; i < ligSize; i++)
 				{
-					sidebar.getLigandJList().setSelectedIndex(i);
-					activeFrame.getLigandSideBar().applyButton.doClick();
+					Residue r = (Residue)ligandList.get(i);
+					if(r.toString().toLowerCase().indexOf(initialLigand.toLowerCase()) >= 0)
+					{
+						sidebar.getLigandJList().setSelectedIndex(i);
+						activeFrame.getLigandSideBar().applyButton.doClick();
+					}
 				}
 			}
 		}
-
 	}
 
 	@Override
@@ -682,9 +697,10 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		case CLEAR_ALL:
 			clearStructure(evt.transitory);
 			break;
-			
+
 		default:
 			super.handleUpdateEvent(evt);
+			break;
 		}
 	}
 	
@@ -915,11 +931,14 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 			// controller to send a 'remove all' signal and then an 'add all'
 			// signal.
 			//
-			// Could likely make this more efficient...
+			// This is really pretty wanky - should look this over and fix.
 			//
+			LXDocumentFrame activeFrame = LigandExplorer.sgetActiveFrame();
 			LXUpdateController update = LigandExplorer.sgetActiveFrame().getUpdateController();
+			update.blockListener(activeFrame);
 			update.removeStructure(true);
 			update.fireStructureAdded(structure, false, true);
+			update.unblockListener(activeFrame);
 
 			final ChainStyle cs = (ChainStyle) structureStyles.getStyle(structureMap
 					.getChain(0)); // **JB assume that all chain styles are the

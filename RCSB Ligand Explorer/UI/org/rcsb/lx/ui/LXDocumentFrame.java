@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.Vector;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -43,6 +44,8 @@ import org.rcsb.lx.ui.dialogs.AngleDialog;
 import org.rcsb.lx.ui.dialogs.DihedralDialog;
 import org.rcsb.lx.ui.dialogs.DistanceDialog;
 import org.rcsb.lx.ui.dialogs.IPickInfoReceiver;
+import org.rcsb.mbt.controllers.update.IUpdateListener;
+import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.glscene.jogl.Constants;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.StructureModel;
@@ -56,7 +59,7 @@ import org.rcsb.vf.ui.VFDocumentFrameBase;
 
 
 
-public class LXDocumentFrame extends VFDocumentFrameBase
+public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListener
 {
 	private static final long serialVersionUID = 8096107058379203682L;
 	
@@ -88,7 +91,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase
 			}
 		}
 		
-		/***
+		/**
 		 * Race condition - if we check and dispose the current displayDialog
 		 * in the UI thread, then create a new dialog, we'll receive the
 		 * WindowClosed event *after* the new dialog has been created and
@@ -277,11 +280,13 @@ public class LXDocumentFrame extends VFDocumentFrameBase
 								String url = Constants.pdbFileBase + pdbId
 										+ Constants.pdbFileExtension;
 								LigandExplorer.sgetDocController().loadStructure(url, pdbId);
-	
+
+/* **
 								Status.progress(-1, "Creating side bar...");
 								sidebar = new LigandSideBar(LXDocumentFrame.this);
 								LXDocumentFrame.this
 										.displaySideBar(sidebar);
+* **/
 							}
 							// if ( cmd.equals( "comboBoxEdited" ) )
 						}
@@ -452,12 +457,6 @@ public class LXDocumentFrame extends VFDocumentFrameBase
 		}
 	}
 	
-	public void reset()
-	{
-		this.sidebar = new LigandSideBar(this);
-		this.displaySideBar(this.sidebar);
-	}
-
 	public IPickInfoReceiver getDisplayDialog()
 	{
 		return this.displayDialog;
@@ -466,6 +465,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase
 	public LXDocumentFrame(final String title, URL iconUrl)
 	{
 		super(title, iconUrl);
+		getUpdateController().registerListener(this);
 	}
 	
 	
@@ -502,25 +502,45 @@ public class LXDocumentFrame extends VFDocumentFrameBase
 		this.inspectorFrame.setVisible(true);
 	}
 	
-	public void displayInitialLigand()
-	{
-		final int ligSize = this.sidebar.ligandList.size();
-		final String initialLigand = LigandExplorer.sgetModel().getInitialLigand();
-		if(initialLigand != null) {
-			for(int i = 0; i < ligSize; i++) {
-				Residue r = (Residue)this.sidebar.ligandList.get(i);
-				if(r.toString().toLowerCase().indexOf(initialLigand.toLowerCase()) >= 0) {
-					sidebar.ligandJList.setSelectedIndex(i);
-					sidebar.applyButton.doClick();
-				}
-			}
-		}
-	}
 	@Override
 	public void setTitle(String title)
 	{
 		super.setTitle("RCSB PDB Ligand Explorer "
 				+ LXVersionInformation.version()
 				+ " (powered by the MBT): " + title);
+	}
+	
+	public void handleUpdateEvent(UpdateEvent evt)
+	{
+		switch (evt.action)
+		{	
+			case CLEAR_ALL:
+				getModel().setInitialLigand(null);
+				break;
+				
+			case STRUCTURE_ADDED:
+						// This happens when loading a new file/url from the 
+						// menu.  We have to retrigger a few things to get the
+						// initial ligand set and redrawn.
+						//
+				sidebar = new LigandSideBar(this);
+				displaySideBar(sidebar);
+				if (getModel().getInitialLigand() == null)
+						// if the initial ligand hasn't been set...
+				{
+					Vector ligandList = sidebar.getLigandList();
+					if (ligandList != null && !ligandList.isEmpty())
+					{
+						Residue ligandResidue = (Residue)ligandList.get(0);
+							// pull the ligand list and get the first entry.
+						
+						getModel().setInitialLigand(ligandResidue.getCompoundCode());
+						getGlGeometryViewer().requestRedrawInitialLigand();
+							// set the initial ligand, and tell the geometry
+							// viewer this is a new situation.
+					}
+				}
+				break;	
+		}
 	}
 }
