@@ -19,6 +19,7 @@ import javax.swing.event.AncestorListener;
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.app.ProgressPanelController;
 import org.rcsb.mbt.controllers.scene.SceneController;
+import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Structure;
@@ -144,9 +145,6 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 				PWDocumentFrame.this.addWindowListener(closer);
 			}
 
-			if (!ProteinWorkshop.backgroundScreenshotOnly)
-				getUpdateController().registerListener(PWDocumentFrame.this.sidebar.mutators.tree);
-
 			GlGeometryViewer glViewer = getGlGeometryViewer();
 			
 			Status.progress(-1, "Creating Scene...");
@@ -156,13 +154,14 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 				String pdbId = "";
 				if (structure != null)
 				{
-					glViewer.structureAdded(structure);
-
 					final String url = structure.getUrlString();
 					String[] split = url.split("[/\\\\]");
 					split = split[split.length - 1].split("\\.");
 					pdbId = split[0];
 					structure.getStructureMap().setPdbId(pdbId);
+					
+					getUpdateController().fireUpdateViewEvent(UpdateEvent.Action.STRUCTURE_ADDED, structure);
+									// notify listeners there's a new structure in town...
 				}
 			}
 			
@@ -187,10 +186,7 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 			{
 				StructureModel model = AppBase.sgetModel();
 				if (model.hasStructures())
-					setTitle(
-									model.getStructures().get(0)
-											.getStructureMap()
-											.getPdbId());
+					setTitle(model.getStructures().get(0).getStructureMap().getPdbId());
 			}
 
 
@@ -205,16 +201,11 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 			if (_showFrame)
 				setVisible(true);
 
-			horizontalSplitPane
-					.addAncestorListener(PWDocumentFrame.this.new HorizontalSplitPaneListener(
-							PWDocumentFrame.this));
+			horizontalSplitPane.addAncestorListener(PWDocumentFrame.this.new HorizontalSplitPaneListener(PWDocumentFrame.this));
 
-			horizontalSplitPane
-					.setDividerLocation(PWDocumentFrame.this.horizontalSplitPane
-							.getWidth() - 375);
+			horizontalSplitPane.setDividerLocation(PWDocumentFrame.this.horizontalSplitPane.getWidth() - 375);
 			curSize = getSize();
-			horizontalBarDistanceFromRight = (int) PWDocumentFrame.this.curSize
-					.getWidth() - horizontalSplitPane.getDividerLocation();
+			horizontalBarDistanceFromRight = (int) PWDocumentFrame.this.curSize.getWidth() - horizontalSplitPane.getDividerLocation();
 
 			glViewer.setDoubleBuffered(false);
 			horizontalSplitPane.setDoubleBuffered(false);

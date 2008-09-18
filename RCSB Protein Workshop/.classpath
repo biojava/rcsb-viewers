@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="PWTools"/>
+	<classpathentry kind="src" path="PWTools (external - not in build)"/>
 	<classpathentry kind="src" path="Controllers"/>
 	<classpathentry kind="src" path="UI"/>
 	<classpathentry kind="src" path="GL Scene"/>

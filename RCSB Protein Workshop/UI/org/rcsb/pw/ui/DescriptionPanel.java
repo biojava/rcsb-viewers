@@ -13,22 +13,18 @@ public class DescriptionPanel extends JPanel {
 
 	public DescriptionPanel() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public DescriptionPanel(final boolean isDoubleBuffered) {
 		super(isDoubleBuffered);
-		// TODO Auto-generated constructor stub
 	}
 
 	public DescriptionPanel(final LayoutManager layout) {
 		super(layout);
-		// TODO Auto-generated constructor stub
 	}
 
 	public DescriptionPanel(final LayoutManager layout, final boolean isDoubleBuffered) {
 		super(layout, isDoubleBuffered);
-		// TODO Auto-generated constructor stub
 	}
 
 }
