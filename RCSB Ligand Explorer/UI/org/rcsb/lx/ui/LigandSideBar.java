@@ -447,7 +447,7 @@ public class LigandSideBar extends JPanel
 			this.add(l_h2o_pFLF2);
 			this.add(l_h2o_pPanel);
 
-			final JCheckBox otherBox = new JCheckBox("Hydrophobic");
+			final JCheckBox otherBox = new JCheckBox("Hydrophobic-Polar");
 			final LegendPanel otherPanel = new LegendPanel(Color.WHITE,
 					mainFrame.sidebarColor);
 			final FloatLimitField otherFLF1 = new FloatLimitField("1.9");
