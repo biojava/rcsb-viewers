@@ -14,8 +14,8 @@
 		<attribute name="subdir" />
 		<sequential>
 			<signjar 
-		    	alias="PDB" keystore="pdbkeys"
-		    	storepass="RCSB-PDB"
+		    	alias="RCSB-PDB" keystore="pdbkeys"
+		    	storepass="pdb0922"
 		    	preservelastmodified="true">
 				<path>
 					<fileset dir="@{subdir}" includes="**/*.jar" />
