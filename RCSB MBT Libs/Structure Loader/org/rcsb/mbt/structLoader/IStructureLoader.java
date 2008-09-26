@@ -75,7 +75,6 @@ import org.rcsb.mbt.model.Structure;
  *  to determine which loader is capable of loading a given named structure.
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.structLoader.StructureFactory
  *  @see	org.rcsb.mbt.model.Structure
  */
 public interface IStructureLoader
