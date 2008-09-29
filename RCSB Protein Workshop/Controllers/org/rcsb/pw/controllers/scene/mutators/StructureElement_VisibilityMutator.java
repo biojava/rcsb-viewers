@@ -169,7 +169,7 @@ public class StructureElement_VisibilityMutator extends Mutator {
 				while(chainIt.hasNext()) {
 					final Chain mbtChain = (Chain)chainIt.next();
 					
-					if(mbtChain.getClassification() == Residue.COMPOUND_AMINO_ACID) {
+					if(mbtChain.getClassification() == Residue.Classification.AMINO_ACID) {
 						return ss.isVisible(mbtChain.getResidue(0)) || (mbtChain.getResidueCount() > 1 && ss.isVisible(mbtChain.getResidue(1)));
 					}
 				}
@@ -192,7 +192,7 @@ public class StructureElement_VisibilityMutator extends Mutator {
 				while(chainIt.hasNext()) {
 					final Chain mbtChain = (Chain)chainIt.next();
 					
-					if(mbtChain.getClassification() == Residue.COMPOUND_AMINO_ACID) {
+					if(mbtChain.getClassification() == Residue.Classification.AMINO_ACID) {
 						return ss.isVisible(mbtChain.getResidue(0)) || (mbtChain.getResidueCount() > 1 && ss.isVisible(mbtChain.getResidue(1)));
 					}
 				}
@@ -222,7 +222,7 @@ public class StructureElement_VisibilityMutator extends Mutator {
 		// for backbones, make sure this is an amino acid chain...
 		if(sc.getStructureComponentType() == StructureComponentRegistry.TYPE_CHAIN) {
 			final Chain c = (Chain)sc;
-			if(c.getClassification() != Residue.COMPOUND_AMINO_ACID) {
+			if(c.getClassification() != Residue.Classification.AMINO_ACID) {
 				return;
 			}
 		}

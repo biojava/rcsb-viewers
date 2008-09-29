@@ -143,28 +143,8 @@ public class Residue
 	extends StructureComponent
 	implements java.lang.Cloneable
 {
-	/**
-	 * Residue compound classification is an amino acid.
-	 */
-	public static final String COMPOUND_AMINO_ACID = "Amino Acid";
+	public enum Classification { AMINO_ACID, NUCLEIC_ACID, LIGAND, WATER }
 
-	/**
-	 * Residue compound is a nucleic acid.
-	 */
-	public static final String COMPOUND_NUCLEIC_ACID = "Nucleic Acid";
-
-	/**
-	 * Residue compound classification is a ligand.
-	 */
-	public static final String COMPOUND_LIGAND = "Ligand";
-
-	// List of residue compound classifications.
-	public static final String COMPOUND_CLASSIFICATIONS[] =
-	{
-		Residue.COMPOUND_AMINO_ACID,
-		Residue.COMPOUND_NUCLEIC_ACID,
-		Residue.COMPOUND_LIGAND
-	};
 
 	// The Atom index for the alpha (backbone) atom
 	private int alphaAtomIndex = -1;
@@ -172,7 +152,7 @@ public class Residue
 	private static final String naAlphaAtomName = "P";
 
 	// The Atom records (if any) for the residue.
-	private Vector atoms = null;
+	private Vector<Atom> atoms = null;
 
 	// The parent Fragment (if any) for the residue.
 	private Fragment parentFragment = null;
@@ -182,7 +162,7 @@ public class Residue
 	private String compoundCode = "UNK";
 
 	// The compound classification for this residue.
-	private String classification = Residue.COMPOUND_LIGAND;
+	private Classification classification = Classification.LIGAND;
 
 	// The secondary structure conformation type assigned to this residue.
 	private String conformationType = Conformation.TYPE_UNDEFINED;
@@ -210,9 +190,9 @@ public class Residue
 	 * Constructor variant used when there will likely be no atom list
 	 * (eg: when only sequence data is loaded).
 	 */
-	public Residue( final String compoundCode )
+	public Residue( final String in_compoundCode )
 	{
-		this.compoundCode = compoundCode;
+		compoundCode = in_compoundCode;
 	}
 
 	/**
@@ -230,19 +210,21 @@ public class Residue
 	 *  Copy all of the field values from the parameter object into "this".
 	 */
 	
+	@Override
 	public void copy( final StructureComponent structureComponent )
 	{
-		this.setStructure( structureComponent.getStructure() );
+		setStructure( structureComponent.getStructure() );
 		final Residue residue = (Residue) structureComponent;
 
-		this.compoundCode   = residue.compoundCode;
-		this.alphaAtomIndex = residue.alphaAtomIndex;
+		compoundCode   = residue.compoundCode;
+		alphaAtomIndex = residue.alphaAtomIndex;
 	}
 
 	/**
 	 *  Clone this object.
 	 */
 	
+	@Override
 	public Object clone( )
 		throws CloneNotSupportedException
 	{
@@ -271,6 +253,7 @@ public class Residue
 	 *  This method returns the fully qualified name of this class.
 	 */
 	
+	@Override
 	public String getStructureComponentType( )
 	{
 		return Residue.className;
@@ -282,7 +265,7 @@ public class Residue
 	 */
 	protected void setFragment( final Fragment fragment )
 	{
-		this.parentFragment = fragment;
+		parentFragment = fragment;
 	}
 
 	/**
@@ -290,7 +273,7 @@ public class Residue
 	 */
 	public Fragment getFragment( )
 	{
-		return this.parentFragment;
+		return parentFragment;
 	}
 
 
@@ -302,24 +285,45 @@ public class Residue
 	 * Return the compound classification for this residue.
 	 * (eg: amino acid, nucleic acid, ligand, unknown).
 	 */
-	public String getClassification( )
+	public Classification getClassification( )
 	{
-		return this.classification;
+		return classification;
+	}
+	
+	/**
+	 * From the chain information, we've determined that the residue is
+	 * really part of a ligand.  Reclassify it as such.
+	 * Note we don't change waters.
+	 */
+	public void reClassifyAsLigand()
+	{
+		if (classification != Classification.WATER)
+			classification = Classification.LIGAND;
 	}
 
 	/**
 	 * Set the 3-letter compound code for this residue.
 	 */
-	public void setCompoundCode( final String compoundCode )
+	public void setCompoundCode( final String in_compoundCode, final String in_chainId )
 	{
-		this.compoundCode = compoundCode;
-
-		if ( AminoAcidInfo.getNameFromCode( compoundCode ) != null ) {
-			this.classification = Residue.COMPOUND_AMINO_ACID;
-		} else if ( NucleicAcidInfo.isNucleotide( compoundCode ) ) {
-			this.classification = Residue.COMPOUND_NUCLEIC_ACID;
-		} else {
-			this.classification = Residue.COMPOUND_LIGAND;
+		compoundCode = in_compoundCode; 
+	
+		if ( compoundCode.equals("HOH"))
+			classification = Classification.WATER;
+		
+		else if (in_chainId == StructureMap.defaultChainId)
+				classification = Classification.LIGAND;
+		
+		else
+		{
+			if ( AminoAcidInfo.getNameFromCode( compoundCode ) != null )
+				classification = Classification.AMINO_ACID;
+		
+			else if ( NucleicAcidInfo.isNucleotide( compoundCode ) )
+				classification = Classification.NUCLEIC_ACID;
+			
+			else
+				classification = classification.LIGAND;
 		}
 	}
 
@@ -328,7 +332,7 @@ public class Residue
 	 */
 	public String getCompoundCode( )
 	{
-		return this.compoundCode;
+		return compoundCode;
 	}
 
 	/**
@@ -336,10 +340,10 @@ public class Residue
 	 */
 	public int getAtomCount( )
 	{
-		if ( this.atoms == null ) {
+		if ( atoms == null ) {
 			return 0;
 		} else {
-			return this.atoms.size();
+			return atoms.size();
 		}
 	}
 
@@ -348,11 +352,11 @@ public class Residue
 	 */
 	public Atom getAtom( final int index )
 	{
-		if ( this.atoms == null ) {
+		if ( atoms == null ) {
 			throw new IndexOutOfBoundsException( "residue has no atoms" );
 		}
 
-		return (Atom) this.atoms.elementAt( index );
+		return atoms.elementAt( index );
 	}
 
 	/**
@@ -360,9 +364,9 @@ public class Residue
 	 * NOTE: The reference to the internal Vector is returned here
 	 * for performance reasons, so DO NOT MODIFY THE VECTOR!
 	 */
-	public Vector getAtoms( )
+	public Vector<Atom> getAtoms( )
 	{
-		return this.atoms;
+		return atoms;
 	}
 
 	/**
@@ -374,10 +378,10 @@ public class Residue
 			throw new IllegalArgumentException( "null atom" );
 		}
 
-		if ( this.atoms == null )
+		if ( atoms == null )
 		{
-			this.atoms = new Vector( );
-			this.setCompoundCode( atom.compound );
+			atoms = new Vector<Atom>( );
+			setCompoundCode( atom.compound, atom.chain_id );
 		}
 		else
 		{
@@ -398,14 +402,14 @@ public class Residue
 		// Do a binary search to determine where this atom should be added.
 
 		int low = 0;
-		final int atomCount = this.atoms.size();
+		final int atomCount = atoms.size();
 		int high = atomCount - 1;
 		int mid = 0;
 		final int atomNumber = atom.number;
 		while ( low <= high )
 		{
 			mid = (low + high) / 2;
-			final Atom atom2 = (Atom) this.atoms.elementAt( mid );
+			final Atom atom2 = atoms.elementAt( mid );
 			final int atomNumber2 = atom2.number;
 
 			if ( atomNumber < atomNumber2 ) {
@@ -423,33 +427,33 @@ public class Residue
 			mid += 1;
 		}
 
-		this.atoms.add( mid, atom );
+		atoms.add( mid, atom );
 
 
 		// Set the alphaAtomIndex, or the polymer head or tail atoms.
 
-		if ( this.classification == Residue.COMPOUND_AMINO_ACID )
+		if ( classification == Classification.AMINO_ACID )
 		{
-			if ( atom.name.equals( Residue.aaAlphaAtomName ) && (this.alphaAtomIndex < 0) ) {
-				this.alphaAtomIndex = mid;
+			if ( atom.name.equals( Residue.aaAlphaAtomName ) && (alphaAtomIndex < 0) ) {
+				alphaAtomIndex = mid;
 			}
 			if ( atom.name.equals( Residue.aaHeadAtomName ) ) {
-				this.polymerHeadAtom = atom;
+				polymerHeadAtom = atom;
 			}
 			if ( atom.name.equals( Residue.aaTailAtomName ) ) {
-				this.polymerTailAtom = atom;
+				polymerTailAtom = atom;
 			}
 		}
-		else if ( this.classification == Residue.COMPOUND_NUCLEIC_ACID )
+		else if ( classification == Classification.NUCLEIC_ACID )
 		{
-			if ( atom.name.equals( Residue.naAlphaAtomName ) && (this.alphaAtomIndex < 0) ) {
-				this.alphaAtomIndex = mid;
+			if ( atom.name.equals( Residue.naAlphaAtomName ) && (alphaAtomIndex < 0) ) {
+				alphaAtomIndex = mid;
 			}
 			if ( atom.name.equals( Residue.naHeadAtomName ) ) {
-				this.polymerHeadAtom = atom;
+				polymerHeadAtom = atom;
 			}
 			if ( atom.name.equals( Residue.naTailAtomName ) ) {
-				this.polymerTailAtom = atom;
+				polymerTailAtom = atom;
 			}
 		}
 	}
@@ -459,14 +463,14 @@ public class Residue
 	 */
 	public void removeAllAtoms( )
 	{
-		if ( this.atoms != null ) {
-			this.atoms.removeAllElements( );
+		if ( atoms != null ) {
+			atoms.removeAllElements( );
 		}
-		this.atoms = null;
-		this.setCompoundCode( "UNK" );
-		this.alphaAtomIndex = -1;
-		this.polymerHeadAtom = null;
-		this.polymerTailAtom = null;
+		atoms = null;
+		setCompoundCode( "UNK", StructureMap.defaultChainId);
+		alphaAtomIndex = -1;
+		polymerHeadAtom = null;
+		polymerTailAtom = null;
 	}
 
 	/**
@@ -474,40 +478,40 @@ public class Residue
 	 */
 	public void removeAtom( final int index )
 	{
-		if ( this.atoms == null ) {
+		if ( atoms == null ) {
 			throw new IndexOutOfBoundsException( "residue has no atoms" );
 		}
-		final Atom atom = this.getAtom( index );
-		this.atoms.remove( index );
+		final Atom atom = getAtom( index );
+		atoms.remove( index );
 		// Just removed the alpha atom
-		if ( index == this.alphaAtomIndex ) {
-			this.alphaAtomIndex = -1;
+		if ( index == alphaAtomIndex ) {
+			alphaAtomIndex = -1;
 		}
 		// Adjust the alpha atom index
-		if ( index < this.alphaAtomIndex ) {
-			this.alphaAtomIndex -= 1;
+		if ( index < alphaAtomIndex ) {
+			alphaAtomIndex -= 1;
 		}
-		if ( this.alphaAtomIndex < 0 ) {
-			this.alphaAtomIndex = -1;
+		if ( alphaAtomIndex < 0 ) {
+			alphaAtomIndex = -1;
 		}
-		if ( this.atoms.size() <= 0 ) {
-			this.removeAllAtoms( );
+		if ( atoms.size() <= 0 ) {
+			removeAllAtoms( );
 		}
 
-		if ( this.classification == Residue.COMPOUND_AMINO_ACID )
+		if ( classification == Classification.AMINO_ACID )
 		{
 			if ( atom.name.equals( Residue.aaHeadAtomName ) ) {
-				this.polymerHeadAtom = null;
+				polymerHeadAtom = null;
 			} else if ( atom.name.equals( Residue.aaTailAtomName ) ) {
-				this.polymerTailAtom = null;
+				polymerTailAtom = null;
 			}
 		}
-		else if ( this.classification == Residue.COMPOUND_NUCLEIC_ACID )
+		else if ( classification == Classification.NUCLEIC_ACID )
 		{
 			if ( atom.name.equals( Residue.naHeadAtomName ) ) {
-				this.polymerHeadAtom = null;
+				polymerHeadAtom = null;
 			} else if ( atom.name.equals( Residue.naTailAtomName ) ) {
-				this.polymerTailAtom = null;
+				polymerTailAtom = null;
 			}
 		}
 	}
@@ -520,7 +524,7 @@ public class Residue
 	 */
 	public int getAlphaAtomIndex( )
 	{
-		return this.alphaAtomIndex;
+		return alphaAtomIndex;
 	}
 
 
@@ -534,7 +538,7 @@ public class Residue
 	 */
 	public void setAlphaAtomIndex( final int index )
 	{
-		this.alphaAtomIndex = index;
+		alphaAtomIndex = index;
 	}
 
 	/**
@@ -543,10 +547,10 @@ public class Residue
 	 */
 	public Atom getAlphaAtom( )
 	{
-		if ( this.atoms == null ) {
+		if ( atoms == null ) {
 			return null;
 		}
-		if ( this.alphaAtomIndex < 0 ) {
+		if ( alphaAtomIndex < 0 ) {
 			return getAtom(0);
 							// This is from the kiosk viewer version of residue.  It seems like
 							// a harmless enough change I've gone ahead and put it in
@@ -554,10 +558,10 @@ public class Residue
 							//
 							// 05-Jun-08 - rickb
 		}
-		if ( this.alphaAtomIndex >= this.atoms.size() ) {
+		if ( alphaAtomIndex >= atoms.size() ) {
 			return null;
 		}
-		return this.alphaAtomIndex >= 0 ? (Atom) this.atoms.elementAt( this.alphaAtomIndex ) : (Atom)this.atoms.elementAt(this.atoms.size() / 2);
+		return alphaAtomIndex >= 0 ? atoms.elementAt( alphaAtomIndex ) : atoms.elementAt(atoms.size() / 2);
 	}
 
 	/**
@@ -569,7 +573,7 @@ public class Residue
 	 */
 	public Atom getPolymerHeadAtom( )
 	{
-		return this.polymerHeadAtom;
+		return polymerHeadAtom;
 	}
 
 	/**
@@ -581,7 +585,7 @@ public class Residue
 	 */
 	public Atom getPolymerTailAtom( )
 	{
-		return this.polymerTailAtom;
+		return polymerTailAtom;
 	}
 
 	/**
@@ -594,7 +598,7 @@ public class Residue
 	{
 		// AminoAcid aminoAcid = AminoAcids.getByCode( compoundCode );
 		// return aminoAcid.getHydrophobicity( );
-		return AminoAcidInfo.getHydrophobicityFromCode( this.compoundCode );
+		return AminoAcidInfo.getHydrophobicityFromCode( compoundCode );
 	}
 
 	/**
@@ -609,7 +613,7 @@ public class Residue
 		// Conformation subclass type, or, Conformation.TYPE_UNDEFINED.
 		}
 
-		this.conformationType = type;
+		conformationType = type;
 	}
 
 	/**
@@ -618,7 +622,7 @@ public class Residue
 	 */
 	public String getConformationType( )
 	{
-		return this.conformationType;
+		return conformationType;
 	}
 
 	/**
@@ -627,10 +631,10 @@ public class Residue
 	 */
 	public String getChainId( )
 	{
-		if ( this.atoms == null ) {
+		if ( atoms == null ) {
 			return null;
 		}
-		final Atom atom = (Atom) this.atoms.elementAt( 0 );
+		final Atom atom = atoms.elementAt( 0 );
 		if ( atom == null ) {
 			return null;
 		}
@@ -643,10 +647,10 @@ public class Residue
 	 */
 	public int getResidueId( )
 	{
-		if ( this.atoms == null ) {
+		if ( atoms == null ) {
 			return -1;
 		}
-		final Atom atom = (Atom) this.atoms.elementAt( 0 );
+		final Atom atom = atoms.elementAt( 0 );
 		if ( atom == null ) {
 			return -1;
 		}
@@ -665,6 +669,7 @@ public class Residue
 	 * we'll preserve that, for now - note that the base implementation will
 	 * simply invoke 'getCompoundCode()'.
 	 */
+	@Override
 	public String toString()
 	{
 		return AppBase.sgetModel().getModifiedResidueName(this);

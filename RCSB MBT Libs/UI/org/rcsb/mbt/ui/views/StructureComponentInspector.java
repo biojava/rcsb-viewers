@@ -505,7 +505,7 @@ public class StructureComponentInspector
 					label = (JLabel) this.table.getValueAt( row, 0 );
 					label.setText( "Classification:" );
 					label = (JLabel) this.table.getValueAt( row, 1 );
-					label.setText( residue.getClassification() );
+					label.setText( residue.getClassification().toString() );
 					row++;
 
 					label = (JLabel) this.table.getValueAt( row, 0 );
@@ -587,7 +587,7 @@ public class StructureComponentInspector
 					label = (JLabel) this.table.getValueAt( row, 0 );
 					label.setText( "Classification:" );
 					label = (JLabel) this.table.getValueAt( row, 1 );
-					label.setText( chain.getClassification() );
+					label.setText( chain.getClassification().toString() );
 					row++;
 
 					label = (JLabel) this.table.getValueAt( row, 0 );

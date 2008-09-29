@@ -3,13 +3,11 @@ package org.rcsb.ks.controllers.app;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -22,9 +20,9 @@ import org.rcsb.ks.glscene.jogl.KSGlGeometryViewer;
 import org.rcsb.ks.model.AnnotatedAtom;
 import org.rcsb.ks.model.EntityDescriptor;
 import org.rcsb.ks.model.KSStructureInfo;
+import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.scene.PickLevel;
 import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
@@ -33,7 +31,6 @@ import org.rcsb.mbt.model.Fragment;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
-import org.rcsb.mbt.model.StructureInfo;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.AtomColorByRgb;
 import org.rcsb.mbt.model.attributes.AtomStyle;
@@ -41,8 +38,6 @@ import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.attributes.IResidueColor;
 import org.rcsb.mbt.model.attributes.ResidueColorByRgb;
 import org.rcsb.mbt.model.attributes.StructureStyles;
-import org.rcsb.mbt.structLoader.CifStructureLoader;
-import org.rcsb.mbt.structLoader.PdbStructureLoader;
 
 public class SlideShow extends Thread {
 	private boolean slideShow = true;
@@ -121,6 +116,7 @@ public class SlideShow extends Thread {
 
 	public void startPreemptiveListLoadingThread() {
 		Thread t = new Thread() {
+			@Override
 			public void run() {
 
 				int failureIndex = 0;
@@ -130,7 +126,7 @@ public class SlideShow extends Thread {
 
 				// {{ start loading the pdb files }}
 				for (int i = 0; i < pdbIdList.size(); i++) {
-					String pdbidvalue = (String) pdbIdList.get(i);
+					String pdbidvalue = pdbIdList.get(i);
 					pdbidvalue = pdbidvalue.toLowerCase();
 					boolean isLocal = false;
 
@@ -176,6 +172,7 @@ public class SlideShow extends Thread {
 		t.start();
 	}
 
+	@Override
 	public void run()
 	{
 		if (pdbIdList.size() <= 0) {
@@ -191,7 +188,7 @@ public class SlideShow extends Thread {
 		}
 		int index = 0;
 
-		StructureModel model = KioskViewer.sgetModel();
+		StructureModel model = AppBase.sgetModel();
 
 		while (slideShow)
 		{
@@ -283,7 +280,7 @@ public class SlideShow extends Thread {
 
 	private void loadStructure(int _index) throws Exception
 	{
-		String pdbId = (String) pdbIdList.get(_index);
+		String pdbId = pdbIdList.get(_index);
 		try {
 			File lk = new File(getPDBFileDirectory() + "/" + pdbId + ".xml.gz");
 
@@ -304,13 +301,13 @@ public class SlideShow extends Thread {
 
 	private void loadFromFile(File lk, String _id)
 	{
-		KioskViewer.sgetDocController().loadStructure(lk.getAbsolutePath(), _id);
+		AppBase.sgetDocController().loadStructure(lk.getAbsolutePath(), _id);
 	}
 
 	private void loadFromURL(String _id)
 	{
 		String url = "http://www.pdb.org/pdb/files/" + _id + ".xml.gz";
-		KioskViewer.sgetDocController().loadStructure(url, _id);
+		AppBase.sgetDocController().loadStructure(url, _id);
 	}
 
 	private StateAnnotationPanel createStateAnnotationPanel() {
@@ -325,7 +322,7 @@ public class SlideShow extends Thread {
 	private ArrayList generateSlowStates()
 	{
 		ArrayList list = new ArrayList();
-		StructureModel model = KioskViewer.sgetModel();
+		StructureModel model = AppBase.sgetModel();
 		KSGlGeometryViewer gl = KioskViewer.sgetGlGeometryViewer();
 		double[] pivot = model.getStructures().get(0).getStructureMap().getAtomCoordinateAverage();
 		generateState(pivot, list, "");
@@ -335,7 +332,7 @@ public class SlideShow extends Thread {
 	private ArrayList generateStates() {
 
 		ArrayList statelist = new ArrayList();
-		StructureModel model = KioskViewer.sgetModel();
+		StructureModel model = AppBase.sgetModel();
 		KSGlGeometryViewer gl = KioskViewer.sgetGlGeometryViewer();
 		double[] pivot = model.getStructures().get(0).getStructureMap()
 				.getAtomCoordinateAverage();

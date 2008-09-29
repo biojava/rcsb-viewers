@@ -2007,7 +2007,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 					final Chain c = (Chain) chainIt.next();
 
 					if (c.getResidueCount() > 0
-							&& c.getResidue(0).getClassification() == Residue.COMPOUND_AMINO_ACID) {
+							&& c.getResidue(0).getClassification() == Residue.Classification.AMINO_ACID) {
 
 						ss.setVisible(c, true);
 					} else {
@@ -2026,7 +2026,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 							final Iterator atomsIt = atoms.iterator();
 							while (atomsIt.hasNext()) {
 								final Atom a = (Atom) atomsIt.next();
-								if (r.getClassification() != Residue.COMPOUND_AMINO_ACID
+								if (r.getClassification() != Residue.Classification.AMINO_ACID
 										&& !r.getCompoundCode().equals("HOH")) {
 									ss.setVisible(a, true);
 								} else {
@@ -2039,8 +2039,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 							while (bondsIt.hasNext()) {
 								final Bond b = (Bond) bondsIt.next();
 
-								if (r.getClassification() != Residue.COMPOUND_AMINO_ACID
-										&& !r.getCompoundCode().equals("HOH")) {
+								if (r.getClassification() != Residue.Classification.AMINO_ACID &&
+									r.getClassification() != Residue.Classification.WATER ) {
 									ss.setVisible(b, true);
 								} else {
 									ss.setVisible(b, false);

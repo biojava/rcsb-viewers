@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Vector;
 
 import javax.media.opengl.GL;
@@ -1039,8 +1040,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 
 		for (int n = 0; n < chainCt; n++) {
 			final Chain chain = structureMap.getChain(n);
-			final String chainClass = chain.getClassification();
-			if (chainClass == Residue.COMPOUND_AMINO_ACID) {
+			if (chain.getClassification() == Residue.Classification.AMINO_ACID) {
 
 				for (int k = 0; k < chain.getResidueCount(); k++) {
 					final Vector atoms = chain.getResidue(k).getAtoms();
@@ -1497,19 +1497,18 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 			final boolean displayDisLabel, final PrintWriter interactionsOut) {
 		final StructureMap structureMap = structure.getStructureMap();
 		final int atomCt = structureMap.getAtomCount();
-		final Vector proAtoms = new Vector();
+		Vector<Atom> proAtoms = new Vector<Atom>();
 		double distance = 0.0;
 		String distString = null;
 		final String interactionType = InteractionConstants.waterMediatedType;
-		final java.util.HashMap uniqRes = new java.util.HashMap();
+		HashSet<Residue> uniqRes = new HashSet<Residue>();
 		int ct = 0;
 
 		for (int i = 0; i < atomCt; i++) {
 			final Atom atom = structureMap.getAtom(i);
-			if (structureMap.getChain(atom).getClassification()
-					.equalsIgnoreCase("amino acid")) {
-				proAtoms.add(atom);
-			}
+			if (structureMap.getChain(atom).getClassification() ==
+				Residue.Classification.AMINO_ACID)
+					proAtoms.add(atom);
 		}
 
 		final LXSceneNode node = (LXSceneNode)structure.getStructureMap().getSceneNode();
@@ -1532,7 +1531,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 						atom_k.coordinate);
 				distString = LXGlGeometryViewer.getDistString(distance);
 				final Residue res = structureMap.getResidue(atom_k);
-				if (!uniqRes.containsKey(res)) {
+				if (!uniqRes.contains(res)) {
 
 					if (distance < upperBound && distance > lowerBound) {
 						this.drawInteraction(structure, atom_j, atom_k,
@@ -1551,7 +1550,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 
 						ct++;
 					}
-					uniqRes.put(res, res);
+					uniqRes.add(res);
 				}
 			}
 		}
@@ -1563,7 +1562,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		final int ligCount = structureMap.getLigandCount();
 		// System.out.println("lig count is " + ligCount);
 		int intCt = 0;
-		final Vector atoms = new Vector();
+		final Vector<Atom> atoms = new Vector<Atom>();
 		double distance = 0.0;
 		String distString = null;
 		final String interactionType = InteractionConstants.interLigandType;

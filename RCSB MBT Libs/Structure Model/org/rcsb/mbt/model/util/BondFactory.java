@@ -407,7 +407,7 @@ public class BondFactory
 		{
 			final Residue residue = structureMap.getResidue( r );
 			final String compoundCode = residue.getCompoundCode( );
-			final String classification = residue.getClassification( );
+			final Residue.Classification classification = residue.getClassification( );
 			final Atom alphaAtom = residue.getAlphaAtom( );
 
 			//
@@ -415,8 +415,8 @@ public class BondFactory
 			// nucleotide, and disulphide).
 			//
 
-			if ( (classification == Residue.COMPOUND_AMINO_ACID) ||
-				(classification == Residue.COMPOUND_NUCLEIC_ACID) )
+			if ( (classification == Residue.Classification.AMINO_ACID) ||
+				(classification == Residue.Classification.NUCLEIC_ACID) )
 			{
 				// Check for disulphide bonds.
 				/*

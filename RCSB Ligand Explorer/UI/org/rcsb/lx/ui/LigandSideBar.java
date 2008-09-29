@@ -28,6 +28,7 @@ import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.model.Chain;
+import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
@@ -234,24 +235,9 @@ public class LigandSideBar extends JPanel
 			{
 				final Structure structure = model.getStructures().get(0);
 
-				// for (int i = 0; i < buttons.size(); i++) {
-				// final JRadioButton button = (JRadioButton)
-				// buttons
-				// .get(i);
-				final Residue value = (Residue) LigandSideBar.this.ligandJList
-						.getSelectedValue();
-				if (value != null) {
-//							setCurrentLigand(value);
+				final Residue value = (Residue) LigandSideBar.this.ligandJList.getSelectedValue();
+				if (value != null)
 					glViewer.setLigand(value);
-				}
-
-				// }
-
-				// if (atomButton.isSelected()) {
-				// viewer.setDisplayLevel("atom");
-				// } else {
-				// viewer.setDisplayLevel("residue");
-				// }
 
 				final float interLigandf1 = Float
 				.parseFloat(interLigandText1);
@@ -712,7 +698,7 @@ public class LigandSideBar extends JPanel
 	private Vector getLigandList(final Structure structure) {
 		final int chainNum = structure.getStructureMap().getChainCount();
 		// HashMap countNames = null;
-		final Vector ligandList = new Vector();
+		final Vector<Residue> ligandList = new Vector<Residue>();
 		Residue ligandResidue = null;
 		for (int i = 0; i < chainNum; i++) {
 			final String chainName = structure.getStructureMap().getChain(i)
@@ -721,9 +707,8 @@ public class LigandSideBar extends JPanel
 			// System.out.println("chain class is
 			// "+structure.getStructureMap().getChain(i).getClassification());
 
-			if (chainName.equals("_")) {
-				final int ligandCount = structure.getStructureMap()
-						.getLigandCount();
+			if (chainName.charAt(0) == '_') {
+				final int ligandCount = structure.getStructureMap().getLigandCount();
 				for (int j = 0; j < ligandCount; j++) {
 					ligandResidue = structure.getStructureMap()
 							.getLigandResidue(j);
@@ -743,9 +728,8 @@ public class LigandSideBar extends JPanel
 		if (ligandList.isEmpty()) {
 			for (int j = 0; j < chainNum; j++) {
 				final Chain chain = structure.getStructureMap().getChain(j);
-				final String chainIdent = chain.getClassification();
 
-				if (chainIdent.equalsIgnoreCase("ligand")) {
+				if (chain.getClassification() == Residue.Classification.LIGAND) {
 					final int k = chain.getResidueCount();
 					for (int h = 0; h < k; h++) {
 						ligandResidue = chain.getResidue(h);

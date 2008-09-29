@@ -223,7 +223,7 @@ public class DerivedInformation implements IUpdateListener
 		Residue residue = null;
 		for (int i = 0; i < resCount; i++) {
 			residue = this.structureMap.getResidue(i);
-			if (residue.getClassification() == Residue.COMPOUND_AMINO_ACID) { // Is
+			if (residue.getClassification() == Residue.Classification.AMINO_ACID) { // Is
 																				// aa
 				aaCount++;
 				this.ssFlags[i] = ' ';
@@ -252,7 +252,7 @@ public class DerivedInformation implements IUpdateListener
 		//
 		int aaIndex = -1;
 		for (int i = 0; i < resCount; i++) {
-			if (this.structureMap.getResidue(i).getClassification() == Residue.COMPOUND_AMINO_ACID) {
+			if (this.structureMap.getResidue(i).getClassification() == Residue.Classification.AMINO_ACID) {
 
 				aaIndex++;
 				resPointers[aaIndex] = i;

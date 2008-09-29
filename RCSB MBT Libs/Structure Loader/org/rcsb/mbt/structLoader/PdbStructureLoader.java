@@ -579,11 +579,8 @@ public class PdbStructureLoader
 							atom.compound = sharedStrings.share( atom.compound );
 
 							atom.chain_id = (new String( line, 21, 1 )).trim();
-							if ( atom.chain_id == null ) {
+							if ( atom.chain_id == null || atom.chain_id.equals("") )
 								atom.chain_id = "_";
-							} else if ( atom.chain_id.equals( "" ) ) {
-								atom.chain_id = "_";
-							}
 
 							if(AppBase.sgetSceneController().shouldTreatModelsAsSubunits()) {
 								atom.chain_id = atom.chain_id + "$$$" + modelCount;

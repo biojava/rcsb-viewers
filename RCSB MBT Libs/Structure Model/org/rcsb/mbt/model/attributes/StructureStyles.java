@@ -355,12 +355,9 @@ public class StructureStyles
 		final int residueCount = structureMap.getResidueCount();
 		for (int r = 0; r < residueCount; r++) {
 			final Residue residue = structureMap.getResidue(r);
-			if (residue.getClassification() == Residue.COMPOUND_AMINO_ACID) {
+			if (residue.getClassification() == Residue.Classification.AMINO_ACID ||
+				residue.getClassification() == Residue.Classification.WATER	)
 				continue;
-			}
-			if (residue.getCompoundCode().equals("HOH")) {
-				continue;
-			}
 
 			final int atomCount = residue.getAtomCount();
 			String lastAtomName = "x_X_x";
@@ -387,7 +384,7 @@ public class StructureStyles
 		final int chainCount = structureMap.getChainCount();
 		for (int c = 0; c < chainCount; c++) {
 			final Chain chain = structureMap.getChain(c);
-			if (chain.getClassification() == Residue.COMPOUND_LIGAND) {
+			if (chain.getClassification() == Residue.Classification.LIGAND) {
 				continue;
 			}
 

@@ -284,9 +284,9 @@ public class FullSequencePanel extends JPanel
                 buf.setColor(new Color(color[0],color[1],color[2]));
                 
                 String symbol = null;
-                if(r.getClassification() == Residue.COMPOUND_AMINO_ACID) {
+                if(r.getClassification() == Residue.Classification.AMINO_ACID) {
                     symbol = AminoAcidInfo.getLetterFromCode(r.getCompoundCode());
-                } else if(r.getClassification() == Residue.COMPOUND_NUCLEIC_ACID) {
+                } else if(r.getClassification() == Residue.Classification.NUCLEIC_ACID) {
                 	symbol = r.getCompoundCode();
                 } else {
                     symbol = "*";

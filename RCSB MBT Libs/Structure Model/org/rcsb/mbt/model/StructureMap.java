@@ -497,7 +497,7 @@ public class StructureMap
 	protected Hashtable<String, Chain> chainById = null;
 
 	// Stores Residue object references by atom.chain_id+atom_residue_id value.
-	protected Hashtable<String, Residue> residueByChainAndResidueId = null;
+	protected Hashtable<String, Residue> residueByChainKeyId = null;
 
 	protected PdbToNdbConverter pdbToNdbConverter = null;
 	protected Set<String> nonproteinChainIds = null;
@@ -571,7 +571,7 @@ public class StructureMap
 		this.ligands = new Vector<Residue>( ); // Only Ligand Residues.
 		// Residue object references by atom.chain_id+atom_residue_id value.
 		// Maps each Atom record to the appropriate Residue.
-		this.residueByChainAndResidueId = new Hashtable<String, Residue>( );
+		this.residueByChainKeyId = new Hashtable<String, Residue>( );
 
 		// All Bonds in the Structure.
 		final int bondCount = this.structure.getStructureComponentCount(
@@ -635,16 +635,34 @@ public class StructureMap
 		int atomCount = this.structure.getStructureComponentCount(
 			StructureComponentRegistry.TYPE_ATOM );
 
+		int defaultChainIX = 0;
+		int lastResidueId = -1;
+		
 		for ( int i=0; i<atomCount; i++ )
 		{
 			final Atom atom = (Atom) this.structure.getStructureComponentByIndex(
 				StructureComponentRegistry.TYPE_ATOM, i );
 
+			String chainKeyId = atom.chain_id + atom.residue_id;
+			
 			// If the chain_id is empty, replace it by a default value.
-			if ( atom.chain_id.length() <= 0 ) {
-				atom.chain_id = StructureMap.defaultChainId;
+			if ( atom.chain_id.length() <= 0 )
+			{
+				if (true /* atom.compound.equals("HOH") */ )
+					atom.chain_id = StructureMap.defaultChainId;
+				
+				else
+				{
+					if (atom.residue_id != lastResidueId)
+					{
+						defaultChainIX++;
+						lastResidueId = atom.residue_id;
+					}
+					
+					atom.chain_id = StructureMap.defaultChainId + defaultChainIX;
+				}
 			}
-
+			
 			boolean newChain = false;
 			Chain chain = this.chainById.get( atom.chain_id );
 			if ( chain == null )
@@ -656,8 +674,9 @@ public class StructureMap
 				this.chainById.put( atom.chain_id, chain );
 			}
 
-			final String chainAndResidueId = atom.chain_id + atom.residue_id;
-			Residue residue = this.residueByChainAndResidueId.get( chainAndResidueId );
+			chainKeyId = atom.chain_id + atom.residue_id;
+			
+			Residue residue = this.residueByChainKeyId.get( chainKeyId );
 			if ( residue == null )
 			{
 				residue = new Residue( );
@@ -665,35 +684,32 @@ public class StructureMap
 				residue.addAtom( atom );
 
 				chain.addResidue( residue );
-				this.residueByChainAndResidueId.put( chainAndResidueId, residue );
-			} else {
-				residue.addAtom( atom );
+				this.residueByChainKeyId.put( chainKeyId, residue );
 			}
+			
+			else
+				residue.addAtom( atom );
 
 			// Need to add the chain to our master list LAST
 			// so that it has a valid chain id (that needs a residue and an atom)!
-			if ( newChain ) {
+			if ( newChain )
 				this.addChain( chain );
-			}
 		}
 
 		// Walk the tree and build our ordered linear lists (residues, atoms)
 
-		final int chainCount = this.getChainCount( );
-		for ( int c=0; c<chainCount; c++ )
-		{
-			final Chain chain = this.getChain( c );
-			final int residueCount = chain.getResidueCount( );
-			for ( int r=0; r<residueCount; r++ )
+		for (Chain chain : chains)
+		{		
+			if (chain.getResidueCount() < 24)
+				chain.reClassifyAsLigand();
+						// any chain with less than 24 residues is a ligand
+			
+			for (Residue residue : chain.getResidues())
 			{
-				final Residue residue = chain.getResidue( r );
-				this.residues.add( residue );
+				residues.add( residue );
 				atomCount = residue.getAtomCount( );
-				for ( int a=0; a<atomCount; a++ )
-				{
-					final Atom atom = residue.getAtom( a );
-					this.atoms.add( atom );
-				}
+				for (Atom atom : residue.getAtoms())
+					atoms.add( atom );
 			}
 		}
 	}
@@ -885,7 +901,7 @@ public class StructureMap
 			final Chain chain = this.chainById.get( chain_id );
 
 			final String res = chain_id + conformation.start_residue;
-			final Residue startResidue = this.residueByChainAndResidueId.get( res );
+			final Residue startResidue = this.residueByChainKeyId.get( res );
 			if ( startResidue == null ) {
 				continue;
 			}
@@ -923,7 +939,7 @@ public class StructureMap
 			final Chain chain = this.chainById.get( chain_id );
 
 			final String res = chain_id + conformation.start_residue;
-			final Residue startResidue = this.residueByChainAndResidueId.get( res );
+			final Residue startResidue = this.residueByChainKeyId.get( res );
 			if ( startResidue == null ) {
 				continue;
 			}
@@ -961,7 +977,7 @@ public class StructureMap
 			final Chain chain = this.chainById.get( chain_id );
 
 			final String res = chain_id + conformation.start_residue;
-			final Residue startResidue = this.residueByChainAndResidueId.get( res );
+			final Residue startResidue = this.residueByChainKeyId.get( res );
 			if ( startResidue == null ) {
 				continue;
 			}
@@ -999,7 +1015,7 @@ public class StructureMap
 			final Chain chain = this.chainById.get( chain_id );
 
 			final String res = chain_id + conformation.start_residue;
-			final Residue startResidue = this.residueByChainAndResidueId.get( res );
+			final Residue startResidue = this.residueByChainKeyId.get( res );
 			if ( startResidue == null ) {
 				continue;
 			}
@@ -1052,9 +1068,8 @@ public class StructureMap
 				final Residue residue = chain.getResidue( r );
 
 				// Is the residue a ligand/non-polymer?
-				final String classification = residue.getClassification( );
-				if ( (classification != Residue.COMPOUND_AMINO_ACID) &&
-			        (classification != Residue.COMPOUND_NUCLEIC_ACID) )
+				if ( (residue.getClassification() != Residue.Classification.AMINO_ACID) &&
+			        (residue.getClassification() != Residue.Classification.NUCLEIC_ACID) )
 				{
 					// Mark ligands/non-polymers as an UNDEFINED fragment.
 					chain.setFragment( r, r, Conformation.TYPE_UNDEFINED );
@@ -1268,7 +1283,7 @@ public class StructureMap
 			this.residues.add( residue );
 			chain.addResidue( residue );
 			final String chainAndResidueId = chain_id + r;
-			this.residueByChainAndResidueId.put( chainAndResidueId, residue );
+			this.residueByChainKeyId.put( chainAndResidueId, residue );
 		}
 	}
 
@@ -1281,13 +1296,10 @@ public class StructureMap
 		for ( int r=0; r<residueCount; r++ )
 		{
 			final Residue residue = this.residues.elementAt( r );
-			final String classification = residue.getClassification( );
-			if ( classification == Residue.COMPOUND_LIGAND ) {
+			if ( residue.getClassification() == Residue.Classification.LIGAND )
 				this.ligands.add( residue );
-			}
 		}
 	}
-
 
 	//
 	// StructureMap Methods.
@@ -1472,13 +1484,13 @@ public class StructureMap
 		if ( atom == null ) {
 			return null;
 		}
-		if ( this.residueByChainAndResidueId == null ) {
+		if ( this.residueByChainKeyId == null ) {
 			return null;
 		}
 
 		final String chainAndResidue = atom.chain_id + atom.residue_id;
 
-		return this.residueByChainAndResidueId.get( chainAndResidue );
+		return this.residueByChainKeyId.get( chainAndResidue );
 	}
 
 
@@ -1499,7 +1511,7 @@ public class StructureMap
 		}
 
 		final String chainAndResidue = chainId + residueId;
-		return this.residueByChainAndResidueId.get( chainAndResidue );
+		return this.residueByChainKeyId.get( chainAndResidue );
 	}
 
 
@@ -1512,7 +1524,7 @@ public class StructureMap
 		if ( atom == null ) {
 			return null;
 		}
-		if ( this.residueByChainAndResidueId == null ) {
+		if ( this.residueByChainKeyId == null ) {
 			return null;
 		}
 
@@ -2424,11 +2436,12 @@ public class StructureMap
 			}
             final String pdbChainId = (String)pdbIds[0];
             if(pdbChainId == null) {
-                if(r.getCompoundCode().equals("HOH")) {
+            	if (r.getClassification() == Residue.Classification.WATER)
                     waterResidues.add(r);
-                } else {   // if this is a non-protein residue...
+                
+                else   //  is a non-protein residue...
                     nonProteinResidues.add(r);
-                }
+
                 continue;
             }
             
@@ -2443,7 +2456,7 @@ public class StructureMap
         
         pdbTopLevelElements = new Vector<StructureComponent>();
         
-        final Comparator<Residue> residueComparitor = new Comparator<Residue>() {
+        final Comparator<Residue> residueComparator = new Comparator<Residue>() {
             public int compare(Residue r1, Residue r2) {
                 return (r1.getResidueId() - r2.getResidueId());
             }
@@ -2459,7 +2472,7 @@ public class StructureMap
                 
                 this.pdbTopLevelElements.add(c);
                 
-                Collections.sort(residues, residueComparitor);
+                Collections.sort(residues, residueComparator);
                 residues.trimToSize();
             }
             
@@ -2468,8 +2481,8 @@ public class StructureMap
                     this.pdbTopLevelElements.add(r);
         }
         
-        Collections.sort(waterResidues, residueComparitor);
-        Collections.sort(nonProteinResidues, residueComparitor);
+        Collections.sort(waterResidues, residueComparator);
+        Collections.sort(nonProteinResidues, residueComparator);
         
         if(waterResidues.size() != 0) {
         	waterResidues.trimToSize();

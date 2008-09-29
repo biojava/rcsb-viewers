@@ -180,8 +180,11 @@ public class Chain
 	implements java.lang.Cloneable
 {
 	// The Residue records for the chain.
-	private Vector residues = null;
+	private Vector<Residue> residues = null;
+	public Vector<Residue> getResidues() { return residues; }
 	// The residue-to-index hash for the chain.
+	
+	
 	private Hashtable residueToIndexHash = null;
 
 	// The default chain id.
@@ -271,51 +274,53 @@ public class Chain
 	 * (eg: amino acid, nucleic acid, ligand). If there are no residues
 	 * in this chain, this method will return null.
 	 */
-	public String getClassification( )
+	public Residue.Classification getClassification( )
 	{
-		if ( this.residues == null ) {
+		if ( residues == null || residues.size() == 0)
 			return null;
-		}
-
-		final int residueCount = this.residues.size( );
-		if ( residueCount <= 0 ) {
-			return null;
-		}
-
+		
 		// Classify the chain based upon how many residues of each type exist.
-
-		final int classTypes = Residue.COMPOUND_CLASSIFICATIONS.length;
-		final int classTalies[] = new int[classTypes];
-		for ( int r=0; r<residueCount; r++ )
-		{
-			final Residue residue = (Residue) this.residues.elementAt( r );
-			final String classification = residue.getClassification( );
-			for ( int c=0; c<classTypes; c++ )
-			{
-				if ( classification == Residue.COMPOUND_CLASSIFICATIONS[c] )
-				{
-					classTalies[c]++;
-					break;
-				}
-			}
-		}
+		int classTallies[] = new int[Residue.Classification.values().length];
+		for ( Residue residue : residues)
+			classTallies[residue.getClassification().ordinal()]++;
 
 		// See which classification type had the highest count.
 		int highestCount = -1;
 		int highestIndex = -1;
-		for ( int c=0; c<classTypes; c++ )
-		{
-			if ( classTalies[c] > highestCount )
+		for ( Residue.Classification residue : Residue.Classification.values())
+			if ( classTallies[residue.ordinal()] > highestCount )
 			{
-				highestCount = classTalies[c];
-				highestIndex = c;
+				highestCount = classTallies[residue.ordinal()];
+				highestIndex = residue.ordinal();
 			}
-		}
+
 		if ( highestIndex < 0 ) {
 			return null;
 		}
+		
+		if (residues.size() < 24 && Residue.Classification.values()[highestIndex] !=
+								  Residue.Classification.LIGAND)
+		{
+			reClassifyAsLigand();
+			return Residue.Classification.LIGAND;
+		}
 
-		return Residue.COMPOUND_CLASSIFICATIONS[highestIndex];
+		return Residue.Classification.values()[highestIndex];
+	}
+	
+	/**
+	 * This will reclassify all of the residues as being part of a ligand,
+	 * which will, in turn, reclassify the chain as a ligand.
+	 */
+	public void reClassifyAsLigand()
+	{
+		for (Residue residue : residues)
+			if (residue.getClassification() == Residue.Classification.LIGAND)
+				return;
+							// shortcut - we're presuming if one is correct,
+							// they're all correct.
+			else
+				residue.reClassifyAsLigand();
 	}
 
 	/**
@@ -430,7 +435,7 @@ public class Chain
 
 		if ( this.residues == null )
 		{
-			this.residues = new Vector( );
+			this.residues = new Vector<Residue>( );
 			this.residueToIndexHash = new Hashtable( );
 		}
 
