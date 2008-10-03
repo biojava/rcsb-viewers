@@ -364,11 +364,11 @@ public class LigandSideBar extends JPanel
 			
 			final JScrollPane ligandScroller = new JScrollPane(this.ligandJList);
 
-			if (this.ligandList.size() > 0) {
+			if (this.ligandList.size() > 0)
 				this.add(ligandScroller);
-			} else {
+			
+			else
 				centerView.setText("No ligands in this structure");
-			}
 
 			final JLabel displayView = new JLabel(
 					"Step 2: Choose interactions and thresholds...");
@@ -692,6 +692,9 @@ public class LigandSideBar extends JPanel
 			l_h2o_pBox.addActionListener(interactionListener);
 			otherBox.addActionListener(interactionListener);
 			distanceBox.addActionListener(interactionListener);
+			
+			if (this.ligandList.size() > 0)
+				ligandJList.setSelectedIndex(0);
 		}
 	}
 
@@ -728,7 +731,7 @@ public class LigandSideBar extends JPanel
 		if (ligandList.isEmpty()) {
 			for (int j = 0; j < chainNum; j++) {
 				final Chain chain = structure.getStructureMap().getChain(j);
-
+				String id = chain.getChainId();
 				if (chain.getClassification() == Residue.Classification.LIGAND) {
 					final int k = chain.getResidueCount();
 					for (int h = 0; h < k; h++) {

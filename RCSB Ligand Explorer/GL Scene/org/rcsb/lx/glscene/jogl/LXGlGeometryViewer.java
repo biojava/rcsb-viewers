@@ -24,7 +24,6 @@ import org.rcsb.lx.model.LXModel;
 import org.rcsb.lx.ui.LXDocumentFrame;
 import org.rcsb.lx.ui.LigandSideBar;
 import org.rcsb.lx.ui.dialogs.IPickInfoReceiver;
-import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.glscene.jogl.AtomGeometry;
@@ -47,7 +46,8 @@ import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.attributes.LineStyle;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
-import org.rcsb.mbt.model.util.Algebra;
+import org.rcsb.mbt.model.geometry.Algebra;
+import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.vf.glscene.jogl.VFGlGeometryViewer;
 
 
@@ -317,7 +317,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		}
 
 		final StructureMap sm = struc.getStructureMap();
-		final LXSceneNode sn = (LXSceneNode)sm.getSceneNode();
+		final LXSceneNode sn = (LXSceneNode)sm.getUData();
 
 		if ((e.getModifiers() & InputEvent.CTRL_MASK) == 0
 				&& (e.getModifiers() & InputEvent.SHIFT_MASK) == 0
@@ -576,7 +576,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		final StructureMap structureMap = str.getStructureMap();
 		final StructureStyles structureStyles = structureMap
 				.getStructureStyles();
-		final JoglSceneNode sn = structureMap.getSceneNode();
+		final JoglSceneNode sn = (JoglSceneNode)structureMap.getUData();
 
 		final ChainGeometry defaultChainGeometry = (ChainGeometry) GlGeometryViewer.defaultGeometry
 				.get(StructureComponentRegistry.TYPE_CHAIN);
@@ -722,7 +722,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		}
 
 		final StructureMap sm = structure.getStructureMap();
-		final LXSceneNode node = (LXSceneNode)sm.getSceneNode();
+		final LXSceneNode node = (LXSceneNode)sm.getUData();
 
 		// a water molecule is assumed to be 1.4 angstroms in "diameter". Use a
 		// multiple of this to push the display out to show a reasonable amount
@@ -1212,7 +1212,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 	public void renderResidue(final Residue r, final AtomStyle as, final AtomGeometry ag,
 			final BondStyle bs, final BondGeometry bg, final boolean showLabel) {
 		final StructureMap sm = r.structure.getStructureMap();
-		final LXSceneNode node = (LXSceneNode)sm.getSceneNode();
+		final LXSceneNode node = (LXSceneNode)sm.getUData();
 
 		final Vector atoms = r.getAtoms();
 		final Vector bonds = sm.getBonds(atoms);
@@ -1250,7 +1250,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 
 	public void hideResidue(final Residue r) {
 		final StructureMap sm = r.structure.getStructureMap();
-		final JoglSceneNode node = sm.getSceneNode();
+		final JoglSceneNode node = (JoglSceneNode)sm.getUData();
 
 		final Vector atoms = r.getAtoms();
 		final Vector bonds = sm.getBonds(atoms);
@@ -1352,7 +1352,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 
 		ss.setStyle(ia, ls);
 
-		final LXSceneNode node = (LXSceneNode)sm.getSceneNode();
+		final LXSceneNode node = (LXSceneNode)sm.getUData();
 
 		if (displayDisLabel) {
 			ls.label = distString;
@@ -1368,7 +1368,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 
 	// added for protein-ligand interactions
 	public void createResLabel(final Structure structure, final Atom atom) {
-		final LXSceneNode node = (LXSceneNode)structure.getStructureMap().getSceneNode();
+		final LXSceneNode node = (LXSceneNode)structure.getStructureMap().getUData();
 
 		final Residue r = structure.getStructureMap().getResidue(atom);
 		final String label = structure.getStructureMap().getChain(atom).getChainId()
@@ -1410,80 +1410,58 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 	public void calWaterInteractions(final Structure structure, final float lowerBound, final float upperBound,
 			final boolean displayDisLabel, final PrintWriter interactionsOut) {
 		final StructureMap structureMap = structure.getStructureMap();
-		final int ligCount = structureMap.getLigandCount();
-		int intCt = 0;
-		final Vector atoms = new Vector();
+
 		double distance = 0.0;
 		String distString = null;
 		final String interactionType = InteractionConstants.waterMediatedType;
-		final Vector waterAtoms = new Vector();
-		// HashMap uniqWater = new HashMap();
-		for (int i = 0; i < ligCount; i++) {
-			final int ligAtomCt = structureMap.getLigandResidue(i).getAtomCount();
-			for (int j = 0; j < ligAtomCt; j++) {
-				atoms.add(structureMap.getLigandResidue(i).getAtom(j));
-			}
-		}
+		final HashSet<Atom> waterAtoms = new HashSet<Atom>();
+		
+		for (Chain hohChain : structureMap.getChains())
+		{
+			if (hohChain.getResidue(0).getClassification() != Residue.Classification.WATER
+				&& hohChain.getChainId() != "_") continue;
+						// find the water chain
 
-		for (int m = 0; m < atoms.size(); m++) {
-			final Atom atom_m = (Atom) atoms.get(m);
-			final Residue residue_m = structureMap.getResidue(atom_m);
-			Atom atom_n = null;
-			for (int n = m + 1; n < atoms.size(); n++) {
-				atom_n = (Atom) atoms.get(n);
-				final Residue residue_n = structureMap.getResidue(atom_n);
-				
-
-				if ((residue_m == this.currentLigand || residue_n
-						== this.currentLigand)
-						&& (atom_m.compound.equals("HOH") || atom_n.compound
-								.equals("HOH"))) {
-
-					distance = Algebra.distance(atom_m.coordinate,
-							atom_n.coordinate);
-					distString = LXGlGeometryViewer.getDistString(distance);
-
-					if (distance < upperBound && distance > lowerBound) {
-
-						this.drawInteraction(structure, atom_m, atom_n,
-								interactionType, displayDisLabel, distString, distance,
-								interactionsOut);
-						intCt++;
-
-						if (atom_m.compound.equals("HOH")) {
-							if (!waterAtoms.contains(atom_m)) {
-								/*
-								 * createResLabel( structure, componentHash,
-								 * atom_m);
-								 */
-								waterAtoms.add(atom_m);
-							}
-						} else {
-							if (!waterAtoms.contains(atom_n)) {
-								/*
-								 * createResLabel( structure, componentHash,
-								 * atom_n);
-								 */
-
-								waterAtoms.add(atom_n);
-							}
-						}
+			//
+			// First, find the closest waters to any of the atoms in the the current ligand.
+			// Traverse all the atoms in the current ligand and compare against all the water
+			// atoms
+			//
+			for (Atom ligAtom : currentLigand.getAtoms())
+				for (Residue hohResidue : hohChain.getResidues())
+					if (hohResidue.getClassification() == Residue.Classification.WATER)
+					{
+						Atom hohAtom = hohResidue.getAtom(0);
+									// water residue only contains a single 'O'
+						
+						distance = Algebra.distance(hohAtom.coordinate,
+													ligAtom.coordinate);
+						if (distance < upperBound && distance > lowerBound)
+						{
+							distString = LXGlGeometryViewer.getDistString(distance);
+							this.drawInteraction(structure, ligAtom, hohAtom,
+									interactionType, displayDisLabel, distString, distance,
+									interactionsOut);
+							
+							waterAtoms.add(hohAtom);
+						}							
 					}
-				}
-			}
 		}
+		
 		this.calWaterProInt(structure, waterAtoms, lowerBound, upperBound, displayDisLabel, interactionsOut);
+					// now calculate the protein interactions with the located water atoms
 
 		if (interactionsOut == null) {
-			final LXSceneNode node = (LXSceneNode)structure.getStructureMap().getSceneNode();
+			final LXSceneNode node = (LXSceneNode)structure.getStructureMap().getUData();
 
 			final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry
 					.get(StructureComponentRegistry.TYPE_ATOM);
 			final AtomStyle as = (AtomStyle) structure.getStructureMap()
 					.getStructureStyles().getDefaultStyle(
 							StructureComponentRegistry.TYPE_ATOM);
-			for (int i = 0; i < waterAtoms.size(); i++) {
-				final Atom a = (Atom) waterAtoms.get(i);
+
+			for (Atom a : waterAtoms)
+			{
 				if (!node.isRendered(a)) {
 					final DisplayListRenderable renderable = new DisplayListRenderable(
 							a, as, ag);
@@ -1493,7 +1471,11 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		}
 	}
 
-	public void calWaterProInt(final Structure structure, final Vector waterAtoms, final float lowerBound, final float upperBound,
+	/*
+	 * Calculate the water protein interactions.  The waters are traversed and compared against the
+	 * amino acid atoms.
+	 */
+	public void calWaterProInt(final Structure structure, final HashSet<Atom> waterAtoms, final float lowerBound, final float upperBound,
 			final boolean displayDisLabel, final PrintWriter interactionsOut) {
 		final StructureMap structureMap = structure.getStructureMap();
 		final int atomCt = structureMap.getAtomCount();
@@ -1511,7 +1493,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 					proAtoms.add(atom);
 		}
 
-		final LXSceneNode node = (LXSceneNode)structure.getStructureMap().getSceneNode();
+		final LXSceneNode node = (LXSceneNode)structure.getStructureMap().getUData();
 		final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry
 				.get(StructureComponentRegistry.TYPE_ATOM);
 		final AtomStyle as = (AtomStyle) structure.getStructureMap()
@@ -1523,8 +1505,8 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 				.getStructureStyles().getDefaultStyle(
 						StructureComponentRegistry.TYPE_BOND);
 
-		for (int j = 0; j < waterAtoms.size(); j++) {
-			final Atom atom_j = (Atom) waterAtoms.get(j);
+		for (Atom atom_j : waterAtoms)
+		{
 			for (int k = 0; k < proAtoms.size(); k++) {
 				final Atom atom_k = (Atom) proAtoms.get(k);
 				distance = Algebra.distance(atom_j.coordinate,
@@ -1561,7 +1543,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		final StructureMap structureMap = structure.getStructureMap();
 		final int ligCount = structureMap.getLigandCount();
 		// System.out.println("lig count is " + ligCount);
-		int intCt = 0;
+
 		final Vector<Atom> atoms = new Vector<Atom>();
 		double distance = 0.0;
 		String distString = null;
@@ -1592,7 +1574,6 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 						this.drawInteraction(structure, atom_m, atom_n,
 								interactionType, displayDisLabel, distString, distance,
 								interactionsOut);
-						intCt++;
 					}
 				}
 			}
