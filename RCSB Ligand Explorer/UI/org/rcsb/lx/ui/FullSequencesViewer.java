@@ -13,7 +13,6 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.MiscellaneousMoleculeChain;
 import org.rcsb.mbt.model.PdbChain;
@@ -21,6 +20,7 @@ import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.WaterChain;
+import org.rcsb.mbt.model.util.PdbToNdbConverter;
 
 
 /**

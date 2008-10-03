@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
 import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.glscene.jogl.LineGeometry;
@@ -24,7 +23,8 @@ import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.WaterChain;
 import org.rcsb.mbt.model.attributes.LineStyle;
-import org.rcsb.mbt.model.util.Algebra;
+import org.rcsb.mbt.model.geometry.Algebra;
+import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.options.LinesOptions;
 
@@ -54,7 +54,7 @@ public class LinesMutator extends Mutator
 		
 		if(mutee instanceof LineSegment)
 		{
-			JoglSceneNode sn = AppBase.sgetModel().getStructures().get(0).getStructureMap().getSceneNode();
+			JoglSceneNode sn = (JoglSceneNode)AppBase.sgetModel().getStructures().get(0).getStructureMap().getUData();
 			sn.removeRenderable((LineSegment)mutee);
 			sn.removeLabel(mutee);
 		}
@@ -94,7 +94,7 @@ public class LinesMutator extends Mutator
 		final StructureMap sm = AppBase.sgetModel().getStructures().get(0).getStructureMap();
 		sm.getStructureStyles().setStyle(line, style);
 		System.arraycopy(this.getOptions().getColor(), 0, style.getColor(), 0, style.getColor().length);
-		sm.getSceneNode().addRenderable(new DisplayListRenderable( line, style, geometry ));
+		((JoglSceneNode)sm.getUData()).addRenderable(new DisplayListRenderable( line, style, geometry ));
 		
 		this.lines.add(line);
 	}

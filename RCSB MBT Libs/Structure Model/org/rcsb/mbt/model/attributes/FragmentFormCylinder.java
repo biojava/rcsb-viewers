@@ -72,11 +72,11 @@ import org.rcsb.mbt.model.*;
  *  shape.
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.attributes.FragmentForm
+ *  @see	org.rcsb.mbt.model.attributes.IFragmentForm
  *  @see	org.rcsb.mbt.model.Fragment
  */
 public class FragmentFormCylinder
-	implements FragmentForm
+	implements IFragmentForm
 {
 	public static final String NAME = "Cylinder";
 

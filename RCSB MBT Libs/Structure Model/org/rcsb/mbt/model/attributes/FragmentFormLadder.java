@@ -70,11 +70,11 @@ import org.rcsb.mbt.model.*;
  *  secondary structure ladder style.
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.attributes.FragmentForm
+ *  @see	org.rcsb.mbt.model.attributes.IFragmentForm
  *  @see	org.rcsb.mbt.model.Fragment
  */
 public class FragmentFormLadder
-	implements FragmentForm
+	implements IFragmentForm
 {
 	public static final String NAME = "Ladder (RNA/DNA)";
 

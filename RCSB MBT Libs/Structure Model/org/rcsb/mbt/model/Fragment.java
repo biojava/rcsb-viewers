@@ -324,9 +324,9 @@ public class Fragment
 	/**
 	 * Get the residues for this Fragment.
 	 */
-	public Vector getResidues( )
+	public Vector<Residue> getResidues( )
 	{
-		final Vector residues = new Vector( );
+		final Vector<Residue> residues = new Vector<Residue>( );
 		final int count = this.getResidueCount( );
 		for ( int r=0; r<count; r++ ) {
 			residues.add( this.getResidue( r ) );

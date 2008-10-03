@@ -1,6 +1,6 @@
 package org.rcsb.mbt.model;
 
-import org.rcsb.mbt.glscene.geometry.Point3d;
+import org.rcsb.mbt.model.geometry.Point3d;
 
 public class LineSegment extends StructureComponent {
 	

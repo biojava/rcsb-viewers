@@ -70,11 +70,11 @@ import org.rcsb.mbt.model.*;
  *  secondary structure cartoon style.
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.attributes.FragmentForm
+ *  @see	org.rcsb.mbt.model.attributes.IFragmentForm
  *  @see	org.rcsb.mbt.model.Fragment
  */
 public class FragmentFormCartoon
-	implements FragmentForm
+	implements IFragmentForm
 {
 	public static final String NAME = "Cartoon";
 

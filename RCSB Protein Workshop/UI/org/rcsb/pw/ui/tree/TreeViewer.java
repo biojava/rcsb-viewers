@@ -149,7 +149,6 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
 import org.rcsb.mbt.controllers.scene.PickLevel;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
@@ -169,7 +168,8 @@ import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.WaterChain;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
-import org.rcsb.mbt.model.attributes.StructureStylesEventListener;
+import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
+import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.Mutator;
 
@@ -183,7 +183,7 @@ import org.rcsb.pw.controllers.scene.mutators.Mutator;
  * @see org.rcsb.mbt.controllers.update.UpdateEvent
  */
 public class TreeViewer extends JPanel implements IUpdateListener,
-		TreeSelectionListener, StructureStylesEventListener, MouseListener
+		TreeSelectionListener, IStructureStylesEventListener, MouseListener
 {
 	private static final long serialVersionUID = -3564103946574642455L;
 

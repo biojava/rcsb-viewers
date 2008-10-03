@@ -29,7 +29,7 @@ public class LXSceneController extends SceneController
 		for (Structure struc : structures)
 		{
 			final StructureMap sm = struc.getStructureMap();
-			final LXSceneNode scene = (LXSceneNode)sm.getSceneNode();
+			final LXSceneNode scene = (LXSceneNode)sm.getUData();
 
 			if (firstReset < structures.size() || forceRecalculation) {
 

@@ -74,11 +74,11 @@ public class BondStyle
 	// Style properties
 	private IBondColor  bondColor  = BondColorRegistry.getDefault( );
 	public static int PROPERTY_COLOR = 1;
-	private BondForm   bondForm   = BondFormRegistry.getDefault( );
+	private IBondForm   bondForm   = BondFormRegistry.getDefault( );
 	public static int PROPERTY_FORM = 2;
-	private BondLabel  bondLabel  = BondLabelRegistry.getDefault( );
+	private IBondLabel  bondLabel  = BondLabelRegistry.getDefault( );
 	public static int PROPERTY_LABEL = 3;
-	private BondRadius bondRadius = BondRadiusRegistry.getDefault( );
+	private IBondRadius bondRadius = BondRadiusRegistry.getDefault( );
 	public static int PROPERTY_RADIUS = 4;
 
 
@@ -104,16 +104,16 @@ public class BondStyle
 	 * Construct a bond style object with the specified properties.
 	 * <P>
 	 * @param IBondColor defines the color applied to each end of a bond.
-	 * @param BondForm defines the geometric form used for a bond shape.
-	 * @param BondLabel defines the String value used to label the bond.
-	 * @param BondRadius defines the radius used to draw a bond shape.
+	 * @param IBondForm defines the geometric form used for a bond shape.
+	 * @param IBondLabel defines the String value used to label the bond.
+	 * @param IBondRadius defines the radius used to draw a bond shape.
 	 * @throws NullPointerException
 	 */
 	public BondStyle(
 		final IBondColor bondColor,
-		final BondForm bondForm,
-		final BondLabel bondLabel,
-		final BondRadius bondRadius
+		final IBondForm bondForm,
+		final IBondLabel bondLabel,
+		final IBondRadius bondRadius
 	)
 	{
 		if ( bondColor == null ) {
@@ -275,7 +275,7 @@ public class BondStyle
 	 * @return
 	 * @throws
 	 */
-	public void setBondRadius( final BondRadius bondRadius )
+	public void setBondRadius( final IBondRadius bondRadius )
 	{
 		if ( bondRadius == null ) {
 			throw new NullPointerException( "null BondRadius argument" );
@@ -292,7 +292,7 @@ public class BondStyle
 	 * @return
 	 * @throws
 	 */
-	public BondRadius getBondRadius( )
+	public IBondRadius getBondRadius( )
 	{
 		return this.bondRadius;
 	}
@@ -318,7 +318,7 @@ public class BondStyle
 	 * @return
 	 * @throws
 	 */
-	public void setBondLabel( final BondLabel bondLabel )
+	public void setBondLabel( final IBondLabel bondLabel )
 	{
 		if ( bondLabel == null ) {
 			throw new NullPointerException( "null BondLabel argument" );
@@ -335,7 +335,7 @@ public class BondStyle
 	 * @return
 	 * @throws
 	 */
-	public BondLabel getBondLabel( )
+	public IBondLabel getBondLabel( )
 	{
 		return this.bondLabel;
 	}
@@ -361,7 +361,7 @@ public class BondStyle
 	 * @return
 	 * @throws
 	 */
-	public void setBondForm( final BondForm bondForm )
+	public void setBondForm( final IBondForm bondForm )
 	{
 		if ( bondForm == null ) {
 			throw new NullPointerException( "null BondForm argument" );
@@ -378,7 +378,7 @@ public class BondStyle
 	 * @return
 	 * @throws
 	 */
-	public BondForm getBondForm( )
+	public IBondForm getBondForm( )
 	{
 		return this.bondForm;
 	}

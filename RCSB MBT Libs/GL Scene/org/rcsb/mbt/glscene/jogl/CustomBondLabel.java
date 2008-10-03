@@ -1,9 +1,9 @@
 package org.rcsb.mbt.glscene.jogl;
 
 import org.rcsb.mbt.model.Bond;
-import org.rcsb.mbt.model.attributes.BondLabel;
+import org.rcsb.mbt.model.attributes.IBondLabel;
 
-public class CustomBondLabel implements BondLabel {
+public class CustomBondLabel implements IBondLabel {
 	private String label = null;
 	
 	public CustomBondLabel(final String label) {

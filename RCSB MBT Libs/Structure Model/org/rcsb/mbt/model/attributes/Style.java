@@ -155,7 +155,7 @@ public abstract class Style
 	 * @throws
 	 */
 	public final void addStructureStylesEventListener(
-		final StructureStylesEventListener listener )
+		final IStructureStylesEventListener listener )
 	{
 		if ( listener == null ) {
 			throw new NullPointerException( "null listener" );
@@ -176,7 +176,7 @@ public abstract class Style
 	 * @throws
 	 */
 	public final void removeStructureStylesEventListener(
-		final StructureStylesEventListener listener )
+		final IStructureStylesEventListener listener )
 	{
 		if ( listener == null ) {
 			throw new NullPointerException( "null listener" );
@@ -199,8 +199,8 @@ public abstract class Style
 		final int listenerCount = this.listeners.size( );
 		for ( int i=0; i<listenerCount; i++ )
 		{
-			final StructureStylesEventListener listener =
-				(StructureStylesEventListener) this.listeners.elementAt( i );
+			final IStructureStylesEventListener listener =
+				(IStructureStylesEventListener) this.listeners.elementAt( i );
 			listener.processStructureStylesEvent( structureStylesEvent );
 		}
 	}

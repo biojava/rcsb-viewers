@@ -120,7 +120,7 @@ import org.rcsb.mbt.model.util.*;
  */
 public class StructureComponentInspector
 	extends JPanel
-	implements IUpdateListener, StructureStylesEventListener
+	implements IUpdateListener, IStructureStylesEventListener
 {
 	/**
 	 * 

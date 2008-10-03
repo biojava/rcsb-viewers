@@ -103,7 +103,6 @@
 
 package org.rcsb.mbt.model;
 
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.filters.IStructureComponentFilter;
 import org.rcsb.mbt.model.filters.RelationFilter;
 import org.rcsb.mbt.model.util.Status;
@@ -253,9 +252,6 @@ public abstract class Structure
 	 */
 	public StructureMap getStructureMap( )
 	{
-		if ( this.structureMap == null )
-			this.structureMap = new StructureMap( this, new JoglSceneNode() );
-
 		return this.structureMap;
 	}
 	

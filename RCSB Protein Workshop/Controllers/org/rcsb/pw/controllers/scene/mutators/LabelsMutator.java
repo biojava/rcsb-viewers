@@ -7,6 +7,7 @@ import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.glscene.jogl.CustomAtomLabel;
 import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
+import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -83,7 +84,7 @@ public class LabelsMutator extends Mutator {
 		final GlGeometryViewer glViewer = AppBase.sgetGlGeometryViewer();
 		
 //		if(PickLevel.pickLevel == PickLevel.COMPONENTS_ATOMS_BONDS) {
-	        final DisplayListRenderable renderable = a.structure.getStructureMap().getSceneNode().getRenderable(a);
+	        final DisplayListRenderable renderable = ((JoglSceneNode)a.structure.getStructureMap().getUData()).getRenderable(a);
 			
 			if(renderable != null) {
 				final AtomStyle oldStyle = (AtomStyle)renderable.style;
@@ -143,7 +144,7 @@ public class LabelsMutator extends Mutator {
 		
 //		if(PickLevel.pickLevel == PickLevel.COMPONENTS_ATOMS_BONDS) {
 			// arbitrarily delegate to first visible atom.
-			if(b.structure.getStructureMap().getSceneNode().getRenderable(b.getAtom(0)) != null) {
+			if(((JoglSceneNode)b.structure.getStructureMap().getUData()).getRenderable(b.getAtom(0)) != null) {
 				this.changeLabelStyle(b.getAtom(0));
 			} else {
 				this.changeLabelStyle(b.getAtom(1));

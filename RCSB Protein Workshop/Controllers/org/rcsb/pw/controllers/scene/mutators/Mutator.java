@@ -8,6 +8,7 @@ import java.util.Vector;
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
+import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -94,7 +95,7 @@ public abstract class Mutator implements IUpdateListener
 			this.previousMutee = mutee;
 			
 			for (Structure struc : AppBase.sgetModel().getStructures())
-				struc.getStructureMap().getSceneNode().regenerateGlobalList();
+				((JoglSceneNode)struc.getStructureMap().getUData()).regenerateGlobalList();
 			
 			AppBase.sgetGlGeometryViewer().requestRepaint();
 		}

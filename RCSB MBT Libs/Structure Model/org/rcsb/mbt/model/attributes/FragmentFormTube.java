@@ -70,11 +70,11 @@ import org.rcsb.mbt.model.*;
  *  tube style.
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.attributes.FragmentForm
+ *  @see	org.rcsb.mbt.model.attributes.IFragmentForm
  *  @see	org.rcsb.mbt.model.Fragment
  */
 public class FragmentFormTube
-	implements FragmentForm
+	implements IFragmentForm
 {
 	public static final String NAME = "Tube";
 

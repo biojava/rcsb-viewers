@@ -75,6 +75,7 @@ import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.structLoader.IStructureLoader;
+import org.rcsb.mbt.structLoader.StructureXMLHandler;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 
 
@@ -95,7 +96,7 @@ public class KioskViewer extends AppBase implements IUpdateListener
 		 * @see org.rcsb.mbt.appController.AppBase.AppModuleFactory#createStructureXMLHandler(java.lang.String)
 		 */
 		@Override
-		public IStructureLoader createStructureXMLHandler(String dataset) {
+		public StructureXMLHandler createStructureXMLHandler(String dataset) {
 			return new KSStructureXMLHandler(dataset);
 		}
 

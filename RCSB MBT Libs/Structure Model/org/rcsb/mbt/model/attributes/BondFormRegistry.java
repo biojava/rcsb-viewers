@@ -74,7 +74,7 @@ import java.util.*;
  *  or more Bond representations to a given bond form scheme.
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.attributes.BondForm
+ *  @see	org.rcsb.mbt.model.attributes.IBondForm
  *  @see	org.rcsb.mbt.model.attributes.StructureStyles
  */
 public class BondFormRegistry
@@ -118,7 +118,7 @@ public class BondFormRegistry
 	/**
 	 *  Add a new BondForm implementation.
 	 */
-	public static void add( final String name, final BondForm bondForm )
+	public static void add( final String name, final IBondForm bondForm )
 	{
 		BondFormRegistry.bondFormObjects.put( name, bondForm );
 	}
@@ -134,17 +134,17 @@ public class BondFormRegistry
 	/**
 	 *  Get an BondForm implementation by name.
 	 */
-	public static BondForm get( final String name )
+	public static IBondForm get( final String name )
 	{
-		return (BondForm) BondFormRegistry.bondFormObjects.get( name );
+		return (IBondForm) BondFormRegistry.bondFormObjects.get( name );
 	}
 
 	/**
 	 *  Get the default BondForm implementation.
 	 */
-	public static BondForm getDefault( )
+	public static IBondForm getDefault( )
 	{
-		return (BondForm) BondFormRegistry.bondFormObjects.get( BondFormRegistry.defaultName );
+		return (IBondForm) BondFormRegistry.bondFormObjects.get( BondFormRegistry.defaultName );
 	}
 
 	/**

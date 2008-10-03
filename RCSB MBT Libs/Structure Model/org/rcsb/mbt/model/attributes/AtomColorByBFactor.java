@@ -74,7 +74,7 @@ public class AtomColorByBFactor
 	// Holds a singleton instance of this class.
 	private static AtomColorByBFactor singleton = null;
 
-	private final ColorMap colorMap =
+	private final IColorMap colorMap =
 		new InterpolatedColorMap( InterpolatedColorMap.COLD_TO_HOT );
 
 

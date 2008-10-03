@@ -59,6 +59,7 @@ package org.rcsb.mbt.model.util;
 
 
 import org.rcsb.mbt.model.*;
+import org.rcsb.mbt.model.geometry.Algebra;
 
 
 /**

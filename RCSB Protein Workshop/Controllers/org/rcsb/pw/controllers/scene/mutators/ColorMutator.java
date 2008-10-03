@@ -9,6 +9,7 @@ import org.rcsb.mbt.controllers.scene.PickLevel;
 import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
+import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -183,7 +184,7 @@ public class ColorMutator extends Mutator
         	this.options.getCurrentColor().getColorComponents(ColorMutator.colorFl);
         	
         	final GlGeometryViewer viewer = AppBase.sgetGlGeometryViewer();
-            final DisplayListRenderable renderable = sm.getSceneNode().getRenderable(a);
+            final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(a);
             if(renderable != null) {
             	final AtomStyle oldStyle = (AtomStyle)renderable.style;
             	final AtomStyle style = new AtomStyle();
@@ -274,7 +275,7 @@ public class ColorMutator extends Mutator
         	final Chain c = sm.getChain(r.getChainId());
             
         	final GlGeometryViewer viewer = AppBase.sgetGlGeometryViewer();
-            final DisplayListRenderable renderable = sm.getSceneNode().getRenderable(c);
+            final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(c);
             if(renderable != null) {
             	this.options.getCurrentColor().getColorComponents(ColorMutator.colorFl);
             	

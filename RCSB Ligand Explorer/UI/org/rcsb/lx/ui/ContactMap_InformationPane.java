@@ -15,9 +15,9 @@ import javax.swing.tree.TreePath;
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.model.Interaction;
 import org.rcsb.lx.model.LXModel;
-import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Residue;
+import org.rcsb.mbt.model.util.PdbToNdbConverter;
 
 
 public class ContactMap_InformationPane extends JScrollPane

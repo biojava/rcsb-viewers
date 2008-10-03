@@ -108,6 +108,7 @@
 package org.rcsb.mbt.model;
 
 
+import org.rcsb.mbt.model.geometry.Algebra;
 import org.rcsb.mbt.model.util.*;
 
 

@@ -76,18 +76,18 @@ import org.rcsb.mbt.model.*;
  *  to the given Chain by using its chainId.
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.attributes.ChainColor
+ *  @see	org.rcsb.mbt.model.attributes.IChainColor
  *  @see	org.rcsb.mbt.model.Chain
  */
 public class ChainColorById
-	implements ChainColor
+	implements IChainColor
 {
 	public static final String NAME = "By ID";
 
 	// Holds a singleton instance of this class.
 	private static ChainColorById singleton = null;
 
-	private ColorMap colorMap =
+	private IColorMap colorMap =
 		new InterpolatedColorMap( InterpolatedColorMap.RAINBOW );
 
 	/**
@@ -128,7 +128,7 @@ public class ChainColorById
 	/**
 	 *  Set the ColorMap used to color by Id.
 	 */
-	public void setColorMap( final ColorMap colorMap )
+	public void setColorMap( final IColorMap colorMap )
 		throws IllegalArgumentException
 	{
 		if ( colorMap == null ) {
@@ -140,7 +140,7 @@ public class ChainColorById
 	/**
 	 *  Get the ColorMap used to color by Id.
 	 */
-	public ColorMap getColorMap( )
+	public IColorMap getColorMap( )
 	{
 		return this.colorMap;
 	}

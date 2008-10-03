@@ -300,7 +300,7 @@ public class StructureStyles
 	private StructureMap structureMap = null;
 
 	// Event listeners.
-	private final ArrayList<StructureStylesEventListener> listeners = new ArrayList<StructureStylesEventListener>();
+	private final ArrayList<IStructureStylesEventListener> listeners = new ArrayList<IStructureStylesEventListener>();
 
 	/**
 	 * The color used to hilight selected objects. Notice that this value is
@@ -1622,7 +1622,7 @@ public class StructureStyles
 		// Loop through and call all StructureStylesEventListener objects.
 		final int listenerCount = this.listeners.size();
 		for (int i = 0; i < listenerCount; i++) {
-			final StructureStylesEventListener listener = this.listeners.get(i);
+			final IStructureStylesEventListener listener = this.listeners.get(i);
 			listener.processStructureStylesEvent(structureStylesEvent);
 		}
 	}
@@ -1636,7 +1636,7 @@ public class StructureStyles
 	 * @throws
 	 */
 	public void addStructureStylesEventListener(
-			final StructureStylesEventListener structureStylesEventListener) {
+			final IStructureStylesEventListener structureStylesEventListener) {
 		this.listeners.add(structureStylesEventListener);
 	}
 
@@ -1649,7 +1649,7 @@ public class StructureStyles
 	 * @throws
 	 */
 	public void removeStructureStylesEventListener(
-			final StructureStylesEventListener structureStylesEventListener) {
+			final IStructureStylesEventListener structureStylesEventListener) {
 		this.listeners.remove(structureStylesEventListener);
 	}
 

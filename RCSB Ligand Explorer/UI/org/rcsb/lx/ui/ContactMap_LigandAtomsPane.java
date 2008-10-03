@@ -15,12 +15,12 @@ import javax.swing.JPanel;
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.glscene.jogl.ResidueFontInfo;
 import org.rcsb.lx.model.LXModel;
-import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.StructureStyles;
+import org.rcsb.mbt.model.util.PdbToNdbConverter;
 
 
 public class ContactMap_LigandAtomsPane extends JPanel {

@@ -72,10 +72,10 @@ import org.rcsb.mbt.model.Bond;
  *  Implements the BondForm interface as a "Split" bond type.
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.attributes.BondForm
+ *  @see	org.rcsb.mbt.model.attributes.IBondForm
  */
 public class BondFormSplit
-	implements BondForm
+	implements IBondForm
 {
 	public static final String NAME = "Split";
 
@@ -103,7 +103,7 @@ public class BondFormSplit
 
 	public int getBondForm( final Bond bond )
 	{
-		return BondForm.SPLIT;
+		return IBondForm.SPLIT;
 	}
 }
 

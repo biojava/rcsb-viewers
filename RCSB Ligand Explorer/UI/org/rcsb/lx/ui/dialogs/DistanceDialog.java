@@ -10,6 +10,7 @@ import javax.swing.border.*;
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
 import org.rcsb.lx.ui.LXDocumentFrame;
+import org.rcsb.mbt.model.geometry.Algebra;
 import org.rcsb.mbt.model.util.*;
 
 

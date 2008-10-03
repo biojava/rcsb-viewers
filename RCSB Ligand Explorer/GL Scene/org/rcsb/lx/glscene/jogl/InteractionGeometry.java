@@ -31,7 +31,7 @@ public class InteractionGeometry extends DisplayListGeometry
 		final LineStyle interactionStyle = (LineStyle) style;
 
 		final DisplayLists[] lists = new DisplayLists[1];
-		JoglSceneNode topsn = LigandExplorer.sgetModel().getStructures().get(0).getStructureMap().getSceneNode();
+		JoglSceneNode topsn = (JoglSceneNode)LigandExplorer.sgetModel().getStructures().get(0).getStructureMap().getUData();
 
 		lists[0] = new DisplayLists(line);
 		lists[0].setupLists(1);

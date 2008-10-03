@@ -99,7 +99,7 @@ public class AtomBondColoringOptions extends JPanel implements IUpdateListener, 
 			{
 		        final StructureMap sm = s.getStructureMap();
 		        final StructureStyles ss = sm.getStructureStyles();
-		        final JoglSceneNode sn = sm.getSceneNode();
+		        final JoglSceneNode sn = (JoglSceneNode)sm.getUData();
 		        
 		        final Vector atoms = sm.getAtoms();
 		        final Iterator atomIt = atoms.iterator();

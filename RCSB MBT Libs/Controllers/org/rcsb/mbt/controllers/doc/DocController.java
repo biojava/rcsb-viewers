@@ -1,40 +1,26 @@
 package org.rcsb.mbt.controllers.doc;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Vector;
-import java.util.zip.GZIPInputStream;
-
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.util.Status;
+import org.rcsb.mbt.structLoader.IFileStructureLoader;
 import org.rcsb.mbt.structLoader.IStructureLoader;
 import org.rcsb.mbt.structLoader.PdbStructureLoader;
 import org.rcsb.mbt.structLoader.StructureXMLHandler;
+import org.rcsb.mbt.structLoader.XMLStructureLoader;
 import org.rcsb.mbt.ui.dialogs.ImageFileManager;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 
 public class DocController
@@ -91,152 +77,75 @@ public class DocController
 	public Structure[] readStructuresFromUrl(String structureUrlParam)
 	{
 		final Vector<Structure> structuresVec = new Vector<Structure>();
-		PdbToNdbConverter residueConverter = null;
-		String[] nonProteinChainIds = null;
 		Structure structureTmp = null;
 	
 		final String[] datasets = structureUrlParam.split(",");
-		for (int i = 0; i < datasets.length; i++) {
-			final String dataset = datasets[i];
-	
-			final int colonIndex = dataset.indexOf(':');
-			final boolean isUrl = dataset.charAt(colonIndex + 1) == '/'
-					&& dataset.charAt(colonIndex + 2) == '/'; // else,
-			// this
-			// is a
-			// file...
-	
-			if (dataset.endsWith(".xml.gz") || dataset.endsWith(".xml"))
+		for (int i = 0; i < datasets.length; i++)
+		{
+			try
 			{
-				try
+				final String dataset = datasets[i];
+				IFileStructureLoader loader = null;
+			
+				if (dataset.endsWith(".xml.gz") || dataset.endsWith(".xml"))
 				{
 					// long time = System.currentTimeMillis();
-					final IStructureLoader handler = AppBase.sgetAppModuleFactory().createStructureXMLHandler(dataset);
-					final SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
-	
-					BufferedReader reader = null;
-					
 					Status.progress(-1, "Reading XML file: " + dataset);
-	
-					// if this is a url (starts with protocol://)
-					if (isUrl)
-					{
-						final URL url = new URL(dataset);
-						final URLConnection urlConnection = url
-								.openConnection();
-						final InputStream inputStream = urlConnection
-								.getInputStream();
-	
-						if (dataset.endsWith(".gz"))
-							reader = new BufferedReader(
-									new InputStreamReader(
-											new GZIPInputStream(
-													inputStream)));
-						else
-							reader = new BufferedReader(
-									new InputStreamReader(inputStream));
-					}
 					
-					else
-					{ // if this is a file
-						if (dataset.endsWith(".gz"))
-							reader = new BufferedReader(
-									new InputStreamReader(
-											new GZIPInputStream(
-													new FileInputStream(
-															dataset))));
-						
-						else
-							reader = new BufferedReader(
-									new InputStreamReader(
-											new FileInputStream(dataset)));
-					}
-	
-					saxParser.parse(new InputSource(reader), (DefaultHandler)handler);
-	
-					// retrieve the data from the handler.
-					structureTmp = handler.getStructure();
-					residueConverter = handler.getIDConverter();
-					nonProteinChainIds = handler.getNonProteinChainIds();
+					loader =
+						new XMLStructureLoader((StructureXMLHandler)AppBase.sgetAppModuleFactory().createStructureXMLHandler(dataset));
+					((XMLStructureLoader)loader).setInitialBiologicalUnitId(initialBiologicalUnitId);
 					
-					finalizeNewStructure(handler, structureTmp);
+					structureTmp = loader.load(dataset);
+				}
 					
-					if (handler.getUnitCell() != null)
-						structureTmp.getStructureMap().setUnitCell(
-							handler.getUnitCell());
-					// TODO getUnitCell, set on structure map
-				}
 				
-				catch (final MalformedURLException e) {
-					e.printStackTrace();
-					System.out
-							.println("Error: Bad url to the structure xml file.");
-				}
-				
-				catch (final IOException e) {
-					e.printStackTrace();
-					System.out.println("Error: " + e.toString());
-				}
-				
-				catch (final ParserConfigurationException pce) {
-					pce.printStackTrace();
-					// System.exit(1);
-				}
-				
-				catch (final SAXException se) {
-					se.printStackTrace();
-					// System.exit(1);
-				}
-			}
-			
-			else if (dataset.matches("^.+\\.pdb\\d*(\\.gz)?$")
-					|| dataset.endsWith(".ent.gz")
-					|| dataset.endsWith(".ent"))
-			{
-				final PdbStructureLoader loader = new PdbStructureLoader();
-				Status.progress(0, "Reading PDB file: " + dataset);
-				if (isUrl)
+				else if (dataset.matches("^.+\\.pdb\\d*(\\.gz)?$")
+						|| dataset.endsWith(".ent.gz")
+						|| dataset.endsWith(".ent"))
 				{
-					try
-					{
-						structureTmp = loader.load(new URL(dataset));
-					}
+					loader = new PdbStructureLoader();
+					((PdbStructureLoader)loader).setTreatModelsAsSubunits(AppBase.sgetSceneController().shouldTreatModelsAsSubunits());
 					
-					catch (final MalformedURLException e)
-					{
-						e.printStackTrace();
-					}
+					Status.progress(0, "Reading PDB file: " + dataset);
+					
+					structureTmp = loader.load(dataset);
 				}
 				
-				else 
-					structureTmp = loader.load(new File(dataset));
-	
-				residueConverter = loader.getIDConverter();
-				nonProteinChainIds = new String[] {};
-						// **JB don't worry about this for now...
+				else
+					Status.output(Status.LEVEL_ERROR,
+									"Could not open file: the file must have an extension of .xml, xml.gz, .pdb, .pdb.gz, .ent, or .ent.gz.");
+		
+				if (structureTmp == null)
+				{
+					Status.output(Status.LEVEL_ERROR, "Could not load: " + dataset);
+					return null;
+				}
 				
+				else
+					System.out.println("Data set loaded: " + dataset);
+		
 				new StructureMap(structureTmp, AppBase.sgetAppModuleFactory().createSceneNode());
-								// TODO: this should call 'finalizeNewStructure' to set this up and
-								// 		 check for biological units, nct's ,etc.
+				structureTmp.getStructureMap().setConverter(loader.getIDConverter());
+				structureTmp.getStructureMap().setNonproteinChainIds(loader.getNonProteinChainIds());
+				finalizeNewStructure(loader, structureTmp);
+								
+				if (loader.getUnitCell() != null)
+					structureTmp.getStructureMap().setUnitCell(loader.getUnitCell());
+		
+				structuresVec.add(structureTmp);			
 			}
 			
-			else
-				Status.output(Status.LEVEL_ERROR,
-								"Could not open file: the file must have an extension of .xml, xml.gz, .pdb, .pdb.gz, .ent, or .ent.gz.");
-	
-			if (structureTmp == null)
+			catch (final MalformedURLException e)
 			{
-				Status.output(Status.LEVEL_ERROR, "Could not load: " + dataset);
-				return null;
+				Status.output(Status.LEVEL_ERROR, "Error: Bad url to the structure xml file.");
 			}
 			
-			else
-				System.out.println("Data set loaded: " + dataset);
-	
-			structureTmp.getStructureMap().setConverter(residueConverter);
-			structureTmp.getStructureMap().setNonproteinChainIds(nonProteinChainIds);
-	
-			structuresVec.add(structureTmp);
+			catch (final IOException e)
+			{
+				Status.output(Status.LEVEL_ERROR, e.getMessage());
+			}
+
 		}
 			// global transforms set in _BU version...
 		
@@ -245,7 +154,7 @@ public class DocController
 		final Structure[] structures = new Structure[structuresVec.size()];
 		for (int i = 0; i < structures.length; i++)
 		{
-			structures[i] = (Structure) structuresVec.get(i);
+			structures[i] = structuresVec.get(i);
 			structures[i].getStructureMap().setPdbId("NOID");
 			structures[i].getStructureMap().setImmutable();
 		}
@@ -397,20 +306,19 @@ public class DocController
 	 */
 	public void finalizeNewStructure(IStructureLoader handler, Structure structureTmp)
 	{
-		StructureMap structureMap = new StructureMap(structureTmp, AppBase.sgetAppModuleFactory().createSceneNode());
+		StructureMap structureMap = structureTmp.getStructureMap();
 		// explicitly create a structureMap for the struc
 
-		StructureXMLHandler xmlHandler = (StructureXMLHandler)handler;
-		if (xmlHandler.hasBiologicUnitTransformationMatrices())
+		if (handler.hasBiologicUnitTransformationMatrices())
 		{
 			StructureMap.BiologicUnitTransforms bu = structureMap.addBiologicUnitTransforms();
-			bu.setBiologicalUnitGenerationMatrices(xmlHandler.getBiologicalUnitTransformationMatrices());
+			bu.setBiologicalUnitGenerationMatrices(handler.getBiologicalUnitTransformationMatrices());
 		}
 
-		else if (xmlHandler.hasNonCrystallographicOperations())
+		else if (handler.hasNonCrystallographicOperations())
 		{
 			StructureMap.NonCrystallographicTransforms nc = structureMap.addNonCrystallographicTransforms();
-			nc.setNonCrystallographicTranslations(xmlHandler.getNonCrystallographicOperations());
+			nc.setNonCrystallographicTranslations(handler.getNonCrystallographicOperations());
 		}
 	}
 }

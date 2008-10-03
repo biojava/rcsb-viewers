@@ -6,17 +6,16 @@ import java.util.Iterator;
 import java.util.Stack;
 import java.util.Vector;
 
-import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
-import org.rcsb.mbt.glscene.geometry.Matrix3f;
-import org.rcsb.mbt.glscene.geometry.UnitCell;
-import org.rcsb.mbt.glscene.jogl.TransformationMatrix;
-import org.rcsb.mbt.glscene.jogl.Vector3f;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.TransformationList;
+import org.rcsb.mbt.model.UnitCell;
+import org.rcsb.mbt.model.geometry.Matrix3f;
+import org.rcsb.mbt.model.geometry.TransformationMatrix;
+import org.rcsb.mbt.model.geometry.Vector3f;
+import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -68,6 +67,8 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
     }
     
     private String urlString;   // for status reporting purposes.
+    private String initialBioId = null;
+    public void setInitialBiologicalUnitId(final String id) { initialBioId = id; }
     
     // used temporarily to store the current atom before putting it into atomVector.
     protected Atom curAtom = null;
@@ -422,7 +423,6 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
 		        case STRUCT_BIOLGEN:
 		        	if(qName.endsWith("pdbx_full_symmetry_operation"))
 		        	{
-		        		String initialBioId = AppBase.sgetDocController().getInitialBiologicalUnitId();
 		        		if (this.curStructBiolGen.id == null ||
 		        				(initialBioId == null && this.curStructBiolGen.id.equals("1")) ||
 		        				(initialBioId != null && this.curStructBiolGen.id.equals(initialBioId)))

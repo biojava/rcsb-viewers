@@ -80,7 +80,7 @@ import java.util.*;
  *  or more Fragment representations to a given style scheme.
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.attributes.FragmentForm
+ *  @see	org.rcsb.mbt.model.attributes.IFragmentForm
  *  @see	org.rcsb.mbt.model.attributes.StructureStyles
  */
 public class FragmentFormRegistry
@@ -127,7 +127,7 @@ public class FragmentFormRegistry
 	/**
 	 *  Add a new FragmentForm implementation.
 	 */
-	public static void add( final String name, final FragmentForm fragmentForm )
+	public static void add( final String name, final IFragmentForm fragmentForm )
 	{
 		FragmentFormRegistry.fragmentFormObjects.put( name, fragmentForm );
 	}
@@ -143,17 +143,17 @@ public class FragmentFormRegistry
 	/**
 	 *  Get an FragmentForm implementation by name.
 	 */
-	public static FragmentForm get( final String name )
+	public static IFragmentForm get( final String name )
 	{
-		return (FragmentForm) FragmentFormRegistry.fragmentFormObjects.get( name );
+		return (IFragmentForm) FragmentFormRegistry.fragmentFormObjects.get( name );
 	}
 
 	/**
 	 *  Get the default FragmentForm implementation.
 	 */
-	public static FragmentForm getDefault( )
+	public static IFragmentForm getDefault( )
 	{
-		return (FragmentForm) FragmentFormRegistry.fragmentFormObjects.get( FragmentFormRegistry.defaultName );
+		return (IFragmentForm) FragmentFormRegistry.fragmentFormObjects.get( FragmentFormRegistry.defaultName );
 	}
 
 	/**

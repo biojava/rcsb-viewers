@@ -74,7 +74,7 @@ import java.util.*;
  *  or more Chain representations to a given coloring scheme.
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.attributes.ChainColor
+ *  @see	org.rcsb.mbt.model.attributes.IChainColor
  *  @see	org.rcsb.mbt.model.attributes.StructureStyles
  */
 public class ChainColorRegistry
@@ -116,7 +116,7 @@ public class ChainColorRegistry
 	/**
 	 *  Add a new ChainColor implementation.
 	 */
-	public static void add( final String name, final ChainColor chainColor )
+	public static void add( final String name, final IChainColor chainColor )
 	{
 		ChainColorRegistry.chainColorObjects.put( name, chainColor );
 	}
@@ -132,17 +132,17 @@ public class ChainColorRegistry
 	/**
 	 *  Get an ChainColor implementation by name.
 	 */
-	public static ChainColor get( final String name )
+	public static IChainColor get( final String name )
 	{
-		return (ChainColor) ChainColorRegistry.chainColorObjects.get( name );
+		return (IChainColor) ChainColorRegistry.chainColorObjects.get( name );
 	}
 
 	/**
 	 *  Get the default ChainColor implementation.
 	 */
-	public static ChainColor getDefault( )
+	public static IChainColor getDefault( )
 	{
-		return (ChainColor) ChainColorRegistry.chainColorObjects.get( ChainColorRegistry.defaultName );
+		return (IChainColor) ChainColorRegistry.chainColorObjects.get( ChainColorRegistry.defaultName );
 	}
 
 	/**

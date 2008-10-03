@@ -61,9 +61,12 @@
 package org.rcsb.mbt.structLoader;
 
 
-import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
-import org.rcsb.mbt.glscene.geometry.UnitCell;
+import java.io.IOException;
+
 import org.rcsb.mbt.model.Structure;
+import org.rcsb.mbt.model.TransformationList;
+import org.rcsb.mbt.model.UnitCell;
+import org.rcsb.mbt.model.util.PdbToNdbConverter;
 
 
 /**
@@ -97,8 +100,9 @@ public interface IStructureLoader
 	 * implement the "canLoad" method, an application can always
 	 * determine if a given loader is capable of delivering a specific
 	 * structure or not.
+	 * @throws IOException 
 	 */
-	public Structure load( String name );
+	public Structure load( String name ) throws IOException;
 
 	/**
 	 * Returns true if the loader is capable of loading the structure,
@@ -127,5 +131,28 @@ public interface IStructureLoader
 	 * @return
 	 */
 	public abstract UnitCell getUnitCell();
+	
+	/**
+	 * Test
+	 * @return
+	 */
+    public abstract boolean hasBiologicUnitTransformationMatrices();
+    
+    /**
+     * Accessor
+     * @return
+     */
+    public abstract TransformationList getBiologicalUnitTransformationMatrices();
+    
+    /**
+     * Test
+     */
+    public abstract boolean hasNonCrystallographicOperations();
+    
+    /**
+     * Accessor
+     * @return
+     */
+    public abstract TransformationList getNonCrystallographicOperations();
 }
 

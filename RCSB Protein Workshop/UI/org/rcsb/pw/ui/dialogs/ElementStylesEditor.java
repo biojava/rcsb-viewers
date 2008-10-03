@@ -102,7 +102,7 @@ import org.rcsb.mbt.ui.dialogs.ColorChooserDialog;
  *  </CENTER>
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.attributes.ColorMap
+ *  @see	org.rcsb.mbt.model.attributes.IColorMap
  */
 public class ElementStylesEditor
 	extends JPanel

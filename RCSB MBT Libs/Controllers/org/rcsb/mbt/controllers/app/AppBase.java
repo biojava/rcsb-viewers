@@ -84,7 +84,7 @@ public abstract class AppBase
 		public StructureModel createModel() { return new StructureModel(); }
 		public GlGeometryViewer createGlGeometryViewer() { return new GlGeometryViewer(); }
 		public JoglSceneNode createSceneNode() { return new JoglSceneNode(); }
-		public IStructureLoader createStructureXMLHandler(String dataset) { return new StructureXMLHandler(dataset); }
+		public StructureXMLHandler createStructureXMLHandler(String dataset) { return new StructureXMLHandler(dataset); }
 
 	}
 

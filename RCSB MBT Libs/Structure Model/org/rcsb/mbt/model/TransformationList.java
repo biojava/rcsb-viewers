@@ -2,7 +2,7 @@ package org.rcsb.mbt.model;
 
 import java.util.ArrayList;
 
-import org.rcsb.mbt.glscene.jogl.TransformationMatrix;
+import org.rcsb.mbt.model.geometry.TransformationMatrix;
 
 
 /**

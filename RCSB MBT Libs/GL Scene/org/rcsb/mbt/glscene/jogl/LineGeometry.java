@@ -4,11 +4,11 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.glscene.geometry.Point3d;
 import org.rcsb.mbt.model.LineSegment;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.attributes.LineStyle;
 import org.rcsb.mbt.model.attributes.Style;
+import org.rcsb.mbt.model.geometry.Point3d;
 
 
 import com.sun.opengl.util.GLUT;
@@ -87,6 +87,7 @@ public class LineGeometry extends DisplayListGeometry {
 
 		int labelDl = -1;
 		//label = null; // JLM DEBUG: Disable atom labels for now...
+		JoglSceneNode sceneNode = (JoglSceneNode)AppBase.sgetModel().getStructures().get(0).getStructureMap().getUData();
 		if ( lineStyle.label != null )
 		{
 			labelDl = gl.glGenLists( 1 );
@@ -101,11 +102,11 @@ public class LineGeometry extends DisplayListGeometry {
 
 			gl.glEndList( );
 			
-			AppBase.sgetModel().getStructures().get(0).getStructureMap().getSceneNode().registerLabel(line, new Integer(labelDl), false, GlGeometryViewer.white);
+			sceneNode.registerLabel(line, new Integer(labelDl), false, GlGeometryViewer.white);
 		}
 		
 		else
-			AppBase.sgetModel().getStructures().get(0).getStructureMap().getSceneNode().removeLabel(line);
+			sceneNode.removeLabel(line);
 		
 		//
 		// Handle shared label display lists.

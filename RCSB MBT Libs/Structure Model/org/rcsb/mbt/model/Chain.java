@@ -302,7 +302,7 @@ public class Chain
 								  Residue.Classification.LIGAND)
 		{
 			reClassifyAsLigand();
-			return Residue.Classification.LIGAND;
+// XXX			return Residue.Classification.LIGAND;
 		}
 
 		return Residue.Classification.values()[highestIndex];
@@ -314,6 +314,8 @@ public class Chain
 	 */
 	public void reClassifyAsLigand()
 	{
+/* ** XXX temporarily turned off.  See above XXX, too.
+ * 
 		for (Residue residue : residues)
 			if (residue.getClassification() == Residue.Classification.LIGAND)
 				return;
@@ -321,6 +323,7 @@ public class Chain
 							// they're all correct.
 			else
 				residue.reClassifyAsLigand();
+* **/
 	}
 
 	/**
@@ -711,9 +714,9 @@ public class Chain
 	 *  Get the fragments for this chain.
 	 *  <P>
 	 */ 
-	public Vector getFragments( )
+	public Vector<Fragment> getFragments( )
 	{
-		final Vector frags = new Vector( );
+		final Vector<Fragment> frags = new Vector<Fragment>( );
 		final int count = this.getFragmentCount( );
 		for ( int i=0; i<count; i++ ) {
 			frags.add( this.getFragment( i ) );

@@ -12,7 +12,6 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.glscene.jogl.TransformationMatrix;
 import org.rcsb.mbt.glscene.surfaces.Surface;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
@@ -27,6 +26,7 @@ import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.TransformationList;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms;
 import org.rcsb.mbt.model.attributes.ChainStyle;
+import org.rcsb.mbt.model.geometry.TransformationMatrix;
 
 
 import com.sun.opengl.util.GLUT;

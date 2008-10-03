@@ -25,7 +25,7 @@ public class LXState extends StateBase
 	protected void setViewerInfo()
 	{
 		LXModel model = LigandExplorer.sgetModel();
-		final LXSceneNode node = (LXSceneNode)model.getStructures().get(0).getStructureMap().getSceneNode();
+		final LXSceneNode node = (LXSceneNode)model.getStructures().get(0).getStructureMap().getUData();
 		setViewerInfo(node.getEye(), node.getCenter(), node.getUp());
 		fog.setAttribute("is_enabled", node.isFogEnabled ? "true" : "false");
 		fog.setAttribute("start", node.fogStart + "");
@@ -85,7 +85,7 @@ public class LXState extends StateBase
 		public void run() {
 			long startTime = -1;
 			final LXModel model = LigandExplorer.sgetModel();
-			final LXSceneNode node = (LXSceneNode)model.getStructures().get(0).getStructureMap().getSceneNode();
+			final LXSceneNode node = (LXSceneNode)model.getStructures().get(0).getStructureMap().getUData();
 			final GlGeometryViewer glViewer = LigandExplorer.sgetGlGeometryViewer();
 			
 			while(true) {
@@ -138,7 +138,7 @@ public class LXState extends StateBase
 	@Override
 	protected void enactViewerOptions() {
 		final LXModel model = LigandExplorer.sgetModel();
-		final LXSceneNode node = (LXSceneNode)model.getStructures().get(0).getStructureMap().getSceneNode();
+		final LXSceneNode node = (LXSceneNode)model.getStructures().get(0).getStructureMap().getUData();
 		final GlGeometryViewer glViewer = LigandExplorer.sgetGlGeometryViewer();
 		
 		try {

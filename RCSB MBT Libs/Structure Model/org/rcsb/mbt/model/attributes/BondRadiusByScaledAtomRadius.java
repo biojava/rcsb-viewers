@@ -76,11 +76,11 @@ import org.rcsb.mbt.model.*;
  *  to the given Bond by using the AtomRadius class.
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.attributes.BondRadius
+ *  @see	org.rcsb.mbt.model.attributes.IBondRadius
  *  @see	org.rcsb.mbt.model.Bond
  */
 public class BondRadiusByScaledAtomRadius
-	implements BondRadius
+	implements IBondRadius
 {
 	public static final String NAME = "By Scaled Atom Radius (Ball-And-Stick)";
 

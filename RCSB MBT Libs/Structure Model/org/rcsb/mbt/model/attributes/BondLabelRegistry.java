@@ -75,7 +75,7 @@ import java.util.Hashtable;
  *  or more Bond representations to a given label scheme.
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.attributes.BondLabel
+ *  @see	org.rcsb.mbt.model.attributes.IBondLabel
  *  @see	org.rcsb.mbt.model.attributes.StructureStyles
  */
 public class BondLabelRegistry
@@ -119,7 +119,7 @@ public class BondLabelRegistry
 	/**
 	 *  Add a new BondLabel implementation.
 	 */
-	public static void add( final String name, final BondLabel bondLabel )
+	public static void add( final String name, final IBondLabel bondLabel )
 	{
 		BondLabelRegistry.bondLabelObjects.put( name, bondLabel );
 	}
@@ -135,17 +135,17 @@ public class BondLabelRegistry
 	/**
 	 *  Get an BondLabel implementation by name.
 	 */
-	public static BondLabel get( final String name )
+	public static IBondLabel get( final String name )
 	{
-		return (BondLabel) BondLabelRegistry.bondLabelObjects.get( name );
+		return (IBondLabel) BondLabelRegistry.bondLabelObjects.get( name );
 	}
 
 	/**
 	 *  Get the default BondLabel implementation.
 	 */
-	public static BondLabel getDefault( )
+	public static IBondLabel getDefault( )
 	{
-		return (BondLabel) BondLabelRegistry.bondLabelObjects.get( BondLabelRegistry.defaultName );
+		return (IBondLabel) BondLabelRegistry.bondLabelObjects.get( BondLabelRegistry.defaultName );
 	}
 
 	/**

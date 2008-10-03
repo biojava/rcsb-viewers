@@ -63,7 +63,7 @@ package org.rcsb.mbt.model.attributes;
 
 
 import org.rcsb.mbt.model.Bond;
-import org.rcsb.mbt.model.attributes.BondLabel;
+import org.rcsb.mbt.model.attributes.IBondLabel;
 
 
 /**
@@ -71,11 +71,11 @@ import org.rcsb.mbt.model.attributes.BondLabel;
  *  string label based upon the Bond atom's distance..
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.attributes.BondLabel
+ *  @see	org.rcsb.mbt.model.attributes.IBondLabel
  *  @see	org.rcsb.mbt.model.Bond
  */
 public class BondLabelByDistance
-	implements BondLabel
+	implements IBondLabel
 {
 	public static final String NAME = "By Atom Distance";
 

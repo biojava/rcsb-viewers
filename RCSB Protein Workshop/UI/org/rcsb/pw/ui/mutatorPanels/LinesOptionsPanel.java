@@ -18,6 +18,7 @@ import javax.swing.JTextField;
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
+import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.LineSegment;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.attributes.LineStyle;
@@ -227,11 +228,11 @@ public class LinesOptionsPanel extends JPanel implements IUpdateListener, Action
 			Structure struc = null;
 			while (it.hasNext()) {
 				final LineSegment line = (LineSegment)it.next();
-				line.structure.getStructureMap().getSceneNode().removeRenderable(line);
+				((JoglSceneNode)line.structure.getStructureMap().getUData()).removeRenderable(line);
 				struc = line.structure;
 			}
 			if(struc != null) {
-				struc.getStructureMap().getSceneNode().regenerateGlobalList();
+				((JoglSceneNode)struc.getStructureMap().getUData()).regenerateGlobalList();
 			}
 			AppBase.sgetGlGeometryViewer().requestRepaint();
 		} else if(arg0.getSource() == this.showDistancesCheck) {

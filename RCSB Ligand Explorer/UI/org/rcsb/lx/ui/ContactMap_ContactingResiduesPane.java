@@ -21,12 +21,12 @@ import org.rcsb.lx.glscene.jogl.ResidueFontInfo;
 import org.rcsb.lx.model.ComparablePdbResidueId;
 import org.rcsb.lx.model.InteractionMap;
 import org.rcsb.lx.model.LXModel;
-import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.util.AminoAcidInfo;
+import org.rcsb.mbt.model.util.PdbToNdbConverter;
 
 
 public class ContactMap_ContactingResiduesPane extends JPanel

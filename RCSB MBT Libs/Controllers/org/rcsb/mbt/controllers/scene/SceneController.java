@@ -12,7 +12,6 @@ import org.rcsb.mbt.glscene.jogl.DisplayLists;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.glscene.jogl.GvPickEvent;
 import org.rcsb.mbt.glscene.jogl.GvPickEventListener;
-import org.rcsb.mbt.glscene.jogl.TransformationMatrix;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
@@ -21,7 +20,8 @@ import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.TransformationList;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms.BiologicalUnitGenerationMapByChain;
-import org.rcsb.mbt.model.util.Algebra;
+import org.rcsb.mbt.model.geometry.Algebra;
+import org.rcsb.mbt.model.geometry.TransformationMatrix;
 
 
 /**

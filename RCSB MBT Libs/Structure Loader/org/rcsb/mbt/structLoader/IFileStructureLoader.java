@@ -63,6 +63,7 @@ package org.rcsb.mbt.structLoader;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 import org.rcsb.mbt.model.Structure;
@@ -81,8 +82,9 @@ public interface IFileStructureLoader
 {
 	/**
 	 * Load a structure from a File object.
+	 * @throws IOException 
 	 */
-	public Structure load( File file );
+	public Structure load( File file ) throws IOException;
 
 	/**
 	 * Returns true if the loader is capable of loading the structure,
@@ -94,8 +96,9 @@ public interface IFileStructureLoader
 
 	/**
 	 * Load a structure from a URL object.
+	 * @throws IOException 
 	 */
-	public Structure load( URL url );
+	public Structure load( URL url ) throws IOException;
 
 	/**
 	 * Returns true if the loader is capable of loading the structure,

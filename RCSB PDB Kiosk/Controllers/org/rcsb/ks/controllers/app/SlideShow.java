@@ -510,7 +510,7 @@ public class SlideShow extends Thread {
 			Chain c = sm.getChain(r.getChainId());
 			
 			KSGlGeometryViewer viewer = KioskViewer.sgetGlGeometryViewer();
-			DisplayListRenderable renderable = sm.getSceneNode().getRenderable(c);
+			DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(c);
 			if (renderable != null) {
 				// this.options.getCurrentColor().getColorComponents(colorFl);
 
@@ -545,7 +545,7 @@ public class SlideShow extends Thread {
 		Structure struc = a.structure;
 		StructureMap sm = struc.getStructureMap();
 		StructureStyles ss = sm.getStructureStyles();
-		JoglSceneNode sn = sm.getSceneNode();
+		JoglSceneNode sn = (JoglSceneNode)sm.getUData();
 
 		switch (PickLevel.pickLevel)
 		{

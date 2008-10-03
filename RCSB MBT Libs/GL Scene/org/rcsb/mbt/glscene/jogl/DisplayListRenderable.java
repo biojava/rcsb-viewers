@@ -171,7 +171,8 @@ public class DisplayListRenderable
 				}
 			}
 		
-			this.structureComponent.structure.getStructureMap().getSceneNode().removeLabel(this.structureComponent);
+			JoglSceneNode sceneNode = (JoglSceneNode) structureComponent.structure.getStructureMap().getUData();
+			sceneNode.removeLabel(this.structureComponent);
 		}
 	}
 

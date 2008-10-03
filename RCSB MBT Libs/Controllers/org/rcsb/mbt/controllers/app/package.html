@@ -14,7 +14,7 @@ The app instance is retrieved via a static accessor:</p>
 <p>
 The app instance has a number of accessors to retrieve the active document
 frame, which in turn has a number of accessors to retrieve doc-centric controllers,
-geometry viewer, etc.</p>
+(doc controller, scene controller, update controller, etc.</p>
 <p>
 In addition, the app class provides a number of static <em>folded</em> accessors
 that collapse the accessor chain to a single call from the AppBase class.</p>
@@ -57,13 +57,9 @@ To provide derived components to the framework, you need to derive the internal
 necessary components, and then override the appropriate create&lt;xxx&gt;() function
 for that module.</p>
 <p>Notes:</p>
-	<ul>
+  <ul>
   <li><em>createDocFrame()</em> is required - if you derive the AppModuleFactory in your
       application, you must derive <em>createDocFrame()</em> and add a creator.</li>
   </ul>
-<h2>Toolkit Controllers</h2>
-<p>
-We don't wan't any toolkit code in here (Swing/OpenGL), thus those toolkits may contain
-toolkit-specific controllers.  Look in UI and GlScene folders for toolkit controllers.</p>
 </body>
 </html>

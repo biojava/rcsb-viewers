@@ -72,10 +72,10 @@ import org.rcsb.mbt.model.Bond;
  *  Implements the BondForm interface as a "Simple" bond type.
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.attributes.BondForm
+ *  @see	org.rcsb.mbt.model.attributes.IBondForm
  */
 public class BondFormSimple
-	implements BondForm
+	implements IBondForm
 {
 	public static final String NAME = "Simple";
 
@@ -103,7 +103,7 @@ public class BondFormSimple
 
 	public int getBondForm( final Bond bond )
 	{
-		return BondForm.SIMPLE;
+		return IBondForm.SIMPLE;
 	}
 }
 

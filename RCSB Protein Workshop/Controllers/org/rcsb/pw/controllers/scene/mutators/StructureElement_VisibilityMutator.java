@@ -8,6 +8,7 @@ import org.rcsb.mbt.controllers.scene.PickLevel;
 import org.rcsb.mbt.glscene.jogl.DisplayListGeometry;
 import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
+import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -245,11 +246,11 @@ public class StructureElement_VisibilityMutator extends Mutator {
 				style = ss.getDefaultStyle(sc.getStructureComponentType());
 			}
 			
-			sm.getSceneNode().addRenderable(new DisplayListRenderable( sc, style, geometry ));
+			((JoglSceneNode)sm.getUData()).addRenderable(new DisplayListRenderable( sc, style, geometry ));
 		}
 		
 		else
-			sm.getSceneNode().removeRenderable(sc);
+			((JoglSceneNode)sm.getUData()).removeRenderable(sc);
 	}
 	
     private void setVisibility(final Atom a, final boolean newVisibility)
@@ -268,8 +269,8 @@ public class StructureElement_VisibilityMutator extends Mutator {
         		final Bond b = (Bond)bonds.get(i);
         		
         		// change the bond visibility based on the new atom visibility
-        		boolean atom0IsVisible = sm.getSceneNode().getRenderable(b.getAtom(0)) != null;
-        		boolean atom1IsVisible = sm.getSceneNode().getRenderable(b.getAtom(1)) != null;
+        		boolean atom0IsVisible = ((JoglSceneNode)sm.getUData()).getRenderable(b.getAtom(0)) != null;
+        		boolean atom1IsVisible = ((JoglSceneNode)sm.getUData()).getRenderable(b.getAtom(1)) != null;
         		if(atom0IsVisible && atom1IsVisible) {
         			this.setComponentVisibilitySimple(b, true);
         		} else if(!atom0IsVisible || !atom1IsVisible) {

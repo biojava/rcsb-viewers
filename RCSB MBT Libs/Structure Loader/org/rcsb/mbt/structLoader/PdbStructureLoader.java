@@ -146,9 +146,6 @@ import java.io.*;
 import java.net.*;
 import java.util.zip.*;
 
-import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
-import org.rcsb.mbt.glscene.geometry.UnitCell;
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.util.*;
 
@@ -172,6 +169,15 @@ public class PdbStructureLoader
 	private long expectedInputBytes = 1;
 	private PdbToNdbConverter converter = null;
 	private Structure structure;
+	private boolean treatModelsAsSubunits = false;
+	
+	/**
+	 * Set this if the models are part of a greater whole.
+	 * This is normally set from a flag in the scene manager.
+	 * 
+	 * @param flag
+	 */
+	public void setTreatModelsAsSubunits(boolean flag) { treatModelsAsSubunits = flag; }
 	
 	// A hashtable of vectors where
 	// each hash KEY is the StructureComponent type String.
@@ -214,28 +220,25 @@ public class PdbStructureLoader
 	 * determine if a given loader is capable of delivering a specific
 	 * structure or not.
 	 */
-	public Structure load( final String name )
+	public Structure load( final String name) throws IOException
 	{
 		structure = null;
+		
 		try
 		{	
 			final File file = new File( name );
-			structure = this.load( file );
+			structure = this.load( file);
 		}
 		catch( final NullPointerException e )
 		{
-			try
-			{	
-				final URL url = new URL( name );
-				structure = this.load( url );
-			}
-			catch( final MalformedURLException e2 )
-			{
-			}
+			final URL url = new URL( name );
+			structure = this.load( url );
 		}
+		
 		if ( structure != null ) {
 			this.urlString = name;
 		}
+		
 		return structure;
 	}
 
@@ -246,7 +249,7 @@ public class PdbStructureLoader
 	 * to build a context sensative menu of only the loaders that can
 	 * load a given structure name.
 	 */
-	public boolean canLoad( final String name )
+	public boolean canLoad( final String name)
 	{
 		// System.err.println( "PdbStructureLoader.canLoad(String)" );
 		if ( name.indexOf( ".pdb" ) < 0 ) {
@@ -269,7 +272,7 @@ public class PdbStructureLoader
 	/**
 	 * Returns a reference to a Structure read from the given File object.
 	 */
-	public Structure load( final File file )
+	public Structure load( final File file ) throws IOException
 	{
 		// System.err.println( "PdbStructureLoader.load(File)" );
 
@@ -288,49 +291,30 @@ public class PdbStructureLoader
 			return null;
 		}
 
-		try
+		final FileInputStream fileInputStream = new FileInputStream( file );
+		if ( fileInputStream == null ) {
+			return null;
+		}
+		this.urlString = file.toURL().toExternalForm();
+		BufferedInputStream bufferedInputStream = null;
+		if ( this.urlString.endsWith( ".gz" ) )
 		{
-			final FileInputStream fileInputStream = new FileInputStream( file );
-			if ( fileInputStream == null ) {
-				return null;
-			}
-			this.urlString = file.toURL().toExternalForm();
-			BufferedInputStream bufferedInputStream = null;
-			if ( this.urlString.endsWith( ".gz" ) )
-			{
-				final GZIPInputStream gzipInputStream =
-					new GZIPInputStream( fileInputStream );
-				bufferedInputStream =
-					new BufferedInputStream( gzipInputStream );
+			final GZIPInputStream gzipInputStream =
+				new GZIPInputStream( fileInputStream );
+			bufferedInputStream =
+				new BufferedInputStream( gzipInputStream );
 
-				// JLM DEBUG: crude hack for progress, because with
-				// a gzip stream we can't tell how much data there will be!
-				// A 4:1 compression is typical for PDB files.
-				this.expectedInputBytes *= 4;
-			}
-			else
-			{
-				bufferedInputStream =
-					new BufferedInputStream( fileInputStream );
-			}
-			return this.load( bufferedInputStream );
+			// JLM DEBUG: crude hack for progress, because with
+			// a gzip stream we can't tell how much data there will be!
+			// A 4:1 compression is typical for PDB files.
+			this.expectedInputBytes *= 4;
 		}
-		catch ( final FileNotFoundException e )
+		else
 		{
-			return null;
+			bufferedInputStream =
+				new BufferedInputStream( fileInputStream );
 		}
-		catch ( final MalformedURLException e )
-		{
-			return null;
-		}
-		catch ( final SecurityException e )
-		{
-			return null;
-		}
-		catch ( final IOException e )
-		{
-			return null;
-		}
+		return this.load( bufferedInputStream );
 	}
 
 
@@ -360,44 +344,34 @@ public class PdbStructureLoader
 	/**
 	 * Returns a reference to a Structure read from the given URL object.
 	 */
-	public Structure load( final URL url )
+	public Structure load( final URL url ) throws IOException
 	{
-		// System.err.println( "PdbStructureLoader.load(URL)" );
-
 		if ( ! this.canLoad( url ) ) {
 			return null;
 		}
 
-		try
-		{
-			final URLConnection urlConnection = url.openConnection( );
-			this.expectedInputBytes = urlConnection.getContentLength( );
+		final URLConnection urlConnection = url.openConnection( );
+		this.expectedInputBytes = urlConnection.getContentLength( );
 //			if ( expectedInputBytes <= 0 ) return null;
-			final InputStream inputStream = urlConnection.getInputStream( );
+		final InputStream inputStream = urlConnection.getInputStream( );
 
-			BufferedInputStream bufferedInputStream = null;
-			if ( inputStream != null ) {
-				this.urlString = url.toExternalForm( );
-			}
-			if ( this.urlString.endsWith( ".gz" ) )
-			{
-				final GZIPInputStream gzipInputStream =
-					new GZIPInputStream( inputStream );
-				bufferedInputStream =
-					new BufferedInputStream( gzipInputStream );
-			}
-			else
-			{
-				bufferedInputStream =
-					new BufferedInputStream( inputStream );
-			}
-			return this.load( bufferedInputStream );
-		}
-		catch( final IOException e )
+		BufferedInputStream bufferedInputStream = null;
+		if ( inputStream != null )
+			this.urlString = url.toExternalForm( );
+
+		if ( this.urlString.endsWith( ".gz" ) )
 		{
-			Status.output( Status.LEVEL_ERROR, "PdbStructureLoader.load( " + url + " ): " + e );
-			return null;
+			final GZIPInputStream gzipInputStream =
+				new GZIPInputStream( inputStream );
+			bufferedInputStream =
+				new BufferedInputStream( gzipInputStream );
 		}
+		else
+		{
+			bufferedInputStream =
+				new BufferedInputStream( inputStream );
+		}
+		return this.load( bufferedInputStream );
 	}
 
 
@@ -418,7 +392,7 @@ public class PdbStructureLoader
 	 * Returns a reference to a Structure read from the given (uncompressed)
 	 * InputStream.
 	 */
-	public Structure load( final BufferedInputStream bufferedInputStream )
+	public Structure load( final BufferedInputStream bufferedInputStream ) throws IOException
 	{
 		// System.err.println( "PdbStructureLoader.load(BufferedInputStream)" );
 		if ( bufferedInputStream == null ) {
@@ -464,205 +438,205 @@ public class PdbStructureLoader
 		int lines = 0;
 		int readCount = 0;
 		int modelCount = 0; // How many models have we seen?
-		try
+
+		while ( true )
 		{
-			while ( true )
+			// Re-fill the raw data buffer.
+
+			lastRead = bufferedInputStream.read( buf, 0, buf.length );
+			if (lastRead == -1) break;
+
+			bytesRead += lastRead;
+
+			readCount++;
+			if ( readCount % onePercent == 0 )
 			{
-				// Re-fill the raw data buffer.
-
-				lastRead = bufferedInputStream.read( buf, 0, buf.length );
-				if (lastRead == -1) break;
-
-				bytesRead += lastRead;
-
-				readCount++;
-				if ( readCount % onePercent == 0 )
-				{
-					percentDone = (int)((bytesRead * 100L)/ expectedBytes);
-					Status.progress( percentDone, "Loading " + this.urlString );
-				}
+				percentDone = (int)((bytesRead * 100L)/ expectedBytes);
+				Status.progress( percentDone, "Loading " + this.urlString );
+			}
 
 /* XXX_DEBUG
 				String strLine  = "";
 **/
-				// Process the buffer
-				for ( int bufPos=0; bufPos<lastRead; bufPos++ )
-				{
-					// Copy a byte from the input buffer into the line buffer
-					line[linePos] = buf[bufPos];
+			// Process the buffer
+			for ( int bufPos=0; bufPos<lastRead; bufPos++ )
+			{
+				// Copy a byte from the input buffer into the line buffer
+				line[linePos] = buf[bufPos];
 /* XXX DEBUG
 					strLine += (char)buf[bufPos];
 **/
-					if ( buf[bufPos] == '\n' )
+				if ( buf[bufPos] == '\n' )
+				{
+					// line[0-linePos] now has a complete line.
+					lines++;
+
+					// Parse the line buffer
+
+					//
+					// ATOM and HETATM records
+					//
+					boolean isAtom = false;
+					if (
+						(line[0] == 'A') &&
+						(line[1] == 'T') &&
+						(line[2] == 'O') &&
+						(line[3] == 'M')
+					) {
+						isAtom = true;
+					} else if (
+						(line[0] == 'H') &&
+						(line[1] == 'E') &&
+						(line[2] == 'T') &&
+						(line[3] == 'A') &&
+						(line[4] == 'T') &&
+						(line[5] == 'M')
+					) {
+						isAtom = true;
+					}
+					if ( isAtom )
 					{
-						// line[0-linePos] now has a complete line.
-						lines++;
-	
-						// Parse the line buffer
-	
-						//
-						// ATOM and HETATM records
-						//
-						boolean isAtom = false;
-						if (
-							(line[0] == 'A') &&
-							(line[1] == 'T') &&
-							(line[2] == 'O') &&
-							(line[3] == 'M')
-						) {
-							isAtom = true;
-						} else if (
-							(line[0] == 'H') &&
-							(line[1] == 'E') &&
-							(line[2] == 'T') &&
-							(line[3] == 'A') &&
-							(line[4] == 'T') &&
-							(line[5] == 'M')
-						) {
-							isAtom = true;
-						}
-						if ( isAtom )
+						// PDB File Atom Record offsets as documented by
+						// http://www.rcsb.org/pdb/docs/format/pdbguide2.2/part_62.html
+						// 1 -  6   RecordName
+						// 7 - 11   serial
+						// 12       -
+						// 13 - 16  name
+						// 17       altLoc
+						// 18 - 20  resName
+						// 21       -
+						// 22       chainID
+						// 23 - 26  resSeq
+						// 27       iCode
+						// 28 - 30  -
+						// 31 - 38  x
+						// 39 - 46  y
+						// 47 - 54  z
+						// 55 - 60  occupancy
+						// 61 - 66  tempFactor
+						// 67 - 72  -
+						// 73 - 76  segID
+						// 77 - 78  element
+						// 79 - 80  charge
+						// NOTE: In this application, we need to subtract 1 from
+						// each index in order to match the 0-based array offsets.
+
+						final Atom atom = new Atom( );
+						String str = null;
+
+						atom.number =  Integer.parseInt( (new String( line, 6, 5 )).trim() );
+
+						atom.name = (new String( line, 12, 4 )).trim().replace('*', '\'');	//**JB quick fix: the dictionary expects ' instead of *
+						atom.name = sharedStrings.share( atom.name );
+
+						atom.element = (new String( line, 76, 2 )).trim();
+						atom.element = atom.element.replaceAll( "[0-9]", "" );
+						if ( (atom.element == null) ||
+							atom.element.equals("") ||
+							(PeriodicTable.getElement( atom.element ) == null)
+						)
 						{
-							// PDB File Atom Record offsets as documented by
-							// http://www.rcsb.org/pdb/docs/format/pdbguide2.2/part_62.html
- 							// 1 -  6   RecordName
- 							// 7 - 11   serial
- 							// 12       -
-							// 13 - 16  name
-							// 17       altLoc
-							// 18 - 20  resName
-							// 21       -
-							// 22       chainID
-							// 23 - 26  resSeq
-							// 27       iCode
-							// 28 - 30  -
-							// 31 - 38  x
-							// 39 - 46  y
-							// 47 - 54  z
-							// 55 - 60  occupancy
-							// 61 - 66  tempFactor
-							// 67 - 72  -
-							// 73 - 76  segID
-							// 77 - 78  element
-							// 79 - 80  charge
-							// NOTE: In this application, we need to subtract 1 from
-							// each index in order to match the 0-based array offsets.
-	
-							final Atom atom = new Atom( );
-							String str = null;
-
-							atom.number =  Integer.parseInt( (new String( line, 6, 5 )).trim() );
-
-							atom.name = (new String( line, 12, 4 )).trim().replace('*', '\'');	//**JB quick fix: the dictionary expects ' instead of *
-							atom.name = sharedStrings.share( atom.name );
-
-							atom.element = (new String( line, 76, 2 )).trim();
-							atom.element = atom.element.replaceAll( "[0-9]", "" );
-							if ( (atom.element == null) ||
-								atom.element.equals("") ||
-								(PeriodicTable.getElement( atom.element ) == null)
-							)
-							{
-								// The element field was not an element,
-								// so, try the first letter of the name.
-								atom.element = atom.name.substring( 0, 1 );
-								if ( PeriodicTable.getElement( atom.element ) == null ) {
-									throw new IllegalArgumentException( "no atom element symbol around line " + lines );
-								}
+							// The element field was not an element,
+							// so, try the first letter of the name.
+							atom.element = atom.name.substring( 0, 1 );
+							if ( PeriodicTable.getElement( atom.element ) == null ) {
+								throw new IllegalArgumentException( "no atom element symbol around line " + lines );
 							}
-							atom.element = sharedStrings.share( atom.element );
-
-							atom.altLoc = (new String( line, 16, 1 )).trim();
-							atom.altLoc = sharedStrings.share( atom.altLoc );
-
-							atom.compound = (new String( line, 17, 3 )).trim();
-							atom.compound = sharedStrings.share( atom.compound );
-
-							atom.chain_id = (new String( line, 21, 1 )).trim();
-							if ( atom.chain_id == null || atom.chain_id.equals("") )
-								atom.chain_id = "_";
-
-							if(AppBase.sgetSceneController().shouldTreatModelsAsSubunits()) {
-								atom.chain_id = atom.chain_id + "$$$" + modelCount;
-							}
-							
-							atom.chain_id = sharedStrings.share( atom.chain_id );
-//							System.out.println(modelCount);
-							
-							final String newResidueIdRaw = new String( line, 22, 6 ).trim();  //**JB expanded to account for non-integer residue ids. Was: ( line, 22, 4 ).
-							String temp = newResidueIdRaw;
-							while(Character.isLetter(temp.charAt(temp.length() - 1))) {		//**JB don't remove anything but the last letters. If there are any spaces between the letters and the number, etc., I want an exception thrown so I know.
-								temp = temp.substring(0, temp.length() - 1);
-							}
-							final int newResidueIdIntSimple = Integer.parseInt(temp);
-							int newResidueIdInt = -1;
-							int increment = Math.abs(newResidueIdIntSimple - previousResidueIdIntSimple);
-							if(increment == 0 && !previousResidueIdRaw.equals(newResidueIdRaw)) {	// if this isn't a simple number, need to check the string as well.
-								increment = 1;
-							}
-							if(previousResidueIdInt == Integer.MIN_VALUE) {
-								newResidueIdInt = newResidueIdIntSimple;
-								increment = 1;	// flag to make sure this chain/residue id pair is recorded.
-							} else {
-								newResidueIdInt = previousResidueIdInt + increment;
-							}
-							
-							if(increment > 0) {
-								pdbChainIds.add(atom.chain_id);
-								ndbChainIds.add(atom.chain_id);
-								pdbResidueIds.add(newResidueIdRaw);
-								ndbResidueIds.add(new Integer(newResidueIdInt));
-							}
-							
-							previousResidueIdInt = newResidueIdInt;
-							previousResidueIdIntSimple = newResidueIdIntSimple;
-							previousResidueIdRaw = newResidueIdRaw;
-							
-							atom.residue_id = newResidueIdInt;
-
-							atom.coordinate = new double[3];
-							atom.coordinate[0] =
-								Double.parseDouble( (new String( line, 30, 8 )).trim() );
-							atom.coordinate[1] =
-								Double.parseDouble( (new String( line, 38, 8 )).trim() );
-							atom.coordinate[2] =
-								Double.parseDouble( (new String( line, 46, 8 )).trim() );
-
-							str = (new String( line, 54, 6 )).trim();
-							if ( str.length() == 0 ) {
-								atom.occupancy = 1.0f;
-							} else {
-								atom.occupancy = Float.parseFloat( str );
-							}
-
-							str = (new String( line, 60, 6 )).trim();
-							if ( str.length() == 0 ) {
-								atom.bfactor = 0.0f;
-							} else {
-								atom.bfactor = Float.parseFloat( str );
-							}
-	
-							Vector<StructureComponent> records = this.passComponents.get(
-								StructureComponentRegistry.TYPE_ATOM );
-							if ( records == null )
-							{
-								records = new Vector<StructureComponent>( );
-								this.passComponents.put(
-									StructureComponentRegistry.TYPE_ATOM, records );
-							}
-							records.add( atom );
-
-							// Add atom to cache for conect record processing.
-							atomNumberHash.put( new Integer( atom.number ), atom );
-
-							// Reset linePos to the start of the line buffer.
-							linePos = 0;
-							continue;
 						}
-	
-						//
-						// HELIX record
-						//
+						atom.element = sharedStrings.share( atom.element );
+
+						atom.altLoc = (new String( line, 16, 1 )).trim();
+						atom.altLoc = sharedStrings.share( atom.altLoc );
+
+						atom.compound = (new String( line, 17, 3 )).trim();
+						atom.compound = sharedStrings.share( atom.compound );
+
+						atom.chain_id = (new String( line, 21, 1 )).trim();
+						if ( atom.chain_id == null || atom.chain_id.equals("") )
+							atom.chain_id = "_";
+
+						if(treatModelsAsSubunits)
+						{
+							atom.chain_id = atom.chain_id + "$$$" + modelCount;
+						}
+						
+						atom.chain_id = sharedStrings.share( atom.chain_id );
+//							System.out.println(modelCount);
+						
+						final String newResidueIdRaw = new String( line, 22, 6 ).trim();  //**JB expanded to account for non-integer residue ids. Was: ( line, 22, 4 ).
+						String temp = newResidueIdRaw;
+						while(Character.isLetter(temp.charAt(temp.length() - 1))) {		//**JB don't remove anything but the last letters. If there are any spaces between the letters and the number, etc., I want an exception thrown so I know.
+							temp = temp.substring(0, temp.length() - 1);
+						}
+						final int newResidueIdIntSimple = Integer.parseInt(temp);
+						int newResidueIdInt = -1;
+						int increment = Math.abs(newResidueIdIntSimple - previousResidueIdIntSimple);
+						if(increment == 0 && !previousResidueIdRaw.equals(newResidueIdRaw)) {	// if this isn't a simple number, need to check the string as well.
+							increment = 1;
+						}
+						if(previousResidueIdInt == Integer.MIN_VALUE) {
+							newResidueIdInt = newResidueIdIntSimple;
+							increment = 1;	// flag to make sure this chain/residue id pair is recorded.
+						} else {
+							newResidueIdInt = previousResidueIdInt + increment;
+						}
+						
+						if(increment > 0) {
+							pdbChainIds.add(atom.chain_id);
+							ndbChainIds.add(atom.chain_id);
+							pdbResidueIds.add(newResidueIdRaw);
+							ndbResidueIds.add(new Integer(newResidueIdInt));
+						}
+						
+						previousResidueIdInt = newResidueIdInt;
+						previousResidueIdIntSimple = newResidueIdIntSimple;
+						previousResidueIdRaw = newResidueIdRaw;
+						
+						atom.residue_id = newResidueIdInt;
+
+						atom.coordinate = new double[3];
+						atom.coordinate[0] =
+							Double.parseDouble( (new String( line, 30, 8 )).trim() );
+						atom.coordinate[1] =
+							Double.parseDouble( (new String( line, 38, 8 )).trim() );
+						atom.coordinate[2] =
+							Double.parseDouble( (new String( line, 46, 8 )).trim() );
+
+						str = (new String( line, 54, 6 )).trim();
+						if ( str.length() == 0 ) {
+							atom.occupancy = 1.0f;
+						} else {
+							atom.occupancy = Float.parseFloat( str );
+						}
+
+						str = (new String( line, 60, 6 )).trim();
+						if ( str.length() == 0 ) {
+							atom.bfactor = 0.0f;
+						} else {
+							atom.bfactor = Float.parseFloat( str );
+						}
+
+						Vector<StructureComponent> records = this.passComponents.get(
+							StructureComponentRegistry.TYPE_ATOM );
+						if ( records == null )
+						{
+							records = new Vector<StructureComponent>( );
+							this.passComponents.put(
+								StructureComponentRegistry.TYPE_ATOM, records );
+						}
+						records.add( atom );
+
+						// Add atom to cache for conect record processing.
+						atomNumberHash.put( new Integer( atom.number ), atom );
+
+						// Reset linePos to the start of the line buffer.
+						linePos = 0;
+						continue;
+					}
+
+					//
+					// HELIX record
+					//
 //						if (
 //							(line[0] == 'H') &&
 //							(line[1] == 'E') &&
@@ -915,9 +889,9 @@ public class PdbStructureLoader
 //							continue;
 //						}
 
-						//
-						// CONECT record
-						//**JB calculate bonds ignoring this data.
+					//
+					// CONECT record
+					//**JB calculate bonds ignoring this data.
 //						if (
 //							(line[0] == 'C') &&
 //							(line[1] == 'O') &&
@@ -942,57 +916,51 @@ public class PdbStructureLoader
 //							continue;
 //						}
 
-						//
-						// MODEL record
-						//
-						if (
-							(line[0] == 'M') &&
-							(line[1] == 'O') &&
-							(line[2] == 'D') &&
-							(line[3] == 'E') &&
-							(line[4] == 'L')
-						)
-						{
-							modelCount++; // How many models have we seen?
+					//
+					// MODEL record
+					//
+					if (
+						(line[0] == 'M') &&
+						(line[1] == 'O') &&
+						(line[2] == 'D') &&
+						(line[3] == 'E') &&
+						(line[4] == 'L')
+					)
+					{
+						modelCount++; // How many models have we seen?
 
-							if ( !this.shouldRecordMoreModels(modelCount) ) {
-								break; // Only load 1st model
-							}
-
-							// Reset linePos to the start of the line buffer.
-							linePos = 0;
-							continue;
+						if ( !this.shouldRecordMoreModels(modelCount) ) {
+							break; // Only load 1st model
 						}
 
 						// Reset linePos to the start of the line buffer.
 						linePos = 0;
+						continue;
+					}
+
+					// Reset linePos to the start of the line buffer.
+					linePos = 0;
 /* XXX_DEBUG 
 						strLine = "";
 **/
-					}
-					else
-					{
-						// Continue building the line.
-						linePos++;
-						if ( linePos >= line.length )
-						{
-							Status.output( Status.LEVEL_ERROR, "PdbStructureLoader.load( stream ): buffer overflow!" );
-							return null;
-						}
-					}
 				}
-
-				if ( !this.shouldRecordMoreModels(modelCount) ) {
-					break; // Only load 1st model
+				else
+				{
+					// Continue building the line.
+					linePos++;
+					if ( linePos >= line.length )
+					{
+						Status.output( Status.LEVEL_ERROR, "PdbStructureLoader.load( stream ): buffer overflow!" );
+						return null;
+					}
 				}
 			}
-		}
-		catch( final IOException e )
-		{
-			Status.output( Status.LEVEL_ERROR, "PdbStructureLoader.load( stream ): " + e );
-			return null;
-		}
 
+			if ( !this.shouldRecordMoreModels(modelCount) ) {
+				break; // Only load 1st model
+			}
+		}
+		
 		//
 		// Post-process cached CONECT records to produce Bond objects.
 		//
@@ -1098,8 +1066,9 @@ public class PdbStructureLoader
 		return this.converter;
 	}
 	
-	private boolean shouldRecordMoreModels(final int modelCount) {
-		return AppBase.sgetSceneController().shouldTreatModelsAsSubunits() || modelCount < 2;
+	private boolean shouldRecordMoreModels(final int modelCount)
+	{
+		return treatModelsAsSubunits || modelCount < 2;
 	}
 	
 	/**
@@ -1116,6 +1085,26 @@ public class PdbStructureLoader
 	 * get the unit cell for biological units
 	 * @return
 	 */
-	public UnitCell getUnitCell() { return null; };
+	public UnitCell getUnitCell() { return null; }
+
+
+	public TransformationList getBiologicalUnitTransformationMatrices() {
+		return null;
+	}
+
+
+	public TransformationList getNonCrystallographicOperations() {
+		return null;
+	}
+
+
+	public boolean hasBiologicUnitTransformationMatrices() {
+		return false;
+	}
+
+
+	public boolean hasNonCrystallographicOperations() {
+		return false;
+	};
 }
 

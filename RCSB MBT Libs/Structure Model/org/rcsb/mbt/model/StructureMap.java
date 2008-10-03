@@ -299,14 +299,9 @@ package org.rcsb.mbt.model;
 // Core
 import java.util.*;
 
-import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
-import org.rcsb.mbt.glscene.geometry.UnitCell;
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
-import org.rcsb.mbt.glscene.jogl.TransformationMatrix;
 import org.rcsb.mbt.model.attributes.*;
+import org.rcsb.mbt.model.geometry.TransformationMatrix;
 import org.rcsb.mbt.model.util.*;
-
-
 
 /**
  *  This class implements a derived data map for a Structure object. It
@@ -491,7 +486,7 @@ public class StructureMap
 	/**
 	 * The scene node this structure represents.
 	 */
-	protected final JoglSceneNode sceneNode;
+	protected final Object udata;
 
 	// Stores Chain object references by atom.chain_id value.
 	protected Hashtable<String, Chain> chainById = null;
@@ -522,11 +517,12 @@ public class StructureMap
 	//
 
 	/**
-	 * Constructs a StructureMap object for a given Structure.
+	 * Constructs a StructureMap object for a given Structure, containing
+	 * a userdata object.
 	 */
-	public StructureMap( final Structure structure, final JoglSceneNode sceneNode )
+	public StructureMap( final Structure structure, final Object udata )
 	{
-		this.sceneNode = sceneNode;
+		this.udata = udata;
 		if ( structure == null ) {
 			throw new IllegalArgumentException( "null Structure" );
 		}
@@ -2398,8 +2394,31 @@ public class StructureMap
 		System.err.println( "StructureMap.print: END" );
 	}
 
-	public JoglSceneNode getSceneNode() {
-		return this.sceneNode;
+	/**
+	 * Retrieve the user data object.
+	 * Note the caller has to cast.
+	 * @return
+	 */
+	public Object getUData() {
+		return this.udata;
+		/*
+		 * I've racked my head trying to figure out how to do this without the user having
+		 * to cast the result, and I come up empty.
+		 * 
+		 * Tried to define the class as a generic, and it works in principal, 
+		 * but the problem is this is carried by 'Structure',
+		 * and Structure needs to return it, but Structure doesn't know what type the
+		 * generic should be, and so we're back to square one.
+		 * 
+		 * Another notion would be to have the application subclass this class, and create
+		 * a hiding retriever that would return the proper type.  That's ok, but then the
+		 * application has to know and reference the derived type everywhere, just to
+		 * access this piece of data.  Seems like overkill.
+		 * 
+		 * So, I've had to sprinkle the code that does this with casts.  Yuck.
+		 * 
+		 * 03-Oct-08 - rickb
+		 */
 	}
 	
 	public PdbToNdbConverter getPdbToNdbConverter() {

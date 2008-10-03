@@ -838,7 +838,7 @@ public class StateBase
 	protected void setVisibilityInfo(final Document doc, final Element visibility)
 	{
 		StructureModel model = AppBase.sgetModel();
-		final JoglSceneNode node = model.getStructures().get(0).getStructureMap().getSceneNode();
+		final JoglSceneNode node = (JoglSceneNode)model.getStructures().get(0).getStructureMap().getUData();
 		final GlGeometryViewer viewer = AppBase.sgetGlGeometryViewer();
 		final Structure struc = model.getStructures().get(0);
 		final StructureMap sm = struc.getStructureMap();
@@ -943,7 +943,7 @@ public class StateBase
 	
 	protected void setStyleInfo(final Document doc, final Element styles) {
 		StructureModel model = AppBase.sgetModel();
-		final JoglSceneNode node = model.getStructures().get(0).getStructureMap().getSceneNode();
+		final JoglSceneNode node = (JoglSceneNode)model.getStructures().get(0).getStructureMap().getUData();
 		final GlGeometryViewer glViewer = AppBase.sgetGlGeometryViewer();
 		final Structure struc = model.getStructures().get(0);
 		final StructureMap sm = struc.getStructureMap();
@@ -1130,7 +1130,7 @@ public class StateBase
 	protected void enactVisibility()
 	{
 		StructureModel model = AppBase.sgetModel();
-		final JoglSceneNode node = model.getStructures().get(0).getStructureMap().getSceneNode();
+		final JoglSceneNode node = (JoglSceneNode)model.getStructures().get(0).getStructureMap().getUData();
 		final GlGeometryViewer glViewer = AppBase.sgetGlGeometryViewer();
 		final Structure struc = model.getStructures().get(0);
 		final StructureMap sm = struc.getStructureMap();
@@ -1287,7 +1287,7 @@ public class StateBase
 	protected final Pattern spaces = Pattern.compile("\\ ++");
 	protected void enactStyles() {
 		StructureModel model = AppBase.sgetModel();
-		final JoglSceneNode node = model.getStructures().get(0).getStructureMap().getSceneNode();
+		final JoglSceneNode node = (JoglSceneNode)model.getStructures().get(0).getStructureMap().getUData();
 		final GlGeometryViewer viewer = AppBase.sgetGlGeometryViewer();
 		final Structure struc = model.getStructures().get(0);
 		final StructureMap sm = struc.getStructureMap();

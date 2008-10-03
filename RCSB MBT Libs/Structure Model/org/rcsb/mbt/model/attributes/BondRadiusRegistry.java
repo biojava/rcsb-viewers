@@ -75,7 +75,7 @@ import java.util.Hashtable;
  *  or more Bond representations to a given radius scheme.
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.attributes.BondRadius
+ *  @see	org.rcsb.mbt.model.attributes.IBondRadius
  *  @see	org.rcsb.mbt.model.attributes.StructureStyles
  */
 public class BondRadiusRegistry
@@ -119,7 +119,7 @@ public class BondRadiusRegistry
 	/**
 	 *  Add a new BondRadius implementation.
 	 */
-	public static void add( final String name, final BondRadius bondRadius )
+	public static void add( final String name, final IBondRadius bondRadius )
 	{
 		BondRadiusRegistry.bondRadiusObjects.put( name, bondRadius );
 	}
@@ -135,17 +135,17 @@ public class BondRadiusRegistry
 	/**
 	 *  Get an BondRadius implementation by name.
 	 */
-	public static BondRadius get( final String name )
+	public static IBondRadius get( final String name )
 	{
-		return (BondRadius) BondRadiusRegistry.bondRadiusObjects.get( name );
+		return (IBondRadius) BondRadiusRegistry.bondRadiusObjects.get( name );
 	}
 
 	/**
 	 *  Get the default BondRadius implementation.
 	 */
-	public static BondRadius getDefault( )
+	public static IBondRadius getDefault( )
 	{
-		return (BondRadius) BondRadiusRegistry.bondRadiusObjects.get( BondRadiusRegistry.defaultName );
+		return (IBondRadius) BondRadiusRegistry.bondRadiusObjects.get( BondRadiusRegistry.defaultName );
 	}
 
 	/**

@@ -108,10 +108,10 @@ import java.awt.Color;
  *  A knot set consists of a float[n][4] tuple.
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.attributes.ColorMap
+ *  @see	org.rcsb.mbt.model.attributes.IColorMap
  */
 public class InterpolatedColorMap
-	implements ColorMap
+	implements IColorMap
 {
 	/**
 	 * The currently active set of color knots.

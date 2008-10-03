@@ -90,7 +90,7 @@ public class StylesMutator extends Mutator {
 		
         switch(PickLevel.pickLevel) {
         case PickLevel.COMPONENTS_ATOMS_BONDS:
-            final DisplayListRenderable renderable = sm.getSceneNode().getRenderable(a);
+            final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(a);
         	if(renderable != null)
         	{
         		final AtomStyle oldStyle = (AtomStyle)ss.getStyle(a);
@@ -129,7 +129,7 @@ public class StylesMutator extends Mutator {
     }
 	
 	private void changeBondStyleBasedOnAtoms(final Bond b) {
-		final JoglSceneNode sn = b.structure.getStructureMap().getSceneNode();
+		final JoglSceneNode sn = (JoglSceneNode)b.structure.getStructureMap().getUData();
 		
 		final DisplayListRenderable renderable = sn.getRenderable(b);
     	if(renderable != null) {
@@ -306,7 +306,7 @@ public class StylesMutator extends Mutator {
         	break;
         case PickLevel.COMPONENTS_RIBBONS:
         	// propogate up one level.
-            final DisplayListRenderable renderable = sm.getSceneNode().getRenderable(c);
+            final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(c);
         	if(renderable != null) {
         		final ChainGeometry oldGeometry = (ChainGeometry)renderable.geometry; // if this is renderable, the geometry will not be null.
         		final ChainGeometry newGeometry = new ChainGeometry();

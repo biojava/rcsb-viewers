@@ -70,11 +70,11 @@ import org.rcsb.mbt.model.*;
  *  fixed radius representing the width IN PIXELS of the wireframe bond.
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.attributes.BondRadius
+ *  @see	org.rcsb.mbt.model.attributes.IBondRadius
  *  @see	org.rcsb.mbt.model.Bond
  */
 public class BondRadiusAsWire
-	implements BondRadius
+	implements IBondRadius
 {
 	public static final String NAME = "As Wireframe";
 

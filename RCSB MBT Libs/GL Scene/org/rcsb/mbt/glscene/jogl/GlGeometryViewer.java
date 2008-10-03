@@ -163,7 +163,6 @@ import javax.media.opengl.glu.GLU;
 import javax.swing.JPanel;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
 import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
@@ -182,8 +181,9 @@ import org.rcsb.mbt.model.attributes.BondStyle;
 import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
-import org.rcsb.mbt.model.attributes.StructureStylesEventListener;
-import org.rcsb.mbt.model.util.Algebra;
+import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
+import org.rcsb.mbt.model.geometry.Algebra;
+import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.mbt.model.util.Status;
 
 
@@ -203,7 +203,7 @@ import com.sun.opengl.util.ImageUtil;
  */
 public class GlGeometryViewer extends JPanel implements GLEventListener,
 		MouseListener, MouseMotionListener, IUpdateListener,
-		WindowListener, StructureStylesEventListener {
+		WindowListener, IStructureStylesEventListener {
 	/**
 	 * 
 	 */
@@ -665,7 +665,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	{
 		for(Structure struct : AppBase.sgetModel().getStructures())
 		{
-			JoglSceneNode.RenderablesMap map = struct.getStructureMap().getSceneNode().renderables;
+			JoglSceneNode sceneNode = (JoglSceneNode)struct.getStructureMap().getUData();
+			JoglSceneNode.RenderablesMap map = sceneNode.renderables;
 			if(!map.isEmpty()) {
 				synchronized(map) {
 					Iterator<DisplayListRenderable> valIt = map.values().iterator();
@@ -1244,7 +1245,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			for (Structure structure : AppBase.sgetModel().getStructures())
 			{
 				gl.glPushMatrix();
-				boolean continuePick = structure.getStructureMap().getSceneNode().draw(gl, glu, glut, isPick, structure);
+				JoglSceneNode sceneNode = (JoglSceneNode)structure.getStructureMap().getUData();
+				boolean continuePick = sceneNode.draw(gl, glu, glut, isPick, structure);
 				gl.glPopMatrix();
 
 				// pick cycles do not need to finish, and paints get
@@ -1992,7 +1994,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			{
 				final StructureMap sm = s.getStructureMap();
 				final StructureStyles ss = sm.getStructureStyles();
-				final JoglSceneNode sn = sm.getSceneNode();
+				final JoglSceneNode sn = (JoglSceneNode)sm.getUData();
 				sn.regenerateGlobalList();
 
 				sn.clearRenderables();
@@ -2084,7 +2086,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		final StructureMap structureMap = str.getStructureMap();
 		final StructureStyles structureStyles = structureMap
 				.getStructureStyles();
-		final JoglSceneNode sn = structureMap.getSceneNode();
+		final JoglSceneNode sn = (JoglSceneNode)structureMap.getUData();
 
 		final ChainGeometry defaultChainGeometry = (ChainGeometry) GlGeometryViewer.defaultGeometry
 				.get(StructureComponentRegistry.TYPE_CHAIN);
@@ -2216,7 +2218,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	{
 		for (Structure structure : AppBase.sgetModel().getStructures())
 		{
-			final JoglSceneNode sn = structure.getStructureMap().getSceneNode();
+			final JoglSceneNode sn = (JoglSceneNode)structure.getStructureMap().getUData();
 
 			final Iterator<DisplayListRenderable> it = sn.renderables.values().iterator();
 			while (it.hasNext())

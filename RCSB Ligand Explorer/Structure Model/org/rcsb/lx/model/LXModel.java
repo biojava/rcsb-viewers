@@ -1,10 +1,10 @@
 package org.rcsb.lx.model;
 
 import org.rcsb.lx.ui.ContactMap;
-import org.rcsb.mbt.controllers.scene.PdbToNdbConverter;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Residue;
+import org.rcsb.mbt.model.util.PdbToNdbConverter;
 
 
 public class LXModel extends StructureModel

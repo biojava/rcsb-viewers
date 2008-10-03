@@ -100,7 +100,7 @@ public class ResidueColorByResidueIndexDna
 	// Holds a singleton instance of this class.
 	private static ResidueColorByResidueIndexDna singleton = null;
 
-	private ColorMap colorMap =
+	private IColorMap colorMap =
 		new InterpolatedColorMap( InterpolatedColorMap.BLACK_TO_WHITE );
 
 	/**
@@ -139,7 +139,7 @@ public class ResidueColorByResidueIndexDna
 	/**
 	 *  Set the ColorMap used to color by Chain-Residue Index.
 	 */
-	public void setColorMap( final ColorMap colorMap )
+	public void setColorMap( final IColorMap colorMap )
 		throws IllegalArgumentException
 	{
 		if ( colorMap == null ) {
@@ -151,7 +151,7 @@ public class ResidueColorByResidueIndexDna
 	/**
 	 *  Get the ColorMap used to color by Chain-Residue Index.
 	 */
-	public ColorMap getColorMap( )
+	public IColorMap getColorMap( )
 	{
 		return this.colorMap;
 	}

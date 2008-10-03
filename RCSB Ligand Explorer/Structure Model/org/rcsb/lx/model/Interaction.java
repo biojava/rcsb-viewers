@@ -1,9 +1,9 @@
 package org.rcsb.lx.model;
 
-import org.rcsb.mbt.glscene.geometry.Point3d;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.LineSegment;
 import org.rcsb.mbt.model.StructureComponent;
+import org.rcsb.mbt.model.geometry.Point3d;
 
 
 /**

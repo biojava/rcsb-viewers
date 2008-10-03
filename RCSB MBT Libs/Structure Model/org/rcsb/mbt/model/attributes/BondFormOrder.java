@@ -72,10 +72,10 @@ import org.rcsb.mbt.model.Bond;
  *  Implements the BondForm interface as a "Order" bond type.
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.model.attributes.BondForm
+ *  @see	org.rcsb.mbt.model.attributes.IBondForm
  */
 public class BondFormOrder
-	implements BondForm
+	implements IBondForm
 {
 	public static final String NAME = "Order";
 
@@ -103,7 +103,7 @@ public class BondFormOrder
 
 	public int getBondForm( final Bond bond )
 	{
-		return BondForm.ORDER;
+		return IBondForm.ORDER;
 	}
 }
 

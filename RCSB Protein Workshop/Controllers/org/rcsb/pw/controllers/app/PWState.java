@@ -98,7 +98,7 @@ public class PWState extends StateBase
 	@Override
 	protected void enactViewerOptions() {
 		final GlGeometryViewer glViewer = AppBase.sgetGlGeometryViewer();
-		final JoglSceneNode node = AppBase.sgetModel().getStructures().get(0).getStructureMap().getSceneNode();
+		final JoglSceneNode node = (JoglSceneNode)AppBase.sgetModel().getStructures().get(0).getStructureMap().getUData();
 		
 		try {
 			final NodeList viewpoints = this.document.getElementsByTagName("Viewpoint");

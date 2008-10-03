@@ -223,7 +223,7 @@ public class AtomGeometry
 		final Structure structure = atom.getStructure( );
 		final StructureMap structureMap = structure.getStructureMap( );
 		final StructureStyles structureStyles = structureMap.getStructureStyles( );
-		final JoglSceneNode sn = structureMap.getSceneNode();
+		final JoglSceneNode sn = (JoglSceneNode) structureMap.getUData();
 
 		if ( form == Geometry.FORM_POINTS )
 		{
