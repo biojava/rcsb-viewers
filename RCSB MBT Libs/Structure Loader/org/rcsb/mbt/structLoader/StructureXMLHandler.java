@@ -6,15 +6,15 @@ import java.util.Iterator;
 import java.util.Stack;
 import java.util.Vector;
 
+import org.rcsb.mbt.glscene.geometry.Matrix3f;
+import org.rcsb.mbt.glscene.geometry.Vector3f;
+import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureComponentRegistry;
-import org.rcsb.mbt.model.TransformationList;
 import org.rcsb.mbt.model.UnitCell;
-import org.rcsb.mbt.model.geometry.Matrix3f;
-import org.rcsb.mbt.model.geometry.TransformationMatrix;
-import org.rcsb.mbt.model.geometry.Vector3f;
+import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -127,9 +127,9 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
     private String curNdbChainId = null;
     private String curPdbChainId = null;
     
-    TransformationMatrix curStructBiolGen = null;
-    TransformationMatrix fractionalTransformation = null;
-    TransformationMatrix fractionalTransformationInverse = null;
+    ModelTransformationMatrix curStructBiolGen = null;
+    ModelTransformationMatrix fractionalTransformation = null;
+    ModelTransformationMatrix fractionalTransformationInverse = null;
     
     UnitCell unitCell = null;
     
@@ -340,7 +340,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
         // update the struct_biol_gen matrices with the unit cell size
         if (this.structBiolGens != null && this.unitCell != null) {
         	for(int i = 0; i < this.structBiolGens.size(); i++) {
-        		final TransformationMatrix matrix = this.structBiolGens.get(i);
+        		final ModelTransformationMatrix matrix = this.structBiolGens.get(i);
         		if(this.fractionalTransformation != null &&  this.fractionalTransformationInverse != null) {
         			matrix.updateFullSymmetryDataWithInverseFractionalTransform(this.fractionalTransformation, this.fractionalTransformationInverse);
         		}
@@ -353,14 +353,14 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
     
     protected static final String emptyString = ""; 
     
-    private TransformationMatrix currentBUTransform = null;
-    private TransformationMatrix currentNcsTranslation = null;
+    private ModelTransformationMatrix currentBUTransform = null;
+    private ModelTransformationMatrix currentNcsTranslation = null;
     private Matrix3f currentRotationMatrix = null;
     private Vector3f currentTranslationVector = null;
     
-    private TransformationList structBiolGens = new TransformationList();
-    private TransformationList nonCrystallographicOperations = new TransformationList();
-    private final TransformationList biologicalUnitCreationMatrices = new TransformationList();    
+    private ModelTransformationList structBiolGens = new ModelTransformationList();
+    private ModelTransformationList nonCrystallographicOperations = new ModelTransformationList();
+    private final ModelTransformationList biologicalUnitCreationMatrices = new ModelTransformationList();    
     
 	@Override
 	public void startElement(final String namespaceURI,
@@ -503,7 +503,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
     public boolean hasBiologicUnitTransformationMatrices()
     	{ return biologicalUnitCreationMatrices.size() + structBiolGens.size() > 0; }
     
-	public TransformationList getBiologicalUnitTransformationMatrices()
+	public ModelTransformationList getBiologicalUnitTransformationMatrices()
 	{
 		// first, combine the (incorrectly used) ncs matrices with the struct_biol_gen entries.
 		// Either (but not both) ncs matrix or struct_biol_gen vectors should contain useful data. In the unexpected case where both contain useful data, use struct_biol_gen.
@@ -516,6 +516,11 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
 		this.structBiolGens.trimToSize();
 		return this.structBiolGens;
 	}
+	
+	public boolean hasUnitCell()
+	{
+		return unitCell!= null;
+	}
 
 	public UnitCell getUnitCell() {
 		return this.unitCell;
@@ -523,7 +528,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
 
 	public boolean hasNonCrystallographicOperations()
 	{ return this.nonCrystallographicOperations.size() > 0; }
-	public TransformationList getNonCrystallographicOperations()
+	public ModelTransformationList getNonCrystallographicOperations()
 	{ return this.nonCrystallographicOperations; }
 	
 	/**
@@ -576,7 +581,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
 		public void run()
 		{
 			setParsingFlag(eIsParsing.NON_CRYSTALLOGRAPHIC_OPERATIONS);
-			currentNcsTranslation = new TransformationMatrix();
+			currentNcsTranslation = new ModelTransformationMatrix();
 			currentRotationMatrix = new Matrix3f();
 			currentTranslationVector = new Vector3f();
    		
@@ -605,7 +610,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
 		public void run()
 		{
 			setParsingFlag(eIsParsing.LEGACY_BIOLOGIC_UNIT_OPERATIONS);
-			currentBUTransform = new TransformationMatrix();
+			currentBUTransform = new ModelTransformationMatrix();
 			currentRotationMatrix = new Matrix3f();
 			currentTranslationVector = new Vector3f();
    		
@@ -632,7 +637,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__struct_biol_gen__Start extends XMLRunnable
    {
 		public void run() {
-			curStructBiolGen = new TransformationMatrix();
+			curStructBiolGen = new ModelTransformationMatrix();
 			curStructBiolGen.id = super.attrs.getValue("biol_id");
 			curStructBiolGen.ndbChainId = super.attrs.getValue("asym_id");		
 			curStructBiolGen.symmetryShorthand = super.attrs.getValue("symmetry");
@@ -976,7 +981,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    	public void run()
    	{
 			setParsingFlag(eIsParsing.ATOM_SITES);
-			fractionalTransformation = new TransformationMatrix();
+			fractionalTransformation = new ModelTransformationMatrix();
 			fractionalTransformation.init();
    	}
    }
@@ -986,10 +991,10 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__atom_sites__End extends XMLRunnable
    {
    	public void run() {
-   		fractionalTransformation.transformationMatrix.put(3, 0f);
-   		fractionalTransformation.transformationMatrix.put(7, 0f);
-   		fractionalTransformation.transformationMatrix.put(11, 0f);
-   		fractionalTransformation.transformationMatrix.put(15, 1f);
+   		fractionalTransformation.values[3] = 0f;
+   		fractionalTransformation.values[7] = 0f;
+   		fractionalTransformation.values[11] = 0f;
+   		fractionalTransformation.values[15] = 1f;
    		
    		fractionalTransformation.printMatrix("fractional transform");
    	}
@@ -1000,7 +1005,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__fract_transf_matrix11__End extends XMLRunnable
    {
 	   public void run() {
-		   fractionalTransformation.transformationMatrix.put(0, Float.parseFloat(buf.trim()));
+		   fractionalTransformation.values[0] = Float.parseFloat(buf.trim());
 	   }
    }
    protected XMLRunnable__fract_transf_matrix11__End createXMLRunnable__fract_transf_matrix11__End()
@@ -1009,7 +1014,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__fract_transf_matrix12__End extends XMLRunnable
    {
 	   public void run() {
-		   fractionalTransformation.transformationMatrix.put(4, Float.parseFloat(buf.trim()));
+		   fractionalTransformation.values[4] = Float.parseFloat(buf.trim());
 	   }
    }
    protected XMLRunnable__fract_transf_matrix12__End createXMLRunnable__fract_transf_matrix12__End()
@@ -1018,7 +1023,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__fract_transf_matrix13__End extends XMLRunnable
    {
 	   public void run() {
-		   fractionalTransformation.transformationMatrix.put(8, Float.parseFloat(buf.trim()));
+		   fractionalTransformation.values[8] = Float.parseFloat(buf.trim());
 	   }
    }
    protected XMLRunnable__fract_transf_matrix13__End createXMLRunnable__fract_transf_matrix13__End()
@@ -1027,7 +1032,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__fract_transf_matrix21__End extends XMLRunnable
    {
 	   public void run() {
-		   fractionalTransformation.transformationMatrix.put(1, Float.parseFloat(buf.trim()));
+		   fractionalTransformation.values[1] = Float.parseFloat(buf.trim());
 	   }
    }
    protected XMLRunnable__fract_transf_matrix21__End createXMLRunnable__fract_transf_matrix21__End()
@@ -1036,7 +1041,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__fract_transf_matrix22__End extends XMLRunnable
    {
 	   public void run() {
-		   fractionalTransformation.transformationMatrix.put(5, Float.parseFloat(buf.trim()));
+		   fractionalTransformation.values[5] = Float.parseFloat(buf.trim());
 	   }
    }
    protected XMLRunnable__fract_transf_matrix22__End createXMLRunnable__fract_transf_matrix22__End()
@@ -1045,7 +1050,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__fract_transf_matrix23__End extends XMLRunnable
    {
 	   public void run() {
-		   fractionalTransformation.transformationMatrix.put(9, Float.parseFloat(buf.trim()));
+		   fractionalTransformation.values[9] = Float.parseFloat(buf.trim());
 	   }
    }
    protected XMLRunnable__fract_transf_matrix23__End createXMLRunnable__fract_transf_matrix23__End()
@@ -1054,7 +1059,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__fract_transf_matrix31__End extends XMLRunnable
    {
 	   public void run() {
-		   fractionalTransformation.transformationMatrix.put(2, Float.parseFloat(buf.trim()));
+		   fractionalTransformation.values[2] = Float.parseFloat(buf.trim());
 	   }
    }
    protected XMLRunnable__fract_transf_matrix31__End createXMLRunnable__fract_transf_matrix31__End()
@@ -1063,7 +1068,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__fract_transf_matrix32__End extends XMLRunnable
    {
 	   public void run() {
-		   fractionalTransformation.transformationMatrix.put(6, Float.parseFloat(buf.trim()));
+		   fractionalTransformation.values[6] = Float.parseFloat(buf.trim());
 	   }
    }
    protected XMLRunnable__fract_transf_matrix32__End createXMLRunnable__fract_transf_matrix32__End()
@@ -1072,7 +1077,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__fract_transf_matrix33__End extends XMLRunnable
    {
 	   public void run() {
-		   fractionalTransformation.transformationMatrix.put(10, Float.parseFloat(buf.trim()));
+		   fractionalTransformation.values[10] = Float.parseFloat(buf.trim());
 	   }
    }
    protected XMLRunnable__fract_transf_matrix33__End createXMLRunnable__fract_transf_matrix33__End()

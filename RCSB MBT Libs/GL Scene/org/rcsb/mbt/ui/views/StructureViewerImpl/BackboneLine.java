@@ -65,8 +65,8 @@ package org.rcsb.mbt.ui.views.StructureViewerImpl;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
+import org.rcsb.mbt.glscene.geometry.Vector3f;
 import org.rcsb.mbt.glscene.jogl.DisplayLists;
-import org.rcsb.mbt.model.geometry.Vector3f;
 
 import com.sun.opengl.util.GLUT;
 

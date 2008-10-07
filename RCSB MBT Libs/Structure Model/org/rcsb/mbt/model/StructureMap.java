@@ -300,7 +300,8 @@ package org.rcsb.mbt.model;
 import java.util.*;
 
 import org.rcsb.mbt.model.attributes.*;
-import org.rcsb.mbt.model.geometry.TransformationMatrix;
+import org.rcsb.mbt.model.geometry.ModelTransformationList;
+import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
 import org.rcsb.mbt.model.util.*;
 
 /**
@@ -368,9 +369,9 @@ public class StructureMap
 	 */
 	public class BiologicUnitTransforms
 	{
-		protected TransformationList biologicalUnitGenerationMatrices = null; // <= TransformationMatrix
+		protected ModelTransformationList biologicalUnitGenerationMatrices = null; // <= TransformationMatrix
 		
-		public class BiologicalUnitGenerationMapByChain extends HashMap<String, TransformationList>
+		public class BiologicalUnitGenerationMapByChain extends HashMap<String, ModelTransformationList>
 		{
 			private static final long serialVersionUID = -1605651855087251797L;
 		}
@@ -382,8 +383,8 @@ public class StructureMap
 		 *
 		 */
 		public void generateGlobalTransformationMatrixHACK() {
-			TransformationList vec = new TransformationList(1);
-			TransformationMatrix matrix = new TransformationMatrix();
+			ModelTransformationList vec = new ModelTransformationList(1);
+			ModelTransformationMatrix matrix = new ModelTransformationMatrix();
 			matrix.init();
 			matrix.setIdentity();
 			
@@ -396,11 +397,11 @@ public class StructureMap
 		 * Part of the hack that is set up by generateGlobalTransformationMatrixHACK(). Similarly, this may disappear in a future version.
 		 * @return
 		 */
-		public TransformationMatrix getFirstGlobalTransformationMatrixHACK() {
+		public ModelTransformationMatrix getFirstGlobalTransformationMatrixHACK() {
 			return this.biologicalUnitGenerationMatrices.get(0);
 		}
 		
-		public TransformationList getBiologicalUnitGenerationMatrixVector() {
+		public ModelTransformationList getBiologicalUnitGenerationMatrixVector() {
 			return this.biologicalUnitGenerationMatrices;
 		}
 		
@@ -409,7 +410,7 @@ public class StructureMap
 		}
 
 		public void setBiologicalUnitGenerationMatrices(
-				final TransformationList biologicalUnitGenerationMatrices)
+				final ModelTransformationList biologicalUnitGenerationMatrices)
 		{
 			if(biologicalUnitGenerationMatrices != null && biologicalUnitGenerationMatrices.size() > 0)
 			{
@@ -420,11 +421,11 @@ public class StructureMap
 					
 					for(int i = 0; i < biologicalUnitGenerationMatrices.size(); i++)
 					{
-						final TransformationMatrix mat = biologicalUnitGenerationMatrices.get(i);
-						TransformationList vec = biologicalUnitGenerationHashByChain.get(mat.ndbChainId);
+						final ModelTransformationMatrix mat = biologicalUnitGenerationMatrices.get(i);
+						ModelTransformationList vec = biologicalUnitGenerationHashByChain.get(mat.ndbChainId);
 						if(vec == null)
 						{
-							vec = new TransformationList();
+							vec = new ModelTransformationList();
 							this.biologicalUnitGenerationHashByChain.put(mat.ndbChainId, vec);
 						}
 						vec.add(mat);
@@ -443,14 +444,14 @@ public class StructureMap
 	 */
 	public class NonCrystallographicTransforms
 	{
-		protected TransformationList nonCrystallographicTranslations = null; // <= NonCrystallographicTranslation
+		protected ModelTransformationList nonCrystallographicTranslations = null; // <= NonCrystallographicTranslation
 
-		public TransformationList getNonCrystallographicTranslations() {
+		public ModelTransformationList getNonCrystallographicTranslations() {
 			return this.nonCrystallographicTranslations;
 		}
 
 		public void setNonCrystallographicTranslations(
-				final TransformationList nonCrystallographicTranslations) {
+				final ModelTransformationList nonCrystallographicTranslations) {
 			this.nonCrystallographicTranslations = nonCrystallographicTranslations;
 		}
 	}

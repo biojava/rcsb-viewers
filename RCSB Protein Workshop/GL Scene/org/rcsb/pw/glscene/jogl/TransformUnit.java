@@ -4,7 +4,7 @@ import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.StructureStyles;
-import org.rcsb.mbt.model.geometry.TransformationMatrix;
+import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
 
 
 /**
@@ -17,5 +17,5 @@ public class TransformUnit {
 	StructureMap sm = null;
 	JoglSceneNode node = null;
 	StructureStyles ss = null;
-	TransformationMatrix globalTransform = null;
+	ModelTransformationMatrix globalTransform = null;
 }

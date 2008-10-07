@@ -3,7 +3,7 @@
 	<classpathentry excluding="edu/sdsc/lx/mbt/Callable.java|org/rcsb/lx/mbt/Callable.java" kind="src" path="Structure Model"/>
 	<classpathentry kind="src" path="Controllers"/>
 	<classpathentry kind="src" path="UI"/>
-	<classpathentry kind="src" path="GL Scene"/>
+	<classpathentry excluding="org/rcsb/mbt/structLoader/StructureXMLHandler.java" kind="src" path="GL Scene"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/RCSB MBT Libs"/>
 	<classpathentry kind="lib" path="/3rd Party Libs/jogl/gluegen-rt.jar"/>

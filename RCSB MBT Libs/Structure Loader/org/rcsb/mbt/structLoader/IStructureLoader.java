@@ -63,8 +63,8 @@ package org.rcsb.mbt.structLoader;
 
 import java.io.IOException;
 
+import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.Structure;
-import org.rcsb.mbt.model.TransformationList;
 import org.rcsb.mbt.model.UnitCell;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
 
@@ -127,6 +127,11 @@ public interface IStructureLoader
 	public abstract String[] getNonProteinChainIds();
 	
 	/**
+	 * Test
+	 */
+	public abstract boolean hasUnitCell();
+	
+	/**
 	 * get the unit cell for biological units
 	 * @return
 	 */
@@ -142,7 +147,7 @@ public interface IStructureLoader
      * Accessor
      * @return
      */
-    public abstract TransformationList getBiologicalUnitTransformationMatrices();
+    public abstract ModelTransformationList getBiologicalUnitTransformationMatrices();
     
     /**
      * Test
@@ -153,6 +158,6 @@ public interface IStructureLoader
      * Accessor
      * @return
      */
-    public abstract TransformationList getNonCrystallographicOperations();
+    public abstract ModelTransformationList getNonCrystallographicOperations();
 }
 

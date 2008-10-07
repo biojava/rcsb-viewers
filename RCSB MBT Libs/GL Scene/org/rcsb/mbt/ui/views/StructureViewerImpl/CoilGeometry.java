@@ -109,13 +109,13 @@ import java.awt.Color;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
+import org.rcsb.mbt.glscene.geometry.Vector3f;
 import org.rcsb.mbt.glscene.jogl.Color3f;
 import org.rcsb.mbt.glscene.jogl.Constants;
 import org.rcsb.mbt.glscene.jogl.DisplayLists;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Fragment;
 import org.rcsb.mbt.model.StructureComponent;
-import org.rcsb.mbt.model.geometry.Vector3f;
 import org.rcsb.mbt.ui.views.StructureViewerImpl.Extrusion;
 import org.rcsb.mbt.ui.views.StructureViewerImpl.FrenetTrihedron;
 import org.rcsb.mbt.ui.views.StructureViewerImpl.Hermite;

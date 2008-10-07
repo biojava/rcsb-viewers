@@ -17,11 +17,11 @@ import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.TransformationList;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms.BiologicalUnitGenerationMapByChain;
 import org.rcsb.mbt.model.geometry.Algebra;
-import org.rcsb.mbt.model.geometry.TransformationMatrix;
+import org.rcsb.mbt.model.geometry.ModelTransformationList;
+import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
 
 
 /**
@@ -176,10 +176,10 @@ public class SceneController implements GvPickEventListener, IUpdateListener
 	// can be null if the ligand name is not found.
 	private double[] tempDouble = new double[3];
 
-	private TransformationList singleElementVectorTemp = new TransformationList(1);
-	private TransformationList singleElementVectorTemp2 = new TransformationList(1);
+	private ModelTransformationList singleElementVectorTemp = new ModelTransformationList(1);
+	private ModelTransformationList singleElementVectorTemp2 = new ModelTransformationList(1);
 
-    private TransformationList getSingleElementVectorTemp()
+    private ModelTransformationList getSingleElementVectorTemp()
     {
     	if (singleElementVectorTemp.size() == 0)
     		singleElementVectorTemp.add(null);
@@ -190,7 +190,7 @@ public class SceneController implements GvPickEventListener, IUpdateListener
     	return singleElementVectorTemp; 
     }
     
-    private TransformationList getSingleElementVectorTemp2()
+    private ModelTransformationList getSingleElementVectorTemp2()
     {
        	if (singleElementVectorTemp2.size() == 0)
     		singleElementVectorTemp2.add(null);
@@ -213,7 +213,7 @@ public class SceneController implements GvPickEventListener, IUpdateListener
 			final StructureMap sm = s.getStructureMap();
 			int chainCount = sm.getChainCount();
 			BiologicalUnitGenerationMapByChain transformMatricesMap = null;
-			TransformationList globalTransforms = null;
+			ModelTransformationList globalTransforms = null;
 			
 			if (sm.hasBiologicUnitTransforms())
 			{
@@ -228,14 +228,14 @@ public class SceneController implements GvPickEventListener, IUpdateListener
 			
 			for(int m = 0; m < globalTransforms.size(); m++)
 			{
-				final TransformationMatrix globalTransform = globalTransforms.get(m);
+				final ModelTransformationMatrix globalTransform = globalTransforms.get(m);
 				
 				for(int l = 0; l < chainCount; l++)
 				{
 					final Chain c = sm.getChain(l);
 					int resCount = c.getResidueCount();
 					
-					final ArrayList<TransformationMatrix> byChainTransforms;
+					final ArrayList<ModelTransformationMatrix> byChainTransforms;
 					if (transformMatricesMap == null || ignorePerChainTransforms)
 						byChainTransforms = getSingleElementVectorTemp2();
 					
@@ -247,7 +247,7 @@ public class SceneController implements GvPickEventListener, IUpdateListener
 					{	// biological units often use fewer than the total number of chains. If per-chain matrices exist, but none is specified for this chain, the chain won't be drawn at all.
 						for(int n = 0; n < byChainTransforms.size(); n++)
 						{
-							TransformationMatrix byChainTransform = byChainTransforms.get(n);
+							ModelTransformationMatrix byChainTransform = byChainTransforms.get(n);
 							
 							for (int j = 0; j < resCount; j++)
 							{

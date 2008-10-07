@@ -4,7 +4,7 @@ import org.rcsb.mbt.controllers.doc.DocController;
 import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.geometry.TransformationMatrix;
+import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
 import org.rcsb.vf.controllers.app.VFAppBase;
 
 
@@ -104,7 +104,7 @@ public class VFDocController extends DocController
 								{
 									StructureMap.BiologicUnitTransforms bu = sm.getBiologicUnitTransforms();
 									bu.generateGlobalTransformationMatrixHACK();
-									TransformationMatrix t = bu.getFirstGlobalTransformationMatrixHACK();
+									ModelTransformationMatrix t = bu.getFirstGlobalTransformationMatrixHACK();
 									t.setTransformationMatrix(
 											globalRotationMatricesFl[i][0],
 											globalRotationMatricesFl[i][1],

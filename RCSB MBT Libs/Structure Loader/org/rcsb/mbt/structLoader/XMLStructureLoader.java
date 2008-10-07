@@ -16,8 +16,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.Structure;
-import org.rcsb.mbt.model.TransformationList;
 import org.rcsb.mbt.model.UnitCell;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.xml.sax.InputSource;
@@ -75,6 +75,11 @@ public class XMLStructureLoader implements IFileStructureLoader
 
 	public Structure getStructure() {
 		return handler.getStructure();
+	}
+	
+	public boolean hasUnitCell()
+	{
+		return handler.hasUnitCell();
 	}
 
 	public UnitCell getUnitCell() {
@@ -135,11 +140,11 @@ public class XMLStructureLoader implements IFileStructureLoader
 		}
 	}
 
-	public TransformationList getBiologicalUnitTransformationMatrices() {
+	public ModelTransformationList getBiologicalUnitTransformationMatrices() {
 		return handler.getBiologicalUnitTransformationMatrices();
 	}
 
-	public TransformationList getNonCrystallographicOperations() {
+	public ModelTransformationList getNonCrystallographicOperations() {
 		return handler.getNonCrystallographicOperations();
 	}
 

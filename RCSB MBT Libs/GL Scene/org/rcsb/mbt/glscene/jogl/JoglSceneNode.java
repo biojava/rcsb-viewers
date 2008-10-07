@@ -1,6 +1,6 @@
 package org.rcsb.mbt.glscene.jogl;
 
-import java.util.ArrayList;
+import java.nio.FloatBuffer;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,10 +23,8 @@ import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.TransformationList;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms;
 import org.rcsb.mbt.model.attributes.ChainStyle;
-import org.rcsb.mbt.model.geometry.TransformationMatrix;
 
 
 import com.sun.opengl.util.GLUT;
@@ -135,20 +133,20 @@ public class JoglSceneNode
 			else
 			{
 				final StructureMap sm = struc.getStructureMap();
-				TransformationList matrices = null;
+				GLTransformationList matrices = null;
 				
 				if (sm.hasBiologicUnitTransforms())
 									// look for biologic unit transforms
 				{
 					StructureMap.BiologicUnitTransforms bu = sm.getBiologicUnitTransforms();
-					matrices = bu.getBiologicalUnitGenerationMatrixVector();
+					matrices = GLTransformationList.fromModelTransformationList(bu.getBiologicalUnitGenerationMatrixVector());
 				}
 				
 				else if (sm.hasNonCrystallographicTransforms())
 									// look for non crystallographic transforms
 				{
 					StructureMap.NonCrystallographicTransforms nc = sm.getNonCrystallographicTransforms();
-					matrices = nc.getNonCrystallographicTranslations();
+					matrices = GLTransformationList.fromModelTransformationList(nc.getNonCrystallographicTranslations());
 				}
 	
 				if (matrices == null)
@@ -159,7 +157,7 @@ public class JoglSceneNode
 				{
 					for (int j = 0; j < matrices.size(); j++)
 					{
-						final TransformationMatrix transformation = matrices
+						final FloatBuffer transformation = matrices
 								.get(j);
 	
 						boolean completed = this.innerDraw(gl, glu, glut, isPick,
@@ -408,7 +406,7 @@ public class JoglSceneNode
 	 * @return
 	 */
 	protected boolean innerDraw(final GL gl, final GLU glu, final GLUT glut, boolean isPick,
-			final Structure struc, final TransformationMatrix inTransform)
+			final Structure struc, final FloatBuffer inTransform)
 	{
 		gl.glPushMatrix();
 
@@ -425,8 +423,8 @@ public class JoglSceneNode
 		if (inTransform != null)
 						// supplied transform overrides anything else(?)
 		{
-			inTransform.transformationMatrix.rewind();
-			gl.glMultMatrixf(inTransform.transformationMatrix);
+			inTransform.rewind();
+			gl.glMultMatrixf(inTransform);
 		}
 		
 		else if (sm.hasBiologicUnitTransforms() &&
@@ -467,14 +465,16 @@ public class JoglSceneNode
 					
 					else
 					{
-						final ArrayList<TransformationMatrix> matricesVec = buMatrices.get(chainId);
+						final GLTransformationList matricesVec =
+							GLTransformationList.fromModelTransformationList(buMatrices.get(chainId));
+						
 						if (matricesVec != null) {
 							for (int i = 0; i < matricesVec.size(); i++) {
-								final TransformationMatrix transformation = matricesVec
-										.get(i);
+								final FloatBuffer transformation = matricesVec.get(i);
 	
 								gl.glPushMatrix();
-								gl.glMultMatrixf(transformation.transformationMatrix);
+								transformation.rewind();
+								gl.glMultMatrixf(transformation);
 								renderable.draw(gl, glu, glut, isPick);
 								gl.glPopMatrix();
 							}

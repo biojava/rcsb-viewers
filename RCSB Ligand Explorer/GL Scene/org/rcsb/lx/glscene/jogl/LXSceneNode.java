@@ -1,5 +1,6 @@
 package org.rcsb.lx.glscene.jogl;
 
+import java.nio.FloatBuffer;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -9,12 +10,10 @@ import javax.media.opengl.glu.GLU;
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.model.Interaction;
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.glscene.jogl.Constants;
 import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
-import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Fragment;
 import org.rcsb.mbt.model.Residue;
@@ -23,7 +22,6 @@ import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.geometry.Algebra;
-import org.rcsb.mbt.model.geometry.TransformationMatrix;
 
 import com.sun.opengl.util.GLUT;
 
@@ -414,7 +412,7 @@ public class LXSceneNode extends JoglSceneNode
 	 */
 	@Override
 	protected boolean innerDraw(final GL gl, final GLU glu, final GLUT glut, boolean isPick,
-			final Structure struc, final TransformationMatrix nc_transform)
+			final Structure struc, final FloatBuffer nc_transform)
 	{
 		gl.glPushMatrix();
 
@@ -422,8 +420,8 @@ public class LXSceneNode extends JoglSceneNode
 
 		if (nc_transform != null)
 		{
-			nc_transform.transformationMatrix.rewind();
-			gl.glMultMatrixf(nc_transform.transformationMatrix);
+			nc_transform.rewind();
+			gl.glMultMatrixf(nc_transform);
 		}
 
 		synchronized (this.renderables)

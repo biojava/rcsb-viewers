@@ -66,9 +66,9 @@
 
 package org.rcsb.mbt.ui.views.StructureViewerImpl;
 
+import org.rcsb.mbt.glscene.geometry.Point3d;
+import org.rcsb.mbt.glscene.geometry.Vector3f;
 import org.rcsb.mbt.glscene.jogl.Color3f;
-import org.rcsb.mbt.model.geometry.Point3d;
-import org.rcsb.mbt.model.geometry.Vector3f;
 import org.rcsb.mbt.ui.views.StructureViewerImpl.FrenetTrihedron;
 import org.rcsb.mbt.ui.views.StructureViewerImpl.IntrinsicCrossSection;
 

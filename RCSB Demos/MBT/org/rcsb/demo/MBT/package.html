@@ -1,0 +1,22 @@
+<html>
+<head></head>
+<body>
+<p>
+Demos here are intended to exercise just the MBT.</p>
+<p>
+Some notes on the enclosed demos:</p>
+<dl>
+<dt>SimpleReadStructureDemo.java</dt>
+<dd>
+This simply reads a structure and then dumps it in reports.  Two salient issues, here:
+<ul>
+This should <em>only</em> require the {@linkplain org.rcsb.mbt.model} and the {@linkplain org.rcsb.mbt.structLoader}
+packages.  You should be able to run this against the corresponding output jars and get <em>no unresolveds.</em>
+(To do this, you need to copy out the jars and copy out the source into its own directory, compile and run.)
+If you <em>do</em> get unresolveds, it means some dependency has incurred itself into the model that shouldn't be there.</ul>
+<ul>
+This should be useable as a basis for unit tests.  Work on it.</ul>
+</dd>
+</dl>
+</body>
+</html>

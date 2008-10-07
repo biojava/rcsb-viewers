@@ -146,6 +146,7 @@ import java.io.*;
 import java.net.*;
 import java.util.zip.*;
 
+import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.util.*;
 
@@ -1081,6 +1082,12 @@ public class PdbStructureLoader
 	 */
 	public String[] getNonProteinChainIds() { return null; }
 	
+
+
+	public boolean hasUnitCell() {
+		return false;
+	};
+	
 	/**
 	 * get the unit cell for biological units
 	 * @return
@@ -1088,12 +1095,12 @@ public class PdbStructureLoader
 	public UnitCell getUnitCell() { return null; }
 
 
-	public TransformationList getBiologicalUnitTransformationMatrices() {
+	public ModelTransformationList getBiologicalUnitTransformationMatrices() {
 		return null;
 	}
 
 
-	public TransformationList getNonCrystallographicOperations() {
+	public ModelTransformationList getNonCrystallographicOperations() {
 		return null;
 	}
 
@@ -1105,6 +1112,7 @@ public class PdbStructureLoader
 
 	public boolean hasNonCrystallographicOperations() {
 		return false;
-	};
+	}
+
 }
 

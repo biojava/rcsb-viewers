@@ -75,9 +75,9 @@
 //
 package org.rcsb.mbt.ui.views.StructureViewerImpl;
 
+import org.rcsb.mbt.glscene.geometry.Quat4f;
+import org.rcsb.mbt.glscene.geometry.Vector3f;
 import org.rcsb.mbt.glscene.jogl.Color3f;
-import org.rcsb.mbt.model.geometry.Quat4f;
-import org.rcsb.mbt.model.geometry.Vector3f;
 import org.rcsb.mbt.ui.views.StructureViewerImpl.vec.*;
 
 

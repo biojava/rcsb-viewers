@@ -7,5 +7,5 @@ package org.rcsb.mbt.model.geometry;
  */
 public class Cell {
 	public float[] upperLeftCorner = new float[3];
-	public float[] lowerLeftConer = new float[3];
+	public float[] lowerLeftCorner = new float[3];
 }

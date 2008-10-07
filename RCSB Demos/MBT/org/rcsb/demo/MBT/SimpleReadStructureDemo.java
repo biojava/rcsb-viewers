@@ -1,6 +1,7 @@
 package org.rcsb.demo.MBT;
 
 import org.rcsb.mbt.model.*;
+import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
 import org.rcsb.mbt.structLoader.*;
 
 import java.io.File;
@@ -110,8 +111,10 @@ public class SimpleReadStructureDemo
 							// create a structuremap associated with the structure.
 							// the second argument is for user data.
 		
-		report(struct);
+		reportChains(struct);
 							// and output the report
+		
+		reportTransforms(loader, struct);
 		
 		System.exit(0);
 	}
@@ -121,7 +124,7 @@ public class SimpleReadStructureDemo
 	 * 
 	 * @param struct
 	 */
-	static private void report(Structure struct)
+	static private void reportChains(Structure struct)
 	{
 		StructureMap structMap = struct.getStructureMap();
 		StructureInfo structInfo = struct.getStructureInfo();
@@ -193,7 +196,6 @@ public class SimpleReadStructureDemo
 		}
 		
 		lineOut("");
-		lineOut("End");
 	}
 	
 	/**
@@ -335,6 +337,68 @@ public class SimpleReadStructureDemo
 			}
 		}
 		return auxChains;
+	}
+	
+	static private void reportTransforms(IStructureLoader loader, Structure struct)
+	{
+		int txIX;
+		
+		lineOut("Unit Cell:");
+		incrementIndent();
+		
+		if (loader.hasUnitCell())
+		{
+			UnitCell unitCell = loader.getUnitCell();
+			lineOut("angleAlpha: " + unitCell.angleAlpha);
+			lineOut("angleBeta: " + unitCell.angleBeta);
+			lineOut("angleGamma: " + unitCell.angleGamma);
+			lineOut("length A: " + unitCell.lengthA);
+			lineOut("length B: " + unitCell.lengthB);
+			lineOut("length C: " + unitCell.lengthC);
+		}
+		
+		else
+			lineOut("(None)");
+		
+		decrementIndent();
+		lineOut("");
+		
+		lineOut("Biological Unit Transforms:");
+		incrementIndent();
+
+		if (loader.hasBiologicUnitTransformationMatrices())
+		{
+			txIX = 1;
+			for (ModelTransformationMatrix modelTransform : loader.getBiologicalUnitTransformationMatrices())
+				outputTransformValues(txIX++, modelTransform.values);
+		}
+		
+		else
+			lineOut("(None)");
+		
+		decrementIndent();
+		lineOut("");
+		
+		lineOut("Non-Crystallographic Transforms:");
+		incrementIndent();
+		if (loader.hasNonCrystallographicOperations())
+		{
+			txIX = 1;
+			for (ModelTransformationMatrix modelTransform : loader.getNonCrystallographicOperations())
+				outputTransformValues(txIX++, modelTransform.values);
+		}
+		
+		else
+			lineOut("(None)");
+	}
+	
+	static private void outputTransformValues(int ix, float[] values)
+	{
+		lineOut(ix + ": " + values[0] + ", " + values[1] + ", " + values[2] + ", " + values[3] + ",");
+		lineOut(" : " + values[4] + ", " + values[5] + ", " + values[6] + ", " + values[7] + ",");
+		lineOut(" : " + values[8] + ", " + values[9] + ", " + values[10] + ", " + values[11] + ",");
+		lineOut(" : " + values[12] + ", " + values[13] + ", " + values[14] + ", " + values[15]);
+		lineOut("");
 	}
 	
 	/* ******************************************************************************************

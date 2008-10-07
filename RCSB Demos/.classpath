@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="MBT"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/RCSB Viewer Jars/RCSBSupport/RCSB-MBT-StructureLoader.jar"/>
-	<classpathentry kind="lib" path="/RCSB Viewer Jars/RCSBSupport/RCSB-MBT-StructureModel.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/RCSB MBT Libs"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

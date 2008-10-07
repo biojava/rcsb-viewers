@@ -126,8 +126,6 @@ package org.rcsb.mbt.model.util;
 import java.util.Vector;
 import java.util.ListIterator;
 
-import org.rcsb.mbt.controllers.update.IUpdateListener;
-import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Chain;
@@ -151,7 +149,7 @@ import org.rcsb.mbt.model.StructureMap;
  * 
  * @author Apostol Gramada
  */
-public class DerivedInformation implements IUpdateListener
+public class DerivedInformation
 {
 	private StructureMap structureMap;
 
@@ -1937,21 +1935,5 @@ public class DerivedInformation implements IUpdateListener
 
 	public void clearStructure() {
 		this.structureMap = null;
-	}
-
-	/* (non-Javadoc)
-	 * Do we need this?  Isn't this deleted if it's structure is delete?
-	 * Seems like it should be...
-	 * 
-	 * rickb
-	 * 
-	 * @see org.rcsb.mbt.app_controller.IViewUpdateListener#handleModelChangedEvent(org.rcsb.mbt.app_controller.ViewUpdateEvent)
-	 */
-	public void handleUpdateEvent(UpdateEvent evt)
-	{
-		if (evt.action == UpdateEvent.Action.CLEAR_ALL ||
-			(evt.action == UpdateEvent.Action.STRUCTURE_REMOVED && evt.structure == structureMap.getStructure()))
-			clearStructure();
-		
 	}
 }
