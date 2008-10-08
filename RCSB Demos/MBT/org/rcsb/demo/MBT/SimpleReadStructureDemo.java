@@ -1,5 +1,6 @@
 package org.rcsb.demo.MBT;
 
+import org.rcsb.demo.utils.Output;
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
 import org.rcsb.mbt.structLoader.*;
@@ -20,11 +21,11 @@ import java.util.Vector;
  * This is the minimal project you can create with the MBT suite.  It uses only the following
  * packages:</p>
  * <dl>
- * <dt>{@link org.rcsb.mbt.model.*}</dt>
+ * <dt>{@link org.rcsb.mbt.model}</dt>
  * <dd>
  * This is the set of model packages that describe the structure model.</dd>
  * 
- * <dt>{@link org.rcsb.mbt.structLoader.*}</dt>
+ * <dt>{@link org.rcsb.mbt.structLoader}</dt>
  * <dd>
  * This is the set of packages used to load structure files.</dd>
  * </dl>
@@ -130,72 +131,72 @@ public class SimpleReadStructureDemo
 		StructureInfo structInfo = struct.getStructureInfo();
 		TreeMap<String, Chain> auxChains = extractAuxilliaries(structMap);
 		
-		lineOut("Url : " + struct.getUrlString());
+		Output.lineOut("Url : " + struct.getUrlString());
 		
 		/*
 		 * output the structureInfo - haven't seen this filled by anything, yet.
 		 */
 		if (structInfo == null)
-			lineOut("(No StructureInfo struct - skipping Structure Info section)");
+			Output.lineOut("(No StructureInfo struct - skipping Structure Info section)");
 		else
 		{
-			lineOut("Structure Info:");
-			incrementIndent();
-			lineOut("Long Name : " + structInfo.getLongName());
-			lineOut("Short Name : " + structInfo.getShortName());
-			lineOut("Release Date : " + structInfo.getReleaseDate());
-			lineOut("Pdb ID : " + structInfo.getIdCode());
-			lineOut("Authors:" + structInfo.getAuthors());
-			decrementIndent();
+			Output.lineOut("Structure Info:");
+			Output.incrementIndent();
+			Output.lineOut("Long Name : " + structInfo.getLongName());
+			Output.lineOut("Short Name : " + structInfo.getShortName());
+			Output.lineOut("Release Date : " + structInfo.getReleaseDate());
+			Output.lineOut("Pdb ID : " + structInfo.getIdCode());
+			Output.lineOut("Authors:" + structInfo.getAuthors());
+			Output.decrementIndent();
 		}
 		
-		lineOut("");
+		Output.lineOut("");
 		
 		/*
 		 * output the chain info using the structure map
 		 */
 		if (structMap == null)
-			lineOut("(No StructureMap - skipping Structure Map section)");
+			Output.lineOut("(No StructureMap - skipping Structure Map section)");
 		
 		else
 		{
-			lineOut("StructureMap Info:");
-			incrementIndent();
-			lineOut("Atom Count : " + structMap.getAtomCount());
-			lineOut("Bond Count : " + structMap.getBondCount());
-			lineOut("Residue Count : " + structMap.getResidueCount());
-			lineOut("Fragment Count : " + structMap.getFragmentCount());
-			lineOut("Chain Count : " + structMap.getChainCount());
-			lineOut("Aux Chain Count : " + auxChains.size());
-			decrementIndent();
+			Output.lineOut("StructureMap Info:");
+			Output.incrementIndent();
+			Output.lineOut("Atom Count : " + structMap.getAtomCount());
+			Output.lineOut("Bond Count : " + structMap.getBondCount());
+			Output.lineOut("Residue Count : " + structMap.getResidueCount());
+			Output.lineOut("Fragment Count : " + structMap.getFragmentCount());
+			Output.lineOut("Chain Count : " + structMap.getChainCount());
+			Output.lineOut("Aux Chain Count : " + auxChains.size());
+			Output.decrementIndent();
 			
-			lineOut("");
-			lineOut("Detail by chain:");
-			incrementIndent();
+			Output.lineOut("");
+			Output.lineOut("Detail by chain:");
+			Output.incrementIndent();
 			
 			for (Chain chain : structMap.getChains())
 				outputChainInfo(chain, null);
 				
-			decrementIndent();
-			lineOut("--End StructureMap--");
+			Output.decrementIndent();
+			Output.lineOut("--End StructureMap--");
 		}
 		
 		if (isPdb)
 		{
 			if (auxChains.size() > 0)
 			{
-				lineOut("");
-				lineOut("Auxilliary Chains (pdb file) (psuedo-ids):");
-				incrementIndent();
+				Output.lineOut("");
+				Output.lineOut("Auxilliary Chains (pdb file) (psuedo-ids):");
+				Output.incrementIndent();
 				
 				for (String key : auxChains.keySet())
 					outputChainInfo(auxChains.get(key), key);
 				
-				decrementIndent();
+				Output.decrementIndent();
 			}
 		}
 		
-		lineOut("");
+		Output.lineOut("");
 	}
 	
 	/**
@@ -210,52 +211,52 @@ public class SimpleReadStructureDemo
 		
 		String chainId = (auxChain)? auxChainId : chain.getChainId();
 		if (auxChain)
-			lineOut("Pseudo Chain Id : " + chainId);
+			Output.lineOut("Pseudo Chain Id : " + chainId);
 		
 		else
-			lineOut("Chain Id : " + chainId);
+			Output.lineOut("Chain Id : " + chainId);
 		
 		if (chainId.equals("_"))
 						// don't output the default chain id - if it contains ions/ligands,
 						// they'll be extracted and displayed elsewhere.
 						// otherwise, it just shows waters - we don't care.
 		{
-			incrementIndent();
-			lineOut("(default chain id group)");
-			decrementIndent();
+			Output.incrementIndent();
+			Output.lineOut("(default chain id group)");
+			Output.decrementIndent();
 			return;
 		}
 		
-		incrementIndent();
+		Output.incrementIndent();
 		if (!auxChain)
 						// auxilliary chains don't have fragments - put out fragment
 						// info for normal chain
 		{
-			lineOut("Fragments: ");
-			incrementIndent();
+			Output.lineOut("Fragments: ");
+			Output.incrementIndent();
 			
 			for (Fragment fragment : chain.getFragments())
 			{
-				lineOut("--New Fragment--");
-				lineOut("Conformation Type : " + fragment.getConformationType());
-				lineOut("Residues:");
-				incrementIndent();
+				Output.lineOut("--New Fragment--");
+				Output.lineOut("Conformation Type : " + fragment.getConformationType());
+				Output.lineOut("Residues:");
+				Output.incrementIndent();
 				
 				outputResidueInfo(fragment.getResidues());
 					
-				decrementIndent();
-				lineOut("--End Fragment--");
+				Output.decrementIndent();
+				Output.lineOut("--End Fragment--");
 			}
 			
-			decrementIndent();
-			lineOut("--End Fragments--");
+			Output.decrementIndent();
+			Output.lineOut("--End Fragments--");
 		}
 		
 		else	// auxChain - no fragments
 			outputResidueInfo(chain.getResidues());
 		
-		decrementIndent();
-		lineOut("--End Chain--");
+		Output.decrementIndent();
+		Output.lineOut("--End Chain--");
 	}
 	
 	/**
@@ -271,28 +272,28 @@ public class SimpleReadStructureDemo
 				continue;
 							// let's ignore waters
 			
-			lineOut("Residue Id : " + residue.getResidueId());
-		    lineOut("Compound Code : " + residue.getCompoundCode());
-		    lineOut("Hydrophobicity : " + residue.getHydrophobicity());
-		    lineOut("Num Atoms : " + residue.getAtomCount());
+			Output.lineOut("Residue Id : " + residue.getResidueId());
+		    Output.lineOut("Compound Code : " + residue.getCompoundCode());
+		    Output.lineOut("Hydrophobicity : " + residue.getHydrophobicity());
+		    Output.lineOut("Num Atoms : " + residue.getAtomCount());
 		    if (doAtoms)
 		    {
-		    	lineOut("Atoms:");
-		    	incrementIndent();
+		    	Output.lineOut("Atoms:");
+		    	Output.incrementIndent();
 
 			    for (Atom atom : residue.getAtoms())
 			    {
-			    	lineOut("Atom Name : " + atom.name);
-			    	lineOut("Element : " + atom.element);
-			    	lineOut("Partial Charge : " + atom.partialCharge);
-			    	lineOut("Occupancy : " + atom.occupancy);
-			    	lineOut("");
+			    	Output.lineOut("Atom Name : " + atom.name);
+			    	Output.lineOut("Element : " + atom.element);
+			    	Output.lineOut("Partial Charge : " + atom.partialCharge);
+			    	Output.lineOut("Occupancy : " + atom.occupancy);
+			    	Output.lineOut("");
 			    }
 			    
-			    decrementIndent();
+			    Output.decrementIndent();
 		    }
 
-		    lineOut("--End Residue");
+		    Output.lineOut("--End Residue");
 		}
 	}
 	
@@ -343,28 +344,28 @@ public class SimpleReadStructureDemo
 	{
 		int txIX;
 		
-		lineOut("Unit Cell:");
-		incrementIndent();
+		Output.lineOut("Unit Cell:");
+		Output.incrementIndent();
 		
 		if (loader.hasUnitCell())
 		{
 			UnitCell unitCell = loader.getUnitCell();
-			lineOut("angleAlpha: " + unitCell.angleAlpha);
-			lineOut("angleBeta: " + unitCell.angleBeta);
-			lineOut("angleGamma: " + unitCell.angleGamma);
-			lineOut("length A: " + unitCell.lengthA);
-			lineOut("length B: " + unitCell.lengthB);
-			lineOut("length C: " + unitCell.lengthC);
+			Output.lineOut("angleAlpha: " + unitCell.angleAlpha);
+			Output.lineOut("angleBeta: " + unitCell.angleBeta);
+			Output.lineOut("angleGamma: " + unitCell.angleGamma);
+			Output.lineOut("length A: " + unitCell.lengthA);
+			Output.lineOut("length B: " + unitCell.lengthB);
+			Output.lineOut("length C: " + unitCell.lengthC);
 		}
 		
 		else
-			lineOut("(None)");
+			Output.lineOut("(None)");
 		
-		decrementIndent();
-		lineOut("");
+		Output.decrementIndent();
+		Output.lineOut("");
 		
-		lineOut("Biological Unit Transforms:");
-		incrementIndent();
+		Output.lineOut("Biological Unit Transforms:");
+		Output.incrementIndent();
 
 		if (loader.hasBiologicUnitTransformationMatrices())
 		{
@@ -374,13 +375,13 @@ public class SimpleReadStructureDemo
 		}
 		
 		else
-			lineOut("(None)");
+			Output.lineOut("(None)");
 		
-		decrementIndent();
-		lineOut("");
+		Output.decrementIndent();
+		Output.lineOut("");
 		
-		lineOut("Non-Crystallographic Transforms:");
-		incrementIndent();
+		Output.lineOut("Non-Crystallographic Transforms:");
+		Output.incrementIndent();
 		if (loader.hasNonCrystallographicOperations())
 		{
 			txIX = 1;
@@ -389,45 +390,16 @@ public class SimpleReadStructureDemo
 		}
 		
 		else
-			lineOut("(None)");
+			Output.lineOut("(None)");
 	}
 	
 	static private void outputTransformValues(int ix, float[] values)
 	{
-		lineOut(ix + ": " + values[0] + ", " + values[1] + ", " + values[2] + ", " + values[3] + ",");
-		lineOut(" : " + values[4] + ", " + values[5] + ", " + values[6] + ", " + values[7] + ",");
-		lineOut(" : " + values[8] + ", " + values[9] + ", " + values[10] + ", " + values[11] + ",");
-		lineOut(" : " + values[12] + ", " + values[13] + ", " + values[14] + ", " + values[15]);
-		lineOut("");
+		Output.lineOut(ix + ": " + values[0] + ", " + values[1] + ", " + values[2] + ", " + values[3] + ",");
+		Output.lineOut(" : " + values[4] + ", " + values[5] + ", " + values[6] + ", " + values[7] + ",");
+		Output.lineOut(" : " + values[8] + ", " + values[9] + ", " + values[10] + ", " + values[11] + ",");
+		Output.lineOut(" : " + values[12] + ", " + values[13] + ", " + values[14] + ", " + values[15]);
+		Output.lineOut("");
 	}
-	
-	/* ******************************************************************************************
-	 * Following code is support for indenting and outputting strings.
-	 * ******************************************************************************************/
-	static private int indentSize = 4;
-	static private String indent = "";
-	static private String indentBuf = null;
-	
-	static private void incrementIndent()
-	{
-		if (indentBuf == null)
-		{
-			indentBuf = new String();
-			for (int i = 0; i < indentSize; i++)
-				indentBuf += ' ';
-		}
-		
-       indent += indentBuf;
-	}
-	
-	static private void decrementIndent()
-	{
-		if (indent.length() >= indentSize)
-			indent = indent.substring(0, indent.length() - indentSize);
-	}
-	
-	static private void lineOut(String line)
-	{
-		System.out.println(line.length() == 0? "" : indent + line);
-	}
+
 }

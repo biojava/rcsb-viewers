@@ -14,9 +14,13 @@ This should <em>only</em> require the {@linkplain org.rcsb.mbt.model} and the {@
 packages.  You should be able to run this against the corresponding output jars and get <em>no unresolveds.</em>
 (To do this, you need to copy out the jars and copy out the source into its own directory, compile and run.)
 If you <em>do</em> get unresolveds, it means some dependency has incurred itself into the model that shouldn't be there.</ul>
-<ul>
-This should be useable as a basis for unit tests.  Work on it.</ul>
 </dd>
+<dt>DumpPeriodicTable</dt>
+<dd>
+The MBT carries an internal representation of the periodic table.  This dumps it.  Note the color
+and radius are default and VDW, respectively.  They may be changed by a mutator to reflect some
+other information for actual rendering.<br>
+{@see org.rcsb.mbt.model.attributes} package for further information.
 </dl>
 </body>
 </html>
