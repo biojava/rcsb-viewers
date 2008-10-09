@@ -2180,7 +2180,9 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		}
 	}
 
-	public void windowActivated(final WindowEvent e) {
+	public void windowActivated(final WindowEvent e)
+	{
+		requestRepaint();
 	}
 
 	public void windowClosed(final WindowEvent e) {
@@ -2189,7 +2191,9 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	public void windowClosing(final WindowEvent e) {
 	}
 
-	public void windowDeactivated(final WindowEvent e) {
+	public void windowDeactivated(final WindowEvent e)
+	{
+		requestRepaint();
 	}
 
 	public void windowDeiconified(final WindowEvent e) {
