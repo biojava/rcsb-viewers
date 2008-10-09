@@ -38,7 +38,6 @@ public class UpdateController
 	public void clear()
 	{
 		fireUpdateViewEvent(UpdateEvent.Action.CLEAR_ALL);
-		views = new UpdateListenerVec();
 	}
 	/**
 	 * Calls 'reset' on all of the panels.

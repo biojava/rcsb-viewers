@@ -176,6 +176,7 @@ import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.StructureModel.StructureList;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
 import org.rcsb.mbt.model.attributes.ChainStyle;
@@ -1242,7 +1243,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 					this.viewCenter[0], this.viewCenter[1], this.viewCenter[2],
 					this.viewUp[0], this.viewUp[1], this.viewUp[2]);
 			
-			for (Structure structure : AppBase.sgetModel().getStructures())
+			StructureList structures = AppBase.sgetModel().getStructures();
+			for (Structure structure : structures)
 			{
 				gl.glPushMatrix();
 				JoglSceneNode sceneNode = (JoglSceneNode)structure.getStructureMap().getUData();

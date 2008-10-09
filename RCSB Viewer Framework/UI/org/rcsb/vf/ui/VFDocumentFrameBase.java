@@ -58,22 +58,28 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 		{
 			private String _url, _pdbid;
 			
+			public LoadThread(File[] files)
+			{
+				_url = files[0].getAbsolutePath();
+				
+				for (int ix = 1; ix < files.length; ix++)
+					_url += ',' + files[ix].getAbsolutePath();
+
+				_pdbid = files[0].getName().substring(0, files[0].getName().indexOf('.'));
+			}
+			
 			public LoadThread(String url, String pdbid)
 			{ _url = url; _pdbid = pdbid; }
 			
 			public void run()
 			{
 				ProgressPanelController.StartProgress();
-				getModel().clear();
-
 				getDocController().loadStructure(_url, _pdbid);
-				getUpdateController().resetEverything();
 				if (getModel().hasStructures())
 					setTitle(getModel().getStructures().get(0).getStructureMap().getPdbId());
 				ProgressPanelController.EndProgress();
 				if (!getModel().hasStructures())
 					JOptionPane.showMessageDialog(null, "Structure not found: " + _pdbid + "\nPlease check file/url specification and try again.", "Error", JOptionPane.ERROR_MESSAGE); 
-				getGlGeometryViewer().updateUI();
 			}
 		};
 		
@@ -125,13 +131,11 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 								dialog.setDialogTitle("Select a coordinate file...");
 								dialog.setDialogType(JFileChooser.OPEN_DIALOG);
 								dialog.setFileHidingEnabled(true);
-								dialog.setMultiSelectionEnabled(false);
+								dialog.setMultiSelectionEnabled(true);
 								
 								if (dialog.showOpenDialog(VFDocumentFrameBase.this) == JFileChooser.APPROVE_OPTION)
 								{
-									final File selectedFile = dialog.getSelectedFile();
-									LoadThread loadIt = new LoadThread(selectedFile.getAbsolutePath(),
-											selectedFile.getName().substring(0, selectedFile.getName().indexOf('.')));										
+									LoadThread loadIt = new LoadThread(dialog.getSelectedFiles());										
 									loadIt.start();
 								}
 							}

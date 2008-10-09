@@ -3,6 +3,7 @@ package org.rcsb.mbt.controllers.app;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URL;
+import java.util.Properties;
 
 import org.rcsb.mbt.controllers.doc.DocController;
 import org.rcsb.mbt.controllers.scene.SceneController;
@@ -114,6 +115,9 @@ public abstract class AppBase
 	public DocumentFrameBase getActiveFrame() { return activeFrame; }
 
 	
+	// Runtime properties (options or parameters)
+	public Properties properties = new Properties();
+
 	/**
 	 * Temporary: Application indication hacks - app overrides these so the subsystems can
 	 * modify behavior, accordingly.
@@ -124,6 +128,12 @@ public abstract class AppBase
 	 */
 	public boolean isSimpleViewer() { return false; }
 	public boolean isLigandExplorer () { return false; }
+	
+	public static boolean isDebug()
+	{
+		String debugVal = (String)getApp().properties.get("debug");
+		return debugVal != null && debugVal.equalsIgnoreCase("true");
+	}
 	
 	/**
 	 * The singleton app
@@ -157,5 +167,25 @@ public abstract class AppBase
 	{
 		super();
 		_theJApp = this;
+	}
+	
+	public AppBase(String args[])
+	{
+		super();
+		boolean isDebug = false;
+		
+		if (args != null)
+			for (int i = 0; i < args.length; i++)
+			{
+				isDebug = args[i].equals("-debug");
+				if (isDebug)
+					properties.setProperty("debug", "true");
+			}
+		
+		_theJApp = this;
+		
+		if (isDebug)
+			System.err.println("-->AppBase - Free memory: " +
+					Runtime.getRuntime().freeMemory());
 	}
 }

@@ -135,9 +135,6 @@ public abstract class VFAppBase extends AppBase
 	public static VFDocController sgetDocController() { return sgetActiveFrame().getDocController(); }
 	public static VFGlGeometryViewer sgetGlGeometryViewer() { return sgetActiveFrame().getGlGeometryViewer(); }
 	
-	// Runtime properties (options or parameters)
-	public Properties properties = new Properties();
-
 	/**
 	 * Constructor - parses args and registers a panel(?)
 	 * 
@@ -151,8 +148,8 @@ public abstract class VFAppBase extends AppBase
 	 */
 	public VFAppBase(String args[])
 	{
+		super(args);
 		
-		super();
 		if (args != null)
 		{
 			for (int i = 0; i < args.length; i++) {
@@ -172,8 +169,6 @@ public abstract class VFAppBase extends AppBase
 					properties.setProperty("output_format", args[++i]);
 				} else if (args[i].equals("-unit_id")) {
 					properties.setProperty("unit_id", args[++i]);
-				} else if (args[i].equals("-debug")) {
-					properties.setProperty("debug", "true");
 				} else if (args[i].equals("-treat_models_as_subunits")) {
 					properties.setProperty("treat_models_as_subunits", "true");
 				} else if (args[i].equals("-log_folder")) {

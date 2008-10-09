@@ -142,18 +142,18 @@ public class StructureModel
 	public class StructureList extends ArrayList<Structure>{};
 	
 	private StructureList structures = new StructureList();
-	public StructureList getStructures() { return structures; }
+	public synchronized StructureList getStructures() { return structures; }
 	
 	/**
 	 * @return - whether we have structures in the model.
 	 */
-	public boolean hasStructures() { return structures != null && structures.size() > 0; }
+	public synchronized boolean hasStructures() { return structures != null && structures.size() > 0; }
 
 	/**
 	 *  Add a structure to the list of managed/viewed structures,
 	 *  then send an event to inform all registered Viewer objects.
 	 */
-	public void addStructure( final Structure structure )
+	public synchronized void addStructure( final Structure structure )
 		throws IllegalArgumentException
 	{
 		if ( structure == null ) {
@@ -169,14 +169,18 @@ public class StructureModel
 		update.fireUpdateViewEvent(UpdateEvent.Action.STRUCTURE_ADDED, structure);
 	}
 	
-	public void setStructures(Structure[] structure_array)
+	public synchronized void setStructures(Structure[] structure_array)
 	{
 		if (structure_array != null)
 		{
-			for (Structure struc : structure_array)
-			  this.structures.add(struc);
-			
 			UpdateController update = AppBase.sgetUpdateController();
+			
+			for (Structure struc : structure_array)
+			{
+			   this.structures.add(struc);
+			   update.fireUpdateViewEvent(UpdateEvent.Action.STRUCTURE_ADDED, struc);
+			}
+			
 			update.fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE);
 		}
 	}
@@ -185,7 +189,7 @@ public class StructureModel
 	 * Remove a Structure from this StructureDocument.
 	 * Send the event, first, in case the receiver may want to do something from the list.
 	 */
-	public void removeStructure( final Structure structure )
+	public synchronized void removeStructure( final Structure structure )
 		throws IllegalArgumentException
 	{
 		if ( structure == null ) {
@@ -204,9 +208,9 @@ public class StructureModel
 	/**
 	 * Remove all Structures from this StructureDocument.
 	 */
-	public void clear()
+	public synchronized void clear()
 	{
-		this.structures = new StructureList();
+		structures.clear();
 	}
 	
 	/**

@@ -52,7 +52,9 @@ public class DocController
 	public void loadStructure(final String url, final String pdbId)
 	{
 		if (url == null)
-			; // stick up an error message box.
+			; // stick up an error message box?
+		
+		AppBase.sgetUpdateController().clear();
 		
 		Structure[] structure = readStructuresFromUrl(url);
 		if (structure != null)
@@ -61,10 +63,6 @@ public class DocController
 				structure[0].getStructureMap().setPdbId(pdbId);
 
 			AppBase.sgetModel().setStructures(structure);
-
-			AppBase.sgetUpdateController().fireUpdateViewEvent(
-					UpdateEvent.Action.STRUCTURE_ADDED,
-					AppBase.sgetModel().getStructures().get(0));
 		}
 	}
 
@@ -78,6 +76,10 @@ public class DocController
 	{
 		final Vector<Structure> structuresVec = new Vector<Structure>();
 		Structure structureTmp = null;
+		
+		if (AppBase.isDebug())
+			System.err.println("--> DocController: Available memory: " +
+					Runtime.getRuntime().freeMemory());
 	
 		final String[] datasets = structureUrlParam.split(",");
 		for (int i = 0; i < datasets.length; i++)
