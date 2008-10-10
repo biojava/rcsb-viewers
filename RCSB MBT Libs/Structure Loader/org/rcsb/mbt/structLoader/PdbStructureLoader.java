@@ -296,14 +296,15 @@ public class PdbStructureLoader
 		if ( fileInputStream == null ) {
 			return null;
 		}
+		
+		BufferedReader bufferedReader;
 		this.urlString = file.toURL().toExternalForm();
-		BufferedInputStream bufferedInputStream = null;
+		InputStreamReader ir = null;
 		if ( this.urlString.endsWith( ".gz" ) )
 		{
 			final GZIPInputStream gzipInputStream =
 				new GZIPInputStream( fileInputStream );
-			bufferedInputStream =
-				new BufferedInputStream( gzipInputStream );
+			ir = new InputStreamReader( gzipInputStream );
 
 			// JLM DEBUG: crude hack for progress, because with
 			// a gzip stream we can't tell how much data there will be!
@@ -311,11 +312,9 @@ public class PdbStructureLoader
 			this.expectedInputBytes *= 4;
 		}
 		else
-		{
-			bufferedInputStream =
-				new BufferedInputStream( fileInputStream );
-		}
-		return this.load( bufferedInputStream );
+			ir = new InputStreamReader(fileInputStream);
+			
+		return this.load( new BufferedReader(ir) );
 	}
 
 
@@ -356,7 +355,8 @@ public class PdbStructureLoader
 //			if ( expectedInputBytes <= 0 ) return null;
 		final InputStream inputStream = urlConnection.getInputStream( );
 
-		BufferedInputStream bufferedInputStream = null;
+		InputStreamReader ir = null;
+		
 		if ( inputStream != null )
 			this.urlString = url.toExternalForm( );
 
@@ -364,15 +364,13 @@ public class PdbStructureLoader
 		{
 			final GZIPInputStream gzipInputStream =
 				new GZIPInputStream( inputStream );
-			bufferedInputStream =
-				new BufferedInputStream( gzipInputStream );
+			ir =
+				new InputStreamReader( gzipInputStream );
 		}
 		else
-		{
-			bufferedInputStream =
-				new BufferedInputStream( inputStream );
-		}
-		return this.load( bufferedInputStream );
+			ir = new InputStreamReader(inputStream);
+
+		return this.load( new BufferedReader(ir) );
 	}
 
 
@@ -393,10 +391,10 @@ public class PdbStructureLoader
 	 * Returns a reference to a Structure read from the given (uncompressed)
 	 * InputStream.
 	 */
-	public Structure load( final BufferedInputStream bufferedInputStream ) throws IOException
+	public Structure load( final BufferedReader rdr ) throws IOException
 	{
 		// System.err.println( "PdbStructureLoader.load(BufferedInputStream)" );
-		if ( bufferedInputStream == null ) {
+		if ( rdr == null ) {
 			return null;
 		}
 		
@@ -414,15 +412,10 @@ public class PdbStructureLoader
 		final long expectedBytes = this.expectedInputBytes;
 		// System.err.println( "PdbStructureLoader.load: expectedBytes = " + expectedBytes );
 
-		final byte buf[] = new byte[ 2048 ]; // raw read data buffer
-		final byte line[] = new byte[ 100 ]; // accumulated line buffer
+		String line;
 
 		// System.err.println( "PdbStructureLoader.load: expectedReads = " + expectedReads );
-		int onePercent = (int) (((float) expectedBytes / (float) buf.length) / 100.f);
-		if ( onePercent <= 0 ) {
-			onePercent = 1;
-		}
-		// System.err.println( "PdbStructureLoader.load: onePercent = " + onePercent );
+
 		int percentDone = 0;
 
 		Status.progress( percentDone, "Loading " + this.urlString );
@@ -433,535 +426,172 @@ public class PdbStructureLoader
 		Hashtable<Integer, Atom> atomNumberHash = new Hashtable<Integer, Atom>( );
 		Vector<int[]> conectRecords = new Vector<int[]>( );
 		
-		int linePos = 0;
 		int bytesRead = 0;
-		int lastRead = 0;
 		int lines = 0;
-		int readCount = 0;
 		int modelCount = 0; // How many models have we seen?
 
-		while ( true )
+		while ( (line = rdr.readLine()) != null )
 		{
-			// Re-fill the raw data buffer.
 
-			lastRead = bufferedInputStream.read( buf, 0, buf.length );
-			if (lastRead == -1) break;
+			bytesRead += line.length() + 1;
+			percentDone = (int)((bytesRead * 100L)/ expectedBytes);
+			Status.progress( percentDone, "Loading " + this.urlString );
 
-			bytesRead += lastRead;
+			lines++;
 
-			readCount++;
-			if ( readCount % onePercent == 0 )
+			// Parse the line buffer
+			if (line.startsWith("ATOM") || line.startsWith("HETATM"))
 			{
-				percentDone = (int)((bytesRead * 100L)/ expectedBytes);
-				Status.progress( percentDone, "Loading " + this.urlString );
-			}
+				// PDB File Atom Record offsets as documented by
+				// http://www.rcsb.org/pdb/docs/format/pdbguide2.2/part_62.html
+				// 1 -  6   RecordName
+				// 7 - 11   serial
+				// 12       -
+				// 13 - 16  name
+				// 17       altLoc
+				// 18 - 20  resName
+				// 21       -
+				// 22       chainID
+				// 23 - 26  resSeq
+				// 27       iCode
+				// 28 - 30  -
+				// 31 - 38  x
+				// 39 - 46  y
+				// 47 - 54  z
+				// 55 - 60  occupancy
+				// 61 - 66  tempFactor
+				// 67 - 72  -
+				// 73 - 76  segID
+				// 77 - 78  element
+				// 79 - 80  charge
+				// NOTE: In this application, we need to subtract 1 from
+				// each index in order to match the 0-based array offsets.
 
-/* XXX_DEBUG
-				String strLine  = "";
-**/
-			// Process the buffer
-			for ( int bufPos=0; bufPos<lastRead; bufPos++ )
-			{
-				// Copy a byte from the input buffer into the line buffer
-				line[linePos] = buf[bufPos];
-/* XXX DEBUG
-					strLine += (char)buf[bufPos];
-**/
-				if ( buf[bufPos] == '\n' )
+				Atom atom = new Atom( );
+				String str = null;
+
+				atom.number =  Integer.parseInt(line.substring( 6, 11 ).trim());
+
+				atom.name = line.substring(12, 16 ).trim().replace('*', '\'');	//**JB quick fix: the dictionary expects ' instead of *
+				atom.name = sharedStrings.share( atom.name );
+
+				atom.element = line.substring(76, 78).trim();
+				atom.element = atom.element.replaceAll( "[0-9]", "" );
+				if ( (atom.element == null) || atom.element.equals("") ||
+						(PeriodicTable.getElement( atom.element ) == null))
 				{
-					// line[0-linePos] now has a complete line.
-					lines++;
-
-					// Parse the line buffer
-
-					//
-					// ATOM and HETATM records
-					//
-					boolean isAtom = false;
-					if (
-						(line[0] == 'A') &&
-						(line[1] == 'T') &&
-						(line[2] == 'O') &&
-						(line[3] == 'M')
-					) {
-						isAtom = true;
-					} else if (
-						(line[0] == 'H') &&
-						(line[1] == 'E') &&
-						(line[2] == 'T') &&
-						(line[3] == 'A') &&
-						(line[4] == 'T') &&
-						(line[5] == 'M')
-					) {
-						isAtom = true;
+					// The element field was not an element,
+					// so, try the first letter of the name.
+					atom.element = atom.name.substring( 0, 1 ).trim();
+					if ( PeriodicTable.getElement( atom.element ) == null ) {
+						throw new IllegalArgumentException( "no atom element symbol around line " + lines );
 					}
-					if ( isAtom )
-					{
-						// PDB File Atom Record offsets as documented by
-						// http://www.rcsb.org/pdb/docs/format/pdbguide2.2/part_62.html
-						// 1 -  6   RecordName
-						// 7 - 11   serial
-						// 12       -
-						// 13 - 16  name
-						// 17       altLoc
-						// 18 - 20  resName
-						// 21       -
-						// 22       chainID
-						// 23 - 26  resSeq
-						// 27       iCode
-						// 28 - 30  -
-						// 31 - 38  x
-						// 39 - 46  y
-						// 47 - 54  z
-						// 55 - 60  occupancy
-						// 61 - 66  tempFactor
-						// 67 - 72  -
-						// 73 - 76  segID
-						// 77 - 78  element
-						// 79 - 80  charge
-						// NOTE: In this application, we need to subtract 1 from
-						// each index in order to match the 0-based array offsets.
-
-						final Atom atom = new Atom( );
-						String str = null;
-
-						atom.number =  Integer.parseInt( (new String( line, 6, 5 )).trim() );
-
-						atom.name = (new String( line, 12, 4 )).trim().replace('*', '\'');	//**JB quick fix: the dictionary expects ' instead of *
-						atom.name = sharedStrings.share( atom.name );
-
-						atom.element = (new String( line, 76, 2 )).trim();
-						atom.element = atom.element.replaceAll( "[0-9]", "" );
-						if ( (atom.element == null) ||
-							atom.element.equals("") ||
-							(PeriodicTable.getElement( atom.element ) == null)
-						)
-						{
-							// The element field was not an element,
-							// so, try the first letter of the name.
-							atom.element = atom.name.substring( 0, 1 );
-							if ( PeriodicTable.getElement( atom.element ) == null ) {
-								throw new IllegalArgumentException( "no atom element symbol around line " + lines );
-							}
-						}
-						atom.element = sharedStrings.share( atom.element );
-
-						atom.altLoc = (new String( line, 16, 1 )).trim();
-						atom.altLoc = sharedStrings.share( atom.altLoc );
-
-						atom.compound = (new String( line, 17, 3 )).trim();
-						atom.compound = sharedStrings.share( atom.compound );
-
-						atom.chain_id = (new String( line, 21, 1 )).trim();
-						if ( atom.chain_id == null || atom.chain_id.equals("") )
-							atom.chain_id = "_";
-
-						if(treatModelsAsSubunits)
-						{
-							atom.chain_id = atom.chain_id + "$$$" + modelCount;
-						}
-						
-						atom.chain_id = sharedStrings.share( atom.chain_id );
-//							System.out.println(modelCount);
-						
-						final String newResidueIdRaw = new String( line, 22, 6 ).trim();  //**JB expanded to account for non-integer residue ids. Was: ( line, 22, 4 ).
-						String temp = newResidueIdRaw;
-						while(Character.isLetter(temp.charAt(temp.length() - 1))) {		//**JB don't remove anything but the last letters. If there are any spaces between the letters and the number, etc., I want an exception thrown so I know.
-							temp = temp.substring(0, temp.length() - 1);
-						}
-						final int newResidueIdIntSimple = Integer.parseInt(temp);
-						int newResidueIdInt = -1;
-						int increment = Math.abs(newResidueIdIntSimple - previousResidueIdIntSimple);
-						if(increment == 0 && !previousResidueIdRaw.equals(newResidueIdRaw)) {	// if this isn't a simple number, need to check the string as well.
-							increment = 1;
-						}
-						if(previousResidueIdInt == Integer.MIN_VALUE) {
-							newResidueIdInt = newResidueIdIntSimple;
-							increment = 1;	// flag to make sure this chain/residue id pair is recorded.
-						} else {
-							newResidueIdInt = previousResidueIdInt + increment;
-						}
-						
-						if(increment > 0) {
-							pdbChainIds.add(atom.chain_id);
-							ndbChainIds.add(atom.chain_id);
-							pdbResidueIds.add(newResidueIdRaw);
-							ndbResidueIds.add(new Integer(newResidueIdInt));
-						}
-						
-						previousResidueIdInt = newResidueIdInt;
-						previousResidueIdIntSimple = newResidueIdIntSimple;
-						previousResidueIdRaw = newResidueIdRaw;
-						
-						atom.residue_id = newResidueIdInt;
-
-						atom.coordinate = new double[3];
-						atom.coordinate[0] =
-							Double.parseDouble( (new String( line, 30, 8 )).trim() );
-						atom.coordinate[1] =
-							Double.parseDouble( (new String( line, 38, 8 )).trim() );
-						atom.coordinate[2] =
-							Double.parseDouble( (new String( line, 46, 8 )).trim() );
-
-						str = (new String( line, 54, 6 )).trim();
-						if ( str.length() == 0 ) {
-							atom.occupancy = 1.0f;
-						} else {
-							atom.occupancy = Float.parseFloat( str );
-						}
-
-						str = (new String( line, 60, 6 )).trim();
-						if ( str.length() == 0 ) {
-							atom.bfactor = 0.0f;
-						} else {
-							atom.bfactor = Float.parseFloat( str );
-						}
-
-						Vector<StructureComponent> records = this.passComponents.get(
-							StructureComponentRegistry.TYPE_ATOM );
-						if ( records == null )
-						{
-							records = new Vector<StructureComponent>( );
-							this.passComponents.put(
-								StructureComponentRegistry.TYPE_ATOM, records );
-						}
-						records.add( atom );
-
-						// Add atom to cache for conect record processing.
-						atomNumberHash.put( new Integer( atom.number ), atom );
-
-						// Reset linePos to the start of the line buffer.
-						linePos = 0;
-						continue;
-					}
-
-					//
-					// HELIX record
-					//
-//						if (
-//							(line[0] == 'H') &&
-//							(line[1] == 'E') &&
-//							(line[2] == 'L') &&
-//							(line[3] == 'I') &&
-//							(line[4] == 'X')
-//						)
-//						{
-//							Helix helix = new Helix( );
-//	
-//							helix.name = (new String( line, 0, 6 )).trim();
-//							helix.name = sharedStrings.share( helix.name );
-//							helix.start_compound = (new String( line, 15, 3 )).trim();
-//							helix.start_compound = sharedStrings.share( helix.start_compound );
-//							helix.start_chain = (new String( line, 19, 1 )).trim();
-//							if ( helix.start_chain == null ) helix.start_chain = "A";
-//							helix.start_chain = sharedStrings.share( helix.start_chain );
-//							helix.start_residue = Integer.parseInt( (new String( line, 21, 4 )).trim() );
-//							helix.end_compound = (new String( line, 27, 3 )).trim();
-//							helix.end_compound = sharedStrings.share( helix.end_compound );
-//							helix.end_chain = (new String( line, 31, 1 )).trim();
-//							if ( helix.end_chain == null ) helix.end_chain = "A";
-//							helix.end_chain = sharedStrings.share( helix.end_chain );
-//							helix.end_residue = Integer.parseInt( (new String( line, 33, 4 )).trim() );
-//							helix.setRighthand( true ); // JLM DEBUG
-//	
-//							Vector records = (Vector) passComponents.get(
-//								StructureComponentRegistry.TYPE_HELIX );
-//							if ( records == null )
-//							{
-//								records = new Vector( );
-//								passComponents.put(
-//									StructureComponentRegistry.TYPE_HELIX, records );
-//							}
-//							records.add( helix );
-//	
-//							// Reset linePos to the start of the line buffer.
-//							linePos = 0;
-//							continue;
-//						}
-//	
-//						//
-//						// TURN record
-//						//
-//						if (
-//							(line[0] == 'T') &&
-//							(line[1] == 'U') &&
-//							(line[2] == 'R') &&
-//							(line[3] == 'N')
-//						)
-//						{
-//							Turn turn = new Turn( );
-//	
-//							turn.name = (new String( line, 0, 6 )).trim();
-//							turn.name = sharedStrings.share( turn.name );
-//							turn.start_compound = (new String( line, 15, 3 )).trim();
-//							turn.start_compound = sharedStrings.share( turn.start_compound );
-//							turn.start_chain = (new String( line, 19, 1 )).trim();
-//							if ( turn.start_chain == null ) turn.start_chain = "A";
-//							turn.start_chain = sharedStrings.share( turn.start_chain );
-//							turn.start_residue = Integer.parseInt( (new String( line, 20, 4 )).trim() );
-//							turn.end_compound = (new String( line, 26, 3 )).trim();
-//							turn.end_compound = sharedStrings.share( turn.end_compound );
-//							turn.end_chain = (new String( line, 30, 1 )).trim();
-//							if ( turn.end_chain == null ) turn.end_chain = "A";
-//							turn.end_chain = sharedStrings.share( turn.end_chain );
-//							turn.end_residue = Integer.parseInt( (new String( line, 31, 4 )).trim() );
-//	
-//							Vector records = (Vector) passComponents.get(
-//								StructureComponentRegistry.TYPE_TURN );
-//							if ( records == null )
-//							{
-//								records = new Vector( );
-//								passComponents.put(
-//									StructureComponentRegistry.TYPE_TURN, records );
-//							}
-//							records.add( turn );
-//	
-//							// Reset linePos to the start of the line buffer.
-//							linePos = 0;
-//							continue;
-//						}
-//	
-//						//
-//						// STRAND (SHEET) record
-//						//
-//						if (
-//							(line[0] == 'S') &&
-//							(line[1] == 'H') &&
-//							(line[2] == 'E') &&
-//							(line[3] == 'E') &&
-//							(line[4] == 'T')
-//						)
-//						{
-//							// Each SHEET record is really composed of
-//							// multiple STRAND records.
-//
-//							Strand strand = new Strand( );
-//
-//							strand.name = (new String( line, 0, 6 )).trim();
-//							strand.name = sharedStrings.share( strand.name );
-//							strand.start_compound = (new String( line, 17, 3 )).trim();
-//							strand.start_compound = sharedStrings.share( strand.start_compound );
-//							strand.start_chain = (new String( line, 21, 1 )).trim();
-//							if ( strand.start_chain == null ) strand.start_chain = "A";
-//							strand.start_chain = sharedStrings.share( strand.start_chain );
-//							strand.start_residue = Integer.parseInt( (new String( line, 22, 4 )).trim() );
-//							strand.end_compound = (new String( line, 28, 3 )).trim();
-//							strand.end_compound = sharedStrings.share( strand.end_compound );
-//							strand.end_chain = (new String( line, 32, 1 )).trim();
-//							if ( strand.end_chain == null ) strand.end_chain = "A";
-//							strand.end_chain = sharedStrings.share( strand.end_chain );
-//							strand.end_residue = Integer.parseInt( (new String( line, 33, 4 )).trim() );
-//
-//							// Add the Strand object.
-//							Vector records = (Vector) passComponents.get(
-//								StructureComponentRegistry.TYPE_STRAND );
-//							if ( records == null )
-//							{
-//								records = new Vector( );
-//								passComponents.put(
-//									StructureComponentRegistry.TYPE_STRAND, records );
-//							}
-//							records.add( strand );
-//	
-//							// Reset linePos to the start of the line buffer.
-//							linePos = 0;
-//							continue;
-//						}
-//
-//						//
-//						// HEADER record
-//						//
-//						if (
-//							(line[0] == 'H') &&
-//							(line[1] == 'E') &&
-//							(line[2] == 'A') &&
-//							(line[3] == 'D') &&
-//							(line[4] == 'E') &&
-//							(line[5] == 'R')
-//						)
-//						{
-//							if ( structureInfo == null )
-//								structureInfo = new StructureInfo( );
-//	
-//							structureInfo.setReleaseDate(
-//								(new String( line, 50, 9 )).trim()
-//							);
-//
-//							structureInfo.setIdCode(
-//								(new String( line, 62, 4 )).trim()
-//							);
-//
-//							// Reset linePos to the start of the line buffer.
-//							linePos = 0;
-//							continue;
-//						}
-//
-//						//
-//						// AUTHOR record
-//						//
-//						if (
-//							(line[0] == 'A') &&
-//							(line[1] == 'U') &&
-//							(line[2] == 'T') &&
-//							(line[3] == 'H') &&
-//							(line[4] == 'O') &&
-//							(line[5] == 'R')
-//						)
-//						{
-//							if ( structureInfo == null )
-//								structureInfo = new StructureInfo( );
-//	
-//							String authors = structureInfo.getAuthors( );
-//							String moreAuthors =
-//								(new String( line, 10, 60 )).trim();
-//
-//							if ( authors == null )
-//								structureInfo.setAuthors( moreAuthors );
-//							else
-//								structureInfo.setAuthors( authors + moreAuthors );
-//
-//							// Reset linePos to the start of the line buffer.
-//							linePos = 0;
-//							continue;
-//						}
-//
-//						//
-//						// COMPND record
-//						//
-//						if (
-//							(line[0] == 'C') &&
-//							(line[1] == 'O') &&
-//							(line[2] == 'M') &&
-//							(line[3] == 'P') &&
-//							(line[4] == 'N') &&
-//							(line[5] == 'D')
-//						)
-//						{
-//							if ( structureInfo == null )
-//								structureInfo = new StructureInfo( );
-//	
-//							String compound = structureInfo.getLongName( );
-//							String moreCompound =
-//								(new String( line, 10, 60 )).trim();
-//
-//							if ( compound == null )
-//							{
-//								structureInfo.setLongName( moreCompound );
-//								if ( moreCompound.length() > 20 )
-//									structureInfo.setShortName( moreCompound.substring( 0, 20 ) + "..." );
-//								else
-//									structureInfo.setShortName( moreCompound );
-//							}
-//							else
-//								structureInfo.setLongName( compound + " : " + moreCompound );
-//
-//							// Reset linePos to the start of the line buffer.
-//							linePos = 0;
-//							continue;
-//						}
-//
-//						//
-//						// EXPDTA record
-//						//
-//						if (
-//							(line[0] == 'E') &&
-//							(line[1] == 'X') &&
-//							(line[2] == 'P') &&
-//							(line[3] == 'D') &&
-//							(line[4] == 'T') &&
-//							(line[5] == 'A')
-//						)
-//						{
-//							if ( structureInfo == null )
-//								structureInfo = new StructureInfo( );
-//	
-//							String expData =
-//								structureInfo.getDeterminationMethod( );
-//							String moreExpData =
-//								(new String( line, 10, 60 )).trim();
-//
-//							if ( expData == null )
-//								structureInfo.setDeterminationMethod( moreExpData );
-//							else
-//								structureInfo.setDeterminationMethod( expData + " : " + moreExpData );
-//
-//							// Reset linePos to the start of the line buffer.
-//							linePos = 0;
-//							continue;
-//						}
-
-					//
-					// CONECT record
-					//**JB calculate bonds ignoring this data.
-//						if (
-//							(line[0] == 'C') &&
-//							(line[1] == 'O') &&
-//							(line[2] == 'N') &&
-//							(line[3] == 'E') &&
-//							(line[4] == 'C') &&
-//							(line[5] == 'T')
-//						)
-//						{
-//							// Cache the data until we have atoms.
-//							int conect[] = new int[11];
-//							for ( int i=0; i<=conect.length; i++ )
-//							{
-//								conect[i] = Integer.parseInt(
-//									(new String( line, 6+i*5, 5 )).trim()
-//								);
-//							}
-//							conectRecords.add( conect );
-//
-//							// Reset linePos to the start of the line buffer.
-//							linePos = 0;
-//							continue;
-//						}
-
-					//
-					// MODEL record
-					//
-					if (
-						(line[0] == 'M') &&
-						(line[1] == 'O') &&
-						(line[2] == 'D') &&
-						(line[3] == 'E') &&
-						(line[4] == 'L')
-					)
-					{
-						modelCount++; // How many models have we seen?
-
-						if ( !this.shouldRecordMoreModels(modelCount) ) {
-							break; // Only load 1st model
-						}
-
-						// Reset linePos to the start of the line buffer.
-						linePos = 0;
-						continue;
-					}
-
-					// Reset linePos to the start of the line buffer.
-					linePos = 0;
-/* XXX_DEBUG 
-						strLine = "";
-**/
 				}
+				atom.element = sharedStrings.share( atom.element );
+
+				atom.altLoc = line.substring(16, 17 ).trim();
+				atom.altLoc = sharedStrings.share( atom.altLoc );
+
+				atom.compound = line.substring(17, 20 ).trim();
+				atom.compound = sharedStrings.share( atom.compound );
+
+				atom.chain_id = line.substring(21, 22 ).trim();
+				if ( atom.chain_id == null || atom.chain_id.equals("") )
+					atom.chain_id = "_";
+
+				if(treatModelsAsSubunits)
+				{
+					atom.chain_id = atom.chain_id + "$$$" + modelCount;
+				}
+
+				atom.chain_id = sharedStrings.share( atom.chain_id );
+				//							System.out.println(modelCount);
+
+				final String newResidueIdRaw = line.substring(22, 28 ).trim();
+					//**JB expanded to read 6 chars to account for non-integer residue ids. (Was 4 chars).
+				String temp = newResidueIdRaw;
+				while(Character.isLetter(temp.charAt(temp.length() - 1)))
+					temp = temp.substring(0, temp.length() - 1);
+						//**JB don't remove anything but the last letters.
+						//  If there are any spaces between the letters and the number, etc.,
+						// I want an exception thrown so I know.
+
+				final int newResidueIdIntSimple = Integer.parseInt(temp);
+				int newResidueIdInt = -1;
+				int increment = Math.abs(newResidueIdIntSimple - previousResidueIdIntSimple);
+				if(increment == 0 && !previousResidueIdRaw.equals(newResidueIdRaw))
+					increment = 1;
+						// if this isn't a simple number, need to check the string as well.
+
+				if(previousResidueIdInt == Integer.MIN_VALUE)
+				{
+					newResidueIdInt = newResidueIdIntSimple;
+					increment = 1;	// flag to make sure this chain/residue id pair is recorded.
+				}
+				
 				else
+					newResidueIdInt = previousResidueIdInt + increment;
+
+				if(increment > 0)
 				{
-					// Continue building the line.
-					linePos++;
-					if ( linePos >= line.length )
-					{
-						Status.output( Status.LEVEL_ERROR, "PdbStructureLoader.load( stream ): buffer overflow!" );
-						return null;
-					}
+					pdbChainIds.add(atom.chain_id);
+					ndbChainIds.add(atom.chain_id);
+					pdbResidueIds.add(newResidueIdRaw);
+					ndbResidueIds.add(new Integer(newResidueIdInt));
 				}
+
+				previousResidueIdInt = newResidueIdInt;
+				previousResidueIdIntSimple = newResidueIdIntSimple;
+				previousResidueIdRaw = newResidueIdRaw;
+
+				atom.residue_id = newResidueIdInt;
+
+				atom.coordinate = new double[3];
+				atom.coordinate[0] = Double.parseDouble(line.substring(30, 38 ).trim());
+				atom.coordinate[1] = Double.parseDouble(line.substring(38, 46 ).trim());
+				atom.coordinate[2] = Double.parseDouble(line.substring(46, 54 ).trim());
+
+				str = line.substring(54, 60 ).trim();
+				atom.occupancy = ( str.length() == 0 )? 1.0f : Float.parseFloat( str );
+
+				str = line.substring(60, 66 ).trim();
+				atom.bfactor = ( str.length() == 0 )? 0.0f : Float.parseFloat( str );
+
+				Vector<StructureComponent> records = this.passComponents.get(StructureComponentRegistry.TYPE_ATOM);
+				
+				if ( records == null )
+				{
+					records = new Vector<StructureComponent>( );
+					this.passComponents.put(
+							StructureComponentRegistry.TYPE_ATOM, records );
+				}
+				
+				records.add( atom );
+
+				// Add atom to cache for conect record processing.
+				atomNumberHash.put( new Integer( atom.number ), atom );
+
+				continue;
 			}
 
-			if ( !this.shouldRecordMoreModels(modelCount) ) {
-				break; // Only load 1st model
+			//
+			// MODEL record
+			//
+			else if (line.startsWith("MODEL"))
+			{
+				modelCount++; // How many models have we seen?
+
+				if ( !this.shouldRecordMoreModels(modelCount) ) {
+					break; // Only load 1st model
+				}
+
+				// Reset linePos to the start of the line buffer.
+				continue;
 			}
+
+			if ( !this.shouldRecordMoreModels(modelCount) )
+				break; // Only load 1st model
 		}
-		
 		//
 		// Post-process cached CONECT records to produce Bond objects.
 		//
@@ -985,6 +615,7 @@ public class PdbStructureLoader
 				}
 			}
 		}
+		
 		conectRecords.clear( );
 		conectRecords = null;
 		atomNumberHash.clear( );
