@@ -309,6 +309,8 @@ public class BondGeometry
 		final float bondSegmentFraction = 0.40f; // 90% JLM DEBUG: Make user settable?
 		double segmentDistance0 = 0.0f;
 		double segmentDistance1 = 0.0f;
+		double atomRadius1 = 0.0;
+		
 		if ( this.showOrder )
 		{
 			final AtomStyle atomStyle0 =
@@ -316,7 +318,7 @@ public class BondGeometry
 			final AtomStyle atomStyle1 =
 				(AtomStyle) structureStyles.getStyle( atom1 );
 			final float atomRadius0 = atomStyle0.getAtomRadius( atom0 );
-			final float atomRadius1 = atomStyle1.getAtomRadius( atom1 );
+			atomRadius1 = atomStyle1.getAtomRadius( atom1 );
 
 			final double interAtomDistance =
 				bondDistance - atomRadius0 - atomRadius1;
@@ -359,20 +361,13 @@ public class BondGeometry
 		final double bondSplitLen = bondDistance / 2.0f;
 
 		// Figure out what to do with the bond order
-		int orderCopies = 1; // By default, we only draw one bond copy.
-		final float bondOrder = bond.getOrder( );
+		int nBondParts = 1; // By default, we only draw one bond copy.
+		float bondOrder = bond.getOrder( );
 		if ( this.showOrder )
 		{
-			orderCopies = Math.round( bondOrder );
-			if ( orderCopies <= 0 ) {
-				orderCopies = 1;
-			}
-			// We don't want the geometry copies too spread out, so...
-			if ( orderCopies > 1 )
-			{
-				bondRadius /= (orderCopies*2);
-				bondScale /= (orderCopies*2);
-			}
+			nBondParts = Math.round( bondOrder );
+			if ( nBondParts <= 0 )
+				nBondParts = 1;
 		}
 
 		// Get bond label
@@ -414,12 +409,33 @@ public class BondGeometry
 //		gl.glMaterialfv( GL.GL_FRONT, GL.GL_SHININESS, high_shininess, 0 );
 //		gl.glMaterialfv( GL.GL_FRONT, GL.GL_EMISSION, black, 0 );
 
-		// If order=1 OR showOrder=false then
-		// orderCopies=1 and we'll only go through the outer loop once.
-		for ( int boc=0; boc<orderCopies; boc++ )
+		// If order == 1 OR !showOrder then
+		// nBondParts == 1 and we'll only go through the outer loop once.
+		int partialIX = (showOrder && bondOrder - (float)nBondParts + 0.1 > 0.5)? nBondParts++ : -1;
+		
+		double stance[] = new double[nBondParts];
+		if (nBondParts > 1)
+		{
+			bondRadius /= (nBondParts);
+			bondScale /= (nBondParts);
+			
+			double offset = atomRadius1 - bondRadius;
+			
+			stance[0] = -offset;
+			if (nBondParts == 3)
+				stance[1] = 0.0f;
+			
+			stance[nBondParts - 1] = offset;
+				// stance array determines where each bond part gets drawn
+		}
+		
+		else
+			stance[0] = 0.0;
+		
+		for ( int bondPartIX = 0; bondPartIX < nBondParts; bondPartIX++ )
 		{
 			// Draw the two split bond segments (top and bottom).
-			for ( int s=0; s<=1; s++ )
+			for ( int s=0; s < 2; s++ )
 			{
 				final DisplayLists currentList = cylinderList.copy();
 				currentList.isLeftSideOfBond = s == 0 ? true : false;
@@ -449,10 +465,10 @@ public class BondGeometry
 
 //				gl.glPushMatrix( );
 				// Position the split bond segment (s=0 VS s=1).
-				final boolean oddOrder = ( ((int) (bondOrder / 0.5)) % 2 == 0 );
-				final boolean partialOrder = 
-					oddOrder && ((boc+1) == orderCopies) && (orderCopies > 1);
-				if ( this.showOrder && partialOrder )
+				// final boolean oddOrder = ( ((int) (bondOrder / 0.5)) % 2 == 0 );
+							// odd calculation...
+				
+				if ( this.showOrder && bondPartIX == partialIX )
 				{
 					locations[0][0] =
 						atom0.coordinate[0] + direction[0] * segmentDistance0;
@@ -475,19 +491,12 @@ public class BondGeometry
 
 				if ( this.showOrder )
 				{
-					// Translate (relative) sideways a bit
-					// before drawing each instance of the bond geometry.
-					double nudge = boc * bondRadius * 1.1f;
-					if ( boc % 2 == 0 ) {
-						nudge *= -1.0; // Alternate sides
-					}
-//					gl.glTranslated( 0.0, 0.0, nudge );
-					currentList.translation[2] += nudge;
+					currentList.translation[2] += stance[bondPartIX];
 
 					// If last copy and odd bond order (ie: 0.5 partial order)
 					// make the geometry "broken" by shrinking the two pieces
 					// of the split geometry vertically to leave gaps.
-					if ( partialOrder ) {
+					if ( bondPartIX == partialIX ) {
 //						gl.glScaled( 1.0, bondSegmentFraction, 1.0 );
 						currentList.scale = new float[] {1f, bondSegmentFraction, 1f};
 					}
