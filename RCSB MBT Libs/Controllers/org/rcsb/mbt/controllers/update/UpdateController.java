@@ -33,7 +33,7 @@ public class UpdateController
 	private UpdateListenerVec pending = null;
 	private UpdateListenerVec blockedListeners = new UpdateListenerVec();
 	
-	private boolean inUpdate = false;
+	private int inUpdate = 0;
 	
 	public void clear()
 	{
@@ -55,7 +55,7 @@ public class UpdateController
 	{
 		if (!views.contains(listener))
 		{
-			if (inUpdate)
+			if (inUpdate > 0)
 						// oops - modifying during an update...
 						// can't put on views queue.
 						// put in temporary 'pending' queue
@@ -143,7 +143,7 @@ public class UpdateController
 	{
 		boolean first = true;
 		
-		inUpdate = true;
+		inUpdate++;
 		
 		do
 		{
@@ -199,6 +199,6 @@ public class UpdateController
 			
 		} while (pending != null);
 		
-		inUpdate = false;
+		inUpdate--;
 	}
 }
