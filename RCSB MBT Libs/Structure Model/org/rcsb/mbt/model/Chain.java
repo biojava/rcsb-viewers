@@ -226,8 +226,6 @@ public class Chain
 	public void copy( final StructureComponent structureComponent )
 	{
 		this.setStructure( structureComponent.getStructure() );
-
-		// xxx = chain.xxx;
 	}
 
 	/**
@@ -302,7 +300,7 @@ public class Chain
 								  Residue.Classification.LIGAND)
 		{
 			reClassifyAsLigand();
-// XXX			return Residue.Classification.LIGAND;
+			return Residue.Classification.LIGAND;
 		}
 
 		return Residue.Classification.values()[highestIndex];
@@ -314,8 +312,6 @@ public class Chain
 	 */
 	public void reClassifyAsLigand()
 	{
-/* ** XXX temporarily turned off.  See above XXX, too.
- * 
 		for (Residue residue : residues)
 			if (residue.getClassification() == Residue.Classification.LIGAND)
 				return;
@@ -323,7 +319,6 @@ public class Chain
 							// they're all correct.
 			else
 				residue.reClassifyAsLigand();
-* **/
 	}
 
 	/**
@@ -365,6 +360,19 @@ public class Chain
 			}
 		}
 		return atomCount;
+	}
+	
+	/**
+	 * Get all the atoms from all the residues in the chain.
+	 * 
+	 * @return
+	 */
+	public Vector<Atom> getAtoms()
+	{
+		Vector<Atom> atomVec = new Vector<Atom>();
+		for (Residue residue : getResidues())
+			atomVec.addAll(residue.getAtoms());
+		return atomVec;
 	}
 
 	/**
@@ -722,6 +730,12 @@ public class Chain
 			frags.add( this.getFragment( i ) );
 		}
 		return frags;
+	}
+
+	@Override
+	public String toString()
+	{
+		return getChainId();
 	}
 }
 

@@ -55,7 +55,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 {
 	private static final long serialVersionUID = -2533795368689609713L;
 
-	public Residue currentLigand = null;
+	public Chain currentLigand = null;
 	
 	private int numberTimesDisplayed = -1;
 		
@@ -90,7 +90,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		LXDocumentFrame activeFrame = LigandExplorer.sgetActiveFrame();
 		LXModel model = LigandExplorer.sgetModel();
 		LigandSideBar sidebar = activeFrame.getLigandSideBar();
-		Vector ligandList = sidebar.getLigandList();
+		Vector<Chain> ligandList = sidebar.getLigandList();
 		if (ligandList != null)
 		{
 			final int ligSize = ligandList.size();
@@ -100,8 +100,8 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 			{
 				for(int i = 0; i < ligSize; i++)
 				{
-					Residue r = (Residue)ligandList.get(i);
-					if(r.toString().toLowerCase().indexOf(initialLigand.toLowerCase()) >= 0)
+					Chain ligand = ligandList.get(i);
+					if(ligand.toString().toLowerCase().indexOf(initialLigand.toLowerCase()) >= 0)
 					{
 						sidebar.getLigandJList().setSelectedIndex(i);
 						activeFrame.getLigandSideBar().applyButton.doClick();
@@ -629,14 +629,17 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 			}
 		}
 
-		final Vector atoms = new Vector();
+		final Vector<Atom> atoms = new Vector<Atom>();
 		final int ligCount = structureMap.getLigandCount();
-		for (int i = 0; i < ligCount; i++) {
+		
+		for (int i = 0; i < ligCount; i++)
+		{
 			final Residue r = structureMap.getLigandResidue(i);
 			atoms.addAll(r.getAtoms());
 			structureStyles.setSelected(r, true);
 		}
-		final Vector bonds = structureMap.getBonds(atoms);
+		
+		final Vector<Bond> bonds = structureMap.getBonds(atoms);
 
 		final int bondCount = bonds.size();
 		for (int i = 0; i < bondCount; i++) {
@@ -679,9 +682,9 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		// this.requestRepaint();
 	}
 
-	public void setLigand(final Residue res)
+	public void setLigand(final Chain chain)
 	{
-		this.currentLigand = res;
+		this.currentLigand = chain;
 	}
 	
 	public void clearStructure(boolean transitory)
@@ -766,17 +769,15 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 	// - double[0]: minimum x,y,z values
 	// - double[1]: maximum x,y,z values
 	// can be null if the ligand name is not found.
-	private double[][] getLigandBounds(final Structure s, final Residue curLigand) {
+	private double[][] getLigandBounds(final Structure s, final Chain curLigand) {
 		double maxX, maxY, maxZ;
 		double minX, minY, minZ;
 
 		maxX = maxY = maxZ = -(Double.MAX_VALUE - 2);
 		minX = minY = minZ = Double.MAX_VALUE;
 
-		final int atomCount = curLigand.getAtomCount();
-		for (int j = 0; j < atomCount; j++) {
-
-			final Atom atom_j = curLigand.getAtom(j);
+		for (Atom atom_j : curLigand.getAtoms())
+		{
 			maxX = Math.max(atom_j.coordinate[0], maxX);
 			maxY = Math.max(atom_j.coordinate[1], maxY);
 			maxZ = Math.max(atom_j.coordinate[2], maxZ);
@@ -1025,8 +1026,10 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		int count = 0;
 		int count_hydro = 0;
 		int count_other = 0;
-		final Vector ligandAtoms = this.currentLigand.getAtoms();;
-		final Vector proteinAtoms = new Vector();
+		final StructureMap structureMap = structure.getStructureMap();
+		Vector<Atom> ligandAtoms = currentLigand.getAtoms();
+		
+		final Vector<Atom> proteinAtoms = new Vector<Atom>();
 
 		String interactionType = null;
 		String distString = null;
@@ -1035,22 +1038,9 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 			return;
 		}
 
-		final StructureMap structureMap = structure.getStructureMap();
-		final int chainCt = structureMap.getChainCount();
-
-		for (int n = 0; n < chainCt; n++) {
-			final Chain chain = structureMap.getChain(n);
-			if (chain.getClassification() == Residue.Classification.AMINO_ACID) {
-
-				for (int k = 0; k < chain.getResidueCount(); k++) {
-					final Vector atoms = chain.getResidue(k).getAtoms();
-					for (int o = 0; o < atoms.size(); o++) {
-						proteinAtoms.add(atoms.get(o));
-					}
-				}
-
-			}
-		}
+		for (Chain chain : structureMap.getChains())
+			if (chain.getClassification() == Residue.Classification.AMINO_ACID)
+				proteinAtoms.addAll(chain.getAtoms());
 
 		final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry
 				.get(StructureComponentRegistry.TYPE_ATOM);
@@ -1100,9 +1090,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 							// node.addRenderable(renderable);
 							// }
 							if (interactionsOut == null) {
-								this.renderResidue(structureMap
-										.getResidue(atom_j), as, ag, bs, bg,
-										true);
+								this.renderResidue(structureMap.getResidue(atom_j), as, ag, bs, bg,true);
 							}
 
 							count++;
@@ -1252,8 +1240,8 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		final StructureMap sm = r.structure.getStructureMap();
 		final JoglSceneNode node = (JoglSceneNode)sm.getUData();
 
-		final Vector atoms = r.getAtoms();
-		final Vector bonds = sm.getBonds(atoms);
+		final Vector<Atom> atoms = r.getAtoms();
+		final Vector<Bond> bonds = sm.getBonds(atoms);
 		for (int i = 0; i < atoms.size(); i++) {
 			final Atom a = (Atom) atoms.get(i);
 			node.removeRenderable(a);
@@ -1565,7 +1553,9 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 				
 				if (!atom_m.compound.equals("HOH")
 						&& !atom_n.compound.equals("HOH")
-						&& (atomResidueM != atomResidueN) && (atomResidueM == this.currentLigand || atomResidueN == this.currentLigand)) {
+						&& (atomResidueM != atomResidueN) &&
+							(atomResidueM.getChainId().equals(currentLigand.getChainId()) ||
+							 atomResidueN.getChainId().equals(currentLigand.getChainId()))) {
 					distance = Algebra.distance(atom_m.coordinate,
 							atom_n.coordinate);
 					distString = LXGlGeometryViewer.getDistString(distance);

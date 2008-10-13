@@ -21,6 +21,7 @@ import org.rcsb.lx.glscene.jogl.ResidueFontInfo;
 import org.rcsb.lx.model.ComparablePdbResidueId;
 import org.rcsb.lx.model.InteractionMap;
 import org.rcsb.lx.model.LXModel;
+import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
@@ -109,7 +110,7 @@ public class ContactMap_ContactingResiduesPane extends JPanel
 		if(!this.isInitialized) {
 			final InteractionMap im = model.getInteractionMap();
 			final Iterator residues = im.getResidues().iterator();
-			final Residue currentLigand = LigandExplorer.sgetGlGeometryViewer().currentLigand;
+			final Chain currentLigand = LigandExplorer.sgetGlGeometryViewer().currentLigand;
 			
 			// if no ligand has been specified, bail.
 			if(currentLigand == null) {
@@ -124,7 +125,7 @@ public class ContactMap_ContactingResiduesPane extends JPanel
 				final Residue r = (Residue)residues.next();
 				
 				// don't report the current ligand's interactions with itself.
-				if(r == currentLigand) {
+				if(r.getChainId().equals(currentLigand.getChainId())) {
 					continue;
 				}
 				

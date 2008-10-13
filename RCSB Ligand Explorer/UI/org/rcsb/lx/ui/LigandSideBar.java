@@ -235,7 +235,7 @@ public class LigandSideBar extends JPanel
 			{
 				final Structure structure = model.getStructures().get(0);
 
-				final Residue value = (Residue) LigandSideBar.this.ligandJList.getSelectedValue();
+				final Chain value = (Chain)LigandSideBar.this.ligandJList.getSelectedValue();
 				if (value != null)
 					glViewer.setLigand(value);
 
@@ -299,8 +299,8 @@ public class LigandSideBar extends JPanel
 	
 	private InteractionListener interactionListener;
 
-	Vector ligandList = null;
-	public Vector getLigandList() { return ligandList; }
+	Vector<Chain> ligandList = null;
+	public Vector<Chain> getLigandList() { return ligandList; }
 
 	JList ligandJList = null;
 
@@ -698,59 +698,14 @@ public class LigandSideBar extends JPanel
 		}
 	}
 
-	private Vector getLigandList(final Structure structure) {
-		final int chainNum = structure.getStructureMap().getChainCount();
-		// HashMap countNames = null;
-		final Vector<Residue> ligandList = new Vector<Residue>();
-		Residue ligandResidue = null;
-		for (int i = 0; i < chainNum; i++) {
-			final String chainName = structure.getStructureMap().getChain(i)
-					.getChainId();
-			// System.out.println("cahin id are "+chainName);
-			// System.out.println("chain class is
-			// "+structure.getStructureMap().getChain(i).getClassification());
+	private Vector<Chain> getLigandList(final Structure structure)
+	{
+		final Vector<Chain> ligandList = new Vector<Chain>();
+		
+		for (Chain chain : structure.getStructureMap().getChains())
+			if (chain.getClassification() == Residue.Classification.LIGAND)
+				ligandList.add(chain);
 
-			if (chainName.charAt(0) == '_') {
-				final int ligandCount = structure.getStructureMap().getLigandCount();
-				for (int j = 0; j < ligandCount; j++) {
-					ligandResidue = structure.getStructureMap()
-							.getLigandResidue(j);
-					// System.out.println(
-					// "ligandRsidue is " + ligandResidue.getResidueId());
-					if (ligandResidue.getCompoundCode().equals("HOH")) {
-						continue;
-					}
-
-					if (!ligandList.contains(ligandResidue)) {
-						ligandList.add(ligandResidue);
-					}
-				}
-			}
-
-		}
-		if (ligandList.isEmpty()) {
-			for (int j = 0; j < chainNum; j++) {
-				final Chain chain = structure.getStructureMap().getChain(j);
-				String id = chain.getChainId();
-				if (chain.getClassification() == Residue.Classification.LIGAND) {
-					final int k = chain.getResidueCount();
-					for (int h = 0; h < k; h++) {
-						ligandResidue = chain.getResidue(h);
-
-						// System.out.println(ligandResidue.getResidueId());
-
-						if (ligandResidue.getCompoundCode().equals("HOH")) {
-							break;
-						}
-							
-						if (!ligandList.contains(ligandResidue)) {
-							ligandList.add(ligandResidue);
-						}
-					}
-				}
-
-			}
-		}
 		return ligandList;
 	}
 }

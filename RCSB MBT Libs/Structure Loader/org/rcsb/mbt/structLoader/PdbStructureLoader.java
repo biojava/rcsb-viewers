@@ -31,110 +31,6 @@
 //
 //  For further information, please see:  http://mbt.sdsc.edu
 //
-//  History:
-//  $Log: PdbStructureLoader.java,v $
-//  Revision 1.1  2007/02/08 02:38:52  jbeaver
-//  version 1.50
-//
-//  Revision 1.1  2006/09/20 16:50:43  jbeaver
-//  first commit - branched from ProteinWorkshop
-//
-//  Revision 1.2  2006/09/02 18:52:28  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/08/24 17:39:03  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.5  2006/07/18 21:06:38  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.4  2006/05/17 16:47:29  jbeaver
-//  fixed bug with biological units flag
-//
-//  Revision 1.3  2006/05/17 06:18:07  jbeaver
-//  added some biological unit processing
-//
-//  Revision 1.2  2006/05/16 17:57:02  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.20  2005/11/08 20:58:16  moreland
-//  Switched style code to new StructureStyles API.
-//
-//  Revision 1.19  2004/11/08 22:54:27  moreland
-//  If the element field is not an element, try the first letter of the name field.
-//
-//  Revision 1.18  2004/08/16 16:30:19  moreland
-//  Now uses SharedObjects class to reduce memory usage.
-//
-//  Revision 1.17  2004/06/29 18:11:05  moreland
-//  Added minimal support for MODEL records - now only loads the first model.
-//
-//  Revision 1.16  2004/05/20 21:58:25  moreland
-//  Improved atom.element determination from atom.name when element is missing.
-//  Added support for the CONECT record.
-//
-//  Revision 1.15  2004/05/12 23:49:30  moreland
-//  Added support to populate the StructureInfo meta-data object.
-//
-//  Revision 1.14  2004/05/10 17:57:24  moreland
-//  Added support for alternate location identifier (atom occupancy < 1.0).
-//
-//  Revision 1.13  2004/04/09 00:06:40  moreland
-//  Updated copyright to new UCSD wording.
-//
-//  Revision 1.12  2004/01/29 17:23:33  moreland
-//  Updated copyright and class block comments.
-//
-//  Revision 1.11  2003/09/19 16:11:51  moreland
-//  Changed "println" to "Status.output" calls.
-//
-//  Revision 1.10  2003/05/16 21:28:19  moreland
-//  Provide a default 1.0 for atom.occupancy and 0.0 for atom.bfactor if data field is empty.
-//
-//  Revision 1.9  2003/05/14 01:09:37  moreland
-//  Fixed shared-state problem to enable multiple structure load operations.
-//
-//  Revision 1.8  2003/04/30 17:55:21  moreland
-//  Added Atom serial number field support.
-//  Corrected progress calculation for expectedBytes for compressed data.
-//
-//  Revision 1.7  2003/04/29 16:08:20  moreland
-//  Changed progress message from "Processing" to "Loading".
-//  Changed default when atom.chain_id is empty or null from "A" to "-" (bourne).
-//
-//  Revision 1.6  2003/04/23 18:08:23  moreland
-//  Removed StructureComponentID/scid and replaced it with a "structure" field
-//  in the StructureComponent base class.
-//  Changed "getType" method to "getStructureComponentType" to return dynamic
-//  SC type (ie: class name).
-//  StructureComponent records are now retrieved from a fast cache.
-//
-//  Revision 1.5  2003/04/05 01:07:10  moreland
-//  Added URL loading support.
-//  Enabled GZIP reading (for both File and URL loading).
-//  Rewrote buffering to use BufferedInputStream and two small read buffers.
-//  Rewrote parser code to instantiate StructureComponent objects.
-//  Tossed "getColumns" method and instead use faster direct buffer access.
-//  Changed import lines to use * (it was too painful to keep adding individual classes).
-//  Moved almost all parameters from the class to the primary load method.
-//  Added Status.progress support.
-//  StructureComponent objects now stored and retrieved from a Hashtable of Vectors.
-//
-//  Revision 1.4  2003/04/02 18:27:34  moreland
-//  Fixed PDB field column error.
-//  Added code to support gzip compressed PDB files.
-//
-//  Revision 1.3  2003/02/25 01:13:04  moreland
-//  Removed unused getToken method.
-//
-//  Revision 1.2  2003/02/03 22:51:08  moreland
-//  Added Strand/sheet support.
-//
-//  Revision 1.1.1.1  2002/07/16 18:00:19  moreland
-//  Imported sources
-//
-//  Revision 1.0  2002/06/10 23:38:39  moreland
-//
 
 
 package org.rcsb.mbt.structLoader;
@@ -159,6 +55,13 @@ import org.rcsb.mbt.model.util.*;
  *  This loader folows the PDB file format as documented by:
  *  http://www.rcsb.org/pdb/docs/format/pdbguide2.2/guide2.2_frame.html
  *  <P>
+ *  <p style="red">
+ *  Note: Currently only responds to ATOM, HETATM records and the first MODEL encountered.
+ *  In particular, CONECT and all the secondary structure stuff are completely ignored.<br/>
+ *  The rest of the system is relying on either the dictionaries or
+ *  internal calculations/determinations for bond information.
+ *  10-Oct-08 - rickb
+ *  </p>
  *  @author	John L. Moreland
  *  @see	org.rcsb.mbt.structLoader.IStructureLoader
  *  @see	org.rcsb.mbt.structLoader.StructureFactory
@@ -171,6 +74,7 @@ public class PdbStructureLoader
 	private PdbToNdbConverter converter = null;
 	private Structure structure;
 	private boolean treatModelsAsSubunits = false;
+	private boolean breakoutByResId = false;
 	
 	/**
 	 * Set this if the models are part of a greater whole.
@@ -179,6 +83,18 @@ public class PdbStructureLoader
 	 * @param flag
 	 */
 	public void setTreatModelsAsSubunits(boolean flag) { treatModelsAsSubunits = flag; }
+	
+	/**
+	 * Set this if you want to break out residues not belonging to a chain into
+	 * their own pseudo-chains.  Psuedo-chains are identified by '_' prefix
+	 * ('_A', '_B', etc.)
+	 * 
+	 * Waters are broken out into their own chain, as well.
+	 * 
+	 * Default is no.
+	 * @param flag
+	 */
+	public void setBreakoutEmptyChainsByResId(boolean flag) { breakoutByResId = flag; }
 	
 	// A hashtable of vectors where
 	// each hash KEY is the StructureComponent type String.
@@ -297,7 +213,6 @@ public class PdbStructureLoader
 			return null;
 		}
 		
-		BufferedReader bufferedReader;
 		this.urlString = file.toURL().toExternalForm();
 		InputStreamReader ir = null;
 		if ( this.urlString.endsWith( ".gz" ) )
@@ -398,15 +313,16 @@ public class PdbStructureLoader
 			return null;
 		}
 		
-		final Vector<String> pdbChainIds = new Vector<String>();
-		final Vector<String> pdbResidueIds = new Vector<String>();
-		final Vector<String> ndbChainIds = new Vector<String>();
-		final Vector<Object> ndbResidueIds = new Vector<Object>();
+		Vector<String> pdbChainIds = new Vector<String>();
+		Vector<String> pdbResidueIds = new Vector<String>();
+		Vector<String> ndbChainIds = new Vector<String>();
+		Vector<Object> ndbResidueIds = new Vector<Object>();
 		String previousResidueIdRaw = "";	// the untouched residue id.
 		int previousResidueIdInt = Integer.MIN_VALUE;	// the residue id which was assigned to the Atom.residue_id field
 		int previousResidueIdIntSimple = Integer.MIN_VALUE;	// the simple int conversion of the file's residue id, minus any letters.  
 
 		SharedObjects sharedStrings = new SharedObjects( );
+		char currentPseudoChainId = 'A' - 1;
 
 		this.passComponents = new Hashtable<String, Vector<StructureComponent>>( );
 		final long expectedBytes = this.expectedInputBytes;
@@ -496,8 +412,7 @@ public class PdbStructureLoader
 				atom.compound = sharedStrings.share( atom.compound );
 
 				atom.chain_id = line.substring(21, 22 ).trim();
-				if ( atom.chain_id == null || atom.chain_id.equals("") )
-					atom.chain_id = "_";
+									// see below to see how this gets modified
 
 				if(treatModelsAsSubunits)
 				{
@@ -507,7 +422,7 @@ public class PdbStructureLoader
 				atom.chain_id = sharedStrings.share( atom.chain_id );
 				//							System.out.println(modelCount);
 
-				final String newResidueIdRaw = line.substring(22, 28 ).trim();
+				String newResidueIdRaw = line.substring(22, 28 ).trim();
 					//**JB expanded to read 6 chars to account for non-integer residue ids. (Was 4 chars).
 				String temp = newResidueIdRaw;
 				while(Character.isLetter(temp.charAt(temp.length() - 1)))
@@ -519,11 +434,11 @@ public class PdbStructureLoader
 				final int newResidueIdIntSimple = Integer.parseInt(temp);
 				int newResidueIdInt = -1;
 				int increment = Math.abs(newResidueIdIntSimple - previousResidueIdIntSimple);
-				if(increment == 0 && !previousResidueIdRaw.equals(newResidueIdRaw))
+				if (increment == 0 && !previousResidueIdRaw.equals(newResidueIdRaw))
 					increment = 1;
 						// if this isn't a simple number, need to check the string as well.
 
-				if(previousResidueIdInt == Integer.MIN_VALUE)
+				if (previousResidueIdInt == Integer.MIN_VALUE)
 				{
 					newResidueIdInt = newResidueIdIntSimple;
 					increment = 1;	// flag to make sure this chain/residue id pair is recorded.
@@ -532,9 +447,29 @@ public class PdbStructureLoader
 				else
 					newResidueIdInt = previousResidueIdInt + increment;
 
-				if(increment > 0)
-				{
-					pdbChainIds.add(atom.chain_id);
+				if (atom.chain_id == null || atom.chain_id.equals(""))
+				{						
+					if (breakoutByResId)
+					{
+						if (atom.compound.equals("HOH"))
+							atom.chain_id = "HOH";
+						
+						else
+						{
+							if (increment > 0) currentPseudoChainId++;
+							atom.chain_id = "_" + String.valueOf(currentPseudoChainId);
+						}
+					}
+					
+					else atom.chain_id = "_";
+				}
+				
+				if (increment > 0)
+				{			
+					if (atom.chain_id.equals("HOH"))
+						pdbChainIds.add("");
+					else
+						pdbChainIds.add(atom.chain_id);
 					ndbChainIds.add(atom.chain_id);
 					pdbResidueIds.add(newResidueIdRaw);
 					ndbResidueIds.add(new Integer(newResidueIdInt));
@@ -710,8 +645,12 @@ public class PdbStructureLoader
     public Structure getStructure() { return structure; }
 
 	/**
+	 * Not implemented.  May be an issue due to nprids getting reclassified in the StructureMap.
 	 */
-	public String[] getNonProteinChainIds() { return null; }
+	public String[] getNonProteinChainIds()
+	{
+		return null;
+	}
 	
 
 

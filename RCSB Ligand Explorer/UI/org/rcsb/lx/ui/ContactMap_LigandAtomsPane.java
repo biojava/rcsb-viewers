@@ -16,11 +16,11 @@ import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.glscene.jogl.ResidueFontInfo;
 import org.rcsb.lx.model.LXModel;
 import org.rcsb.mbt.model.Atom;
-import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
+import org.rcsb.mbt.model.Chain;
 
 
 public class ContactMap_LigandAtomsPane extends JPanel {
@@ -86,7 +86,7 @@ public class ContactMap_LigandAtomsPane extends JPanel {
 		// initialize, if necessary...
 		if(!this.isInitialized) {
 			final PdbToNdbConverter converter = sm.getPdbToNdbConverter();
-			final Residue currentLigand = LigandExplorer.sgetGlGeometryViewer().currentLigand;
+			final Chain currentLigand = LigandExplorer.sgetGlGeometryViewer().currentLigand;
 			
 			if(ContactMap_LigandAtomsPane.letterMetrics == null) {
 				ContactMap_LigandAtomsPane.letterMetrics = ResidueFontInfo.contactsResidueFont.getLineMetrics("M",g2.getFontRenderContext());

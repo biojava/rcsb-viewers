@@ -302,9 +302,14 @@ public class Residue
 	}
 
 	/**
-	 * Set the 3-letter compound code for this residue.
+	 * Set the classification, one of:
+	 * <ul>
+	 * <li>AMINO_ACID</li>
+	 * <li>NUCLEIC_ACID</li>
+	 * <li>LIGAND</li>
+	 * <li>WATER</li>
 	 */
-	public void setCompoundCode( final String in_compoundCode, final String in_chainId )
+	public void setClassification( final String in_compoundCode, final String in_chainId )
 	{
 		compoundCode = in_compoundCode; 
 	
@@ -381,7 +386,7 @@ public class Residue
 		if ( atoms == null )
 		{
 			atoms = new Vector<Atom>( );
-			setCompoundCode( atom.compound, atom.chain_id );
+			setClassification( atom.compound, atom.chain_id );
 		}
 		else
 		{
@@ -467,7 +472,7 @@ public class Residue
 			atoms.removeAllElements( );
 		}
 		atoms = null;
-		setCompoundCode( "UNK", StructureMap.defaultChainId);
+		setClassification( "UNK", StructureMap.defaultChainId);
 		alphaAtomIndex = -1;
 		polymerHeadAtom = null;
 		polymerTailAtom = null;

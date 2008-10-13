@@ -247,14 +247,14 @@ public class LigandExplorer extends VFAppBase
 		
 		final String structureUrlParam = this.properties.getProperty("structure_url");
 		
+		activeFrame.initialize(true);
+		
 		if (structureUrlParam != null)
 		{
 			ProgressPanelController.StartProgress();
 			model.setStructures(activeFrame.getDocController().readStructuresFromUrl(structureUrlParam));
 		}
 
-		activeFrame.initialize(true);
-		
 		ProgressPanelController.EndProgress();
 	}
 	

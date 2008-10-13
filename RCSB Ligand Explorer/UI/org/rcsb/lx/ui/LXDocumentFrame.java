@@ -48,6 +48,7 @@ import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.glscene.jogl.Constants;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
+import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
@@ -523,18 +524,19 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 						// menu.  We have to retrigger a few things to get the
 						// initial ligand set and redrawn.
 						//
+				
 				sidebar = new LigandSideBar(this);
 				displaySideBar(sidebar);
 				if (getModel().getInitialLigand() == null)
 						// if the initial ligand hasn't been set...
 				{
-					Vector ligandList = sidebar.getLigandList();
+					Vector<Chain> ligandList = sidebar.getLigandList();
 					if (ligandList != null && !ligandList.isEmpty())
 					{
-						Residue ligandResidue = (Residue)ligandList.get(0);
+						Chain ligandChain = ligandList.get(0);
 							// pull the ligand list and get the first entry.
 						
-						getModel().setInitialLigand(ligandResidue.getCompoundCode());
+						getModel().setInitialLigand(ligandChain.getChainId());
 						getGlGeometryViewer().requestRedrawInitialLigand();
 							// set the initial ligand, and tell the geometry
 							// viewer this is a new situation.

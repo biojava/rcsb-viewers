@@ -107,6 +107,7 @@ public class DocController
 						|| dataset.endsWith(".ent"))
 				{
 					loader = new PdbStructureLoader();
+					((PdbStructureLoader)loader).setBreakoutEmptyChainsByResId(true);
 					((PdbStructureLoader)loader).setTreatModelsAsSubunits(AppBase.sgetSceneController().shouldTreatModelsAsSubunits());
 					
 					Status.progress(0, "Reading PDB file: " + dataset);
