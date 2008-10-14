@@ -13,6 +13,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 import org.rcsb.mbt.controllers.app.AppBase;
+import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.MiscellaneousMoleculeChain;
 import org.rcsb.mbt.model.PdbChain;
@@ -67,64 +68,68 @@ public class FullSequencesViewer extends JScrollPane {
         
         final PdbToNdbConverter converter = sm.getPdbToNdbConverter();
         
-        final Vector chains = sm.getPdbTopLevelElements();
-        if(chains != null) {            
+        final Vector<StructureComponent> chains = sm.getPdbTopLevelElements();
+        if(chains != null)
+        {            
             this.sequencePanels = new FullSequencePanel[chains.size()];
             
-            for(int i = 0; i < chains.size(); i++) {
+            int i = 0;
+            for (StructureComponent c : chains)
+            {
             	String title = null;
             	
-            	final StructureComponent c = (StructureComponent)chains.get(i);
-                if(c instanceof PdbChain) {
+                if (c instanceof PdbChain)
                 	title = "Chain " + ((PdbChain)c).pdbChainId + ":";
-                } else if(c instanceof WaterChain) {
-                	continue;	// don't bother reporting water residues
-                } else if(c instanceof MiscellaneousMoleculeChain) {
-                	// MiscellaneousMoleculeChains are those without pdb chain ids.
-                	title = "Various Molecules:";
-                }
                 
-                this.sequencePanels[i] = new FullSequencePanel(title, c, scrollbarWidth);
+                else if (c instanceof WaterChain)
+                	continue;
+                			// don't bother reporting water residues
+                
+                else if(c instanceof MiscellaneousMoleculeChain)
+                	title = "Various Molecules:";
+            				// MiscellaneousMoleculeChains are those without pdb chain ids.
+               
+                this.sequencePanels[i++] = new FullSequencePanel(title, c, scrollbarWidth);
             }
             
-            Arrays.sort(this.sequencePanels, new Comparator() {
+            Arrays.sort(this.sequencePanels, new Comparator<FullSequencePanel>() {
 
-				public int compare(final Object o1, final Object o2) {
-					final FullSequencePanel s1 = (FullSequencePanel)o1;
-					final FullSequencePanel s2 = (FullSequencePanel)o2;
-					
+				public int compare(final FullSequencePanel s1, final FullSequencePanel s2)
+				{
 					String pdbChainId1 = null;
-					if(s1 == null) {
+					if (s1 == null)
 						return 1;
-					} else if(s1.chain instanceof PdbChain) {
+						
+					else if (s1.chain instanceof PdbChain)
 						pdbChainId1 = ((PdbChain)s1.chain).pdbChainId;
-					} else if(s1.chain instanceof MiscellaneousMoleculeChain) {
+					
+					else if (s1.chain instanceof MiscellaneousMoleculeChain)
 						return -1;
-					}
-					if(pdbChainId1 == null) {
+
+					if (pdbChainId1 == null)
 						return 1;
-					}
 					
 					String pdbChainId2 = null;
-					if(s2 == null) {
+					if (s2 == null)
 						return -1;
-					} if(s2.chain instanceof PdbChain) {
+					
+					if (s2.chain instanceof PdbChain)
 						pdbChainId2 = ((PdbChain)s2.chain).pdbChainId;
-					} else if(s2.chain instanceof MiscellaneousMoleculeChain) {
+					
+					else if (s2.chain instanceof MiscellaneousMoleculeChain)
 						return 1;
-					}
-					if(pdbChainId2 == null) {
+
+					if (pdbChainId2 == null)
 						return -1;
-					}
 					
 					return pdbChainId1.compareTo(pdbChainId2);
 				}
             	
             });
             
-            for(int i = 0; i < this.sequencePanels.length; i++) {
-            	if(this.sequencePanels[i] != null) {
-            		this.contentPane.add(this.sequencePanels[i]);
+            for(int iPanel = 0; iPanel < this.sequencePanels.length; iPanel++) {
+            	if(this.sequencePanels[iPanel] != null) {
+            		this.contentPane.add(this.sequencePanels[iPanel]);
             	}
             }
         }
@@ -165,19 +170,4 @@ public class FullSequencesViewer extends JScrollPane {
 			this.contentPane.setPreferredSize(new Dimension(newSize.width - scrollWidth - insets.left - insets.right,curY + insets.top + insets.bottom));
         }
     }
-
-	public void clearStructure(final boolean transatory) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void newStructureAdded(final Structure struc, final boolean transatory) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void reset() {
-		// TODO Auto-generated method stub
-		
-	}
 }

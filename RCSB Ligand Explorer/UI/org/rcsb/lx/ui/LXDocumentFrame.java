@@ -8,29 +8,22 @@ import java.awt.Event;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Vector;
 
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
-import javax.swing.JWindow;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
@@ -44,13 +37,13 @@ import org.rcsb.lx.ui.dialogs.AngleDialog;
 import org.rcsb.lx.ui.dialogs.DihedralDialog;
 import org.rcsb.lx.ui.dialogs.DistanceDialog;
 import org.rcsb.lx.ui.dialogs.IPickInfoReceiver;
+import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.glscene.jogl.Constants;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.StructureModel;
-import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.util.Status;
 import org.rcsb.mbt.ui.views.StructureComponentInspector;
@@ -64,9 +57,13 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 {
 	private static final long serialVersionUID = 8096107058379203682L;
 	
+	@Override
 	public LXModel getModel() { return (LXModel)super.getModel(); }
+	@Override
 	public LXGlGeometryViewer getGlGeometryViewer() { return (LXGlGeometryViewer)super.getGlGeometryViewer(); }
+	@Override
 	public LXUpdateController getUpdateController() { return (LXUpdateController)super.getUpdateController(); }
+	@Override
 	public LXSceneController getSceneController() { return (LXSceneController)super.getSceneController(); }
 	
 	class LigandExplorerUIBuilder extends VFDocumentFrameBase.UIBuilder
@@ -114,6 +111,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 			
 			MeasurementDialogExclusiveCheck(JDialog dlg) { _dlg = dlg; }
 			
+			@Override
 			public void run()
 			{
 				if (displayDialog != null)
@@ -139,12 +137,13 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 			}
 		};
 		
+		@Override
 		public void run()
 		{
 			super.run();
 			// define the base level UI items
 
-			if (!LigandExplorer.backgroundScreenshotOnly)
+			if (!AppBase.backgroundScreenshotOnly)
 			{	
 
 				final JMenuItem fileSaveContactsItem = new JMenuItem("Save Interactions...");
@@ -153,7 +152,8 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
-						LigandExplorer.getApp().saveInteractionsFlag = true;
+						LigandExplorer.getApp();
+						LigandExplorer.saveInteractionsFlag = true;
 						sidebar.applyButton.doClick();
 					}
 				};
@@ -217,6 +217,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 						{
 							Thread runner = new Thread()
 							{
+								@Override
 								public void run()
 								{
 									String address = helpURL;
@@ -280,7 +281,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 										.getSelectedItem();
 								String url = Constants.pdbFileBase + pdbId
 										+ Constants.pdbFileExtension;
-								LigandExplorer.sgetDocController().loadStructure(url, pdbId);
+								VFAppBase.sgetDocController().loadStructure(url, pdbId);
 
 /* **
 								Status.progress(-1, "Creating side bar...");
@@ -358,7 +359,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 			// Reset the view to look at the center of the data.
 			getSceneController().resetView(false);
 
-			if (!LigandExplorer.backgroundScreenshotOnly)
+			if (!AppBase.backgroundScreenshotOnly)
 			{
 				if (getModel().hasStructures())
 					setTitle(getModel().getStructures().get(0).getStructureMap().getPdbId());
@@ -417,6 +418,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 
 	private IPickInfoReceiver displayDialog = null;
 	
+	@Override
 	public void initialize(boolean showFrame)
 	{
 		super.initialize(showFrame);
@@ -516,7 +518,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 		switch (evt.action)
 		{	
 			case CLEAR_ALL:
-				getModel().setInitialLigand(null);
+				getModel().clear();
 				break;
 				
 			case STRUCTURE_ADDED:

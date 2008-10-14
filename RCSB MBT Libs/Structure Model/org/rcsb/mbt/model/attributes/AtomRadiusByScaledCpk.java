@@ -83,6 +83,7 @@ package org.rcsb.mbt.model.attributes;
 
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.Atom;
+import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.attributes.ElementStyles;
 import org.rcsb.mbt.model.attributes.IAtomRadius;
 import org.rcsb.mbt.model.util.AminoAcidInfo;
@@ -151,7 +152,8 @@ public class AtomRadiusByScaledCpk
 		 */
 		if (AppBase.getApp().isLigandExplorer())
 		{
-			final boolean isAminoAcid = AminoAcidInfo.getLetterFromCode(atom.compound) != null;
+			final boolean isAminoAcid =
+				atom.getStructure().getStructureMap().getResidue(atom).getClassification() == Residue.Classification.AMINO_ACID;
 			return isAminoAcid ? radius / 2 : radius;
 		}
 		

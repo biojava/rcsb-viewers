@@ -29,15 +29,19 @@ public class SequenceTabbedPane extends JTabbedPane implements IUpdateListener
         update.registerListener(this);
     }
 
-    public void setComponents() {
-    	this.fullSequences = new FullSequencesViewer();
-        this.fullSequences.setComponents();
-        
-        this.contacts = new ContactMap();
-        this.contacts.setComponents();
-        
-        super.addTab("Full Sequences",this.fullSequences);
-        super.addTab("Contact Map", this.contacts);
+    public void setComponents()
+    {
+    	if (fullSequences == null)
+    	{
+    		fullSequences = new FullSequencesViewer();
+    		contacts = new ContactMap();
+            
+            super.addTab("Full Sequences", fullSequences);
+            super.addTab("Contact Map", contacts);
+    	}
+
+        contacts.setComponents(); 
+        fullSequences.setComponents();
     }
 
     /**

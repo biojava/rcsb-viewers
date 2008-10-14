@@ -97,7 +97,10 @@ package org.rcsb.lx.controllers.app;
 // CORE JAVA
 
 import java.awt.image.BufferedImage;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+
+import javax.swing.SwingUtilities;
 
 import org.rcsb.lx.controllers.scene.LXSceneController;
 import org.rcsb.lx.controllers.update.LXUpdateController;

@@ -1,13 +1,7 @@
 package org.rcsb.mbt.controllers.update;
 
-import java.util.Iterator;
 import java.util.Vector;
 
-import org.rcsb.mbt.controllers.update.UpdateEvent.Action;
-import org.rcsb.mbt.glscene.jogl.AtomGeometry;
-import org.rcsb.mbt.glscene.jogl.BondGeometry;
-import org.rcsb.mbt.glscene.jogl.DisplayLists;
-import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Structure;
 
 
@@ -27,18 +21,61 @@ public class UpdateController
 	 * @author rickb
 	 *
 	 */
-	public class UpdateListenerVec extends Vector<IUpdateListener>{};
+	@SuppressWarnings("serial")
+	private class UpdatePendingInfo
+	{
+		public IUpdateListener view;
+		public UpdateEvent.Action action;
 
+		public UpdatePendingInfo(UpdateEvent.Action _action, IUpdateListener _view) {action = _action; view = _view; }
+	}
+
+	@SuppressWarnings("serial")
+	public class UpdateListenerVec extends Vector<IUpdateListener>{};
+	
+	@SuppressWarnings("serial")
+	private class UpdatePendingEventsVec extends Vector<UpdatePendingInfo>
+	{
+		@Override
+		public synchronized boolean add(UpdatePendingInfo info)
+		{
+			for (UpdatePendingInfo check : this)
+				if (compare(check, info)) return false;
+			
+			return super.add(info);
+		}
+		
+		private boolean compare(Object _l, Object _r)
+		{
+			UpdatePendingInfo lInfo = (UpdatePendingInfo)_l;
+			UpdatePendingInfo rInfo = (UpdatePendingInfo)_r;
+			
+			return (lInfo.action == rInfo.action && lInfo.view == rInfo.view);
+		}
+		
+	};
+	
 	private UpdateListenerVec views = new UpdateListenerVec();
-	private UpdateListenerVec pending = null;
 	private UpdateListenerVec blockedListeners = new UpdateListenerVec();
+	private UpdatePendingEventsVec pending = null;
+	
+	private UpdatePendingEventsVec getPending()
+	{
+		if (pending == null)
+			pending = new UpdatePendingEventsVec();
+		return pending;
+	}
 	
 	private int inUpdate = 0;
 	
+	/**
+	 * Clean out all the structures
+	 */
 	public void clear()
 	{
 		fireUpdateViewEvent(UpdateEvent.Action.CLEAR_ALL);
 	}
+	
 	/**
 	 * Calls 'reset' on all of the panels.
 	 */
@@ -56,15 +93,10 @@ public class UpdateController
 		if (!views.contains(listener))
 		{
 			if (inUpdate > 0)
+				getPending().add(new UpdatePendingInfo(UpdateEvent.Action.VIEW_ADDED, listener));
 						// oops - modifying during an update...
 						// can't put on views queue.
 						// put in temporary 'pending' queue
-			{
-				if (pending == null)
-					pending = new UpdateListenerVec();
-				if (!pending.contains(listener))
-					pending.add(listener);
-			}
 		
 			else
 			{
@@ -109,9 +141,14 @@ public class UpdateController
 			throw new IllegalArgumentException( "view not found" );
 		}
 		
-		fireUpdateViewEvent(UpdateEvent.Action.VIEW_REMOVED);
+		if (inUpdate > 0)
+			getPending().add(new UpdatePendingInfo(UpdateEvent.Action.VIEW_REMOVED, view));
 
-		this.views.remove( view );
+		else
+		{
+			this.views.remove( view );
+			fireUpdateViewEvent(UpdateEvent.Action.VIEW_REMOVED);
+		}
 	}
 	
 	/**
@@ -141,64 +178,53 @@ public class UpdateController
 	
 	protected void fireUpdateViewEvent( final UpdateEvent evt )
 	{
-		boolean first = true;
-		
 		inUpdate++;
 		
-		do
+		for (IUpdateListener view : views)
 		{
-			for (IUpdateListener view : views)
-			{
-				if (blockedListeners.contains(view)) continue;
-					// ignore blocked listeners
-				
-				if (first)
-					view.handleUpdateEvent(evt);
-					// what!!!  This isn't firing an event!!
-					// this is just an interface call!!!
-					//
-					// it would be better if it *were* an event, though...
-					// think about that...
-				
-				else
-					// new components may have been registered as a result of
-					// an update.  They will have been put on the 'pending' queue
-					// (otherwise, if they're put on the 'views' queue, we get a
-					// 'concurrent modification' exception.)
-					//
-					// after the first pass, the main queue is updated from the
-					// pending queue and the next pass initiated.  So, we only
-					// want to send the update event to new registrants.  We
-					// use the 'pending.contains' function to check that.
-					//
-					// if more views register in subsequent passes, that's ok -
-					// they'll get pushed on to the pending queue (which we aren't
-					// traversing) and get handled on the next pass.
-					//
-					if (pending.contains(view))
-					{
-						view.handleUpdateEvent(evt);
-						pending.removeElement(view);
-								// now we can remove the view
-					}
-			}
+			if (blockedListeners.contains(view)) continue;
+				// ignore blocked listeners
 			
-			// update the pending queue
-			//
-			if (pending != null)
-				if (pending.isEmpty())
-					pending = null;
-				else
-					for (IUpdateListener view : pending)
-						views.add(view);
-							// transfer references to the views list
-							// for the next go round.  Don't remove, yet...
-			
-			first = false;
-							// subsequent passes...
-			
-		} while (pending != null);
+			view.handleUpdateEvent(evt);
+				// what!!!  This isn't firing an event!!
+				// this is just an interface call!!!
+				//
+				// it would be better if it *were* an event, though...
+				// think about that...
+		}
 		
-		inUpdate--;
+		/*
+		 * Ok, now handle the pending events que (note we wait until we back out of all recursions
+		 * before doing this.
+		 * 
+		 * Currently, the only events pushed onto the pending queue are those that would modify the
+		 * views list.  That is VIEW_ADDED, and VIEW_REMOVED.
+		 */
+		if (inUpdate == 0)
+		{
+			while (pending != null)
+			{
+				UpdatePendingEventsVec processPending = pending;
+				pending = null;
+								// shift over to temp variable and clear the pending.
+								// it can be reinitialized and receive more events while
+								// we're processing the current set.
+
+				for (UpdatePendingInfo pendingInfo : processPending)
+				{
+					if (pendingInfo.action == UpdateEvent.Action.VIEW_ADDED)
+						views.add(pendingInfo.view);
+					
+					else if (pendingInfo.action == UpdateEvent.Action.VIEW_REMOVED)
+						views.remove(pendingInfo.view);
+					
+					this.fireUpdateViewEvent(pendingInfo.action, pendingInfo.view);
+				}
+			}
+		}
+		
+		if (--inUpdate < 0)
+			inUpdate = 0;
+							// no lower than zero
 	}
 }

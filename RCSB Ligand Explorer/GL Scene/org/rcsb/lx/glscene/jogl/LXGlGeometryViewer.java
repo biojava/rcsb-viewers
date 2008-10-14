@@ -941,6 +941,9 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 			update.removeStructure(true);
 			update.fireStructureAdded(structure, false, true);
 			update.unblockListener(activeFrame);
+			
+			if (this.numberTimesDisplayed == 1)
+				resetView(true, true);
 
 			final ChainStyle cs = (ChainStyle) structureStyles.getStyle(structureMap
 					.getChain(0)); // **JB assume that all chain styles are the
