@@ -408,6 +408,13 @@ public class LXSceneNode extends JoglSceneNode
 	 * something the base is not, or there's something in the 'synchronized' execution that isn't
 	 * happening if I try to use the base version.
 	 * 
+	 * BIG NOTE: The atom radius scaling for protein atoms that appear during calculations is this
+	 * odd bit of code down in {@linkplain org.rcsb.mbt.glscene.jogl.AtomGeometry} that is sensitized
+	 * specifically for LX.  It's pretty Mickey Mouse.  The real way to do this, I think, is to
+	 * create and register an AtomStyle for protein atoms, and switch it in when drawing those.
+	 * 
+	 * I have to figure out how to do that, though, and it all takes time....
+	 * 
 	 * 31-Jul-08 - rickb
 	 */
 	@Override
