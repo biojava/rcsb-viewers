@@ -14,6 +14,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.Properties;
 import java.util.Vector;
 
 import javax.swing.JComboBox;
@@ -43,8 +44,11 @@ import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.glscene.jogl.Constants;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.Chain;
+import org.rcsb.mbt.model.Residue;
+import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Structure;
+import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.mbt.model.util.Status;
 import org.rcsb.mbt.ui.views.StructureComponentInspector;
 import org.rcsb.vf.controllers.app.BBBrowserLauncher;
@@ -521,7 +525,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 				getModel().clear();
 				break;
 				
-			case STRUCTURE_ADDED:
+			case VIEW_UPDATE:
 						// This happens when loading a new file/url from the 
 						// menu.  We have to retrigger a few things to get the
 						// initial ligand set and redrawn.
@@ -529,22 +533,47 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 				
 				sidebar = new LigandSideBar(this);
 				displaySideBar(sidebar);
-				if (getModel().getInitialLigand() == null)
-						// if the initial ligand hasn't been set...
+
+				Vector<Chain> ligandList = sidebar.getLigandList();
+				if (ligandList != null && !ligandList.isEmpty())
 				{
-					Vector<Chain> ligandList = sidebar.getLigandList();
-					if (ligandList != null && !ligandList.isEmpty())
+					int ligandId = 0;
+					String initialLigand = (String)AppBase.getApp().properties.get("ligand");
+					if (initialLigand != null)
 					{
-						Chain ligandChain = ligandList.get(0);
-							// pull the ligand list and get the first entry.
-						
-						getModel().setInitialLigand(ligandChain.getChainId());
-						getGlGeometryViewer().requestRedrawInitialLigand();
-							// set the initial ligand, and tell the geometry
-							// viewer this is a new situation.
+						for (Structure structure : getModel().getStructures())
+						{
+							StructureMap sm = structure.getStructureMap();
+									
+							PdbToNdbConverter conv = sm.getPdbToNdbConverter();
+										// this makes things ungodly complicated...
+									
+							for (int ix = 0; ix < ligandList.size(); ix++)
+							{
+								Chain chain = ligandList.get(ix);
+								for (Residue residue : chain.getResidues())
+								{
+									Object pdbIds[] = conv.getPdbIds(chain.getChainId(), residue.getResidueId());
+									for (int lx = 0; lx < pdbIds.length; lx++)
+										if (pdbIds[lx].equals(initialLigand))
+										{
+											ligandId = ix;
+											ix = ligandList.size();
+											break;
+										}
+								}
+							}
+						}
 					}
+						
+					Chain ligandChain = ligandList.get(ligandId);
+						// pull the ligand list and get the first entry.
+					
+					getModel().setInitialLigand(ligandChain.getChainId());
+					getGlGeometryViewer().requestRedrawInitialLigand();
+						// set the initial ligand, and tell the geometry
+						// viewer this is a new situation.
 				}
-				break;	
 		}
 	}
 }

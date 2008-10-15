@@ -1,7 +1,10 @@
 package org.rcsb.pw.controllers.app;
 
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+
+import javax.swing.SwingUtilities;
 
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.app.ProgressPanelController;
@@ -15,6 +18,7 @@ import org.rcsb.pw.controllers.scene.PWSceneController;
 import org.rcsb.pw.glscene.jogl.PWGlGeometryViewer;
 import org.rcsb.pw.ui.PWDocumentFrame;
 import org.rcsb.vf.controllers.app.VFAppBase;
+import org.rcsb.vf.ui.VFDocumentFrameBase;
 
 /**
 * ProteinWorkshopViewer.java
@@ -86,22 +90,11 @@ public class ProteinWorkshop extends VFAppBase
 	
 		final String structureUrlParam = this.properties.getProperty("structure_url");
 		
+		activeFrame.initialize(true);
+
 		final StructureModel model = sgetModel();
 
-		if (structureUrlParam != null)	
-		{
-			ProgressPanelController.StartProgress();
-			model.setStructures(sgetDocController().readStructuresFromUrl(structureUrlParam));
-		}
-		
-		if (!model.hasStructures())
-		{
-			Status.output(Status.LEVEL_WARNING,
-							"No structure loaded. Please load a structure from the File menu, above.");
-			// System.exit( 1 );
-		}
-		
-		activeFrame.initialize(true);
-		ProgressPanelController.EndProgress();
+		if (structureUrlParam != null)
+			((VFDocumentFrameBase)activeFrame).loadURL(structureUrlParam);
 	}
 }

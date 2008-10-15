@@ -306,13 +306,6 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 		{
 			e.printStackTrace();
 		}
-	
-		if (!AppBase.sgetModel().hasStructures()) {
-			Status.output(Status.LEVEL_WARNING,
-							"No structure loaded. Please load a structure from the File menu, above.");
-			// System.exit( 1 );
-		}
-
 	}
 
 	@Override

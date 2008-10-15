@@ -1,5 +1,5 @@
 #! /bin/tcsh
-set MOL="24TE.xml.gz"
+set MOL="2FTE.xml.gz"
 if ( "$1" != "" ) then
   set MOL="$1"
 endif

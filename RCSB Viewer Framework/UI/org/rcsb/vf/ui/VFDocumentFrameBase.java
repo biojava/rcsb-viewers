@@ -39,49 +39,49 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 	public VFGlGeometryViewer getGlGeometryViewer() { return (VFGlGeometryViewer)super.getGlGeometryViewer(); }
 	public VFDocController getDocController() { return (VFDocController)super.getDocController(); }
 
+	/**
+	 * Once the action decides to load a structure, we need to get out of the SWT so the
+	 * progress bar will work properly (more properly, anyway.)
+	 * 
+	 * Actions create and start this thread to load the requested structure.
+	 * 
+	 * @author rickb
+	 *
+	 */
+	protected class LoadThread extends Thread
+	{
+		private String _url, _pdbid;
+		
+		public LoadThread(File[] files)
+		{
+			_url = files[0].getAbsolutePath();
+			
+			for (int ix = 1; ix < files.length; ix++)
+				_url += ',' + files[ix].getAbsolutePath();
+
+			_pdbid = files[0].getName().substring(0, files[0].getName().indexOf('.'));
+		}
+		
+		public LoadThread(String url, String pdbid)
+		{ _url = url; _pdbid = pdbid; }
+		
+		public void run()
+		{
+			ProgressPanelController.StartProgress();
+			getDocController().loadStructure(_url, _pdbid);
+			if (getModel().hasStructures())
+				setTitle(getModel().getStructures().get(0).getStructureMap().getPdbId());
+			ProgressPanelController.EndProgress();
+			if (!getModel().hasStructures())
+				JOptionPane.showMessageDialog(null, "Structure not found: " + _pdbid + "\nPlease check file/url specification and try again.", "Error", JOptionPane.ERROR_MESSAGE); 
+		}
+	};
+	
 	protected class UIBuilder extends DocumentFrameBase.UIBuilder
 	{
 		protected JMenuBar menuBar;
 		protected JMenu fileMenu;		
 		protected StatusPanel statusPanel = null;
-
-		/**
-		 * Once the action decides to load a structure, we need to get out of the SWT so the
-		 * progress bar will work properly (more properly, anyway.)
-		 * 
-		 * Actions create and start this thread to load the requested structure.
-		 * 
-		 * @author rickb
-		 *
-		 */
-		protected class LoadThread extends Thread
-		{
-			private String _url, _pdbid;
-			
-			public LoadThread(File[] files)
-			{
-				_url = files[0].getAbsolutePath();
-				
-				for (int ix = 1; ix < files.length; ix++)
-					_url += ',' + files[ix].getAbsolutePath();
-
-				_pdbid = files[0].getName().substring(0, files[0].getName().indexOf('.'));
-			}
-			
-			public LoadThread(String url, String pdbid)
-			{ _url = url; _pdbid = pdbid; }
-			
-			public void run()
-			{
-				ProgressPanelController.StartProgress();
-				getDocController().loadStructure(_url, _pdbid);
-				if (getModel().hasStructures())
-					setTitle(getModel().getStructures().get(0).getStructureMap().getPdbId());
-				ProgressPanelController.EndProgress();
-				if (!getModel().hasStructures())
-					JOptionPane.showMessageDialog(null, "Structure not found: " + _pdbid + "\nPlease check file/url specification and try again.", "Error", JOptionPane.ERROR_MESSAGE); 
-			}
-		};
 		
 		public void run()
 		{
@@ -294,5 +294,13 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public void loadURL(String url)
+	{
+		File files[] = new File[1];
+		files[0] = new File(url);
+		LoadThread loader = new LoadThread(files);
+		loader.run();
 	}
 }

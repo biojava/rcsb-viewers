@@ -117,6 +117,7 @@ import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.util.PickUtils;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 import org.rcsb.vf.controllers.app.VFAppBase;
+import org.rcsb.vf.ui.VFDocumentFrameBase;
 
 
 
@@ -231,11 +232,6 @@ public class LigandExplorer extends VFAppBase
 	
 		super.initialize(true);
 		
-		final String initialLigand = this.properties.getProperty("ligand");
-		
-		LXModel model = sgetModel();
-		model.setInitialLigand(initialLigand);
-
 		final String showAsymmetricUnitOnly = this.properties.getProperty("show_asymmetric_unit_only");
 		SceneController sceneController = activeFrame.getSceneController();
 		if (showAsymmetricUnitOnly != null && showAsymmetricUnitOnly.equals("true"))
@@ -253,12 +249,7 @@ public class LigandExplorer extends VFAppBase
 		activeFrame.initialize(true);
 		
 		if (structureUrlParam != null)
-		{
-			ProgressPanelController.StartProgress();
-			model.setStructures(activeFrame.getDocController().readStructuresFromUrl(structureUrlParam));
-		}
-
-		ProgressPanelController.EndProgress();
+			((VFDocumentFrameBase)activeFrame).loadURL(structureUrlParam);
 	}
 	
 

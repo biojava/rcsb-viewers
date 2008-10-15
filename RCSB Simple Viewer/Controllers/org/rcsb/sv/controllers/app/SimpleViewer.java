@@ -11,6 +11,7 @@ import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 import org.rcsb.sv.ui.SVDocumentFrame;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.glscene.jogl.VFGlGeometryViewer;
+import org.rcsb.vf.ui.VFDocumentFrameBase;
 
 
 
@@ -84,23 +85,12 @@ public class SimpleViewer extends VFAppBase
 		super.initialize(isApplication);
 		
 		PickUtils.setPickLevel(PickUtils.PICK_RESIDUES);
+		
+		activeFrame.initialize(true);
 	
 		final String structureUrlParam = this.properties.getProperty("structure_url");
 	
 		if (structureUrlParam != null)
-		{
-			ProgressPanelController.StartProgress();
-			getActiveFrame().getModel().setStructures(getActiveFrame().getDocController().readStructuresFromUrl(structureUrlParam));
-		}
-		
-		if (!getActiveFrame().getModel().hasStructures())
-		{
-			Status.output(Status.LEVEL_WARNING,
-							"No structure loaded. Please load a structure from the File menu, above.");
-			// System.exit( 1 );
-		}
-		
-		activeFrame.initialize(true);
-		ProgressPanelController.EndProgress();
+			((VFDocumentFrameBase)activeFrame).loadURL(structureUrlParam);
 	}
 }

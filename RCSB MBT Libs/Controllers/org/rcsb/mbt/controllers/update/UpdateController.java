@@ -200,7 +200,7 @@ public class UpdateController
 		 * Currently, the only events pushed onto the pending queue are those that would modify the
 		 * views list.  That is VIEW_ADDED, and VIEW_REMOVED.
 		 */
-		if (inUpdate == 0)
+		if (inUpdate == 1)
 		{
 			while (pending != null)
 			{
