@@ -14,7 +14,6 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.util.Properties;
 import java.util.Vector;
 
 import javax.swing.JComboBox;
@@ -45,10 +44,8 @@ import org.rcsb.mbt.glscene.jogl.Constants;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
-import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Structure;
-import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.mbt.model.util.Status;
 import org.rcsb.mbt.ui.views.StructureComponentInspector;
 import org.rcsb.vf.controllers.app.BBBrowserLauncher;
@@ -541,26 +538,16 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 					String initialLigand = (String)AppBase.getApp().properties.get("ligand");
 					if (initialLigand != null)
 					{
-						for (Structure structure : getModel().getStructures())
+						for (int ix = 0; ix < ligandList.size(); ix++)
 						{
-							StructureMap sm = structure.getStructureMap();
-									
-							PdbToNdbConverter conv = sm.getPdbToNdbConverter();
-										// this makes things ungodly complicated...
-									
-							for (int ix = 0; ix < ligandList.size(); ix++)
+							Chain chain = ligandList.get(ix);
+							for (Residue residue : chain.getResidues())
 							{
-								Chain chain = ligandList.get(ix);
-								for (Residue residue : chain.getResidues())
+								if (residue.toString().startsWith(initialLigand))
 								{
-									Object pdbIds[] = conv.getPdbIds(chain.getChainId(), residue.getResidueId());
-									for (int lx = 0; lx < pdbIds.length; lx++)
-										if (pdbIds[lx].equals(initialLigand))
-										{
-											ligandId = ix;
-											ix = ligandList.size();
-											break;
-										}
+									ligandId = ix;
+									ix = ligandList.size();
+									break;
 								}
 							}
 						}
