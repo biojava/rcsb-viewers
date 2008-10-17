@@ -1,25 +1,54 @@
 #! /bin/tcsh -v
-rm *.*
-rm -rf jogl-*
+## clean everything out except the dists, the lib32 and lib64 dirs
+## and this script
+foreach NM ( *.* )
+  if (`echo $NM | sed -E 's/^dists.*/x/'` != 'x') then
+    rm -rf $NM
+  endif
+end
 
+## clean out the upper dir jogl and gluegen jars
+rm ../jogl.jar ../gluegen-rt.jar >& /dev/null
+
+## unzip the distfiles
 foreach NM ( dists/*.zip )
   unzip $NM
 end
 
+## flags for first encountered
 set FIRST=1
+
+## run through all the jogl dists
 foreach DIRNAME (`ls -1d jogl-*`)
+
+  ## if first encountered pass up the jogl and gluegen-rt jars
+  ## note: these jars are the same whether 32 bit or 64 bit
   if ( $FIRST ) then
-    cp $DIRNAME/lib/jogl.jar ../
-    cp $DIRNAME/lib/gluegen-rt.jar ../
-    set FIRST=0
+    cp $DIRNAME/lib/jogl.jar ..
+    cp $DIRNAME/lib/gluegen-rt.jar ..
+	  set FIRST = 0;
   endif
-  set JARNAME=`echo $DIRNAME | sed -E 's/-[0-9\.]+//'`.jar
+  
+  ## don't want the jars in the new archives - complicates signing
   rm $DIRNAME/lib/*.jar
+
+  ## set the new jarname to the expanded dirname without the version.
+  ## that way we don't have to update version numbers in the JWS
+  ## files on every update
+  set JARNAME=`echo $DIRNAME | sed -E 's/-[0-9\.]+//'`.jar
+
+  ## cd to the directory and re-jar the files
   pushd $DIRNAME/lib
   jar -cvf ../../$JARNAME *.*
-  if ( `echo $DIRNAME | sed 's/^.*amd64.*/yes/'` != "yes") then
-    echo moving lib bins up for $DIRNAME
-    mv *.* ../..
+
+  ## and copy the unpacked shared libs to the jni dir
+  ## we need this for the commandline tests
+  ## (ignore 64bit and sparc - if those need to be run, they need to
+  ##  be copied up manually - see instructions in the 'TestRuns'
+  ##  README file)
+	if (`echo $DIRNAME | sed -E 's/^.*(amd64|sparc).*$/x/'` != 'x') then
+    echo copying lib bins up for $DIRNAME
+    cp *.* ../../
   endif
   popd
 end

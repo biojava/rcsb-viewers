@@ -8,6 +8,6 @@ if ( "$1" != "" ) then
     echo ERROR: Ligand required if molecule specified.
     goto Done
   endif
-  set MOL="$1"
 endif
-java -D"java.library.path=../3rdParty/jnilibs" -jar ../RCSBViewers/RCSB-LigandExplorer.jar -standalone -structure_url molecules/$MOL -ligand $LIG
+source setargs.csh
+java $PATHARGS -jar ../RCSBViewers/RCSB-LigandExplorer.jar -standalone -structure_url molecules/$MOL -ligand $LIG

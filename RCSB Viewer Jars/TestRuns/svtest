@@ -1,6 +1,4 @@
 #! /bin/tcsh
 set MOL="2FTE.xml.gz"
-if ( "$1" != "" ) then
-  set MOL="$1"
-endif
-java -D"java.library.path=../3rdParty/jnilibs" -jar ../RCSBViewers/RCSB-SimpleViewer.jar -standalone -structure_url molecules/$MOL
+source setargs.csh
+java $PATHARGS -jar ../RCSBViewers/RCSB-SimpleViewer.jar -standalone -structure_url molecules/$MOL

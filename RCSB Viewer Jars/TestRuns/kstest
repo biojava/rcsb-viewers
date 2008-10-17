@@ -1,1 +1,3 @@
-java -D"java.library.path=../3rdParty/jnilibs" -jar ../RCSBKiosk/RCSB-Kiosk.jar 
+#! /bin/tcsh
+source setargs.csh
+java $PATHARGS -jar ../RCSBKiosk/RCSB-Kiosk.jar 

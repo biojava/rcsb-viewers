@@ -1,0 +1,18 @@
+TestRuns
+rickb - 17-Oct-08
+
+These are standalone scripts that reference a default pdb file and
+bring up the viewer.  You can specify a PDB file on the commandline,
+if you wish.  For Ligand Explorer (lxtest) you can also specify a
+ligand as the second argument.
+
+Environment:
+-----------
+These reference the jars and jnilibs in the ../3rdParty and
+../3rdParty/jnilib dirs, respectively.
+
+If you need to run on a 64bit or sparc architecture (or if things
+just don't run), go to the ../3rdParty/jnilib and view the README
+to get the correct shared binaries into the ../3rdParty/jnilib dir.
+
+Enjoy

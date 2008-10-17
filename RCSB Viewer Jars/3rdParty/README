@@ -1,0 +1,6 @@
+3rdParty
+rickb - 17-Oct-08
+
+Third party jars and jnilibs (currently jogl only) are here.
+
+Read the jnilibs README for more information on jni handling.
