@@ -52,16 +52,44 @@ import org.rcsb.mbt.model.util.*;
  *  Implements the StructureLoader interface to enable reading of PDB files
  *  either from local disk or from a URL.
  *  <P>
- *  This loader folows the PDB file format as documented by:
+ *  This loader follows (somewhat) the PDB file format as documented by:
  *  http://www.rcsb.org/pdb/docs/format/pdbguide2.2/guide2.2_frame.html
  *  <P>
+ *  <h3>Rules for non-protein/ligand classification: ('breakoutByResId' defined)</h3>
+ *  <p>
+ *  In the XML reader, there are secondary identifiers that can be used to break out
+ *  non-protein chains more clearly.  Those aren't available in the PDB file.</p>
+ *  <p>
+ *  However, by examining the HETATM records and looking at residue and compound id, it is
+ *  possible to break out chains like the XML reader.  The structure is essentially the same,
+ *  however the name specifics aren't, because we don't have those in the pdb file.</p>
+ *  <p>
+ *  In general, it is probably better and more accurate to bring up the .xml file, if
+ *  possible.  If not, the reconstructed pdb reader with the 'breakoutByResId' flag
+ *  (currently set explicitly in the doc controller) will do a reasonable job of
+ *  mimic-ing the .xml reader behavior.</p>
+ *  <ul>
+ *  <li>
+ *  HETATM records are considered to be ligands, no matter what their chain affiliation.</li>
+ *  <li>
+ *  Waters are broken out into their own chain.</li>
+ *  <li>
+ *  HETATM records that have no chain id are assigned a pseudo-id, beginning with an underscore
+ *  and having a sequential numeric component for the rest of the id.</li>
+ *  <li>
+ *  HETATM records that have a chain id corresponding to a previously defined chain id in the
+ *  ATOM record set (protein atoms) are broken out into their own chain with an id of
+ *  &lt;original id&gt;'</li>
+ *  </ul>
+ *  <p>
+ *  21-Oct-08 - rickb</p>
  *  <p style="red">
- *  Note: Currently only responds to ATOM, HETATM records and the first MODEL encountered.
+ *  Note: The loader currently only responds to ATOM, HETATM records and the first MODEL encountered.
  *  In particular, CONECT and all the secondary structure stuff are completely ignored.<br/>
  *  The rest of the system is relying on either the dictionaries or
  *  internal calculations/determinations for bond information.
- *  10-Oct-08 - rickb
- *  </p>
+ *  10-Oct-08 - rickb</p>
+ *  
  *  @author	John L. Moreland
  *  @see	org.rcsb.mbt.structLoader.IStructureLoader
  *  @see	org.rcsb.mbt.structLoader.StructureFactory
@@ -75,6 +103,7 @@ public class PdbStructureLoader
 	private Structure structure;
 	private boolean treatModelsAsSubunits = false;
 	private boolean breakoutByResId = false;
+	private Set<String> nonProteinChainIds = new TreeSet<String>();
 	
 	/**
 	 * Set this if the models are part of a greater whole.
@@ -322,7 +351,7 @@ public class PdbStructureLoader
 		int previousResidueIdIntSimple = Integer.MIN_VALUE;	// the simple int conversion of the file's residue id, minus any letters.  
 
 		SharedObjects sharedStrings = new SharedObjects( );
-		char currentPseudoChainId = 'A' - 1;
+		Integer currentPseudoChainId = 0;
 
 		this.passComponents = new Hashtable<String, Vector<StructureComponent>>( );
 		final long expectedBytes = this.expectedInputBytes;
@@ -354,9 +383,11 @@ public class PdbStructureLoader
 			Status.progress( percentDone, "Loading " + this.urlString );
 
 			lines++;
+			
+			boolean isHetAtom = line.startsWith("HETATM");
 
 			// Parse the line buffer
-			if (line.startsWith("ATOM") || line.startsWith("HETATM"))
+			if (line.startsWith("ATOM") || isHetAtom)
 			{
 				// PDB File Atom Record offsets as documented by
 				// http://www.rcsb.org/pdb/docs/format/pdbguide2.2/part_62.html
@@ -421,7 +452,7 @@ public class PdbStructureLoader
 
 				atom.chain_id = sharedStrings.share( atom.chain_id );
 				//							System.out.println(modelCount);
-
+				
 				String newResidueIdRaw = line.substring(22, 28 ).trim();
 					//**JB expanded to read 6 chars to account for non-integer residue ids. (Was 4 chars).
 				String temp = newResidueIdRaw;
@@ -434,7 +465,7 @@ public class PdbStructureLoader
 				final int newResidueIdIntSimple = Integer.parseInt(temp);
 				int newResidueIdInt = -1;
 				int increment = Math.abs(newResidueIdIntSimple - previousResidueIdIntSimple);
-				if (increment == 0 && !previousResidueIdRaw.equals(newResidueIdRaw))
+				if ((increment == 0 && !previousResidueIdRaw.equals(newResidueIdRaw)))
 					increment = 1;
 						// if this isn't a simple number, need to check the string as well.
 
@@ -447,30 +478,52 @@ public class PdbStructureLoader
 				else
 					newResidueIdInt = previousResidueIdInt + increment;
 
-				if (atom.chain_id == null || atom.chain_id.equals(""))
-				{						
-					if (breakoutByResId)
-					{
-						if (atom.compound.equals("HOH"))
-							atom.chain_id = "HOH";
-						
-						else
+				if (isHetAtom)
+									// het atoms are explicitly non-protein chains, in the
+									// current vernacular.  Break them out into pseudo chains.
+				{
+					if (atom.chain_id == null || atom.chain_id.equals(""))
+					{						
+						if (breakoutByResId)
 						{
-							if (increment > 0) currentPseudoChainId++;
-							atom.chain_id = "_" + String.valueOf(currentPseudoChainId);
+							if (atom.compound.equals("HOH"))
+								atom.chain_id = "HOH";
+							
+							else
+							{
+								if (increment > 0) currentPseudoChainId++;
+								atom.chain_id = "_" + currentPseudoChainId;
+							}
 						}
+						
+						else atom.chain_id = "_";
+					}
+
+					else if (pdbChainIds.contains(atom.chain_id))
+								// uh-oh - 'embedded' (hetatoms defined same chain id as a protein.)
+								// break out embedded chains, regardless
+					{
+						atom.chain_id += '\'';
+								// signify new chain with a prime
+
+						if (!pdbChainIds.contains(atom.chain_id))
+							increment = 1;						
+							// make sure the new id is added to the pdbChainIds
+							// (just use increment as a flag, not an operation...)
 					}
 					
-					else atom.chain_id = "_";
+					nonProteinChainIds.add(atom.chain_id);
 				}
-				
+
 				if (increment > 0)
 				{			
 					if (atom.chain_id.equals("HOH"))
 						pdbChainIds.add("");
 					else
 						pdbChainIds.add(atom.chain_id);
+										
 					ndbChainIds.add(atom.chain_id);
+					
 					pdbResidueIds.add(newResidueIdRaw);
 					ndbResidueIds.add(new Integer(newResidueIdInt));
 				}
@@ -645,11 +698,11 @@ public class PdbStructureLoader
     public Structure getStructure() { return structure; }
 
 	/**
-	 * Not implemented.  May be an issue due to nprids getting reclassified in the StructureMap.
+	 * Not implemented. NPRIDS are chain ids comprised of HETATM records
 	 */
-	public String[] getNonProteinChainIds()
+	public Set<String> getNonProteinChainIds()
 	{
-		return null;
+		return nonProteinChainIds;
 	}
 	
 

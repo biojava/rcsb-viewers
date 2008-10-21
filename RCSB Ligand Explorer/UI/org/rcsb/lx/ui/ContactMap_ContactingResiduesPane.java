@@ -110,10 +110,10 @@ public class ContactMap_ContactingResiduesPane extends JPanel
 		if(!this.isInitialized) {
 			final InteractionMap im = model.getInteractionMap();
 			final Iterator residues = im.getResidues().iterator();
-			final Chain currentLigand = LigandExplorer.sgetGlGeometryViewer().currentLigand;
+			final Residue currentLigandResidues[] = LigandExplorer.sgetGlGeometryViewer().currentLigandResidues;
 			
 			// if no ligand has been specified, bail.
-			if(currentLigand == null) {
+			if(currentLigandResidues == null) {
 				return;
 			}
 			
@@ -125,7 +125,7 @@ public class ContactMap_ContactingResiduesPane extends JPanel
 				final Residue r = (Residue)residues.next();
 				
 				// don't report the current ligand's interactions with itself.
-				if(r.getChainId().equals(currentLigand.getChainId())) {
+				if(r.getChainId().equals(currentLigandResidues[0].getChainId())) {
 					continue;
 				}
 				

@@ -45,7 +45,7 @@ public class Output
 	/**
 	 * Bump the indent
 	 */
-	static public void incrementIndent()
+	static public void indent()
 	{
 		if (indentBuf == null)
 		{
@@ -60,7 +60,7 @@ public class Output
 	/**
 	 * Back out the current indent
 	 */
-	static public void decrementIndent()
+	static public void outdent()
 	{
 		if (indent.length() >= indentSize)
 			indent = indent.substring(0, indent.length() - indentSize);

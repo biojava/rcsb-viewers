@@ -169,7 +169,7 @@ public class DerivedInformation
 	 * Creates a DerivedInformation object from a structure object.
 	 */
 	public DerivedInformation(final Structure structure) {
-		this.structureMap = new StructureMap(structure, new JoglSceneNode());
+		this.structureMap = new StructureMap(structure, new JoglSceneNode(), null, null);
 	}
 
 	/**

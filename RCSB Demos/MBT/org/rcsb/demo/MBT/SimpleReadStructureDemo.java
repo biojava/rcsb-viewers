@@ -37,6 +37,8 @@ import org.rcsb.mbt.structLoader.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 
@@ -66,6 +68,8 @@ public class SimpleReadStructureDemo
 {
 	static boolean isPdb = false;
 	static boolean doAtoms = true;
+	static boolean doResidues = true;
+	static boolean doBreakout = true;
 	
 	/**
 	 * Here's the main...
@@ -80,6 +84,12 @@ public class SimpleReadStructureDemo
 		{
 			if (arg.equals("-noatoms"))
 				doAtoms = false;
+			
+			if (arg.equals("-noresidues"))
+				doResidues = doAtoms = false;
+			
+			else if (arg.equals("-nobreakout"))
+				doBreakout = false;
 			
 			else
 				fileName = arg;
@@ -109,8 +119,14 @@ public class SimpleReadStructureDemo
 		
 		Structure struct = null;
 		
-		if (isPdb)			
+		if (isPdb)
+		{
 			loader = new PdbStructureLoader();
+		    ((PdbStructureLoader)loader).setBreakoutEmptyChainsByResId(doBreakout);
+		    			// default behavior is to lump all the unassociated residues (including waters) into a single
+		    			// default chain labelled "_".   Setting this flag will cause the loader to break out 'pseudo-chains'
+		    			// by residue id.
+		}
 		
 		else if (sfx.equalsIgnoreCase("xml"))
 			loader = new XMLStructureLoader(new StructureXMLHandler(fileName));
@@ -138,9 +154,24 @@ public class SimpleReadStructureDemo
 			System.exit(4);
 		}
 		
-		new StructureMap(struct, null);
+		new StructureMap(struct, null, loader.getIDConverter(), loader.getNonProteinChainIds());
 							// create a structuremap associated with the structure.
 							// the second argument is for user data.
+		
+		Output.lineOut("Structure Loaded");
+		Set<String> nprids = loader.getNonProteinChainIds();
+		Output.lineOut("Non Protein Chain ID Count: " + nprids.size());
+		if (nprids.size() > 0)
+		{
+			Output.indent();
+			Output.lineOut("IDs:");
+			Output.indent();
+			for (String id : nprids)
+				Output.lineOut(id);
+			Output.outdent();
+			Output.outdent();
+			Output.lineOut("");
+		}
 		
 		reportChains(struct);
 							// and output the report
@@ -171,13 +202,13 @@ public class SimpleReadStructureDemo
 		else
 		{
 			Output.lineOut("Structure Info:");
-			Output.incrementIndent();
+			Output.indent();
 			Output.lineOut("Long Name : " + structInfo.getLongName());
 			Output.lineOut("Short Name : " + structInfo.getShortName());
 			Output.lineOut("Release Date : " + structInfo.getReleaseDate());
 			Output.lineOut("Pdb ID : " + structInfo.getIdCode());
 			Output.lineOut("Authors:" + structInfo.getAuthors());
-			Output.decrementIndent();
+			Output.outdent();
 		}
 		
 		Output.lineOut("");
@@ -191,23 +222,23 @@ public class SimpleReadStructureDemo
 		else
 		{
 			Output.lineOut("StructureMap Info:");
-			Output.incrementIndent();
+			Output.indent();
 			Output.lineOut("Atom Count : " + structMap.getAtomCount());
 			Output.lineOut("Bond Count : " + structMap.getBondCount());
 			Output.lineOut("Residue Count : " + structMap.getResidueCount());
 			Output.lineOut("Fragment Count : " + structMap.getFragmentCount());
 			Output.lineOut("Chain Count : " + structMap.getChainCount());
-			Output.lineOut("Aux Chain Count : " + auxChains.size());
-			Output.decrementIndent();
+			Output.lineOut("Aux Chain Count : " + ((doBreakout)? "(N/A - breakout set)" : auxChains.size() + " (no breakout"));
+			Output.outdent();
 			
 			Output.lineOut("");
 			Output.lineOut("Detail by chain:");
-			Output.incrementIndent();
+			Output.indent();
 			
 			for (Chain chain : structMap.getChains())
 				outputChainInfo(chain, null);
 				
-			Output.decrementIndent();
+			Output.outdent();
 			Output.lineOut("--End StructureMap--");
 		}
 		
@@ -217,12 +248,12 @@ public class SimpleReadStructureDemo
 			{
 				Output.lineOut("");
 				Output.lineOut("Auxilliary Chains (pdb file) (psuedo-ids):");
-				Output.incrementIndent();
+				Output.indent();
 				
 				for (String key : auxChains.keySet())
 					outputChainInfo(auxChains.get(key), key);
 				
-				Output.decrementIndent();
+				Output.outdent();
 			}
 		}
 		
@@ -237,56 +268,54 @@ public class SimpleReadStructureDemo
 	 */
 	static private void outputChainInfo(Chain chain, String auxChainId)
 	{
-		boolean auxChain = auxChainId != null;
+		boolean isNonProteinChain = auxChainId != null || chain.isNonProteinChain();
 		
-		String chainId = (auxChain)? auxChainId : chain.getChainId();
-		if (auxChain)
-			Output.lineOut("Pseudo Chain Id : " + chainId);
+		String chainId = (auxChainId != null)? auxChainId : chain.getChainId();
+		if (isNonProteinChain)
+			Output.lineOut("Pseudo (Non-Protein) Chain Id : " + chainId);
 		
 		else
 			Output.lineOut("Chain Id : " + chainId);
 		
-		if (chainId.equals("_"))
+		if (chainId.equals("_") || chainId.equals("HOH"))
 						// don't output the default chain id - if it contains ions/ligands,
 						// they'll be extracted and displayed elsewhere.
 						// otherwise, it just shows waters - we don't care.
 		{
-			Output.incrementIndent();
-			Output.lineOut("(default chain id group)");
-			Output.decrementIndent();
+			Output.indent();
+			Output.lineOut("(default chain id group or explicit water chain)");
+			Output.lineOut(chain.getResidueCount() + " residues, " + chain.getAtomCount() + " atoms.");
+			Output.outdent();
 			return;
 		}
 		
-		Output.incrementIndent();
-		if (!auxChain)
-						// auxilliary chains don't have fragments - put out fragment
-						// info for normal chain
+		Output.indent();
+		if (!isNonProteinChain)
+						// non-protein chains don't have fragments - put out fragment
+						// info for protein chain
 		{
 			Output.lineOut("Fragments: ");
-			Output.incrementIndent();
+			Output.indent();
 			
 			for (Fragment fragment : chain.getFragments())
 			{
 				Output.lineOut("--New Fragment--");
 				Output.lineOut("Conformation Type : " + fragment.getConformationType());
-				Output.lineOut("Residues:");
-				Output.incrementIndent();
-				
 				outputResidueInfo(fragment.getResidues());
-					
-				Output.decrementIndent();
 				Output.lineOut("--End Fragment--");
+				Output.lineOut("");
 			}
 			
-			Output.decrementIndent();
+			Output.outdent();
 			Output.lineOut("--End Fragments--");
 		}
 		
 		else	// auxChain - no fragments
 			outputResidueInfo(chain.getResidues());
 		
-		Output.decrementIndent();
+		Output.outdent();
 		Output.lineOut("--End Chain--");
+		Output.lineOut("");
 	}
 	
 	/**
@@ -296,6 +325,11 @@ public class SimpleReadStructureDemo
 	 */
 	static private void outputResidueInfo(Vector<Residue> residues)
 	{
+		Output.lineOut("Residues: " + residues.size());
+
+		if (!doResidues) return;
+		
+		Output.indent();
 		for (Residue residue : residues)
 		{
 			if (residue.getClassification() == Residue.Classification.WATER)
@@ -309,7 +343,7 @@ public class SimpleReadStructureDemo
 		    if (doAtoms)
 		    {
 		    	Output.lineOut("Atoms:");
-		    	Output.incrementIndent();
+		    	Output.indent();
 
 			    for (Atom atom : residue.getAtoms())
 			    {
@@ -320,11 +354,13 @@ public class SimpleReadStructureDemo
 			    	Output.lineOut("");
 			    }
 			    
-			    Output.decrementIndent();
+			    Output.outdent();
 		    }
 
 		    Output.lineOut("--End Residue");
 		}
+		
+		Output.outdent();
 	}
 	
 	/**
@@ -375,7 +411,7 @@ public class SimpleReadStructureDemo
 		int txIX;
 		
 		Output.lineOut("Unit Cell:");
-		Output.incrementIndent();
+		Output.indent();
 		
 		if (loader.hasUnitCell())
 		{
@@ -391,11 +427,11 @@ public class SimpleReadStructureDemo
 		else
 			Output.lineOut("(None)");
 		
-		Output.decrementIndent();
+		Output.outdent();
 		Output.lineOut("");
 		
 		Output.lineOut("Biological Unit Transforms:");
-		Output.incrementIndent();
+		Output.indent();
 
 		if (loader.hasBiologicUnitTransformationMatrices())
 		{
@@ -407,11 +443,11 @@ public class SimpleReadStructureDemo
 		else
 			Output.lineOut("(None)");
 		
-		Output.decrementIndent();
+		Output.outdent();
 		Output.lineOut("");
 		
 		Output.lineOut("Non-Crystallographic Transforms:");
-		Output.incrementIndent();
+		Output.indent();
 		if (loader.hasNonCrystallographicOperations())
 		{
 			txIX = 1;

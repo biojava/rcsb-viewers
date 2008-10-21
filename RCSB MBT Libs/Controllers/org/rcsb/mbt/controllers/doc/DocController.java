@@ -128,9 +128,8 @@ public class DocController
 				else
 					System.out.println("Data set loaded: " + dataset);
 		
-				new StructureMap(structureTmp, AppBase.sgetAppModuleFactory().createSceneNode());
-				structureTmp.getStructureMap().setConverter(loader.getIDConverter());
-				structureTmp.getStructureMap().setNonproteinChainIds(loader.getNonProteinChainIds());
+				new StructureMap(structureTmp, AppBase.sgetAppModuleFactory().createSceneNode(),
+						loader.getIDConverter(), loader.getNonProteinChainIds());
 				finalizeNewStructure(loader, structureTmp);
 								
 				if (loader.getUnitCell() != null)

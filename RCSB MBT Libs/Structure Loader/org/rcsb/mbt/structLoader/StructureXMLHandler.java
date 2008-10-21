@@ -2,8 +2,9 @@ package org.rcsb.mbt.structLoader;
 
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import org.rcsb.mbt.glscene.geometry.Matrix3f;
@@ -44,12 +45,19 @@ import org.xml.sax.helpers.DefaultHandler;
  *  </ul>
  * 
  * <h3>Further Thoughts</h3>
+ * <p>
  * Another possible implementation would be to push everything down into a base class that provides stubs
  * for <em>all</em> elements.  An application could then pick and choose which elements it wanted to
- * implement by overriding and optionally loading the class (have to figure out a nice mechanism to do that.)
+ * implement by overriding and optionally loading the class (have to figure out a nice mechanism to do that.)</p>
+ * <p>
+ * Sample implementations could be built on that, including a reference test implementation.<br/>
+ * 04-Aug-08 - rickb</p>
  * 
- * Sample implementations could be built on that, including a reference test implementation.
- * 04-Aug-08 - rickb
+ * <h3>Non-Protein Chains (ligands/waters/ions)</h3>
+ * <p>
+ * Non protein chains are accumulated into their own chains, typically by using the Ndb identifier
+ * (hence the need for the {@linkplain org.rcsb.mbt.model.util.PdbToNdbConverter}, created by the
+ * loader and passed off to the {@linkplain org.rcsb.mbt.model.StructureMap} class.</p>
  * 
  * @author John Beaver, Jeff Milton
  * @author (revised) rickb
@@ -147,11 +155,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
     
     protected boolean pdbStrandIdEncountered = false;
     protected boolean ndbSeqNumEncountered = false;
-    protected boolean pdbSeqNumEncountered = false;
-    
-    
-    String[] nonProteinChainIds = null;
-    
+    protected boolean pdbSeqNumEncountered = false;   
 
     protected static final String xmlPrefix = "PDBx:";
     
@@ -316,7 +320,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
     /* (non-Javadoc)
 	 * @see edu.sdsc.lx.model.IStructureXMLHandler#getNonProteinChainIds()
 	 */
-    public String[] getNonProteinChainIds() {
+    public Set<String> getNonProteinChainIds() {
         return this.nonProteinChainIds;
     }
         
@@ -379,7 +383,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
         this.buf = emptyString;
     }
     
-    private final HashMap<String, ?> uniqueNonProteinChainIds = new HashMap<String, Object>();
+    private Set<String> nonProteinChainIds = new TreeSet<String>();
     private boolean isCurrentNonProteinChain = false;
     private String previousPdbResidueId = null;
     private String previousNdbChainId = null;
@@ -771,15 +775,8 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
 
    protected class XMLRunnable__atom_siteCategory__End extends XMLRunnable
    {
-		public void run() {
-			final int count = uniqueNonProteinChainIds.size();
-			nonProteinChainIds = new String[count];
-           final Iterator<String> it = uniqueNonProteinChainIds.keySet().iterator();
-           for(int i = 0; it.hasNext(); i++) {
-               final String chainId = it.next();
-               nonProteinChainIds[i] = chainId;
-           }
-           
+		public void run()
+		{           
            curAtom = null;    // flags the end of the atoms.
 		}
    }
@@ -841,9 +838,8 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
            
            final String chainId = getUnique(trim);
            
-           if(isCurrentNonProteinChain) {
-           	uniqueNonProteinChainIds.put(chainId, null);
-           }
+           if (isCurrentNonProteinChain)
+           	  nonProteinChainIds.add(chainId);
            
            curAtom.chain_id = chainId;
            

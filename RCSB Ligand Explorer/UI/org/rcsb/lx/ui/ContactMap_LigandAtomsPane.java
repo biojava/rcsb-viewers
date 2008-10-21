@@ -16,6 +16,7 @@ import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.glscene.jogl.ResidueFontInfo;
 import org.rcsb.lx.model.LXModel;
 import org.rcsb.mbt.model.Atom;
+import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.StructureStyles;
@@ -86,7 +87,7 @@ public class ContactMap_LigandAtomsPane extends JPanel {
 		// initialize, if necessary...
 		if(!this.isInitialized) {
 			final PdbToNdbConverter converter = sm.getPdbToNdbConverter();
-			final Chain currentLigand = LigandExplorer.sgetGlGeometryViewer().currentLigand;
+			final Residue currentLigandResidues[] = LigandExplorer.sgetGlGeometryViewer().currentLigandResidues;
 			
 			if(ContactMap_LigandAtomsPane.letterMetrics == null) {
 				ContactMap_LigandAtomsPane.letterMetrics = ResidueFontInfo.contactsResidueFont.getLineMetrics("M",g2.getFontRenderContext());
@@ -94,7 +95,7 @@ public class ContactMap_LigandAtomsPane extends JPanel {
 			final int letterHeight = (int)ContactMap_LigandAtomsPane.letterMetrics.getAscent();
 			
 			// if no ligand has been specified, bail.
-			if(currentLigand == null) {
+			if(currentLigandResidues == null) {
 				return;
 			}
 			
@@ -102,24 +103,23 @@ public class ContactMap_LigandAtomsPane extends JPanel {
 			this.atomRanges.clear();
 			
 			int curY = insets.top;
-			final Vector atoms = currentLigand.getAtoms();
-			for(int i = 0; i < atoms.size(); i++) {
-				final Atom a = (Atom)atoms.get(i);
-				
-				final int stringWidth = (int)ResidueFontInfo.contactsResidueFont.getStringBounds(a.name,g2.getFontRenderContext()).getWidth();
-				
-				final AtomRange range = new AtomRange();
-				range.atomDescription = a.name;
-				range.atom = a;
-				range.startY = curY;
-				curY += letterHeight;
-				range.endY = curY;
-				this.atomRanges.add(range);
-				
-				this.fullSize.width = Math.max(this.fullSize.width, stringWidth);
-				
-				curY += padding;
-			}
+			for (Residue residue : currentLigandResidues)
+				for (Atom a : residue.getAtoms())
+				{
+					final int stringWidth = (int)ResidueFontInfo.contactsResidueFont.getStringBounds(a.name,g2.getFontRenderContext()).getWidth();
+					
+					final AtomRange range = new AtomRange();
+					range.atomDescription = a.name;
+					range.atom = a;
+					range.startY = curY;
+					curY += letterHeight;
+					range.endY = curY;
+					this.atomRanges.add(range);
+					
+					this.fullSize.width = Math.max(this.fullSize.width, stringWidth);
+					
+					curY += padding;
+				}
 			
 			this.fullSize.width += insets.left + insets.right + padding * 2 + 2;	// hack. The scrollpane adds a border of its own. May not be same for all platforms. 
 			this.fullSize.height = curY + insets.top + insets.bottom;

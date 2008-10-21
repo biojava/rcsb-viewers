@@ -202,7 +202,12 @@ public class Chain
 	 *  <P>
 	 */ 
 	private RangeMap fragments = null;
-	private Vector fragmentObjects = null;
+	private Vector<Fragment> fragmentObjects = null;
+	
+	private boolean isNonProteinChain = false;
+	
+	public void setIsNonProteinChain(boolean flag) { isNonProteinChain = flag; }
+	public boolean isNonProteinChain() { return isNonProteinChain; }
 
 
 	//
@@ -294,13 +299,6 @@ public class Chain
 
 		if ( highestIndex < 0 ) {
 			return null;
-		}
-		
-		if (residues.size() < 24 && Residue.Classification.values()[highestIndex] !=
-								  Residue.Classification.LIGAND)
-		{
-			reClassifyAsLigand();
-			return Residue.Classification.LIGAND;
 		}
 
 		return Residue.Classification.values()[highestIndex];
@@ -682,7 +680,7 @@ public class Chain
 			this.fragmentObjects.clear( );
 		}
 		final int fragmentCount = this.getFragmentCount( );
-		this.fragmentObjects = new Vector( fragmentCount );
+		this.fragmentObjects = new Vector<Fragment>( fragmentCount );
 
 		for ( int i=0; i<fragmentCount; i++ )
 		{

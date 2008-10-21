@@ -56,7 +56,7 @@ public class DumpPeriodicTable
 	{
 		Output.lineOut("Dumping Periodic Table:");
 		Output.lineOut("");
-		Output.incrementIndent();
+		Output.indent();
 		
 		for (int atomicNumber = 1; atomicNumber < PeriodicTable.getElementCount(); atomicNumber++)
 		{
@@ -71,7 +71,7 @@ public class DumpPeriodicTable
 			Output.lineOut("");
 		}
 		
-		Output.decrementIndent();
+		Output.outdent();
 	}
 	
 }

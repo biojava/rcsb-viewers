@@ -309,26 +309,29 @@ public class Residue
 	 * <li>LIGAND</li>
 	 * <li>WATER</li>
 	 */
-	public void setClassification( final String in_compoundCode, final String in_chainId )
+	public void setClassification( final Atom atom )
 	{
-		compoundCode = in_compoundCode; 
-	
-		if ( compoundCode.equals("HOH"))
-			classification = Classification.WATER;
-		
-		else if (in_chainId == StructureMap.defaultChainId)
-				classification = Classification.LIGAND;
+		if (atom == null)
+		{
+			compoundCode = "UNK";
+			classification = Classification.LIGAND;
+		}
 		
 		else
 		{
-			if ( AminoAcidInfo.getNameFromCode( compoundCode ) != null )
-				classification = Classification.AMINO_ACID;
+			compoundCode = atom.compound; 
 		
+			if ( compoundCode.equals("HOH"))
+				classification = Classification.WATER;
+			
+			else if (atom.getStructure().getStructureMap().getChain(atom.chain_id).isNonProteinChain())
+				classification = Classification.LIGAND;
+			
+			else if ( AminoAcidInfo.getNameFromCode( compoundCode ) != null )
+				classification = Classification.AMINO_ACID;
+			
 			else if ( NucleicAcidInfo.isNucleotide( compoundCode ) )
 				classification = Classification.NUCLEIC_ACID;
-			
-			else
-				classification = classification.LIGAND;
 		}
 	}
 
@@ -386,7 +389,7 @@ public class Residue
 		if ( atoms == null )
 		{
 			atoms = new Vector<Atom>( );
-			setClassification( atom.compound, atom.chain_id );
+			setClassification( atom );
 		}
 		else
 		{
@@ -472,7 +475,7 @@ public class Residue
 			atoms.removeAllElements( );
 		}
 		atoms = null;
-		setClassification( "UNK", StructureMap.defaultChainId);
+		setClassification( null );
 		alphaAtomIndex = -1;
 		polymerHeadAtom = null;
 		polymerTailAtom = null;

@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -23,6 +24,15 @@ import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+/**
+ * This is a shell around the {@linkplain org.rcsb.mbt.structLoader.StructureXMLHandler}
+ * class.  Wrapping it pulls all fo the pre-load boilerplate together and makes it behave
+ * the same as the other loaders (@linkplain org.rcsb.mbt.structLoader.PdbStructureLoader}, currently.)
+ * <p>
+ * Most of the access functions are passthroughs to the XML loader.</p>
+ * @author rickb
+ *
+ */
 public class XMLStructureLoader implements IFileStructureLoader
 {
 	private StructureXMLHandler handler = null;
@@ -69,7 +79,7 @@ public class XMLStructureLoader implements IFileStructureLoader
 		return handler.getLoaderName();
 	}
 
-	public String[] getNonProteinChainIds() {
+	public Set<String> getNonProteinChainIds() {
 		return handler.getNonProteinChainIds();
 	}
 

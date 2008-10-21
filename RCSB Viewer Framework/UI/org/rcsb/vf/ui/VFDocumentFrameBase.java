@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
@@ -52,14 +53,32 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 	{
 		private String _url, _pdbid;
 		
-		public LoadThread(File[] files)
+		/**
+		 * This can be either a file spec or a url.  It is what comes in from the commandline
+		 * or a url specification.
+		 * 
+		 * @param url - one or more urls, concatenated with a ',' if more than one.
+		 */
+		public LoadThread(String url)
+		{
+			_url = url;		
+			_pdbid = url.replaceFirst("^.*[/\\\\]([A-Za-z0-9]{4})\\.(xml|pdb[0-9]*)(.gz)*$", "$1");
+							// extract the id from the url specification
+		}
+		
+		/**
+		 * This is what comes from the 'file open' dialog.  Note that we turn the absolute file
+		 * paths into a concatenated list of strings, like above, and then extract the pdb id
+		 * from the first file name
+		 * @param files
+		 */
+		public LoadThread(File files[])
 		{
 			_url = files[0].getAbsolutePath();
-			
-			for (int ix = 1; ix < files.length; ix++)
-				_url += ',' + files[ix].getAbsolutePath();
-
-			_pdbid = files[0].getName().substring(0, files[0].getName().indexOf('.'));
+			for (int ixFile = 1; ixFile < files.length; ixFile++)
+				_url += ',' + files[0].getAbsolutePath();
+			_pdbid = files[0].getName().substring(0,files[0].getName().indexOf('.'));
+							// extract the id from the file specification
 		}
 		
 		public LoadThread(String url, String pdbid)
@@ -298,9 +317,7 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 	
 	public void loadURL(String url)
 	{
-		File files[] = new File[1];
-		files[0] = new File(url);
-		LoadThread loader = new LoadThread(files);
+		LoadThread loader = new LoadThread(url);
 		loader.run();
 	}
 }

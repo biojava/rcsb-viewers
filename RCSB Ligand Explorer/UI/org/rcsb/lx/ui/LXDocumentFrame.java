@@ -534,32 +534,8 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 				Vector<Chain> ligandList = sidebar.getLigandList();
 				if (ligandList != null && !ligandList.isEmpty())
 				{
-					int ligandId = 0;
-					String initialLigand = (String)AppBase.getApp().properties.get("ligand");
-					if (initialLigand != null)
-					{
-						for (int ix = 0; ix < ligandList.size(); ix++)
-						{
-							Chain chain = ligandList.get(ix);
-							for (Residue residue : chain.getResidues())
-							{
-								if (residue.toString().startsWith(initialLigand))
-								{
-									ligandId = ix;
-									ix = ligandList.size();
-									break;
-								}
-							}
-						}
-					}
-						
-					Chain ligandChain = ligandList.get(ligandId);
-						// pull the ligand list and get the first entry.
-					
-					getModel().setInitialLigand(ligandChain.getChainId());
-					getGlGeometryViewer().requestRedrawInitialLigand();
-						// set the initial ligand, and tell the geometry
-						// viewer this is a new situation.
+					getModel().setInitialLigand((String)AppBase.getApp().properties.get("ligand"));
+					sidebar.selectInitialLigand();					
 				}
 		}
 	}

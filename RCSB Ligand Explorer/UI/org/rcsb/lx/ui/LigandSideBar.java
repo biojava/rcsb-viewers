@@ -13,27 +13,28 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.JTree;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
-import org.rcsb.mbt.controllers.update.IUpdateListener;
-import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.model.Chain;
-import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.util.Status;
-
 
 public class LigandSideBar extends JPanel
 {
@@ -235,9 +236,37 @@ public class LigandSideBar extends JPanel
 			{
 				final Structure structure = model.getStructures().get(0);
 
-				final Chain value = (Chain)LigandSideBar.this.ligandJList.getSelectedValue();
-				if (value != null)
-					glViewer.setLigand(value);
+				final TreePath treeSelection[] = ligandJList.getSelectionPaths();
+				if (treeSelection != null)
+				{
+					Residue residues[] = null;
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode)treeSelection[0].getLastPathComponent();
+					StructureComponent nodeValue = (StructureComponent)node.getUserObject();
+					if (nodeValue instanceof Chain)
+					{
+						assert(treeSelection.length == 1);
+						Chain chain = (Chain) nodeValue;
+						residues = new Residue[chain.getResidueCount()];
+						for (int ix = 0; ix < chain.getResidueCount(); ix++)
+							residues[ix] = chain.getResidue(ix);
+					}
+					
+					else 
+					{
+						int ix = 0;
+						residues = new Residue[treeSelection.length];
+						
+						for (TreePath path : treeSelection)
+						{
+							node = (DefaultMutableTreeNode)path.getLastPathComponent();
+							nodeValue = (StructureComponent)node.getUserObject();
+							assert(nodeValue instanceof Residue);
+							residues[ix] = (Residue)nodeValue;
+						}
+						
+						glViewer.setLigandResidues(residues);
+					}
+				}
 
 				final float interLigandf1 = Float
 				.parseFloat(interLigandText1);
@@ -294,6 +323,41 @@ public class LigandSideBar extends JPanel
 			}
 		}
 	}
+	
+	private class LigandTreeCellRenderer extends DefaultTreeCellRenderer
+	{
+		private static final long serialVersionUID = -5623805877904497060L;
+
+		private final ImageIcon residueIcon = new ImageIcon(this.getClass()
+				.getResource("residue_16.jpg"));
+
+		private final ImageIcon chainIcon = new ImageIcon(this.getClass()
+				.getResource("chain_16.jpg"));
+		
+		@Override
+		public Component getTreeCellRendererComponent(final JTree tree,
+				final Object value, final boolean selected,
+				final boolean expanded, final boolean leaf, final int row,
+				final boolean hasFocus)
+		{
+			final LigandTreeCellRenderer component = (LigandTreeCellRenderer) super
+					.getTreeCellRendererComponent(tree, value, selected,
+							expanded, leaf, row, hasFocus);
+			
+			ImageIcon imageIcon = null;
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
+			
+			if (node.getUserObject() instanceof Chain)
+				imageIcon = chainIcon;
+			
+			else if (node.getUserObject() instanceof Residue)
+				imageIcon = residueIcon;
+
+			setIcon(imageIcon);
+			
+			return component;
+		}
+	}
 
 	private static final long serialVersionUID = 119898371139373941L;
 	
@@ -302,10 +366,11 @@ public class LigandSideBar extends JPanel
 	Vector<Chain> ligandList = null;
 	public Vector<Chain> getLigandList() { return ligandList; }
 
-	JList ligandJList = null;
+	JTree ligandJList = null;
 
 	public JButton applyButton = null;
-	public JList getLigandJList () { return ligandJList; }
+	public JTree getLigandJList () { return ligandJList; }
+	private JScrollPane ligandScroller;
 
 	public LigandSideBar(LXDocumentFrame mainFrame)
 	{
@@ -315,18 +380,18 @@ public class LigandSideBar extends JPanel
 
 		if (!model.hasStructures())
 		{
-			this.setBackground(mainFrame.sidebarColor);
+			this.setBackground(LXDocumentFrame.sidebarColor);
 			this.setLayout(new BorderLayout());
 
 			final JPanel pdbPanel = new JPanel();
 			pdbPanel.setLayout(new FlowLayout());
-			pdbPanel.setBackground(mainFrame.sidebarColor);
+			pdbPanel.setBackground(LXDocumentFrame.sidebarColor);
 
 			final JLabel pdbLabel = new JLabel("PDB id");
 			pdbLabel.setFont(pdbLabel.getFont().deriveFont(Font.BOLD));
-			pdbLabel.setBackground(mainFrame.sidebarColor);
+			pdbLabel.setBackground(LXDocumentFrame.sidebarColor);
 
-			mainFrame.getPdbIdList().setBackground(mainFrame.sidebarColor);
+			mainFrame.getPdbIdList().setBackground(LXDocumentFrame.sidebarColor);
 
 			pdbPanel.add(pdbLabel);
 			pdbPanel.add(mainFrame.getPdbIdList());
@@ -349,23 +414,38 @@ public class LigandSideBar extends JPanel
 			this.add(centerView);
 
 			// JPanel ligandPanel = new JPanel();
-			this.ligandJList = new JList(this.ligandList);
-			this.ligandJList
-					.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			ligandJList.getSelectionModel().addListSelectionListener(
-				new ListSelectionListener()
-				{
-
-					public void valueChanged(ListSelectionEvent e)
-					{
-						applyButton.doClick();
-					}					
-				});
 			
-			final JScrollPane ligandScroller = new JScrollPane(this.ligandJList);
-
 			if (this.ligandList.size() > 0)
-				this.add(ligandScroller);
+			{
+				DefaultMutableTreeNode root = new DefaultMutableTreeNode("Ligands:");
+				ligandJList = new JTree(root);
+				ligandJList.getSelectionModel().setSelectionMode(TreeSelectionModel.CONTIGUOUS_TREE_SELECTION);
+				ligandJList.setCellRenderer(new LigandTreeCellRenderer());
+				ligandJList.setExpandsSelectedPaths(true);
+				ligandJList.setRootVisible(false);
+				ligandJList.setShowsRootHandles(true);
+	
+				for (Chain chain : ligandList)
+				{
+					DefaultMutableTreeNode chainNode = new DefaultMutableTreeNode(chain);
+					root.add(chainNode);
+					for (Residue residue : chain.getResidues())
+						chainNode.add(new DefaultMutableTreeNode(residue));					
+				}
+			
+				ligandJList.getSelectionModel().addTreeSelectionListener(
+					new TreeSelectionListener()
+					{
+						public void valueChanged(TreeSelectionEvent e)
+						{
+							applyButton.doClick();
+						}				
+					});
+				
+				ligandScroller = new JScrollPane(this.ligandJList);
+
+				add(ligandScroller);
+			}
 			
 			else
 				centerView.setText("No ligands in this structure");
@@ -377,9 +457,9 @@ public class LigandSideBar extends JPanel
 			this.add(displayView);
 
 			final JCheckBox interLigandBox = new JCheckBox("Inter-ligand");
-			interLigandBox.setBackground(mainFrame.sidebarColor);
+			interLigandBox.setBackground(LXDocumentFrame.sidebarColor);
 			final LegendPanel interLigandPanel = new LegendPanel(Color.RED,
-					mainFrame.sidebarColor);
+					LXDocumentFrame.sidebarColor);
 			final FloatLimitField interLigandFLF1 = new FloatLimitField("0.0");
 			final JLabel interLigandDashLabel = new JLabel("-");
 			final FloatLimitField interLigandFLF2 = new FloatLimitField("5.0");
@@ -397,7 +477,7 @@ public class LigandSideBar extends JPanel
 
 			final JCheckBox hydrophilicBox = new JCheckBox("Hydrophilic");
 			final LegendPanel hydrophilicPanel = new LegendPanel(Color.GREEN,
-					mainFrame.sidebarColor);
+					LXDocumentFrame.sidebarColor);
 			final FloatLimitField philicFLF1 = new FloatLimitField("2.7");
 			final JLabel philicDashLabel = new JLabel("-");
 			final FloatLimitField philicFLF2 = new FloatLimitField("3.3");
@@ -409,7 +489,7 @@ public class LigandSideBar extends JPanel
 
 			final JCheckBox hydrophobicBox = new JCheckBox("Hydrophobic C-C");
 			final LegendPanel hydrophobicPanel = new LegendPanel(Color.MAGENTA,
-					mainFrame.sidebarColor);
+					LXDocumentFrame.sidebarColor);
 			final FloatLimitField phobicFLF1 = new FloatLimitField("1.9");
 			final JLabel phobicDashLabel = new JLabel("-");
 			final FloatLimitField phobicFLF2 = new FloatLimitField("3.9");
@@ -420,10 +500,10 @@ public class LigandSideBar extends JPanel
 			this.add(hydrophobicPanel);
 
 			final JCheckBox l_h2o_pBox = new JCheckBox("Bridged H-Bond");
-			l_h2o_pBox.setBackground(mainFrame.sidebarColor);
+			l_h2o_pBox.setBackground(LXDocumentFrame.sidebarColor);
 			final LegendPanel l_h2o_pPanel = new LegendPanel(Color.BLUE,
-					mainFrame.sidebarColor);
-			l_h2o_pBox.setBackground(mainFrame.sidebarColor);
+					LXDocumentFrame.sidebarColor);
+			l_h2o_pBox.setBackground(LXDocumentFrame.sidebarColor);
 			final FloatLimitField l_h2o_pFLF1 = new FloatLimitField("0.0");
 			final JLabel l_h2o_pDashLabel = new JLabel("-");
 			final FloatLimitField l_h2o_pFLF2 = new FloatLimitField("5.0");
@@ -435,7 +515,7 @@ public class LigandSideBar extends JPanel
 
 			final JCheckBox otherBox = new JCheckBox("Hydrophobic-Polar");
 			final LegendPanel otherPanel = new LegendPanel(Color.WHITE,
-					mainFrame.sidebarColor);
+					LXDocumentFrame.sidebarColor);
 			final FloatLimitField otherFLF1 = new FloatLimitField("1.9");
 			final JLabel otherDashLabel = new JLabel("-");
 			final FloatLimitField otherFLF2 = new FloatLimitField("3.9");
@@ -460,7 +540,7 @@ public class LigandSideBar extends JPanel
 
 			final JCheckBox distanceBox = new JCheckBox(
 					"Label interactions by distance");
-			distanceBox.setBackground(mainFrame.sidebarColor);
+			distanceBox.setBackground(LXDocumentFrame.sidebarColor);
 			distanceBox.setSelected(true);
 			this.add(distanceBox);
 
@@ -483,8 +563,6 @@ public class LigandSideBar extends JPanel
 					
 					public void layoutContainer(Container parent)
 					{
-						LXDocumentFrame mainFrame = LigandExplorer.sgetActiveFrame();
-						
 						final int visualBuffer = 3;
 						Insets parentInsets = parent.getInsets();
 						
@@ -663,21 +741,21 @@ public class LigandSideBar extends JPanel
 			});
 
 			// set colors and initial state
-			this.setBackground(mainFrame.sidebarColor);
+			this.setBackground(LXDocumentFrame.sidebarColor);
 //			hydrophilicBox.setBackground(JoglViewer.sidebarColor);
 			// hydrophilicBox.setSelected(true);
 
 			// atomButton.setSelected(true);
 
-			hydrophilicBox.setBackground(mainFrame.sidebarColor);
+			hydrophilicBox.setBackground(LXDocumentFrame.sidebarColor);
 			hydrophilicBox.setSelected(false);
-			hydrophobicBox.setBackground(mainFrame.sidebarColor);
+			hydrophobicBox.setBackground(LXDocumentFrame.sidebarColor);
 			hydrophobicBox.setSelected(false);
-			otherBox.setBackground(mainFrame.sidebarColor);
+			otherBox.setBackground(LXDocumentFrame.sidebarColor);
 			otherBox.setSelected(false);
 
-			applyButton.setBackground(mainFrame.sidebarColor);
-			resetButton.setBackground(mainFrame.sidebarColor);
+			applyButton.setBackground(LXDocumentFrame.sidebarColor);
+			resetButton.setBackground(LXDocumentFrame.sidebarColor);
 
 			interactionListener = new InteractionListener(l_h2o_pBox, otherFLF1, philicFLF1,
 					l_h2o_pFLF1, hydrophilicBox, hydrophobicBox, otherBox,
@@ -692,9 +770,6 @@ public class LigandSideBar extends JPanel
 			l_h2o_pBox.addActionListener(interactionListener);
 			otherBox.addActionListener(interactionListener);
 			distanceBox.addActionListener(interactionListener);
-			
-			if (this.ligandList.size() > 0)
-				ligandJList.setSelectedIndex(0);
 		}
 	}
 
@@ -707,5 +782,51 @@ public class LigandSideBar extends JPanel
 				ligandList.add(chain);
 
 		return ligandList;
+	}
+	
+	/**
+	 * This will select the intial ligand in the tree and trigger an update
+	 */
+	public void selectInitialLigand()
+	{
+		String initialLigand = LigandExplorer.sgetModel().getInitialLigand();
+		DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode)ligandJList.getModel().getRoot();
+		TreePath paths[] = null;
+		
+		for (int ix = 0; ix < rootNode.getChildCount(); ix++)
+		{
+			DefaultMutableTreeNode chainNode = (DefaultMutableTreeNode)rootNode.getChildAt(ix);
+			if (initialLigand != null)
+			{
+				for (int lx = 0; lx < chainNode.getChildCount(); lx++)
+				{
+					DefaultMutableTreeNode residueNode = (DefaultMutableTreeNode)chainNode.getChildAt(lx);
+					Residue residue = (Residue)residueNode.getUserObject();
+					if (residue.getCompoundCode().startsWith(initialLigand))
+					{
+						if (paths == null)
+							paths = new TreePath[chainNode.getChildCount()];
+						paths[lx] = new TreePath(residueNode.getPath());
+					}
+				}
+			}
+		}
+		
+		TreePath rootPath = new TreePath(rootNode);
+		for (int ix = 0; ix < rootNode.getChildCount(); ix++)
+			ligandJList.expandPath(rootPath.pathByAddingChild(rootNode.getChildAt(ix)));
+
+		if (paths != null)
+			ligandJList.setSelectionPaths(paths);
+							// set the discovered intial ligand path(s) as selected
+		else
+		{
+			DefaultMutableTreeNode firstChainNode = (DefaultMutableTreeNode)rootNode.getFirstChild();
+			TreePath selectedPath = rootPath.pathByAddingChild(firstChainNode);
+			selectedPath = selectedPath.pathByAddingChild(firstChainNode.getFirstChild());
+			ligandJList.setSelectionPath(selectedPath);
+							// set the first residue in the first chain as selected
+							// (jeez, this is a lot of work to do something this simple, I might add...)
+		}
 	}
 }

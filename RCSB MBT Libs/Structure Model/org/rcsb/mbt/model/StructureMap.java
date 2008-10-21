@@ -305,38 +305,38 @@ import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
 import org.rcsb.mbt.model.util.*;
 
 /**
- *  This class implements a derived data map for a Structure object. It
+ *  After initial loading, the structure is incorporated into a referenceable
+ *  structure by this class.
+ *  <p>
+ *  To do this, it
  *  generates a number of hierarchical links, indexes, and generally provides
  *  access to the numerous relationships that exists between chains,
  *  fragments (secondary structure conformations), residues, atoms, and bonds
- *  for a Structure. The map enables one to "walk" a Structure's
+ *  for a Structure.</p>
+ *  <p>
+ *  The map then enables one to "walk" a Structure's
  *  backbone, and finds "gaps" in the map (ie: segments of chains which are not
  *  spanned by Conformation objects). The set of map relationships that are
  *  managed by this class are suitable for applications and viewers to construct
- *  more spacially/biologically meaningful representations and displays.
- *  <P>
- *  <center>
- *  <IMG SRC="doc-files/StructureMap.jpg">
- *  </center>
- *  <P>
- *  This class provides a number of different "entry points" to traverse
+ *  more spacially/biologically meaningful representations and displays.</p>
+ *  <IMG style="text-align:center">SRC="doc-files/StructureMap.jpg"/>
+ *  <p>
+ *  The class provides a number of different "entry points" to traverse
  *  the underlying Structure data. The one an application should choose
- *  depeonds mostly on what the application wishes to accomplish. For
+ *  depends mostly on what the application wishes to accomplish. For
  *  example, while a basic sequence viewer might simply walk the raw list
  *  of residues (ie: by calling getResidueCount and getResidue in a loop)
  *  another sequence viewer may want to obtain residues by walking each
  *  chain (ie: by calling getChainCount, plus getChain and chain.getResidue
  *  in a nested loop) so that it knows where the residues of one chain ends
- *  and another begins. Again, its entirely up to the application.
- *  <P>
- *  <HR WIDTH="50%">
- *  <P>
+ *  and another begins. Again, its entirely up to the application.</p>
  *  <p>
- *  Additional:  This is contained in the structure component.  The structure
- *  			 also contains the scene node for the structure.
- *  			 13-May-08 - rickb
+ *  Additional:  This is contained in the {@linkplain org.rcsb.mbt.model.Structure} class.
+ *  			 This class also contains the scene node (sub-scene) for the structure.
+ *  			 13-May-08 - rickb</p>
  *  
  *  @author	John L. Moreland
+ *  @author rickb (revisions)
  *  @see	org.rcsb.mbt.model.StructureComponent
  *  @see	org.rcsb.mbt.model.StructureComponentRegistry
  */
@@ -521,13 +521,16 @@ public class StructureMap
 	 * Constructs a StructureMap object for a given Structure, containing
 	 * a userdata object.
 	 */
-	public StructureMap( final Structure structure, final Object udata )
+	public StructureMap( final Structure structure, final Object udata,
+			final PdbToNdbConverter in_converter, final Set<String> in_nonproteinChainIds)
 	{
 		this.udata = udata;
 		if ( structure == null ) {
 			throw new IllegalArgumentException( "null Structure" );
 		}
 		this.structure = structure;
+		
+		nonproteinChainIds = in_nonproteinChainIds;
 		
 		if (!structure.hasStructureMap())
 			structure.setStructureMap(this);
@@ -537,8 +540,10 @@ public class StructureMap
 		this.initialize( );
 
 		if ( Status.getOutputLevel() >= Status.LEVEL_DUMP ) {
-			this.print( ); // System.exit(1);
+			print( ); // System.exit(1);
 		}
+		
+		setConverter(in_converter);
 	}
 
 	/**
@@ -631,9 +636,6 @@ public class StructureMap
 	{
 		int atomCount = this.structure.getStructureComponentCount(
 			StructureComponentRegistry.TYPE_ATOM );
-
-		int defaultChainIX = 0;
-		int lastResidueId = -1;
 		
 		for ( int i=0; i<atomCount; i++ )
 		{
@@ -641,11 +643,14 @@ public class StructureMap
 				StructureComponentRegistry.TYPE_ATOM, i );
 
 			String chainKeyId = atom.chain_id + atom.residue_id;
-			
+
+			assert(atom.chain_id.length() > 0);
+						// with new structure loader paradigm, this should never happen
+/* **
 			// If the chain_id is empty, replace it by a default value.
 			if ( atom.chain_id.length() <= 0 )
 			{
-				if (true /* atom.compound.equals("HOH") */ )
+				if (true /* atom.compound.equals("HOH") * / )
 					atom.chain_id = StructureMap.defaultChainId;
 				
 				else
@@ -659,12 +664,14 @@ public class StructureMap
 					atom.chain_id = StructureMap.defaultChainId + defaultChainIX;
 				}
 			}
+ * **/
 			
 			boolean newChain = false;
 			Chain chain = this.chainById.get( atom.chain_id );
 			if ( chain == null )
 			{
 				chain = new Chain( );
+				chain.setIsNonProteinChain(nonproteinChainIds.contains(atom.chain_id));
 				chain.setStructure( this.structure );
 
 				newChain = true;
@@ -697,7 +704,7 @@ public class StructureMap
 
 		for (Chain chain : chains)
 		{		
-			if (chain.getResidueCount() < 24)
+			if (nonproteinChainIds.contains(chain.getChainId()) && chain.getResidueCount() < 24)
 				chain.reClassifyAsLigand();
 						// any chain with less than 24 residues is a ligand
 			
@@ -1289,13 +1296,9 @@ public class StructureMap
 	 */
 	protected void extractLigands( )
 	{
-		final int residueCount = this.residues.size();
-		for ( int r=0; r<residueCount; r++ )
-		{
-			final Residue residue = this.residues.elementAt( r );
+		for ( Residue residue : residues)
 			if ( residue.getClassification() == Residue.Classification.LIGAND )
-				this.ligands.add( residue );
-		}
+				ligands.add( residue );
 	}
 
 	//
@@ -2416,7 +2419,7 @@ public class StructureMap
 		 * application has to know and reference the derived type everywhere, just to
 		 * access this piece of data.  Seems like overkill.
 		 * 
-		 * So, I've had to sprinkle the code that does this with casts.  Yuck.
+		 * So, I've had to sprinkle the code that uses this with casts.  Yuck.
 		 * 
 		 * 03-Oct-08 - rickb
 		 */
@@ -2535,15 +2538,9 @@ public class StructureMap
     /**
      * @param nonproteinChainIds The nonproteinChainIds to set.
      */
-    public void setNonproteinChainIds( final String[] nonproteinChainIds) {
-    	if(nonproteinChainIds == null) {
-    		return;
-    	}
-    	
-        this.nonproteinChainIds = new HashSet<String>();
-        for(int i = 0; i < nonproteinChainIds.length; i++) {
-            this.nonproteinChainIds.add(nonproteinChainIds[i]);
-        }
+    public void setNonproteinChainIds( Set<String> in_nonProteinChainIds )
+    {
+        nonproteinChainIds = in_nonProteinChainIds;
     }
     
     public StructureComponent getTopPdbComponent(final Residue r)
