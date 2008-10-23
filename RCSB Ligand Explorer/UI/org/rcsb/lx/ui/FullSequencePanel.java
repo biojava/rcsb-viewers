@@ -15,6 +15,8 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
@@ -46,9 +48,6 @@ import org.rcsb.mbt.model.util.Status;
  */
 public class FullSequencePanel extends JPanel
 {
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 6692539761089101610L;
 
 	public String[] title = null;
@@ -58,7 +57,11 @@ public class FullSequencePanel extends JPanel
     protected static int decriptionFontSize = 16;
     protected static Font descriptionFont = new Font( "SansSerif", Font.PLAIN, FullSequencePanel.decriptionFontSize );
     protected static Rectangle cellBounds = null;
-    protected static final int descriptionBarBuffer = 10;
+    protected static Rectangle2D letterBounds = null;
+    protected static int letterCenterX;
+
+    protected static final int descriptionBarPadding = 10;
+    protected static final int rulerWidth = 3;
 	
 	Pattern spaces = Pattern.compile("\\s++");
     
@@ -81,11 +84,12 @@ public class FullSequencePanel extends JPanel
      *      }
      *   }
      */
-    HashMap<Integer, Integer[]> rangesByRow = new HashMap<Integer, Integer[]>();
+    Map<Integer, Integer[]> rangesByRow = new TreeMap<Integer, Integer[]>();
 	
     // useLight: display a light chain; otherwise, display a heavy chain
     // immunoOnly: only display the immunogenic residues (paratope).
-    public FullSequencePanel(final String title, final StructureComponent chain, final int scrollbarWidth) {
+    public FullSequencePanel(final String title, final StructureComponent chain, final int scrollbarWidth)
+    {
         super(null, false);
         super.setDoubleBuffered(false);
         
@@ -93,44 +97,49 @@ public class FullSequencePanel extends JPanel
         this.scrollbarWidth = scrollbarWidth;
         
         if(chain instanceof ExternChain)
+        						// so what do we do if it's *not* an ExternChain???
         {
         	final ExternChain xc = (ExternChain)chain;
         	final Residue firstRes = xc.getResidue(0);
-        	this.firstNdbChain = firstRes.structure.getStructureMap().getChain(firstRes.getChainId());
+        	firstNdbChain = firstRes.structure.getStructureMap().getChain(firstRes.getChainId());
         }
         
         super.addMouseListener(new SequenceMouseListener(this));
         super.addMouseMotionListener(new SequenceMouseMotionListener(this));
         
-        this.title = this.spaces.split(title);
+        this.title = spaces.split(title);
     }
 	
 	
-    public void setStatics(final Graphics g) {
-        // quick fix.
-        if(g == null) {
+    public void setStatics(final Graphics g)
+    {
+        if(g == null)
             return;
-        }
         
-        final int horizontalCellBuffer = 2;
+        final int horizontalCellPadding = 2;
         
-        if(FullSequencePanel.cellBounds == null) {
+        if (FullSequencePanel.cellBounds == null)
+        {
             final FontMetrics fontMetrics = g.getFontMetrics(ResidueFontInfo.fullSequenceResidueFont);
-            final Rectangle2D letterBounds = fontMetrics.getStringBounds("W",g);
-            FullSequencePanel.cellBounds = new Rectangle((int)letterBounds.getWidth() + horizontalCellBuffer,(int)letterBounds.getHeight());
+            letterBounds = fontMetrics.getStringBounds("W", g);
+            letterCenterX = (int)letterBounds.getCenterX();
+            cellBounds = new Rectangle((int)letterBounds.getWidth() + horizontalCellPadding,
+            										     (int)letterBounds.getHeight() * 2 + rulerWidth);
         }
         
         
         final FontMetrics fontMetrics = g.getFontMetrics(FullSequencePanel.descriptionFont);
 		int descriptionWidth = -1;
 		int descriptionHeight = 0;
-		for(int i = 0; i < this.title.length; i++) {
-			final Rectangle2D descriptionBounds = fontMetrics.getStringBounds(this.title[i], g);
+		for (int i = 0; i < title.length; i++)
+		{
+			final Rectangle2D descriptionBounds = fontMetrics.getStringBounds(title[i], g);
 			descriptionWidth = Math.max((int)descriptionBounds.getWidth(), descriptionWidth);
 			descriptionHeight += descriptionBounds.getHeight();
 		}
 		
-        FullSequencePanel.startSequenceX = Math.max(FullSequencePanel.startSequenceX,descriptionWidth + FullSequencePanel.descriptionBarBuffer * 2);
+        startSequenceX = Math.max(FullSequencePanel.startSequenceX,
+        											descriptionWidth + FullSequencePanel.descriptionBarPadding * 2);
     }
     
     
@@ -140,86 +149,87 @@ public class FullSequencePanel extends JPanel
     // width: the panel width to generate the ranges for.
     public int preferredHeight = 0;
     private int oldWidth = -1;
-    public StructureComponent generateRanges(final int width) {
-//        Vector proteins = this.data.getCurrentProteins();
-//        if(proteins == null) return null;
-        
-        this.setStatics(super.getGraphics());
+    
+    public StructureComponent generateRanges(final int width)
+    {
+        setStatics(super.getGraphics());
         
         final Insets insets = super.getInsets();
         
         // quick fix.
-        if(insets == null || FullSequencePanel.cellBounds == null) {
+        if (insets == null || FullSequencePanel.cellBounds == null || chain == null)
             return null;
-        }
         
         // calculate the number of columns for this window size
-        final int numCols = (width - insets.left - insets.right - FullSequencePanel.startSequenceX - this.scrollbarWidth - FullSequencePanel.descriptionBarBuffer) / (int)FullSequencePanel.cellBounds.getWidth();
+        final int drawWidth = width - insets.left - insets.right -
+		 					  FullSequencePanel.startSequenceX - scrollbarWidth -
+		 					  FullSequencePanel.descriptionBarPadding;
+        
+        final int numCols = drawWidth / (int)FullSequencePanel.cellBounds.getWidth();
         
         // set up the ranges
         int curRow = 0;
         
-        // exit if no chain is found...
-        if(this.chain == null) {
-            return null;
-        }
-        
         // exit if the width is the same as last time this function was called...
-        if(this.oldWidth == width || numCols <= 3) {
-            return this.chain;
-        }
-        this.oldWidth = width;
+        if (oldWidth == width || numCols <= 3)
+            return chain;
+
+        oldWidth = width;
         
         // remove all ranges in preparation for adding new ones.
-        this.rangesByRow.clear();
+        rangesByRow.clear();
         
-        int numResidues = (this.chain instanceof ExternChain)? ((ExternChain)chain).getResidueCount() : 0;
+        int numResidues = (chain instanceof ExternChain)? ((ExternChain)chain).getResidueCount() : 0;
         
-        for(int startIndex = 0; startIndex < numResidues; curRow++, startIndex += numCols) {
-            //int startIndex = i * numCols;
+        int extraRow = 0;
+        for (int startIndex = 0; startIndex < numResidues; curRow++, startIndex += numCols)
+        {
             final int size = Math.min(numCols, numResidues - startIndex);
-            if(size >= 0) {
-                this.rangesByRow.put(new Integer(curRow),
-                				     new Integer[] {new Integer(0),new Integer(startIndex),new Integer(size)});
-            }
+            if (numCols != size) extraRow = 1;
+            if (size >= 0)
+                rangesByRow.put(new Integer(curRow),
+                				new Integer[] {new Integer(0),new Integer(startIndex),new Integer(size)});
         }
         
-        this.preferredHeight = Math.max(curRow * FullSequencePanel.cellBounds.height + 10, (int)FullSequencePanel.cellBounds.getHeight() * (this.title.length + 1));  // 10 == visual buffer.
+        preferredHeight = Math.max((curRow + extraRow) * FullSequencePanel.cellBounds.height + 10,
+        						   (int)FullSequencePanel.cellBounds.getHeight() * (title.length + 1));
         
-        return this.chain;
+        return chain;
     }
     
     private Dimension oldSize = new Dimension(-1,-1);
     public BufferedImage oldImage = null;
+    
     @Override
-	public void paintComponent(final Graphics g) {
+	public void paintComponent(final Graphics g)
+    {
         final Graphics2D g2 = (Graphics2D)g;
 
         // only make a new image if something has changed.
         final Dimension newSize = super.getSize();
-        if(newSize.equals(this.oldSize) && this.oldImage != null && !this.needsComponentReposition) {
+        if (newSize.equals(oldSize) && oldImage != null && !needsComponentReposition)
+        {
            super.paintComponent(g);
-           g2.drawImage(this.oldImage,null,0,0);
+           g2.drawImage(oldImage,null,0,0);
            return; 
         }
-        this.oldSize = newSize;
-        this.needsComponentReposition = false;
         
-        this.oldImage = new BufferedImage(newSize.width,newSize.height,BufferedImage.TYPE_INT_RGB);
-        final Graphics2D buf = (Graphics2D)this.oldImage.getGraphics();
+        oldSize = newSize;
+        needsComponentReposition = false;
         
-        //buf.setColor(new Color( 0.7f, 0.7f, 0.7f ));
-        //buf.fillRect(0,0,this.oldImage.getWidth(),this.oldImage.getHeight());
+        oldImage = new BufferedImage(newSize.width, newSize.height, BufferedImage.TYPE_INT_RGB);
+        final Graphics2D buf = (Graphics2D)oldImage.getGraphics();
         
-        final StructureMap sm = this.chain.structure.getStructureMap();
+        final StructureMap sm = chain.structure.getStructureMap();
         final StructureStyles ss = sm.getStructureStyles();
         
         buf.setFont( ResidueFontInfo.fullSequenceResidueFont );
         
-        final StructureComponent chain = this.generateRanges(newSize.width);
+        final StructureComponent chain = generateRanges(newSize.width);
         
         // if there is no chain for this panel, paint the base panel, and quit.
-        if(chain == null) {
+        if (chain == null)
+        {
             super.paintComponent(g);
             return;
         }
@@ -228,7 +238,7 @@ public class FullSequencePanel extends JPanel
         if(chain instanceof ExternChain)
         	residuesVec = ((ExternChain)chain).getResiduesVec();
                 
-        final ChainStyle style = (ChainStyle)ss.getStyle(this.firstNdbChain);
+        final ChainStyle style = (ChainStyle)ss.getStyle(firstNdbChain);
         
         // draw the ranges
         int maxRow = 0;
@@ -245,7 +255,10 @@ public class FullSequencePanel extends JPanel
             final int tmp = startCell + length;
             final int curY = row * (int)FullSequencePanel.cellBounds.getHeight() + (int)FullSequencePanel.cellBounds.getHeight();
             int curX = FullSequencePanel.startSequenceX;
-            for(int cell = startCell, index = startIndex; cell < tmp; cell++, index++) {
+            boolean first = true;
+            int lastCharEndX = curX - 1;
+            for(int cell = startCell, index = startIndex; cell < tmp; cell++, index++)
+            {
                 final Residue r = residuesVec.get(index);
                 
                 // if this is visible, draw an indicator
@@ -260,16 +273,30 @@ public class FullSequencePanel extends JPanel
                 buf.setColor(new Color(color[0],color[1],color[2]));
                 
                 String symbol = null;
-                if(r.getClassification() == Residue.Classification.AMINO_ACID) {
-                    symbol = AminoAcidInfo.getLetterFromCode(r.getCompoundCode());
-                } else if(r.getClassification() == Residue.Classification.NUCLEIC_ACID) {
-                	symbol = r.getCompoundCode();
-                } else {
-                    symbol = "*";
+                switch (r.getClassification())
+                {
+                case AMINO_ACID: symbol = AminoAcidInfo.getLetterFromCode(r.getCompoundCode()); break;                
+                case NUCLEIC_ACID: symbol = r.getCompoundCode(); break;
+                default: symbol = "*"; break;
                 }
                 
                 buf.drawString(symbol,curX,curY);
                 
+                buf.setColor(Color.white);
+                int lineY = curY + 1;
+                if (first || ( r.getResidueId() % 10 == 0 && curX > lastCharEndX))
+                {
+                	String resId = "";
+                	final Object[] val = sm.getPdbToNdbConverter().getPdbIds(r.getChainId(), new Integer(r.getResidueId()));
+	        		if (val != null)
+	        			resId = (String)val[1];
+	                buf.drawString(resId, curX, curY + (int)letterBounds.getHeight() + rulerWidth);
+	                lastCharEndX = curX + (resId.length() * (int)letterBounds.getWidth() + 1);
+	                int tickX = curX + letterCenterX;
+	                buf.drawLine(tickX , lineY, tickX, lineY + rulerWidth);
+	                first = false;
+                }
+                buf.drawLine(curX, lineY, curX + (int)letterBounds.getWidth(), lineY);                              
                 curX += (int)FullSequencePanel.cellBounds.getWidth();
             }
         }
@@ -278,36 +305,33 @@ public class FullSequencePanel extends JPanel
         buf.setColor(Color.white);
         buf.setFont(FullSequencePanel.descriptionFont);
 		
-		for(int i = 0; i < this.title.length; i++) {
-			buf.drawString(this.title[i], FullSequencePanel.descriptionBarBuffer, (int)FullSequencePanel.cellBounds.getHeight() * (i + 1));
+		for(int i = 0; i < title.length; i++) {
+			buf.drawString(title[i], FullSequencePanel.descriptionBarPadding, (int)FullSequencePanel.cellBounds.getHeight() * (i + 1));
 		}
         
         // draw the background, etc.
         super.paintComponent(g2);
         
         // draw the buffer
-        g2.drawImage(this.oldImage,null,0,0);
+        g2.drawImage(oldImage,null,0,0);
     }
 	
 	
     
-    public Residue getResidueAt(final Point p) {
-        if(p.x < FullSequencePanel.startSequenceX) {
+    public Residue getResidueAt(final Point p)
+    {
+        if (p.x < FullSequencePanel.startSequenceX)
             return null;
-        }
-        
-        //Vector receptors = this.data.getCurrentReceptors();
         
         // if we're only showing immunogenic residues (epitope), handle separately...
         Residue r = null;
         
         final int row = p.y / FullSequencePanel.cellBounds.height;
         
-        final Integer[] tmp = this.rangesByRow.get(new Integer(row));
+        final Integer[] tmp = rangesByRow.get(new Integer(row));
         // if this is not a valid row...
-        if(tmp == null) {
+        if(tmp == null)
             return null;
-        }
         
         final int startCell = tmp[0].intValue();
         final int startIndex = tmp[1].intValue();
@@ -315,35 +339,35 @@ public class FullSequencePanel extends JPanel
         
         final int column = (p.x - FullSequencePanel.startSequenceX) / FullSequencePanel.cellBounds.width;
         // if this is not a valid column...
-        if(column >= startCell + length) {
+        if(column >= startCell + length)
             return null;
-        }
         
         final int index = (column - startCell) + startIndex;
-        if (this.chain instanceof ExternChain) 
-        	r = ((ExternChain)this.chain).getResidue(index);
+        if (chain instanceof ExternChain) 
+        	r = ((ExternChain)chain).getResidue(index);
         
         return r;
     }
 }
 
-class SequenceMouseListener extends MouseAdapter {
+class SequenceMouseListener extends MouseAdapter
+{
     private FullSequencePanel parent;
     
-    public SequenceMouseListener(final FullSequencePanel parent) {
-        this.parent = parent;
-    }
+    public SequenceMouseListener(final FullSequencePanel parent) {  this.parent = parent; }
     
     @Override
-	public void mouseClicked(final MouseEvent e) {
-        final Structure struc = this.parent.chain.structure;
+	public void mouseClicked(final MouseEvent e)
+    {
+        final Structure struc = parent.chain.structure;
         final StructureStyles ss = struc.getStructureMap().getStructureStyles();
         
         final LXGlGeometryViewer viewer = LigandExplorer.sgetGlGeometryViewer();
         
         final Point p = e.getPoint();
-        final Residue r = this.parent.getResidueAt(p);
-        if(r != null) {
+        final Residue r = parent.getResidueAt(p);
+        if (r != null)
+        {
         	final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry.get(StructureComponentRegistry.TYPE_ATOM);
     		final AtomStyle as = (AtomStyle) ss.getDefaultStyle(
     				StructureComponentRegistry.TYPE_ATOM);
@@ -351,39 +375,38 @@ class SequenceMouseListener extends MouseAdapter {
     		final BondStyle bs = (BondStyle) ss.getDefaultStyle(
     				StructureComponentRegistry.TYPE_BOND);
             // toggle between adding and removing
-        	if(ss.isSelected(r)) {
+    		
+        	if(ss.isSelected(r))
         		viewer.hideResidue(r);
-        	} else {
+        	
+        	else
         		viewer.renderResidue(r, as, ag, bs, bg, false);
-        	}
             
-            this.parent.needsComponentReposition = true;
-            this.parent.repaint();
+            parent.needsComponentReposition = true;
+            parent.repaint();
         }
         viewer.requestRepaint();
     }
     
     @Override
 	public void mouseExited(final MouseEvent e) {
-        this.parent.selectedResidue = null;
+        parent.selectedResidue = null;
     }
 }
 
-class SequenceMouseMotionListener extends MouseMotionAdapter {
+class SequenceMouseMotionListener extends MouseMotionAdapter
+{
     private FullSequencePanel parent;
     
-    public SequenceMouseMotionListener(final FullSequencePanel parent) {
-        this.parent = parent;
-    }
+    public SequenceMouseMotionListener(final FullSequencePanel parent) { this.parent = parent; }
     
-    //private static final ResidueColorByRgb yellow = new ResidueColorByRgb(Color.yellow.getRed() / 255,Color.yellow.getGreen() / 255,Color.yellow.getBlue() / 255);
     @Override
-	public void mouseMoved(final MouseEvent e) {
+	public void mouseMoved(final MouseEvent e)
+    {
         final Point p = e.getPoint();
-        final Residue r = this.parent.getResidueAt(p);
-        if(r == null || r == this.parent.selectedResidue) {
+        final Residue r = parent.getResidueAt(p);
+        if (r == null || r == parent.selectedResidue)
             return;
-        }
         
         final Structure struc = r.structure;
         final StructureMap sm = struc.getStructureMap();
