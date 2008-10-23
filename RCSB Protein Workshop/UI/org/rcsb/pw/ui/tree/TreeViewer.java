@@ -135,7 +135,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Iterator;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -158,14 +157,12 @@ import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Conformation;
 import org.rcsb.mbt.model.Fragment;
 import org.rcsb.mbt.model.StructureModel;
-import org.rcsb.mbt.model.MiscellaneousMoleculeChain;
-import org.rcsb.mbt.model.PdbChain;
+import org.rcsb.mbt.model.ExternChain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.WaterChain;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
 import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
@@ -263,18 +260,13 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 		private final ImageIcon chainIcon = new ImageIcon(this.getClass()
 				.getResource("chain_16.jpg"));
 
-		private final ImageIcon conformationIcon = new ImageIcon(this
-				.getClass().getResource("helix_16.jpg"));
-
 		private final ImageIcon bondIcon = new ImageIcon(this.getClass()
 				.getResource("bonds_16.jpg"));
-
-		private final ImageIcon structureIcon = new ImageIcon(this.getClass()
-				.getResource("structure_16.jpg"));
 
 		private final ImageIcon documentIcon = new ImageIcon(this.getClass()
 				.getResource("document_16.jpg"));
 
+		@Override
 		public Component getTreeCellRendererComponent(final JTree tree,
 				final Object value, final boolean selected,
 				final boolean expanded, final boolean leaf, final int row,
@@ -308,24 +300,20 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 								+ componentText.substring(ctLen - 15, ctLen);
 					}
 				}
+			}
+			
+			else if (value instanceof ExternChain)
+			{
+				final ExternChain xc = (ExternChain) value;
 
-				// setToolTipText( componentText );
-				imageIcon = this.structureIcon;
-			} else if (value instanceof WaterChain) {
-				componentText = "Water molecules";
-
-				imageIcon = this.chainIcon;
-			} else if (value instanceof MiscellaneousMoleculeChain) {
-				componentText = "Miscellaneous molecules (no pdb chain id)";
-
-				imageIcon = this.chainIcon;
-			} else if (value instanceof PdbChain) {
-				final PdbChain c = (PdbChain) value;
-
-				componentText = "Chain " + c.pdbChainId;
+				componentText = (xc.isBasicChain())? "Chain " + xc.getChainId() :
+							    (xc.isWaterChain())? "Water molecules" :
+							    	"Miscellaneous molecules (no pdb chain id)";
 
 				imageIcon = this.chainIcon;
-			} else if (value instanceof StructureComponent) {
+			}
+			
+			else if (value instanceof StructureComponent) {
 				final StructureComponent structureComponent = (StructureComponent) value;
 				final StructureMap structureMap = structureComponent.structure
 						.getStructureMap();
@@ -411,22 +399,20 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 						componentText = "not found";
 					}
 					imageIcon = this.residueIcon;
-					// setToolTipText( "class=" + residue.getClassification() +
-					// ", " + "conf=" + residue.getConformationType() );
 
 					boolean isVisible = false;
 					if (isAtomMode) {
 						// denote the residue as visible if even one of its
 						// atoms are visible.
-						final Iterator it = residue.getAtoms().iterator();
-						while (it.hasNext()) {
-							final Atom a = (Atom) it.next();
-							if (structureStyles.isVisible(a)) {
+						for (Atom a : residue.getAtoms())
+							if (structureStyles.isVisible(a))
+							{
 								isVisible = true;
 								break;
 							}
-						}
-					} else if (isBackboneMode) {
+					}
+					
+					else if (isBackboneMode) {
 						final Fragment f = residue.getFragment();
 						if (f != null && structureStyles.isVisible(f)) {
 							isVisible = true;
@@ -759,14 +745,12 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 		this.tree.expandPath(treePath);
 
 		// expand the path for the non-protein atoms, if any are present...
-		final Iterator it = structureMap.getPdbTopLevelElements().iterator();
-		while (it.hasNext()) {
-			final Object next = it.next();
-			if (next instanceof MiscellaneousMoleculeChain) {
+		for (StructureComponent next : structureMap.getPdbTopLevelElements())
+			if (next instanceof ExternChain && ((ExternChain)next).isMiscellaneousChain())
+			{
 				treePath = new TreePath(new Object[] { model, structure, next });
 				this.tree.expandPath(treePath);
 			}
-		}
 	}
 
 	/**
@@ -844,6 +828,7 @@ class NonSelectionModel extends DefaultTreeSelectionModel {
 		super.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 	}
 
+	@Override
 	public void setSelectionPath(final TreePath path) {
 		super.setSelectionPath(path);
 		this.nonSelector.setLivePath(path);
@@ -873,6 +858,7 @@ class NonSelectionIndicatorThread extends Thread {
 		this.interrupt();
 	}
 
+	@Override
 	public void run() {
 		while (true) {
 			try {

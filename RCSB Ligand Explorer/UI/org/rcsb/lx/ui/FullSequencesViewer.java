@@ -13,15 +13,11 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.StructureModel;
-import org.rcsb.mbt.model.MiscellaneousMoleculeChain;
-import org.rcsb.mbt.model.PdbChain;
+import org.rcsb.mbt.model.ExternChain;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.WaterChain;
-import org.rcsb.mbt.model.util.PdbToNdbConverter;
 
 
 /**
@@ -48,25 +44,22 @@ public class FullSequencesViewer extends JScrollPane {
         super.setDoubleBuffered(false);
     }
 
-    public void setComponents() {
-//        this.data = data;
-        
+    public void setComponents()
+    {
         this.createViewersForCurrentEpitope();
     }
     
-    public void createViewersForCurrentEpitope() {
+    public void createViewersForCurrentEpitope()
+    {
         this.contentPane.removeAll();
         StructureModel model = AppBase.sgetModel();
-        if(model.getStructures() == null) {
+        if (model.getStructures() == null)
         	return;
-        }
         
         final Structure struc = model.getStructures().get(0);
         final StructureMap sm = struc.getStructureMap();
         
         final int scrollbarWidth = (int)super.getVerticalScrollBar().getPreferredSize().getWidth();
-        
-        final PdbToNdbConverter converter = sm.getPdbToNdbConverter();
         
         final Vector<StructureComponent> chains = sm.getPdbTopLevelElements();
         if(chains != null)
@@ -78,54 +71,63 @@ public class FullSequencesViewer extends JScrollPane {
             {
             	String title = null;
             	
-                if (c instanceof PdbChain)
-                	title = "Chain " + ((PdbChain)c).pdbChainId + ":";
-                
-                else if (c instanceof WaterChain)
-                	continue;
-                			// don't bother reporting water residues
-                
-                else if(c instanceof MiscellaneousMoleculeChain)
-                	title = "Various Molecules:";
-            				// MiscellaneousMoleculeChains are those without pdb chain ids.
-               
+                if (c instanceof ExternChain)
+                {
+                	ExternChain xc = (ExternChain)c;
+                	switch (xc.getExternChainType())
+                	{
+                	case BASIC: title = "Chain " + xc.getChainId() + ":"; break;
+                	case MISCELLANEOUS: title = "Miscellaneous Molecules (no chain id):"; break;
+                	default:
+                		continue;
+                						// no waters...
+                	}
+                }
                 this.sequencePanels[i++] = new FullSequencePanel(title, c, scrollbarWidth);
             }
             
-            Arrays.sort(this.sequencePanels, new Comparator<FullSequencePanel>() {
-
-				public int compare(final FullSequencePanel s1, final FullSequencePanel s2)
-				{
-					String pdbChainId1 = null;
-					if (s1 == null)
-						return 1;
+            Arrays.sort(this.sequencePanels,
+            	new Comparator<FullSequencePanel>()
+            	{
+					public int compare(final FullSequencePanel s1, final FullSequencePanel s2)
+					{
+						String pdbChainId1 = null;
+						if (s1 == null)
+							return 1;
+							
+						if (s1.chain instanceof ExternChain)
+						{
+							ExternChain xc = (ExternChain)s1.chain;
+							if (xc.isBasicChain())
+								pdbChainId1 = xc.getChainId();
+							
+							else 
+								return -1;
+						}
 						
-					else if (s1.chain instanceof PdbChain)
-						pdbChainId1 = ((PdbChain)s1.chain).pdbChainId;
+						if (pdbChainId1 == null)
+							return 1;
+						
+						String pdbChainId2 = null;
+						if (s2 == null)
+							return -1;
+						
+						if (s2.chain instanceof ExternChain)
+						{
+						ExternChain xc = (ExternChain)s2.chain;
+						  if (xc.isBasicChain())
+							  pdbChainId2 = xc.getChainId();
 					
-					else if (s1.chain instanceof MiscellaneousMoleculeChain)
-						return -1;
-
-					if (pdbChainId1 == null)
-						return 1;
-					
-					String pdbChainId2 = null;
-					if (s2 == null)
-						return -1;
-					
-					if (s2.chain instanceof PdbChain)
-						pdbChainId2 = ((PdbChain)s2.chain).pdbChainId;
-					
-					else if (s2.chain instanceof MiscellaneousMoleculeChain)
-						return 1;
-
-					if (pdbChainId2 == null)
-						return -1;
-					
-					return pdbChainId1.compareTo(pdbChainId2);
-				}
-            	
-            });
+						  else
+							  return 1;
+						}
+	
+						if (pdbChainId2 == null)
+							return -1;
+						
+						return pdbChainId1.compareTo(pdbChainId2);
+					}           	
+	            });
             
             for(int iPanel = 0; iPanel < this.sequencePanels.length; iPanel++) {
             	if(this.sequencePanels[iPanel] != null) {
@@ -144,7 +146,8 @@ public class FullSequencesViewer extends JScrollPane {
     }
     
     private final Dimension oldSize = new Dimension(-1,-1);
-    public void paintComponent(final Graphics g) {
+    @Override
+	public void paintComponent(final Graphics g) {
         final Dimension newSize = this.contentPane.getSize();
         
         if(!newSize.equals(this.oldSize) || this.needsRepositioning) {

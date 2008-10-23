@@ -15,7 +15,6 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
@@ -28,14 +27,12 @@ import org.rcsb.mbt.glscene.jogl.AtomGeometry;
 import org.rcsb.mbt.glscene.jogl.BondGeometry;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.Chain;
-import org.rcsb.mbt.model.MiscellaneousMoleculeChain;
-import org.rcsb.mbt.model.PdbChain;
+import org.rcsb.mbt.model.ExternChain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.WaterChain;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
 import org.rcsb.mbt.model.attributes.ChainStyle;
@@ -84,7 +81,7 @@ public class FullSequencePanel extends JPanel
      *      }
      *   }
      */
-    HashMap rangesByRow = new HashMap();
+    HashMap<Integer, Integer[]> rangesByRow = new HashMap<Integer, Integer[]>();
 	
     // useLight: display a light chain; otherwise, display a heavy chain
     // immunoOnly: only display the immunogenic residues (paratope).
@@ -95,17 +92,10 @@ public class FullSequencePanel extends JPanel
         this.chain = chain;
         this.scrollbarWidth = scrollbarWidth;
         
-        if(chain instanceof PdbChain) {
-        	final PdbChain ch = (PdbChain)chain;
-        	final Residue firstRes = ch.getResidue(0);
-        	this.firstNdbChain = firstRes.structure.getStructureMap().getChain(firstRes.getChainId());
-        } else if(chain instanceof WaterChain) {
-        	final WaterChain ch = (WaterChain)chain;
-        	final Residue firstRes = ch.getResidue(0);
-        	this.firstNdbChain = firstRes.structure.getStructureMap().getChain(firstRes.getChainId());
-        } else if(chain instanceof MiscellaneousMoleculeChain) {
-        	final MiscellaneousMoleculeChain ch = (MiscellaneousMoleculeChain)chain;
-        	final Residue firstRes = ch.getResidue(0);
+        if(chain instanceof ExternChain)
+        {
+        	final ExternChain xc = (ExternChain)chain;
+        	final Residue firstRes = xc.getResidue(0);
         	this.firstNdbChain = firstRes.structure.getStructureMap().getChain(firstRes.getChainId());
         }
         
@@ -183,19 +173,14 @@ public class FullSequencePanel extends JPanel
         // remove all ranges in preparation for adding new ones.
         this.rangesByRow.clear();
         
-        int numResidues = 0;
-        if(this.chain instanceof PdbChain) {
-        	numResidues = ((PdbChain)this.chain).getResidueCount();
-        } else if(this.chain instanceof WaterChain) {
-        	numResidues = ((WaterChain)this.chain).getResidueCount();
-        } else if(this.chain instanceof MiscellaneousMoleculeChain) {
-        	numResidues = ((MiscellaneousMoleculeChain)this.chain).getResidueCount();
-        }
+        int numResidues = (this.chain instanceof ExternChain)? ((ExternChain)chain).getResidueCount() : 0;
+        
         for(int startIndex = 0; startIndex < numResidues; curRow++, startIndex += numCols) {
             //int startIndex = i * numCols;
             final int size = Math.min(numCols, numResidues - startIndex);
             if(size >= 0) {
-                this.rangesByRow.put(new Integer(curRow), new Integer[] {new Integer(0),new Integer(startIndex),new Integer(size)});
+                this.rangesByRow.put(new Integer(curRow),
+                				     new Integer[] {new Integer(0),new Integer(startIndex),new Integer(size)});
             }
         }
         
@@ -239,29 +224,20 @@ public class FullSequencePanel extends JPanel
             return;
         }
         
-        Vector residuesVec = null;
-        if(chain instanceof PdbChain)
-        	residuesVec = ((PdbChain)chain).getResiduesVec();
-        
-        else if(chain instanceof WaterChain)
-        	residuesVec = ((WaterChain)chain).getResiduesVec();
-        
-        else if(chain instanceof MiscellaneousMoleculeChain)
-        	residuesVec = ((MiscellaneousMoleculeChain)chain).getResiduesVec();
+        Vector<Residue> residuesVec = null;
+        if(chain instanceof ExternChain)
+        	residuesVec = ((ExternChain)chain).getResiduesVec();
                 
         final ChainStyle style = (ChainStyle)ss.getStyle(this.firstNdbChain);
         
         // draw the ranges
-        final Iterator rangesKeyIt = this.rangesByRow.keySet().iterator();
-        final Iterator rangesValuesIt = this.rangesByRow.values().iterator();
         int maxRow = 0;
-        while(rangesKeyIt.hasNext()) {
-            final int row = ((Integer)rangesKeyIt.next()).intValue();
-            if(row > maxRow) {
+        for (Integer row : rangesByRow.keySet())
+        {
+            if (row > maxRow)
 				maxRow = row;
-			}
             
-            final Integer[] values = (Integer[])rangesValuesIt.next();
+            final Integer[] values = rangesByRow.get(row);
             final int startCell = values[0].intValue();
             final int startIndex = values[1].intValue();
             final int length = values[2].intValue();
@@ -270,7 +246,7 @@ public class FullSequencePanel extends JPanel
             final int curY = row * (int)FullSequencePanel.cellBounds.getHeight() + (int)FullSequencePanel.cellBounds.getHeight();
             int curX = FullSequencePanel.startSequenceX;
             for(int cell = startCell, index = startIndex; cell < tmp; cell++, index++) {
-                final Residue r = (Residue)residuesVec.get(index);
+                final Residue r = residuesVec.get(index);
                 
                 // if this is visible, draw an indicator
                 if(ss.isSelected(r)) {
@@ -327,7 +303,7 @@ public class FullSequencePanel extends JPanel
         
         final int row = p.y / FullSequencePanel.cellBounds.height;
         
-        final Integer[] tmp = (Integer[])this.rangesByRow.get(new Integer(row));
+        final Integer[] tmp = this.rangesByRow.get(new Integer(row));
         // if this is not a valid row...
         if(tmp == null) {
             return null;
@@ -344,34 +320,11 @@ public class FullSequencePanel extends JPanel
         }
         
         final int index = (column - startCell) + startIndex;
-        if(this.chain instanceof PdbChain) {
-        	r = ((PdbChain)this.chain).getResidue(index);
-        } else if(this.chain instanceof WaterChain) {
-        	r = ((WaterChain)this.chain).getResidue(index);
-        } else if(this.chain instanceof MiscellaneousMoleculeChain) {
-        	r = ((MiscellaneousMoleculeChain)this.chain).getResidue(index);
-        }
+        if (this.chain instanceof ExternChain) 
+        	r = ((ExternChain)this.chain).getResidue(index);
         
         return r;
     }
-
-
-	public void clearStructure(final boolean transatory) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	public void newStructureAdded(final Structure struc, final boolean transatory) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	public void reset() {
-		// TODO Auto-generated method stub
-		
-	}
 }
 
 class SequenceMouseListener extends MouseAdapter {
@@ -434,7 +387,6 @@ class SequenceMouseMotionListener extends MouseMotionAdapter {
         
         final Structure struc = r.structure;
         final StructureMap sm = struc.getStructureMap();
-        final StructureStyles ss = sm.getStructureStyles();
         
         final Chain c = r.getFragment().getChain();
 		final Object[] val = sm.getPdbToNdbConverter().getPdbIds(c.getChainId(), new Integer(r.getResidueId()));

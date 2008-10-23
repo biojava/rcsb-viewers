@@ -1,27 +1,23 @@
 package org.rcsb.pw.controllers.scene.mutators;
 
 import java.awt.Color;
-import java.util.Iterator;
 import java.util.Vector;
 
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.scene.PickLevel;
 import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
+import org.rcsb.mbt.model.ExternChain;
 import org.rcsb.mbt.model.Fragment;
-import org.rcsb.mbt.model.MiscellaneousMoleculeChain;
-import org.rcsb.mbt.model.PdbChain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.WaterChain;
 import org.rcsb.mbt.model.attributes.AtomColorByRgb;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
@@ -45,24 +41,27 @@ public class ColorMutator extends Mutator
 	}
 	
 	
+	@Override
 	public boolean supportsBatchMode() {
 		return true;
 	}
 	
 	
+	@Override
 	public void doMutationSingle(final Object mutee) {
-		Mutator.mutees.clear();
-		Mutator.mutees.put(mutee, null);
+		mutees.clear();
+		mutees.add(mutee);
 		this.doMutation();
-		Mutator.mutees.clear();
+		mutees.clear();
 	}
 
 	
+	@Override
 	public void doMutation()
 	{
 		SceneController sceneController = AppBase.sgetSceneController();
-		if(sceneController.isColorSelectorSampleModeEnabled() && super.mutees.size() > 0) {
-			final Object mutee = super.mutees.keySet().iterator().next();
+		if(sceneController.isColorSelectorSampleModeEnabled() && mutees.size() > 0) {
+			final Object mutee = mutees.iterator().next();
 			
 			this.performColorSample(mutee);
 			
@@ -71,9 +70,7 @@ public class ColorMutator extends Mutator
 		
 		else
 		{
-			final Iterator it = super.mutees.keySet().iterator();
-			while(it.hasNext()) {
-				final Object next = it.next();
+			for (Object next : mutees)
 				if(next instanceof Atom) {
 					this.changeColor((Atom)next);
 				} else if(next instanceof Bond) {
@@ -82,19 +79,14 @@ public class ColorMutator extends Mutator
 					this.changeColor((Residue)next);
 				} else if(next instanceof Chain) {
 					this.changeColor((Chain)next);
-				} else if(next instanceof PdbChain) {
-					this.changeColor((PdbChain)next);
-				} else if(next instanceof WaterChain) {
-					this.changeColor((WaterChain)next);
-				} else if(next instanceof MiscellaneousMoleculeChain) {
-					this.changeColor((MiscellaneousMoleculeChain)next);
+				} else if(next instanceof ExternChain) {
+					this.changeColor((ExternChain)next);
 				} else if(next instanceof Fragment) {
 					this.changeColor((Fragment)next);
 				} else if(next instanceof Structure) {
 					final Structure s = (Structure)next;
 					this.changeColor(s);
 				}
-			}
 		}
 	}
 	
@@ -134,22 +126,16 @@ public class ColorMutator extends Mutator
 				
 				final ChainStyle style = (ChainStyle)c.structure.getStructureMap().getStructureStyles().getStyle(c);
 				style.getResidueColor(c.getResidue(c.getResidueCount() / 2), colorFl);
-			} else if(mutee_ instanceof PdbChain) {
-				final PdbChain c = (PdbChain)mutee;
+			}
+			
+			else if (mutee_ instanceof ExternChain)
+			{
+				final ExternChain c = (ExternChain)mutee;
 				
-				final ChainStyle style = (ChainStyle)c.structure.getStructureMap().getStructureStyles().getStyle((Chain)c.getMbtChainIterator().next());
-				style.getResidueColor(c.getResidue(c.getResidueCount() / 2), colorFl);
-			} else if(mutee_ instanceof WaterChain) {
-				final WaterChain c = (WaterChain)mutee;
-				
-				final ChainStyle style = (ChainStyle)c.structure.getStructureMap().getStructureStyles().getStyle((Chain)c.getMbtChainIterator().next());
-				style.getResidueColor(c.getResidue(c.getResidueCount() / 2), colorFl);
-			} else if(mutee_ instanceof MiscellaneousMoleculeChain) {
-				final MiscellaneousMoleculeChain c = (MiscellaneousMoleculeChain)mutee;
-				
-				final ChainStyle style = (ChainStyle)c.structure.getStructureMap().getStructureStyles().getStyle((Chain)c.getMbtChainIterator().next());
+				final ChainStyle style = (ChainStyle)c.structure.getStructureMap().getStructureStyles().getStyle(c.getMbtChainIterator().next());
 				style.getResidueColor(c.getResidue(c.getResidueCount() / 2), colorFl);
 			}
+
 		} else if(mutee instanceof Structure) {
 			final Structure s = (Structure)mutee;
 			final StructureMap sm = s.getStructureMap();
@@ -183,7 +169,6 @@ public class ColorMutator extends Mutator
         case PickLevel.COMPONENTS_ATOMS_BONDS:
         	this.options.getCurrentColor().getColorComponents(ColorMutator.colorFl);
         	
-        	final GlGeometryViewer viewer = AppBase.sgetGlGeometryViewer();
             final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(a);
             if(renderable != null) {
             	final AtomStyle oldStyle = (AtomStyle)renderable.style;
@@ -196,7 +181,6 @@ public class ColorMutator extends Mutator
                 ss.setStyle(a, style);
                 
             	renderable.style = style;
-//            	renderable.setDirty();
             }
             break;
         case PickLevel.COMPONENTS_RIBBONS:
@@ -211,7 +195,6 @@ public class ColorMutator extends Mutator
     private void changeColor(final Bond b) {
         final Structure struc = b.structure;
         final StructureMap sm = struc.getStructureMap();
-        final StructureStyles ss = sm.getStructureStyles();
         
         switch(PickLevel.pickLevel) {
         case PickLevel.COMPONENTS_ATOMS_BONDS:
@@ -254,27 +237,20 @@ public class ColorMutator extends Mutator
         final StructureMap sm = struc.getStructureMap();
         final StructureStyles ss = sm.getStructureStyles();
         
-        switch(PickLevel.pickLevel) {
+        switch(PickLevel.pickLevel)
+        {
         case PickLevel.COMPONENTS_ATOMS_BONDS:
-            final Vector atoms = r.getAtoms();
-            
-            final Iterator atomIt = atoms.iterator();
-            while(atomIt.hasNext()) {
-                final Atom a = (Atom)atomIt.next();  
+        	Vector<Atom> atoms = r.getAtoms();
+            for (Atom a : atoms)
                 this.changeColor(a);
-            }
             
-            final Vector bonds = sm.getBonds(atoms);
-            final Iterator bondsIt = bonds.iterator();
-            while(bondsIt.hasNext()) {
-            	final Bond b = (Bond)bondsIt.next();
+            for (Bond b : sm.getBonds(atoms))
             	this.changeColor(b);
-            }
             break;
+            
         case PickLevel.COMPONENTS_RIBBONS:
         	final Chain c = sm.getChain(r.getChainId());
             
-        	final GlGeometryViewer viewer = AppBase.sgetGlGeometryViewer();
             final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(c);
             if(renderable != null) {
             	this.options.getCurrentColor().getColorComponents(ColorMutator.colorFl);
@@ -290,18 +266,11 @@ public class ColorMutator extends Mutator
                 	style.setResidueColor(residueColorByRgb);
                 	ss.setStyle(c, style);
                 }
-                residueColorByRgb.setColor(r, ColorMutator.colorFl);
-            	
-//                for(int i = 0; i < renderable.arrayLists.length; i++) {
-//                	if(renderable.arrayLists[i] != null) {
-//                		renderable.arrayLists[i].setEntityColor(r, colorFl);
-//                	}
-//                }
-                
+                residueColorByRgb.setColor(r, ColorMutator.colorFl);               
             	renderable.style = style;
-//            	renderable.setDirty();
             }
             break;
+            
         default:
             (new Exception()).printStackTrace();
         }
@@ -322,35 +291,15 @@ public class ColorMutator extends Mutator
     	}
     }
     
-    private void changeColor(final PdbChain c) {
-    	final Iterator it = c.getResidueIterator();
-    	while(it.hasNext()) {
-    		final Residue r = (Residue)it.next();
+    private void changeColor(final ExternChain c)
+    {
+    	for (Residue r : c.getResiduesVec())
     		this.changeColor(r);
-    	}
     }
     
-    private void changeColor(final MiscellaneousMoleculeChain c) {
-    	final Iterator it = c.getIterator();
-    	while(it.hasNext()) {
-    		final Residue r = (Residue)it.next();
-    		this.changeColor(r);
-    	}
-    }
-    
-    private void changeColor(final WaterChain c) {
-    	final Iterator it = c.getIterator();
-    	while(it.hasNext()) {
-    		final Residue r = (Residue)it.next();
-    		this.changeColor(r);
-    	}
-    }
-    
-    private void changeColor(final Structure s) {
-    	final Iterator chainIt = s.getStructureMap().getChains().iterator();
-		while(chainIt.hasNext()) {
-			final Chain c = (Chain)chainIt.next();
+    private void changeColor(final Structure s)
+    {
+		for (Chain c : s.getStructureMap().getChains())
 			this.changeColor(c);
-		}
     }
 }

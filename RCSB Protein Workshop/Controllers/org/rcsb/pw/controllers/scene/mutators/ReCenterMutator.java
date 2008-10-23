@@ -1,18 +1,14 @@
 package org.rcsb.pw.controllers.scene.mutators;
 
-import java.util.Iterator;
-
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Fragment;
-import org.rcsb.mbt.model.MiscellaneousMoleculeChain;
-import org.rcsb.mbt.model.PdbChain;
+import org.rcsb.mbt.model.ExternChain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.WaterChain;
 import org.rcsb.pw.controllers.scene.mutators.options.ReCenterOptions;
 
 
@@ -41,12 +37,8 @@ public class ReCenterMutator extends Mutator
 			this.changeCenter((Residue)mutee);
 		} else if(mutee instanceof Chain) {
 			this.changeCenter((Chain)mutee);
-		} else if(mutee instanceof PdbChain) {
-			this.changeCenter((PdbChain)mutee);
-		} else if(mutee instanceof WaterChain) {
-			this.changeCenter((WaterChain)mutee);
-		} else if(mutee instanceof MiscellaneousMoleculeChain) {
-			this.changeCenter((MiscellaneousMoleculeChain)mutee);
+		} else if(mutee instanceof ExternChain) {
+			this.changeCenter((ExternChain)mutee);
 		} else if(mutee instanceof Fragment) {
 			this.changeCenter((Fragment)mutee);
 		} else if(mutee instanceof Structure) {
@@ -57,11 +49,8 @@ public class ReCenterMutator extends Mutator
 	
 	
 	public void doMutation() {
-		final Iterator it = super.mutees.keySet().iterator();
-		while(it.hasNext()) {
-			final Object next = it.next();
+		for (Object next : mutees)
 			this.doMutationSingle(next);
-		}
 	}
 	
 	public ReCenterOptions getOptions() {
@@ -93,15 +82,7 @@ public class ReCenterMutator extends Mutator
     	this.changeCenter(c.getFragment(c.getFragmentCount() / 2));
     }
     
-    private void changeCenter(final PdbChain c) {
-    	this.changeCenter(c.getResidue(c.getResidueCount() / 2));
-    }
-    
-    private void changeCenter(final MiscellaneousMoleculeChain c) {
-    	this.changeCenter(c.getResidue(c.getResidueCount() / 2));
-    }
-    
-    private void changeCenter(final WaterChain c) {
+    private void changeCenter(final ExternChain c) {
     	this.changeCenter(c.getResidue(c.getResidueCount() / 2));
     }
     

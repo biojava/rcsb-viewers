@@ -1,33 +1,24 @@
 package org.rcsb.pw.controllers.scene.mutators;
 
-import java.util.Iterator;
-import java.util.Vector;
-
-import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.scene.PickLevel;
 import org.rcsb.mbt.glscene.jogl.AtomGeometry;
 import org.rcsb.mbt.glscene.jogl.BondGeometry;
 import org.rcsb.mbt.glscene.jogl.ChainGeometry;
 import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
 import org.rcsb.mbt.glscene.jogl.Geometry;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Fragment;
-import org.rcsb.mbt.model.MiscellaneousMoleculeChain;
-import org.rcsb.mbt.model.PdbChain;
+import org.rcsb.mbt.model.ExternChain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.WaterChain;
+
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.pw.controllers.scene.mutators.options.StylesOptions;
-
-
-
 
 public class StylesMutator extends Mutator {
 	private StylesOptions options = null; 
@@ -38,23 +29,24 @@ public class StylesMutator extends Mutator {
 	}
 
 	
+	@Override
 	public boolean supportsBatchMode() {
 		return true;
 	}
 	
 	
+	@Override
 	public void doMutationSingle(final Object mutee) {
-		Mutator.mutees.clear();
-		Mutator.mutees.put(mutee, null);
+		mutees.clear();
+		mutees.add(mutee);
 		this.doMutation();
-		Mutator.mutees.clear();
+		mutees.clear();
 	}
 	
 	
+	@Override
 	public void doMutation() {
-		final Iterator it = super.mutees.keySet().iterator();
-		while(it.hasNext()) {
-			final Object next = it.next();
+		for (Object next : mutees)
 			if(next instanceof Atom) {
 				this.changeStyle((Atom)next);
 			} else if(next instanceof Bond) {
@@ -63,20 +55,13 @@ public class StylesMutator extends Mutator {
 				this.changeStyle((Residue)next);
 			} else if(next instanceof Chain) {
 				this.changeStyle((Chain)next);
-			} else if(next instanceof PdbChain) {
-				this.changeStyle((PdbChain)next);
-			} else if(next instanceof WaterChain) {
-				this.changeStyle((WaterChain)next);
-			} else if(next instanceof MiscellaneousMoleculeChain) {
-				this.changeStyle((MiscellaneousMoleculeChain)next);
+			} else if(next instanceof ExternChain) {
+				this.changeStyle((ExternChain)next);
 			} else if(next instanceof Fragment) {
 				this.changeStyle((Fragment)next);
 			} else if(next instanceof Structure) {
 				this.changeStyle((Structure)next);
-			}
-		}
-		
-//		Model.getSingleton().getStructures()[0].getStructureMap().getSceneNode().regenerateGlobalList();
+			}		
 	}
 
 	public StylesOptions getOptions() {
@@ -111,11 +96,8 @@ public class StylesMutator extends Mutator {
         		
         		renderable.setDirty();
         		
-        		final Vector bonds = sm.getBonds(a);
-        		final int bondSize = bonds.size();
-        		for(int i = 0; i < bondSize; i++) {
-        			this.changeBondStyleBasedOnAtoms((Bond)bonds.get(i));
-        		}
+        		for (Bond b : sm.getBonds(a))
+        			this.changeBondStyleBasedOnAtoms(b);
         	}
         	
         	break;
@@ -162,7 +144,6 @@ public class StylesMutator extends Mutator {
     private void changeStyle(final Bond b) {
     	final Structure s = b.getStructure();
 		final StructureMap sm = s.getStructureMap();
-		final StructureStyles ss = sm.getStructureStyles();
 		
         switch(PickLevel.pickLevel) {
         case PickLevel.COMPONENTS_ATOMS_BONDS:
@@ -192,29 +173,20 @@ public class StylesMutator extends Mutator {
         }     
     }
     
-    private void changeStyle(final Residue r) {
-    	final Structure s = r.getStructure();
-		final StructureMap sm = s.getStructureMap();
-		final StructureStyles ss = sm.getStructureStyles();
-		
-        switch(PickLevel.pickLevel) {
-        case PickLevel.COMPONENTS_ATOMS_BONDS:
-        	/*Iterator atomsIt = r.getAtoms().iterator();
-        	while(atomsIt.hasNext()) {
-        		Atom a = (Atom)atomsIt.next();
-        		this.changeStyle(a);
-        	}*/
-        	
-        	final Iterator bondsIt = r.getStructure().getStructureMap().getBonds(r.getAtoms()).iterator();
-        	while(bondsIt.hasNext()) {
-        		final Bond b = (Bond)bondsIt.next();
+    private void changeStyle(final Residue r)
+    {
+        switch(PickLevel.pickLevel)
+        {
+        case PickLevel.COMPONENTS_ATOMS_BONDS:       	
+        	for (Bond b : r.getStructure().getStructureMap().getBonds(r.getAtoms()))
         		this.changeStyle(b);
-        	}
         	break;
+        	
         case PickLevel.COMPONENTS_RIBBONS:
         	// propogate up one level.
         	this.changeStyle(r.getFragment());
         	break;
+        	
         default:
         	(new Exception(PickLevel.pickLevel + " is an invalid style mode.")).printStackTrace();
         }
@@ -223,68 +195,43 @@ public class StylesMutator extends Mutator {
     private void changeStyle(final Fragment f) {
     	final Structure s = f.getStructure();
 		final StructureMap sm = s.getStructureMap();
-		final StructureStyles ss = sm.getStructureStyles();
 		
         switch(PickLevel.pickLevel) {
         case PickLevel.COMPONENTS_ATOMS_BONDS:
-        	final Iterator residueIt = f.getResidues().iterator();
-        	while(residueIt.hasNext()) {
-        		final Residue r = (Residue)residueIt.next();
-        		
-        		/*Iterator atomsIt = r.getAtoms().iterator();
-            	while(atomsIt.hasNext()) {
-            		Atom a = (Atom)atomsIt.next();
-            		this.changeStyle(a);
-            	}*/
-        		
-        		final Iterator bondsIt = sm.getBonds(r.getAtoms()).iterator();
-            	while(bondsIt.hasNext()) {
-            		final Bond b = (Bond)bondsIt.next();
+        	for (Residue r : f.getResidues())
+            	for (Bond b : sm.getBonds(r.getAtoms()))
             		this.changeStyle(b);
-            	}
-        	}
         	break;
+        	
         case PickLevel.COMPONENTS_RIBBONS:
         	// propogate up one level.
         	this.changeStyle(f.getChain());
         	break;
+        	
         default:
         	(new Exception(PickLevel.pickLevel + " is an invalid style mode.")).printStackTrace();
         }
     }
     
-    private void changeStyle(final PdbChain c) {
+    private void changeStyle(final ExternChain c)
+    {
     	final Structure s = c.structure;
 		final StructureMap sm = s.getStructureMap();
-		final StructureStyles ss = sm.getStructureStyles();
 		
-        switch(PickLevel.pickLevel) {
+        switch(PickLevel.pickLevel)
+        {
         case PickLevel.COMPONENTS_ATOMS_BONDS:
-        	final Iterator residueIt = c.getResidueIterator();
-        	while(residueIt.hasNext()) {
-        		final Residue r = (Residue)residueIt.next();
-        		
-        		/*Iterator atomsIt = r.getAtoms().iterator();
-            	while(atomsIt.hasNext()) {
-            		Atom a = (Atom)atomsIt.next();
-            		this.changeStyle(a);
-            	}*/
-        		
-        		final Iterator bondsIt = sm.getBonds(r.getAtoms()).iterator();
-            	while(bondsIt.hasNext()) {
-            		final Bond b = (Bond)bondsIt.next();
+        	for (Residue r : c.getResiduesVec())
+            	for (Bond b : sm.getBonds(r.getAtoms()))
             		this.changeStyle(b);
-            	}
-        	}
         	break;
+        	
         case PickLevel.COMPONENTS_RIBBONS:
         	// propogate to the chains
-        	final Iterator chainIt = c.getMbtChainIterator();
-        	while(chainIt.hasNext()) {
-        		final Chain mbtChain = (Chain)chainIt.next();
+        	for (Chain mbtChain : c.getMbtChains())
         		this.changeStyle(mbtChain);
-        	}
         	break;
+        	
         default:
         	(new Exception(PickLevel.pickLevel + " is an invalid style mode.")).printStackTrace();
         }
@@ -293,17 +240,13 @@ public class StylesMutator extends Mutator {
     private void changeStyle(final Chain c) {
     	final Structure s = c.getStructure();
 		final StructureMap sm = s.getStructureMap();
-		final StructureStyles ss = sm.getStructureStyles();
 		
         switch(PickLevel.pickLevel) {
         case PickLevel.COMPONENTS_ATOMS_BONDS:
-        	final Iterator fragmentIt = c.getFragments().iterator();
-        	while(fragmentIt.hasNext()) {
-        		final Fragment f = (Fragment)fragmentIt.next();
-        		
+        	for (Fragment f : c.getFragments())
         		this.changeStyle(f);
-        	}
         	break;
+        	
         case PickLevel.COMPONENTS_RIBBONS:
         	// propogate up one level.
             final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(c);
@@ -323,87 +266,9 @@ public class StylesMutator extends Mutator {
         }        
     }
     
-    private void changeStyle(final WaterChain c) {
-    	final Structure s = c.structure;
-		final StructureMap sm = s.getStructureMap();
-		final StructureStyles ss = sm.getStructureStyles();
-		
-        switch(PickLevel.pickLevel) {
-        case PickLevel.COMPONENTS_ATOMS_BONDS:
-        	final Iterator residueIt = c.getResidueIterator();
-        	while(residueIt.hasNext()) {
-        		final Residue r = (Residue)residueIt.next();
-        		
-        		/*Iterator atomsIt = r.getAtoms().iterator();
-            	while(atomsIt.hasNext()) {
-            		Atom a = (Atom)atomsIt.next();
-            		this.changeStyle(a);
-            	}*/
-        		
-        		final Iterator bondsIt = sm.getBonds(r.getAtoms()).iterator();
-            	while(bondsIt.hasNext()) {
-            		final Bond b = (Bond)bondsIt.next();
-            		this.changeStyle(b);
-            	}
-        	}
-        	break;
-        case PickLevel.COMPONENTS_RIBBONS:
-        	// propogate to the chains
-        	final Iterator chainIt = c.getMbtChainIterator();
-        	while(chainIt.hasNext()) {
-        		final Chain mbtChain = (Chain)chainIt.next();
-        		this.changeStyle(mbtChain);
-        	}
-        	break;
-        default:
-        	(new Exception(PickLevel.pickLevel + " is an invalid style mode.")).printStackTrace();
-        }
-    }
-    
-    private void changeStyle(final MiscellaneousMoleculeChain c) {
-    	final Structure s = c.structure;
-		final StructureMap sm = s.getStructureMap();
-		final StructureStyles ss = sm.getStructureStyles();
-		
-        switch(PickLevel.pickLevel) {
-        case PickLevel.COMPONENTS_ATOMS_BONDS:
-        	final Iterator residueIt = c.getResidueIterator();
-        	while(residueIt.hasNext()) {
-        		final Residue r = (Residue)residueIt.next();
-        		
-        		/*Iterator atomsIt = r.getAtoms().iterator();
-            	while(atomsIt.hasNext()) {
-            		Atom a = (Atom)atomsIt.next();
-            		this.changeStyle(a);
-            	}*/
-        		
-        		final Iterator bondsIt = sm.getBonds(r.getAtoms()).iterator();
-            	while(bondsIt.hasNext()) {
-            		final Bond b = (Bond)bondsIt.next();
-            		this.changeStyle(b);
-            	}
-        	}
-        	break;
-        case PickLevel.COMPONENTS_RIBBONS:
-        	// propogate to the chains
-        	final Iterator chainIt = c.getMbtChainIterator();
-        	while(chainIt.hasNext()) {
-        		final Chain mbtChain = (Chain)chainIt.next();
-        		this.changeStyle(mbtChain);
-        	}
-        	break;
-        default:
-        	(new Exception(PickLevel.pickLevel + " is an invalid style mode.")).printStackTrace();
-        }        
-    }
-    
-    private void changeStyle(final Structure s) {
-    	// propogate everything down to the chains.
-    	final StructureMap sm = s.getStructureMap();
-    	final Iterator chainIt = sm.getChains().iterator();
-    	while(chainIt.hasNext()) {
-    		final Chain c = (Chain)chainIt.next();
+    private void changeStyle(final Structure s)
+    {
+    	for (Chain c : s.getStructureMap().getChains())
     		this.changeStyle(c);
-    	}
     }
 }

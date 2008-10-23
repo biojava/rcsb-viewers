@@ -2488,15 +2488,13 @@ public class StructureMap
         for (String pdbId : byPdbId.keySet())
         {
         	Vector<Residue> residues = byPdbId.get(pdbId);
-            if(pdbId != null && pdbId.length() != 0) {
-                final PdbChain c = new PdbChain();
-                c.pdbChainId = pdbId;
-                c.setResidues(residues);
-                
-                this.pdbTopLevelElements.add(c);
-                
+            if (pdbId != null && pdbId.length() != 0)
+            { 
                 Collections.sort(residues, residueComparator);
                 residues.trimToSize();
+                
+                ExternChain c = ExternChain.createBasicChain(pdbId, residues);               
+                this.pdbTopLevelElements.add(c);
             }
             
             else
@@ -2509,15 +2507,13 @@ public class StructureMap
         
         if(waterResidues.size() != 0) {
         	waterResidues.trimToSize();
-            final WaterChain waterChain = new WaterChain();
-            waterChain.setResidues(waterResidues);
+            final ExternChain waterChain = ExternChain.createWaterChain(waterResidues);
             this.pdbTopLevelElements.add(waterChain);
         }
         
         if(nonProteinResidues.size() != 0) {
             nonProteinResidues.trimToSize();
-            final MiscellaneousMoleculeChain nonProteinChain = new MiscellaneousMoleculeChain();
-            nonProteinChain.setResidues(nonProteinResidues);
+            final ExternChain nonProteinChain = ExternChain.createMiscellaneousMoleculeChain(nonProteinResidues);
             this.pdbTopLevelElements.add(nonProteinChain);
         }
         
@@ -2546,24 +2542,8 @@ public class StructureMap
     public StructureComponent getTopPdbComponent(final Residue r)
     {
 		for (StructureComponent next : pdbTopLevelElements)
-		{
-			if(next instanceof PdbChain) {
-				final PdbChain next_ = (PdbChain)next;
-				if(next_.contains(r)) {
-					return next;
-				}
-			} else if(next instanceof WaterChain) {
-				final WaterChain next_ = (WaterChain)next;
-				if(next_.contains(r)) {
-					return next;
-				}
-			} else if(next instanceof MiscellaneousMoleculeChain) {
-				final MiscellaneousMoleculeChain next_ = (MiscellaneousMoleculeChain)next;
-				if(next_.contains(r)) {
-					return next;
-				}
-			}
-		}
+			if (next instanceof ExternChain)
+				if (((ExternChain)next).contains(r)) return next;
 		
 		return null;
 	}

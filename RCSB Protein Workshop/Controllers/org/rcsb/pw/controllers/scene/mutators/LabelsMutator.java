@@ -1,23 +1,17 @@
 package org.rcsb.pw.controllers.scene.mutators;
 
-import java.util.Iterator;
 import java.util.Vector;
 
-import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.glscene.jogl.CustomAtomLabel;
 import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Fragment;
-import org.rcsb.mbt.model.MiscellaneousMoleculeChain;
-import org.rcsb.mbt.model.PdbChain;
+import org.rcsb.mbt.model.ExternChain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
-import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.WaterChain;
 import org.rcsb.mbt.model.attributes.AtomLabelByAtomCompound;
 import org.rcsb.mbt.model.attributes.AtomLabelByAtomName;
 import org.rcsb.mbt.model.attributes.AtomLabelNone;
@@ -37,23 +31,24 @@ public class LabelsMutator extends Mutator {
 	}
 	
 	
+	@Override
 	public boolean supportsBatchMode() {
 		return true;
 	}
 	
 	
+	@Override
 	public void doMutationSingle(final Object mutee) {
-		Mutator.mutees.clear();
-		Mutator.mutees.put(mutee, null);
+		mutees.clear();
+		mutees.add(mutee);
 		this.doMutation();
-		Mutator.mutees.clear();
+		mutees.clear();
 	}
 	
 	
+	@Override
 	public void doMutation() {
-		final Iterator it = super.mutees.keySet().iterator();
-		while(it.hasNext()) {
-			final Object next = it.next();
+		for (Object next : mutees)
 			if(next instanceof Atom) {
 				this.changeLabelStyle((Atom)next);
 			} else if(next instanceof Bond) {
@@ -62,39 +57,35 @@ public class LabelsMutator extends Mutator {
 				this.changeLabelStyle((Residue)next);
 			} else if(next instanceof Chain) {
 				this.changeLabelStyle((Chain)next);
-			} else if(next instanceof PdbChain) {
-				this.changeLabelStyle((PdbChain)next);
-			} else if(next instanceof WaterChain) {
-				this.changeLabelStyle((WaterChain)next);
-			} else if(next instanceof MiscellaneousMoleculeChain) {
-				this.changeLabelStyle((MiscellaneousMoleculeChain)next);
+			} else if(next instanceof ExternChain) {
+				this.changeLabelStyle((ExternChain)next);
 			} else if(next instanceof Fragment) {
 				this.changeLabelStyle((Fragment)next);
 			} else if(next instanceof Structure) {
 				this.changeLabelStyle((Structure)next);
 			}
-		}
 	}
 
 	public LabelsOptions getOptions() {
 		return this.options;
 	}
 
-	public void changeLabelStyle(final Atom a) {
-		final GlGeometryViewer glViewer = AppBase.sgetGlGeometryViewer();
-		
-//		if(PickLevel.pickLevel == PickLevel.COMPONENTS_ATOMS_BONDS) {
+	public void changeLabelStyle(final Atom a)
+	{
 	        final DisplayListRenderable renderable = ((JoglSceneNode)a.structure.getStructureMap().getUData()).getRenderable(a);
 			
-			if(renderable != null) {
+			if(renderable != null)
+			{
 				final AtomStyle oldStyle = (AtomStyle)renderable.style;
 				final AtomStyle newStyle = new AtomStyle();
 				IAtomLabel label = null;
 				
-				switch(this.options.getCurrentLabellingStyle()) {
+				switch(this.options.getCurrentLabellingStyle())
+				{
 				case LabelsOptions.LABEL_BY_ATOM:
 					label = AtomLabelByAtomName.create();
 					break;
+					
 				case LabelsOptions.LABEL_BY_RESIDUE:
 					final Residue r = a.getStructure().getStructureMap().getResidue(a);
 					// label only if this is this either the alpha atom (amino acid) or the center atom (non-amino acid)?
@@ -104,6 +95,7 @@ public class LabelsMutator extends Mutator {
 						label = AtomLabelNone.create();
 					}
 					break;
+					
 				case LabelsOptions.LABEL_CUSTOM:
 					CustomAtomLabel label_ = null;
 					
@@ -116,142 +108,66 @@ public class LabelsMutator extends Mutator {
 					
 					label = label_;
 					break;
+					
 				case LabelsOptions.LABELS_OFF:
 					label = AtomLabelNone.create();
 					break;
+					
 				default:
 					(new IllegalArgumentException(this.options.getCurrentLabellingStyle() + "")).printStackTrace();
 				}
 				
-				if(oldStyle != null) {
+				if(oldStyle != null)
+				{
 					newStyle.setAtomColor(oldStyle.getAtomColor());
 					newStyle.setAtomRadius(oldStyle.getAtomRadius());
 				}
+				
 				newStyle.setAtomLabel(label);
 				a.structure.getStructureMap().getStructureStyles().setStyle(a, newStyle);
 				
 				renderable.style = newStyle;
 				renderable.setDirty();
 			}
-//		} else {	// if ribbon residues, delegate up to the residue
-//			final Residue r = a.structure.getStructureMap().getResidue(a);
-//			this.changeLabelStyle(r);
-//		}
 	}
 	
-	public void changeLabelStyle(final Bond b) {
-		final GlGeometryViewer glViewer = AppBase.sgetGlGeometryViewer();
-		
-//		if(PickLevel.pickLevel == PickLevel.COMPONENTS_ATOMS_BONDS) {
-			// arbitrarily delegate to first visible atom.
+	public void changeLabelStyle(final Bond b)
+	{
 			if(((JoglSceneNode)b.structure.getStructureMap().getUData()).getRenderable(b.getAtom(0)) != null) {
 				this.changeLabelStyle(b.getAtom(0));
 			} else {
 				this.changeLabelStyle(b.getAtom(1));
 			}
-//		} else { // if ribbon residues, delegate up to the residue
-//			Atom a = b.getAtom(0);
-//			if(a == null) {
-//				a = b.getAtom(1);
-//			}
-//			final Residue r = b.structure.getStructureMap().getResidue(a);
-//			this.changeLabelStyle(r);
-//		}
 	}
 	
-	public void changeLabelStyle(final Residue r) {
-//		if(PickLevel.pickLevel == PickLevel.COMPONENTS_ATOMS_BONDS) {
-			final Vector atoms = r.getAtoms();
-			final Iterator atomsIt = atoms.iterator();
-			while(atomsIt.hasNext()) {
-				final Atom a = (Atom)atomsIt.next();
-				this.changeLabelStyle(a);
-			}
-			
-			final Iterator bondsIt = r.getStructure().getStructureMap().getBonds(atoms).iterator();
-			while(bondsIt.hasNext()) {
-				final Bond b = (Bond)bondsIt.next();
-				this.changeLabelStyle(b);
-			}
-//		} else {	// if this is a ribbon pick level, then we're at the right place.
-//			final StructureMap sm = r.structure.getStructureMap();
-//			final StructureStyles ss = sm.getStructureStyles();
-//			final Chain c = sm.getChain(r.getChainId());
-//			final ChainStyle cs = (ChainStyle)ss.getStyle(c);
-//			
-//			final ResidueLabel label = cs.getResidueLabel();
-//			label.setResidueLabel(r, r.getCompoundCode());	// actually not used right now...
-//			sm.getSceneNode().createAndAddLabel(r, r.getCompoundCode());
-//			Model.getSingleton().getViewer().requestRepaint();
-//		}
+	public void changeLabelStyle(final Residue r)
+	{
+		final Vector<Atom> atoms = r.getAtoms();
+
+		for (final Atom a : atoms)
+			this.changeLabelStyle(a);
+		
+		for (final Bond b : r.getStructure().getStructureMap().getBonds(atoms))
+			this.changeLabelStyle(b);
 	}
 	
 	public void changeLabelStyle(final Chain c) {
-//		if(PickLevel.pickLevel == PickLevel.COMPONENTS_ATOMS_BONDS) {
-			final Iterator it = c.getFragments().iterator();
-			while(it.hasNext()) {
-				final Fragment f = (Fragment)it.next();
+			for (final Fragment f : c.getFragments())
 				this.changeLabelStyle(f);
-			}
-//		} else { // if this is a ribbon pick level, then delegate to the middle residue.
-//			this.changeLabelStyle(c.getResidue(c.getResidueCount() / 2));
-//		}
 	}
 	
-	public void changeLabelStyle(final PdbChain c) {
-//		if(PickLevel.pickLevel == PickLevel.COMPONENTS_ATOMS_BONDS) {
-			final Iterator it = c.getMbtChainIterator();
-			while(it.hasNext()) {
-				final Chain mbtChain = (Chain)it.next();
-				this.changeLabelStyle(mbtChain);
-			}
-//		} else { // if this is a ribbon pick level, then delegate to the middle residue.
-//			this.changeLabelStyle(c.getResidue(c.getResidueCount() / 2));
-//		}
-	}
-	
-	public void changeLabelStyle(final WaterChain c) {
-//		if(PickLevel.pickLevel == PickLevel.COMPONENTS_ATOMS_BONDS) {
-			final Iterator it = c.getMbtChainIterator();
-			while(it.hasNext()) {
-				final Chain mbtChain = (Chain)it.next();
-				this.changeLabelStyle(mbtChain);
-			}
-//		} else { // if this is a ribbon pick level, then delegate to the middle residue.
-//			this.changeLabelStyle(c.getResidue(c.getResidueCount() / 2));
-//		}	
-	}
-	
-	public void changeLabelStyle(final MiscellaneousMoleculeChain c) {
-//		if(PickLevel.pickLevel == PickLevel.COMPONENTS_ATOMS_BONDS) {
-			final Iterator it = c.getMbtChainIterator();
-			while(it.hasNext()) {
-				final Chain mbtChain = (Chain)it.next();
-				this.changeLabelStyle(mbtChain);
-			}
-//		} else { // if this is a ribbon pick level, then delegate to the middle residue.
-//			this.changeLabelStyle(c.getResidue(c.getResidueCount() / 2));
-//		}
+	public void changeLabelStyle(final ExternChain c) {
+			for (final Chain mbtChain : c.getMbtChains())
+				changeLabelStyle(mbtChain);
 	}
 	
 	public void changeLabelStyle(final Fragment f) {
-//		if(PickLevel.pickLevel == PickLevel.COMPONENTS_ATOMS_BONDS) {
-			final int resCount = f.getResidueCount();
-			for(int i = 0; i < resCount; i++) {
-				this.changeLabelStyle(f.getResidue(i));
-			}
-//		} else { // if this is a ribbon pick level, then delegate to the middle residue.
-//			this.changeLabelStyle(f.getResidue(f.getResidueCount() / 2));
-//		}	
+			for (final Residue r : f.getResidues())
+				this.changeLabelStyle(r);
 	}
 	
 	public void changeLabelStyle(final Structure s) {
-		final StructureMap sm = s.getStructureMap();
-		
-		final Iterator it = sm.getChains().iterator();
-		while(it.hasNext()) {
-			final Chain c = (Chain)it.next();
+		for (final Chain c : s.getStructureMap().getChains())
 			this.changeLabelStyle(c);
-		}
 	}
 }

@@ -1,8 +1,8 @@
 package org.rcsb.pw.controllers.scene.mutators;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Vector;
 
 import org.rcsb.mbt.controllers.app.AppBase;
@@ -13,15 +13,12 @@ import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Fragment;
-import org.rcsb.mbt.model.MiscellaneousMoleculeChain;
-import org.rcsb.mbt.model.PdbChain;
+import org.rcsb.mbt.model.ExternChain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.WaterChain;
 import org.rcsb.mbt.model.attributes.StructureStyles;
-import org.rcsb.pw.ui.mutatorPanels.StylesOptionsPanel;
 
 
 
@@ -41,16 +38,9 @@ public abstract class Mutator implements IUpdateListener
 	
 	private boolean considerSelectedFlag = false;
 	private boolean isSelected = false;
-	
-	private StylesOptionsPanel stylesOptionsPanel = null;
 
-	// using a hash map as a search structure.
-	/* HashMap mutees {
-	 * 	key: StructureComponent mutee
-	 * 	value: null
-	 * }
-	 */
-	public static HashMap mutees = new HashMap();
+	public static Set<Object> mutees = new HashSet<Object>();
+					// normally 'StructureComonent', but 'Structure' also...?
 	
 	private Object previousMutee = null;
 	
@@ -66,10 +56,10 @@ public abstract class Mutator implements IUpdateListener
 		
 		if(AppBase.sgetSceneController().isBatchMode()) {
 			if(this.supportsBatchMode()) {
-				if(Mutator.mutees.containsKey(mutee)) {
-					Mutator.mutees.remove(mutee);
+				if(mutees.contains(mutee)) {
+					mutees.remove(mutee);
 				} else {
-					Mutator.mutees.put(mutee, null);
+					mutees.add(mutee);
 					isMuteeOnNow = true;
 				}
 			}
@@ -77,17 +67,17 @@ public abstract class Mutator implements IUpdateListener
 			Mutator.removeAllMutees();
 			
 			if(this.isShiftDown) {
-				final Vector range = this.generateMuteeRange(mutee, this.previousMutee);
+				final Vector<StructureComponent> range = this.generateMuteeRange(mutee, this.previousMutee);
 				if(range == null) {
-					Mutator.mutees.put(mutee, null);
+					mutees.add(mutee);
 				} else {
 					for(int i = 0; i < range.size(); i++) {
 						final Object mutee_ = range.get(i);
-						Mutator.mutees.put(mutee_, null);
+						mutees.add(mutee_);
 					}
 				}
 			} else {
-				Mutator.mutees.put(mutee, null);
+				mutees.add(mutee);
 			}
 			
 			this.doMutation();
@@ -120,11 +110,13 @@ public abstract class Mutator implements IUpdateListener
 	// parameters can be null.
 	// if returned value is null, there is no range associated with these mutees.
 	// range is between mutee1 and mutee2, not including mutee2, but including mutee1.
-	private Vector generateMuteeRange(final Object mutee1, final Object mutee2) {
-		if(mutee1 == null || mutee2 == null || mutee1 == mutee2 || !mutee1.getClass().equals(mutee2.getClass()) || mutee1 instanceof Structure) {
+	private Vector<StructureComponent> generateMuteeRange(final Object mutee1, final Object mutee2)
+	{
+		if (mutee1 == null || mutee2 == null || mutee1 == mutee2 ||
+		   !mutee1.getClass().equals(mutee2.getClass()) || mutee1 instanceof Structure)
 			return null;
-		}
-		final Vector mutees = new Vector();
+
+		final Vector<StructureComponent> mutees = new Vector<StructureComponent>();
 		
 		if(mutee1 instanceof Atom) {
 			final Atom a1 = (Atom)mutee1;
@@ -211,78 +203,33 @@ public abstract class Mutator implements IUpdateListener
 					mutees.add(sm.getChain(i));
 				}
 			}
-		} else if(mutee1 instanceof WaterChain) {
-			final WaterChain c1 = (WaterChain)mutee1;
-			final WaterChain c2 = (WaterChain)mutee2;
+		}
+		
+		else if(mutee1 instanceof ExternChain)
+		{
+			ExternChain xcArray[] = {(ExternChain)mutee1, (ExternChain)mutee2 };
 			
-			final StructureMap sm = c1.structure.getStructureMap();
+			if (xcArray[0].getExternChainType() != xcArray[1].getExternChainType())
+				return null;
+								// ok, this would have been caught in the actual type test
+								// above, but we've removed *so* much duplicate code by
+								// condensing, this is a small price to pay.
+								//
+								// 22-Oct-08 - rickb
 			
-			int minIndex = Integer.MAX_VALUE;
-			int maxIndex = -1;
-			final Iterator it1 = c1.getMbtChainIterator();
-			final Iterator it2 = c2.getMbtChainIterator();
-			while(it1.hasNext()) {
-				final Chain c = (Chain)it1.next();
-				final int index = sm.getChainIndex(c);
-				minIndex = Math.min(index, minIndex);
-				maxIndex = Math.max(index, maxIndex);
-			}
-			while(it2.hasNext()) {
-				final Chain c = (Chain)it2.next();
-				final int index = sm.getChainIndex(c);
-				minIndex = Math.min(index + 1, minIndex);
-				maxIndex = Math.max(index - 1, maxIndex);
-			}
-			for(int i = minIndex; i <= maxIndex; i++) {
-				mutees.add(sm.getChain(i));
-			}
-		} else if(mutee1 instanceof PdbChain) {
-			final PdbChain c1 = (PdbChain)mutee1;
-			final PdbChain c2 = (PdbChain)mutee2;
-			
-			final StructureMap sm = c1.structure.getStructureMap();
+			final StructureMap sm = xcArray[0].structure.getStructureMap();
 			
 			int minIndex = Integer.MAX_VALUE;
 			int maxIndex = -1;
-			final Iterator it1 = c1.getMbtChainIterator();
-			final Iterator it2 = c2.getMbtChainIterator();
-			while(it1.hasNext()) {
-				final Chain c = (Chain)it1.next();
-				final int index = sm.getChainIndex(c);
-				minIndex = Math.min(index, minIndex);
-				maxIndex = Math.max(index, maxIndex);
-			}
-			while(it2.hasNext()) {
-				final Chain c = (Chain)it2.next();
-				final int index = sm.getChainIndex(c);
-				minIndex = Math.min(index + 1, minIndex);
-				maxIndex = Math.max(index - 1, maxIndex);
-			}
-			for(int i = minIndex; i <= maxIndex; i++) {
-				mutees.add(sm.getChain(i));
-			}
-		} else if(mutee1 instanceof MiscellaneousMoleculeChain) {
-			final MiscellaneousMoleculeChain c1 = (MiscellaneousMoleculeChain)mutee1;
-			final MiscellaneousMoleculeChain c2 = (MiscellaneousMoleculeChain)mutee2;
-			
-			final StructureMap sm = c1.structure.getStructureMap();
-			
-			int minIndex = Integer.MAX_VALUE;
-			int maxIndex = -1;
-			final Iterator it1 = c1.getMbtChainIterator();
-			final Iterator it2 = c2.getMbtChainIterator();
-			while(it1.hasNext()) {
-				final Chain c = (Chain)it1.next();
-				final int index = sm.getChainIndex(c);
-				minIndex = Math.min(index, minIndex);
-				maxIndex = Math.max(index, maxIndex);
-			}
-			while(it2.hasNext()) {
-				final Chain c = (Chain)it2.next();
-				final int index = sm.getChainIndex(c);
-				minIndex = Math.min(index + 1, minIndex);
-				maxIndex = Math.max(index - 1, maxIndex);
-			}
+
+			for (ExternChain xc : xcArray)
+				for (Chain c : xc.getMbtChains())
+				{
+					final int index = sm.getChainIndex(c);
+					minIndex = Math.min(index, minIndex);
+					maxIndex = Math.max(index, maxIndex);
+				}
+
 			for(int i = minIndex; i <= maxIndex; i++) {
 				mutees.add(sm.getChain(i));
 			}
@@ -306,11 +253,11 @@ public abstract class Mutator implements IUpdateListener
 		}
 	
 	public static void removeMutee(final Object mutee) {
-		Mutator.mutees.remove(mutee);
+		mutees.remove(mutee);
 	}
 	
 	public static void removeAllMutees() {
-		Mutator.mutees.clear();
+		mutees.clear();
 	}
 	
 	public abstract void doMutationSingle(Object mutee);

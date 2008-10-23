@@ -31,126 +31,6 @@
 //
 //  For further information, please see:  http://mbt.sdsc.edu
 //
-//  History:
-//  $Log: Chain.java,v $
-//  Revision 1.1  2007/02/08 02:38:52  jbeaver
-//  version 1.50
-//
-//  Revision 1.1  2006/09/20 16:50:42  jbeaver
-//  first commit - branched from ProteinWorkshop
-//
-//  Revision 1.2  2006/09/02 18:52:28  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/08/24 17:39:03  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.2  2006/07/18 21:06:38  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/03/09 00:18:55  jbeaver
-//  Initial commit
-//
-//  Revision 1.29  2005/11/08 20:58:12  moreland
-//  Switched style code to new StructureStyles API.
-//
-//  Revision 1.28  2005/06/21 20:45:40  moreland
-//  Added hasGapAfter method that returns true when a residue ID gap is detected.
-//
-//  Revision 1.27  2005/06/21 19:45:34  moreland
-//  Fragment count now correctly returns 1 (default) when getRangeCount returns 0.
-//
-//  Revision 1.26  2004/04/09 00:17:00  moreland
-//  Updated copyright to new UCSD wording.
-//
-//  Revision 1.25  2004/01/31 19:11:48  moreland
-//  Removed outdated programming note.
-//
-//  Revision 1.24  2004/01/29 17:08:15  moreland
-//  Updated copyright and class block comments.
-//
-//  Revision 1.23  2004/01/16 23:05:14  moreland
-//  Added exception handling for (startResidue > endResidue) condition.
-//
-//  Revision 1.22  2004/01/15 00:47:02  moreland
-//  Added more bounds checking and exception handling in the setFragment method.
-//
-//  Revision 1.21  2003/12/20 00:59:21  moreland
-//  The generateFragments method now sets the parent Fragment for each Residue.
-//
-//  Revision 1.20  2003/12/09 21:17:50  moreland
-//  Commented out debug print statements.
-//
-//  Revision 1.19  2003/11/20 21:31:40  moreland
-//  Added setChain, getChain, getResidueCount and getResidue methods to Fragment.
-//  Added call to fragment.setChain method to Chain class.
-//  Both changes above enable the Fragment class to access parent and child objects.
-//
-//  Revision 1.18  2003/10/06 23:12:44  moreland
-//  Cleaned up code to generate Fragments in StructureMap so that Fragments are set
-//  as complete ranges (instead of individual residues - which didn't work well).
-//
-//  Revision 1.17  2003/10/03 23:59:16  moreland
-//  Added support for setCollapseOn flag to maintain fragment integrity.
-//
-//  Revision 1.16  2003/10/01 21:16:15  agramada
-//  Changes made by John M in the generating of fragments when derived from
-//  data.
-//
-//  Revision 1.15  2003/09/19 22:27:13  moreland
-//  Added getResidueIndex method by using the residueToIndexHash Hashtable.
-//
-//  Revision 1.14  2003/09/16 17:18:22  moreland
-//  Added code to enable secondary structure generation from data VS derivation.
-//
-//  Revision 1.13  2003/09/11 19:40:42  moreland
-//  Set "structure" field when a new Fragment object is created.
-//
-//  Revision 1.12  2003/07/21 20:48:09  moreland
-//  Added getFragment method which returns a Fragment object.
-//
-//  Revision 1.11  2003/06/24 23:32:14  moreland
-//  Added null alphaAtom checks to resetFragments method.
-//
-//  Revision 1.10  2003/04/30 17:48:52  moreland
-//  Changed default chain id from "A" to "-" (bourne).
-//
-//  Revision 1.9  2003/04/28 21:56:34  moreland
-//  If the fragmentType is a real conformation type (Helix, Turn, Strand) and the
-//  fragment only covers one residue, then replace the fragment type with Coil.
-//
-//  Revision 1.8  2003/04/25 17:28:29  moreland
-//  Fragment methods check "fragments" field rather than "residues" field for null-ness.
-//
-//  Revision 1.7  2003/04/25 00:56:09  moreland
-//  Added code to resetFragments method to fill gaps after conformations are applied.
-//
-//  Revision 1.6  2003/04/24 21:07:02  moreland
-//  Added gap/Coil/fragment filling code to resetFragments method.
-//
-//  Revision 1.5  2003/04/24 17:56:22  moreland
-//  Corrected private VS public declaration in fragment methods.
-//
-//  Revision 1.4  2003/04/24 17:52:47  moreland
-//  Corrected spelling error of Fragment routines.
-//
-//  Revision 1.3  2003/04/24 17:11:54  moreland
-//  Added secondary structure conformation fragment support.
-//
-//  Revision 1.2  2003/04/23 17:20:10  moreland
-//  Removed StructureComponentID/scid and replaced it with a "structure" field
-//  in the StructureComponent base class.
-//  Changed "getType" method to "getStructureComponentType" to return dynamic
-//  SC type (ie: class name).
-//  Enabled adding/removing of Residue objects.
-//
-//  Revision 1.1  2003/04/03 23:08:40  moreland
-//  First version.
-//
-//  Revision 1.0  2002/10/24 17:54:01  moreland
-//  First implementation.
-//
-
 
 package org.rcsb.mbt.model;
 
@@ -160,6 +40,7 @@ package org.rcsb.mbt.model;
 // Core
 import java.util.*;
 
+import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.util.*;
 
 
@@ -180,15 +61,17 @@ public class Chain
 	implements java.lang.Cloneable
 {
 	// The Residue records for the chain.
-	private Vector<Residue> residues = null;
+	protected Vector<Residue> residues = null;
 	public Vector<Residue> getResidues() { return residues; }
 	// The residue-to-index hash for the chain.
 	
+	private Residue.Classification chainClassification = null;
 	
-	private Hashtable residueToIndexHash = null;
+	
+	protected Hashtable<Residue,Integer> residueToIndexHash = null;
 
 	// The default chain id.
-	private static final String defaultChainId = "-";
+	protected static final String defaultChainId = "-";
 
 	/** 
 	 *  Secondary structure conformation fragments.
@@ -204,6 +87,9 @@ public class Chain
 	private RangeMap fragments = null;
 	private Vector<Fragment> fragmentObjects = null;
 	
+	/**
+	 * Simply an indicator to the caller - not used internally
+	 */
 	private boolean isNonProteinChain = false;
 	
 	public void setIsNonProteinChain(boolean flag) { isNonProteinChain = flag; }
@@ -273,35 +159,57 @@ public class Chain
 	//
 
 	/**
-	 * Return the chain classification by asking the first residue.
-	 * (eg: amino acid, nucleic acid, ligand). If there are no residues
-	 * in this chain, this method will return null.
+	 * Return the chain classification by tallying up the number of residues of
+	 * each classification and returning the biggest number.
+	 */
+	/*
+	 * Seems odd, to me - a chain should have residues of only one type, yes?
+	 * Anyway, I've optimized this so it only goes through the loop once.  If chain
+	 * is mutable, add a dirty flag.
+	 * 
+	 * 10-22-08	- rickb
 	 */
 	public Residue.Classification getClassification( )
 	{
 		if ( residues == null || residues.size() == 0)
 			return null;
 		
-		// Classify the chain based upon how many residues of each type exist.
-		int classTallies[] = new int[Residue.Classification.values().length];
-		for ( Residue residue : residues)
-			classTallies[residue.getClassification().ordinal()]++;
-
-		// See which classification type had the highest count.
-		int highestCount = -1;
-		int highestIndex = -1;
-		for ( Residue.Classification residue : Residue.Classification.values())
-			if ( classTallies[residue.ordinal()] > highestCount )
-			{
-				highestCount = classTallies[residue.ordinal()];
-				highestIndex = residue.ordinal();
+		if (chainClassification == null)
+		{	
+			// Classify the chain based upon how many residues of each type exist.
+			int classTallies[] = new int[Residue.Classification.values().length];
+			for ( Residue residue : residues)
+				classTallies[residue.getClassification().ordinal()]++;
+	
+			// See which classification type had the highest count.
+			int highestCount = -1;
+			int highestIndex = -1;
+			for ( Residue.Classification residue : Residue.Classification.values())
+				if ( classTallies[residue.ordinal()] > highestCount )
+				{
+					highestCount = classTallies[residue.ordinal()];
+					highestIndex = residue.ordinal();
+				}
+	
+			if ( highestIndex < 0 ) {
+				return null;
 			}
-
-		if ( highestIndex < 0 ) {
-			return null;
+			
+			/* **/
+			if (AppBase.isDebug())
+			{
+				int numTallies = 0;
+				for (int tally : classTallies)
+					if (tally > 0) numTallies++;
+				assert (numTallies == 1);
+									// check to see if this ever happens...
+			/* **/
+			}
+	
+			chainClassification = Residue.Classification.values()[highestIndex];
 		}
-
-		return Residue.Classification.values()[highestIndex];
+		
+		return chainClassification;
 	}
 	
 	/**
@@ -406,7 +314,7 @@ public class Chain
 			throw new IndexOutOfBoundsException( "chain has no residues" );
 		}
 
-		final Integer integer = (Integer) this.residueToIndexHash.get( residue );
+		final Integer integer = this.residueToIndexHash.get( residue );
 		if ( integer == null ) {
 			return -1;
 		}
@@ -445,7 +353,7 @@ public class Chain
 		if ( this.residues == null )
 		{
 			this.residues = new Vector<Residue>( );
-			this.residueToIndexHash = new Hashtable( );
+			this.residueToIndexHash = new Hashtable<Residue,Integer>( );
 		}
 
 		// Do a binary search to determine where this new residue should be added.

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="edu/sdsc/protein_workshop/joglViewerApp/" kind="src" path="Structure Model"/>
+	<classpathentry excluding="org/rcsb/mbt/model/WaterChain.java|org/rcsb/mbt/model/MiscellaneousMoleculeChain.java" kind="src" path="Structure Model"/>
 	<classpathentry excluding="edu/sdsc/mbt/ui/views/SequenceViewer.java|edu/sdsc/mbt/ui/views/SequenceViewerPanel.java|org/rcsb/mbt/ui/views/SequenceViewer.java|org/rcsb/mbt/ui/views/SequenceViewerPanel.java" kind="src" path="UI"/>
 	<classpathentry excluding="org/rcsb/mbt/glscene/jogl/GLTransformationMatrix.java" kind="src" path="GL Scene"/>
-	<classpathentry excluding="edu/sdsc/mbt/app_controller/MBTModel.java|edu/sdsc/mbt/app_controller/ImageSaver.java|org/rcsb/mbt/views_controller/ViewsController.java" kind="src" path="Controllers"/>
-	<classpathentry excluding="org/rcsb/mbt/structLoader/StructureFactory.java|org/rcsb/mbt/structLoader/CifStructureLoader.java|org/rcsb/mbt/structLoader/RcsbStructureLoader.java|org/rcsb/mbt/structLoader/IBatchStructureLoader.java|org/rcsb/mbt/structLoader/TestStructureLoader.java|org/rcsb/mbt/structLoader/FastaStructureLoader.java" kind="src" path="Structure Loader"/>
+	<classpathentry kind="src" path="Controllers"/>
+	<classpathentry kind="src" path="Structure Loader"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/3rd Party Libs/jogl/gluegen-rt.jar">
 		<attributes>

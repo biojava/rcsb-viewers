@@ -1,18 +1,14 @@
 package org.rcsb.pw.controllers.scene.mutators;
 
-import java.util.Iterator;
-
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Fragment;
-import org.rcsb.mbt.model.MiscellaneousMoleculeChain;
-import org.rcsb.mbt.model.PdbChain;
+import org.rcsb.mbt.model.ExternChain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.WaterChain;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 
 
@@ -48,12 +44,8 @@ public class SelectionMutator extends Mutator {
 			this.changeSelection((Residue)mutee);
 		} else if(mutee instanceof Chain) {
 			this.changeSelection((Chain)mutee);
-		} else if(mutee instanceof PdbChain) {
-			this.changeSelection((PdbChain)mutee);
-		} else if(mutee instanceof WaterChain) {
-			this.changeSelection((WaterChain)mutee);
-		} else if(mutee instanceof MiscellaneousMoleculeChain) {
-			this.changeSelection((MiscellaneousMoleculeChain)mutee);
+		} else if(mutee instanceof ExternChain) {
+			this.changeSelection((ExternChain)mutee);
 		} else if(mutee instanceof Fragment) {
 			this.changeSelection((Fragment)mutee);
 		} else if(mutee instanceof Structure) {
@@ -65,11 +57,8 @@ public class SelectionMutator extends Mutator {
 	
 	
 	public void doMutation() {
-		final Iterator it = Mutator.mutees.keySet().iterator();
-		while(it.hasNext()) {
-			final Object next = it.next();
+		for (Object next : mutees)
 			this.doMutationSingle(next);
-		}
 	}
 
 //	public LabelsOptions getOptions() {
@@ -220,28 +209,9 @@ public class SelectionMutator extends Mutator {
 		}
 	}
 	
-	public void changeSelection(final PdbChain c) {
-		final Iterator it = c.getMbtChainIterator();
-		while(it.hasNext()) {
-			final Chain mbtChain = (Chain)it.next();
+	public void changeSelection(final ExternChain c) {
+		for (Chain mbtChain : c.getMbtChains())
 			this.changeSelection(mbtChain);
-		}
-	}
-	
-	public void changeSelection(final WaterChain c) {
-		final Iterator it = c.getMbtChainIterator();
-		while(it.hasNext()) {
-			final Chain mbtChain = (Chain)it.next();
-			this.changeSelection(mbtChain);
-		}
-	}
-	
-	public void changeSelection(final MiscellaneousMoleculeChain c) {
-		final Iterator it = c.getMbtChainIterator();
-		while(it.hasNext()) {
-			final Chain mbtChain = (Chain)it.next();
-			this.changeSelection(mbtChain);
-		}
 	}
 	
 	public void changeSelection(final Fragment f) {
@@ -280,12 +250,7 @@ public class SelectionMutator extends Mutator {
 	}
 	
 	public void changeSelection(final Structure s) {
-		final StructureMap sm = s.getStructureMap();
-		
-		final Iterator it = sm.getChains().iterator();
-		while(it.hasNext()) {
-			final Chain c = (Chain)it.next();
+		for (Chain c : s.getStructureMap().getChains())
 			this.changeSelection(c);
-		}
 	}
 }

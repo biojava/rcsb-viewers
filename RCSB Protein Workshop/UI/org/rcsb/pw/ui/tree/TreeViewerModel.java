@@ -82,15 +82,11 @@ import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Fragment;
 import org.rcsb.mbt.model.StructureModel;
-import org.rcsb.mbt.model.MiscellaneousMoleculeChain;
-import org.rcsb.mbt.model.PdbChain;
+import org.rcsb.mbt.model.ExternChain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureComponentRegistry;
-import org.rcsb.mbt.model.WaterChain;
-
-
 
 /**
  *  This class impements a custom TreeModel for the TreeViewer class.
@@ -106,7 +102,7 @@ public class TreeViewerModel
 	// Private variables.
 	//
 
-	private final Vector treeModelListeners = new Vector( );
+	private final Vector<TreeModelListener> treeModelListeners = new Vector<TreeModelListener>( );
 	private StructureModel structureDocument = null;
     
 	//
@@ -122,7 +118,7 @@ public class TreeViewerModel
 	 */
 	public void addTreeModelListener( final TreeModelListener l )
 	{
-		this.treeModelListeners.addElement( l );
+		treeModelListeners.addElement( l );
 	}
 
 	/**
@@ -138,17 +134,9 @@ public class TreeViewerModel
 			final Structure struc = (Structure)parent;
             return struc.getStructureMap().getPdbTopLevelElements().get(index);
 		}
-		else if ( parent instanceof WaterChain )
+        else if ( parent instanceof ExternChain )
         {
-            return ((WaterChain)parent).getResidue(index);
-        }
-        else if ( parent instanceof MiscellaneousMoleculeChain )
-        {
-            return ((MiscellaneousMoleculeChain)parent).getResidue(index);
-        }
-        else if ( parent instanceof PdbChain )
-        {
-            return ((PdbChain)parent).getResidue(index);
+            return ((ExternChain)parent).getResidue(index);
         }
 		else if ( parent instanceof StructureComponent )
 		{
@@ -194,17 +182,9 @@ public class TreeViewerModel
 			final Structure struc = (Structure)parent;
 			return struc.getStructureMap().getPdbTopLevelElements().size();
 		}
-		else if ( parent instanceof WaterChain )
+        else if ( parent instanceof ExternChain )
         {
-            return ((WaterChain)parent).getResidueCount();
-        }
-        else if ( parent instanceof MiscellaneousMoleculeChain )
-        {
-            return ((MiscellaneousMoleculeChain)parent).getResidueCount();
-        }
-        else if ( parent instanceof PdbChain )
-        {
-            return ((PdbChain)parent).getResidueCount();
+            return ((ExternChain)parent).getResidueCount();
         }
 		else if ( parent instanceof StructureComponent )
 		{
@@ -248,7 +228,7 @@ public class TreeViewerModel
 		else if ( parent instanceof Structure )
 		{
 			final Structure struc = (Structure)parent;
-            final Iterator it = struc.getStructureMap().getPdbTopLevelElements().iterator();
+            final Iterator<StructureComponent> it = struc.getStructureMap().getPdbTopLevelElements().iterator();
             for(int i = 0; it.hasNext(); i++) {
                 if(it.next() == child) {
                     return i;
@@ -256,36 +236,17 @@ public class TreeViewerModel
             }
             return -1;
 		}
-        else if ( parent instanceof WaterChain ) {
-            final Iterator it = ((WaterChain)parent).getIterator();
-            
-            for(int i = 0; it.hasNext(); i++) {
-                if(it.next() == child) {
-                    return i;
-                }
-            }
+
+        else if ( parent instanceof ExternChain )
+        {
+        	ExternChain xc = (ExternChain)parent;
+	        for (int i = 0; i < xc.getResidueCount(); i++)
+	                if (xc.getResidue(i) == child)
+	                    return i;
+	        
             return -1;
         }
-        else if ( parent instanceof MiscellaneousMoleculeChain ) {
-            final Iterator it = ((WaterChain)parent).getIterator();
-            
-            for(int i = 0; it.hasNext(); i++) {
-                if(it.next() == child) {
-                    return i;
-                }
-            }
-            return -1;
-        }
-        else if ( parent instanceof PdbChain ) {
-            final Iterator it = ((PdbChain)parent).getResidueIterator();
-            
-            for(int i = 0; it.hasNext(); i++) {
-                if(it.next() == child) {
-                    return i;
-                }
-            }
-            return -1;
-        }
+		
 		else if ( parent instanceof StructureComponent )
 		{
 			final StructureComponent structureComponent = (StructureComponent) parent;

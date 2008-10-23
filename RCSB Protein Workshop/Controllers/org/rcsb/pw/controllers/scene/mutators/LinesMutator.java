@@ -1,7 +1,6 @@
 package org.rcsb.pw.controllers.scene.mutators;
 
 import java.awt.Color;
-import java.util.Iterator;
 import java.util.Vector;
 
 import org.rcsb.mbt.controllers.app.AppBase;
@@ -13,15 +12,12 @@ import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Fragment;
 import org.rcsb.mbt.model.LineSegment;
-import org.rcsb.mbt.model.StructureModel;
-import org.rcsb.mbt.model.MiscellaneousMoleculeChain;
-import org.rcsb.mbt.model.PdbChain;
+import org.rcsb.mbt.model.ExternChain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.WaterChain;
 import org.rcsb.mbt.model.attributes.LineStyle;
 import org.rcsb.mbt.model.geometry.Algebra;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
@@ -34,7 +30,7 @@ import org.rcsb.pw.controllers.scene.mutators.options.LinesOptions;
 public class LinesMutator extends Mutator
 {
 	private LinesOptions options = null;
-	public Vector lines = new Vector();
+	public Vector<LineSegment> lines = new Vector<LineSegment>();
 	
 	private boolean isFirstClick = true;	// Is this the first object in an object pair? Else this is the second click.
 	public LinesMutator()
@@ -44,12 +40,14 @@ public class LinesMutator extends Mutator
 	}
 
 	
+	@Override
 	public boolean supportsBatchMode()
 	{
 		return false;
 	}
 	
 	
+	@Override
 	public void doMutationSingle(final Object mutee) {
 		
 		if(mutee instanceof LineSegment)
@@ -96,7 +94,7 @@ public class LinesMutator extends Mutator
 		System.arraycopy(this.getOptions().getColor(), 0, style.getColor(), 0, style.getColor().length);
 		((JoglSceneNode)sm.getUData()).addRenderable(new DisplayListRenderable( line, style, geometry ));
 		
-		this.lines.add(line);
+		lines.add(line);
 	}
 	
 
@@ -264,22 +262,18 @@ public class LinesMutator extends Mutator
 				}
 	
 				// structureMap.getStructureStyles().setResidueColor(res, yellow);
-			} else if (mutee instanceof PdbChain) {
-				final PdbChain c = (PdbChain) structureComponent;
-	
-				// remove all but the local name for the secondary structure class.
-				message = "Chain " + c.pdbChainId;
-			} else if (mutee instanceof WaterChain) {
-				final WaterChain c = (WaterChain) structureComponent;
-	
-				// remove all but the local name for the secondary structure class.
-				message = "Water Molecules";
-			} else if (mutee instanceof MiscellaneousMoleculeChain) {
-				final MiscellaneousMoleculeChain c = (MiscellaneousMoleculeChain) structureComponent;
-	
-				// remove all but the local name for the secondary structure class.
-				message = "Miscellaneous Molecules (no chain ID)";
 			}
+			
+			else if (mutee instanceof ExternChain)
+			{
+				final ExternChain c = (ExternChain) structureComponent;
+	
+				// remove all but the local name for the secondary structure class.
+				message = (c.isBasicChain())? "Chain " + c.getChainId() : 
+						  (c.isWaterChain())? "Water Molecules" :
+							  "Miscellaneous Molecules (no chain ID)";
+			} 
+			
 		} else if(mutee instanceof Structure){	// not a StructureComponent
 			final Structure struct = (Structure)mutee;
 			message = struct.toString();
@@ -329,21 +323,11 @@ public class LinesMutator extends Mutator
 				final Residue r = c.getResidue(c.getResidueCount() / 2);
 				
 				return this.getCoordinates(r);
-			} else if(structureComponent instanceof PdbChain) {
-				final PdbChain c = (PdbChain) structureComponent;
+			} else if(structureComponent instanceof ExternChain) {
+				final ExternChain c = (ExternChain) structureComponent;
 				final Residue r = c.getResidue(c.getResidueCount() / 2);
 				
 				return this.getCoordinates(r); 
-			} else if(structureComponent instanceof WaterChain) {
-				final WaterChain c = (WaterChain) structureComponent;
-				final Residue r = c.getResidue(c.getResidueCount() / 2);
-				
-				return this.getCoordinates(r);
-			} else if(structureComponent instanceof MiscellaneousMoleculeChain) {
-				final MiscellaneousMoleculeChain c = (MiscellaneousMoleculeChain) structureComponent;
-				final Residue r = c.getResidue(c.getResidueCount() / 2);
-				
-				return this.getCoordinates(r);
 			}
 		} else if(mutee instanceof Structure){	// not a StructureComponent
 			final Structure struct = (Structure)mutee;
@@ -358,12 +342,11 @@ public class LinesMutator extends Mutator
 
 	
 	
-	public void doMutation() {
-		final Iterator it = super.mutees.keySet().iterator();
-		while(it.hasNext()) {
-			final Object next = it.next();
+	@Override
+	public void doMutation()
+	{
+		for (Object next : mutees)
 			this.doMutationSingle(next);
-		}
 	}
 	
 	public LinesOptions getOptions() {
@@ -377,6 +360,7 @@ public class LinesMutator extends Mutator
 	}
 	
 	
+	@Override
 	public void clearStructure() {
 		this.reset();
 	}
