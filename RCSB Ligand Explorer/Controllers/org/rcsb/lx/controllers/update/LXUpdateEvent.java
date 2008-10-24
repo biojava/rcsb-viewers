@@ -8,6 +8,12 @@ import org.rcsb.mbt.model.Structure;
 public class LXUpdateEvent extends UpdateEvent
 {
 	public boolean transitory = false;
+	
+	public enum LXAction { INTERACTIONS_CHANGED }
+				// use these when EXTENDED specified.
+	
+	public LXAction lxAction;
+				// the extended action
 
 	public LXUpdateEvent(Action action, IUpdateListener view)
 	{

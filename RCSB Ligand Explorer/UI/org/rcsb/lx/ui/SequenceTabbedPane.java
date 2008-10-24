@@ -66,8 +66,7 @@ public class SequenceTabbedPane extends JTabbedPane implements IUpdateListener
 
 	public void reset()
 	{
-		LXUpdateController update = LigandExplorer.sgetActiveFrame().getUpdateController();
-		update.refreshSequencePanes();
+		fullSequences.updateSequences();
 	}
 
 	/* (non-Javadoc)

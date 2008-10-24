@@ -70,7 +70,6 @@
 
 package org.rcsb.mbt.controllers.update;
 
-import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Structure;
 
 
@@ -90,11 +89,12 @@ public class UpdateEvent
 {
 	 /**
 	  * The possible actions for this event type
+	  * EXTENDED is for derived classes to use.
 	  * 
 	  * @author rickb
 	  *
 	  */
-	 public enum Action { STRUCTURE_ADDED, STRUCTURE_REMOVED, VIEW_ADDED, VIEW_REMOVED, VIEW_RESET, VIEW_UPDATE, CLEAR_ALL }
+	 public enum Action { STRUCTURE_ADDED, STRUCTURE_REMOVED, VIEW_ADDED, VIEW_REMOVED, VIEW_RESET, VIEW_UPDATE, CLEAR_ALL, EXTENDED }
 	 
 	 /**
 	  * Constructor - takes an action

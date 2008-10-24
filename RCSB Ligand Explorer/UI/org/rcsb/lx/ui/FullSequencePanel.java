@@ -2,7 +2,6 @@ package org.rcsb.lx.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -14,13 +13,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.regex.Pattern;
-
-import javax.swing.JPanel;
 
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
@@ -28,6 +24,7 @@ import org.rcsb.lx.glscene.jogl.ResidueFontInfo;
 import org.rcsb.mbt.glscene.jogl.AtomGeometry;
 import org.rcsb.mbt.glscene.jogl.BondGeometry;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
+import org.rcsb.mbt.glscene.jogl.SequencePanelBase;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.ExternChain;
 import org.rcsb.mbt.model.Residue;
@@ -46,26 +43,20 @@ import org.rcsb.mbt.model.util.Status;
 /**
  * @author John Beaver
  */
-public class FullSequencePanel extends JPanel
+@SuppressWarnings("serial")
+public class FullSequencePanel extends SequencePanelBase
 {
-	private static final long serialVersionUID = 6692539761089101610L;
-
 	public String[] title = null;
     
     protected static int startSequenceX = Integer.MIN_VALUE; 
     
-    protected static int decriptionFontSize = 16;
-    protected static Font descriptionFont = new Font( "SansSerif", Font.PLAIN, FullSequencePanel.decriptionFontSize );
     protected static Rectangle cellBounds = null;
     protected static Rectangle2D letterBounds = null;
     protected static int letterCenterX;
 
-    protected static final int descriptionBarPadding = 10;
     protected static final int rulerWidth = 3;
 	
 	Pattern spaces = Pattern.compile("\\s++");
-    
-    public boolean needsComponentReposition = false;
     
     public StructureComponent chain;     // the index of the chain in ag and epi which we're concerned about.
     public Chain firstNdbChain = null;
@@ -90,8 +81,7 @@ public class FullSequencePanel extends JPanel
     // immunoOnly: only display the immunogenic residues (paratope).
     public FullSequencePanel(final String title, final StructureComponent chain, final int scrollbarWidth)
     {
-        super(null, false);
-        super.setDoubleBuffered(false);
+        super();
         
         this.chain = chain;
         this.scrollbarWidth = scrollbarWidth;
@@ -110,8 +100,16 @@ public class FullSequencePanel extends JPanel
         this.title = spaces.split(title);
     }
 	
-	
-    public void setStatics(final Graphics g)
+    @Override
+	public void heightForWidth(int width)
+    {
+    	generateRanges(width);
+	}
+
+
+
+
+	public void setStatics(final Graphics g)
     {
         if(g == null)
             return;
@@ -128,7 +126,7 @@ public class FullSequencePanel extends JPanel
         }
         
         
-        final FontMetrics fontMetrics = g.getFontMetrics(FullSequencePanel.descriptionFont);
+        final FontMetrics fontMetrics = g.getFontMetrics(descriptionFont);
 		int descriptionWidth = -1;
 		int descriptionHeight = 0;
 		for (int i = 0; i < title.length; i++)
@@ -138,8 +136,7 @@ public class FullSequencePanel extends JPanel
 			descriptionHeight += descriptionBounds.getHeight();
 		}
 		
-        startSequenceX = Math.max(FullSequencePanel.startSequenceX,
-        											descriptionWidth + FullSequencePanel.descriptionBarPadding * 2);
+        startSequenceX = Math.max(startSequenceX, descriptionWidth + descriptionBarPadding * 2);
     }
     
     
@@ -147,7 +144,6 @@ public class FullSequencePanel extends JPanel
     // sets the panelHeight, as a side product.
     // returns the Chain corresponding to the ranges.
     // width: the panel width to generate the ranges for.
-    public int preferredHeight = 0;
     private int oldWidth = -1;
     
     public StructureComponent generateRanges(final int width)
@@ -163,7 +159,7 @@ public class FullSequencePanel extends JPanel
         // calculate the number of columns for this window size
         final int drawWidth = width - insets.left - insets.right -
 		 					  FullSequencePanel.startSequenceX - scrollbarWidth -
-		 					  FullSequencePanel.descriptionBarPadding;
+		 					 descriptionBarPadding;
         
         final int numCols = drawWidth / (int)FullSequencePanel.cellBounds.getWidth();
         
@@ -197,9 +193,6 @@ public class FullSequencePanel extends JPanel
         return chain;
     }
     
-    private Dimension oldSize = new Dimension(-1,-1);
-    public BufferedImage oldImage = null;
-    
     @Override
 	public void paintComponent(final Graphics g)
     {
@@ -207,7 +200,7 @@ public class FullSequencePanel extends JPanel
 
         // only make a new image if something has changed.
         final Dimension newSize = super.getSize();
-        if (newSize.equals(oldSize) && oldImage != null && !needsComponentReposition)
+        if (newSize.equals(oldSize) && oldImage != null && !isDirty)
         {
            super.paintComponent(g);
            g2.drawImage(oldImage,null,0,0);
@@ -215,7 +208,7 @@ public class FullSequencePanel extends JPanel
         }
         
         oldSize = newSize;
-        needsComponentReposition = false;
+        isDirty = false;
         
         oldImage = new BufferedImage(newSize.width, newSize.height, BufferedImage.TYPE_INT_RGB);
         final Graphics2D buf = (Graphics2D)oldImage.getGraphics();
@@ -303,10 +296,10 @@ public class FullSequencePanel extends JPanel
         
         // draw the description bar
         buf.setColor(Color.white);
-        buf.setFont(FullSequencePanel.descriptionFont);
+        buf.setFont(descriptionFont);
 		
 		for(int i = 0; i < title.length; i++) {
-			buf.drawString(title[i], FullSequencePanel.descriptionBarPadding, (int)FullSequencePanel.cellBounds.getHeight() * (i + 1));
+			buf.drawString(title[i], descriptionBarPadding, (int)cellBounds.getHeight() * (i + 1));
 		}
         
         // draw the background, etc.
@@ -352,20 +345,20 @@ public class FullSequencePanel extends JPanel
 
 class SequenceMouseListener extends MouseAdapter
 {
-    private FullSequencePanel parent;
+    private FullSequencePanel owner;
     
-    public SequenceMouseListener(final FullSequencePanel parent) {  this.parent = parent; }
+    public SequenceMouseListener(final FullSequencePanel parent) {  this.owner = parent; }
     
     @Override
 	public void mouseClicked(final MouseEvent e)
     {
-        final Structure struc = parent.chain.structure;
+        final Structure struc = owner.chain.structure;
         final StructureStyles ss = struc.getStructureMap().getStructureStyles();
         
         final LXGlGeometryViewer viewer = LigandExplorer.sgetGlGeometryViewer();
         
         final Point p = e.getPoint();
-        final Residue r = parent.getResidueAt(p);
+        final Residue r = owner.getResidueAt(p);
         if (r != null)
         {
         	final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry.get(StructureComponentRegistry.TYPE_ATOM);
@@ -382,30 +375,30 @@ class SequenceMouseListener extends MouseAdapter
         	else
         		viewer.renderResidue(r, as, ag, bs, bg, false);
             
-            parent.needsComponentReposition = true;
-            parent.repaint();
+            owner.isDirty = true;
+            owner.repaint();
         }
         viewer.requestRepaint();
     }
     
     @Override
 	public void mouseExited(final MouseEvent e) {
-        parent.selectedResidue = null;
+        owner.selectedResidue = null;
     }
 }
 
 class SequenceMouseMotionListener extends MouseMotionAdapter
 {
-    private FullSequencePanel parent;
+    private FullSequencePanel owner;
     
-    public SequenceMouseMotionListener(final FullSequencePanel parent) { this.parent = parent; }
+    public SequenceMouseMotionListener(final FullSequencePanel parent) { this.owner = parent; }
     
     @Override
 	public void mouseMoved(final MouseEvent e)
     {
         final Point p = e.getPoint();
-        final Residue r = parent.getResidueAt(p);
-        if (r == null || r == parent.selectedResidue)
+        final Residue r = owner.getResidueAt(p);
+        if (r == null || r == owner.selectedResidue)
             return;
         
         final Structure struc = r.structure;

@@ -24,6 +24,7 @@ import org.rcsb.lx.model.LXModel;
 import org.rcsb.lx.ui.LXDocumentFrame;
 import org.rcsb.lx.ui.dialogs.IPickInfoReceiver;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
+import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.glscene.jogl.AtomGeometry;
 import org.rcsb.mbt.glscene.jogl.BondGeometry;
 import org.rcsb.mbt.glscene.jogl.ChainGeometry;
@@ -251,6 +252,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 	 * Sigh.  Ok, this does essentially the same thing as the base class, but it does it on
 	 * the SceneNode view vectors, rather than the built-in carried vectors.
 	 * Very annoying.
+	 * 
 	 * This should be refactorable, but not now.
 	 * 
 	 * Deliberately hides base version.
@@ -683,7 +685,8 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 	
 
 	// added for protein-ligand interactions
-	public void ligandView(final Structure structure) {
+	public void ligandView(final Structure structure)
+	{
 		// if (inLigName != null && inLigName.length() > 0) {
 		// // GeometryViewer gv = getGeometryViewer();
 		// Transform3D trans3D = new Transform3D();
@@ -773,7 +776,8 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 
 	}
 
-	public String getResidueName(final Atom atom) {
+	public String getResidueName(final Atom atom)
+	{
 		final PdbToNdbConverter converter = atom.structure.getStructureMap()
 				.getPdbToNdbConverter();
 		final Object[] tmp = converter.getPdbIds(atom.chain_id, new Integer(
@@ -965,9 +969,8 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		if (interactionsOut != null) {
 			interactionsOut.close();
 		}
-
-		LXUpdateController update = LigandExplorer.sgetActiveFrame().getUpdateController();
-		update.refreshSequencePanes();
+		
+		LigandExplorer.sgetUpdateController().fireInteractionChanged();
 
 		// XXX Status.progress(1.0f, null);
 	}
@@ -1343,36 +1346,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		node.lxCreateAndAddLabel(r, label, InteractionConstants.hydrophilicBondColor);
 	}
 
-	// all below are added for protein-ligand interactions
-	// public void createDistanceLabel(
-	// Structure structure,
-	// Atom atom_i,
-	// Atom atom_j,
-	// String interactionType,
-	// String label) {
-	//
-	// JoglSceneNode node = structure.getStructureMap().getSceneNode();
-	//		
-	// Residue r = structure.getStructureMap().getResidue(atom);
-	// String label =
-	// structure.getStructureMap().getChain(atom).getChainId()
-	// + ":"
-	// + r.getCompoundCode()
-	// + r.getResidueId();
-	// node.createAndAddLabel(r, label, StructureStylesImpl.hbondColor);
-	//		
-	// double labelCoord[] = new double[3];
-	// labelCoord[0] = (atom_i.coordinate[0] + atom_j.coordinate[0]) / 2;
-	// labelCoord[1] = (atom_i.coordinate[1] + atom_j.coordinate[1]) / 2;
-	// labelCoord[2] = (atom_i.coordinate[2] + atom_j.coordinate[2]) / 2;
-	//
-	// //System.out.println("label " + label);
-	// LabelJ3D lg = new LabelJ3D(label, labelCoord);
-	// lg.setCapability(BranchGroup.ALLOW_DETACH);
-	//
-	// ((BranchGroup) componentHash.get(structure)).addChild(lg);
-	// monitors.put(lg, structure);
-	// }
+
 
 	public void calWaterInteractions(final Structure structure, final float lowerBound, final float upperBound,
 			final boolean displayDisLabel, final PrintWriter interactionsOut) {

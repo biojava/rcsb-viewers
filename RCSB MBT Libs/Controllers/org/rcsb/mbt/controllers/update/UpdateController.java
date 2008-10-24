@@ -21,7 +21,6 @@ public class UpdateController
 	 * @author rickb
 	 *
 	 */
-	@SuppressWarnings("serial")
 	private class UpdatePendingInfo
 	{
 		public IUpdateListener view;
@@ -157,14 +156,14 @@ public class UpdateController
 	public void fireUpdateViewEvent(final UpdateEvent.Action action, final Structure structure)
 	{
 		UpdateEvent evt = new UpdateEvent(action, structure);
-		fireUpdateViewEvent(evt);
+		fireUpdateEvent(evt);
 		evt = null;
 	}
 	
 	public void fireUpdateViewEvent(final UpdateEvent.Action action, final IUpdateListener view)
 	{
 		UpdateEvent evt = new UpdateEvent(action, view);
-		fireUpdateViewEvent(evt);
+		fireUpdateEvent(evt);
 		evt = null;
 	}
 	
@@ -172,11 +171,11 @@ public class UpdateController
 	{
 		UpdateEvent evt = new UpdateEvent(action);
 		evt.action = action;
-		fireUpdateViewEvent(evt);
+		fireUpdateEvent(evt);
 		evt = null;
 	}
 	
-	protected void fireUpdateViewEvent( final UpdateEvent evt )
+	public void fireUpdateEvent( final UpdateEvent evt )
 	{
 		inUpdate++;
 		
