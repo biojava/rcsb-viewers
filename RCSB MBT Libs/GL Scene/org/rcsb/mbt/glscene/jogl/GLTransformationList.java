@@ -14,9 +14,10 @@ import com.sun.opengl.util.BufferUtil;
  * Qualified class for list of transformations.
  * Used for Biological Unit or Non-Crystallographic transforms
  * 
- * Note this is different from the ModelTransformationList, which
- * holds ModelTransformationMatrices.  There is a utility to
- * create and return a GLTransformationList from a ModelTransformationList
+ * Contains a list of niobuffer representations created from the supplied
+ * ModelTransformationList matrices in the constructor.
+ * 
+ * This keeps ModelTransformationMatrix clean of any nio or gl dependencies.
  * 
  * @see org.rcsb.mbt.model.geometry.ModelTranformationMatrix
  * @see org.rcsb.mbt.model.geometry.ModelTransformationList
