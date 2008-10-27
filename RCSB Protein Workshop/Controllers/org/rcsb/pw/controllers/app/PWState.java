@@ -39,8 +39,10 @@ public class PWState extends StateBase
 			this.intermediateOrientation = new double[3];
 			this.intermediatePosition = new double[3];
 			this.intermediateUpArray = new double[3];
-			
+
+/* **
 			AppBase.sgetGlGeometryViewer().setHasRenderedFlag();
+* **/
 			
 		}
 		
@@ -61,10 +63,7 @@ public class PWState extends StateBase
 				} catch (final InterruptedException e) {
 					e.printStackTrace();
 				}
-				
-				if(!glViewer.hasRenderedAtLeastOnce) {
-					continue;
-				}
+
 				if(!this.isAnimationStarted) {
 					this.isAnimationStarted = true;
 					startTime = System.currentTimeMillis();
@@ -126,10 +125,7 @@ public class PWState extends StateBase
 							upArray[i] = Double.parseDouble(upSplit[i]);
 						}
 						
-//						if(this.movementThread != null && this.movementThread.isRunning()) {
-//							this.movementThread.stop();
-//						}
-						
+
 						final double[] currentOrientation = glViewer.getEye();
 						final double[] currentPosition = glViewer.getCenter();
 						final double[] currentUp = glViewer.getUp();

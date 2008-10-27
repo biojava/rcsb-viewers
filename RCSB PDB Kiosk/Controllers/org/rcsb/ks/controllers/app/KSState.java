@@ -35,8 +35,6 @@ public class KSState extends StateBase
 			intermediateOrientation = new double[3];
 			intermediatePosition = new double[3];
 			intermediateUpArray = new double[3];
-
-			KioskViewer.sgetGlGeometryViewer().setHasRenderedFlag();
 		}
 
 		public boolean isTerminated = false;
@@ -59,9 +57,6 @@ public class KSState extends StateBase
 					e.printStackTrace();
 				}
 
-				if (!glViewer.hasRenderedAtLeastOnce) {
-					continue;
-				}
 				if (!isAnimationStarted) {
 					isAnimationStarted = true;
 					startTime = System.currentTimeMillis();

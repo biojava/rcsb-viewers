@@ -1,21 +1,13 @@
 package org.rcsb.lx.controllers.scene;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Vector;
 
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
-
 import org.rcsb.lx.controllers.app.LigandExplorer;
-import org.rcsb.lx.controllers.update.LXUpdateController;
 import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
 import org.rcsb.lx.glscene.jogl.LXSceneNode;
 import org.rcsb.lx.model.InteractionConstants;
-import org.rcsb.lx.model.LXModel;
-import org.rcsb.lx.ui.LXDocumentFrame;
 import org.rcsb.mbt.glscene.jogl.AtomGeometry;
 import org.rcsb.mbt.glscene.jogl.BondGeometry;
 import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
@@ -28,8 +20,6 @@ import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
-import org.rcsb.mbt.model.attributes.ChainStyle;
-import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.geometry.Algebra;
 
 /*

@@ -523,7 +523,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 				break;
 				
 			case VIEW_UPDATE:
-						// This happens when loading a new file/url from the 
+						// This happens after loading a new file/url from the 
 						// menu.  We have to retrigger a few things to get the
 						// initial ligand set and redrawn.
 						//
@@ -535,7 +535,8 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 				if (ligandList != null && !ligandList.isEmpty())
 				{
 					getModel().setInitialLigand((String)AppBase.getApp().properties.get("ligand"));
-					sidebar.selectInitialLigand();					
+					sidebar.selectInitialLigand();
+					LigandExplorer.sgetGlGeometryViewer().requestRedrawInitialLigand();
 				}
 		}
 	}

@@ -277,12 +277,14 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 	public static final float[] DEFAULT_DIFFUSE_COLOR = GlGeometryViewer.black;
 
+/* **
 	// Frame rate and other drawing statistics
 	private long lastTime = System.currentTimeMillis();
 
 	private int frameCount = 0;
 
 	private double fps = 0.0f;
+* **/
 
 	private boolean isScreenshotRequested = false;
 
@@ -870,16 +872,6 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	 */
 	public void display(final GLAutoDrawable drawable) {
 		try {
-			// if (!this.needsRepaint && !this.needsPick) {
-			// System.out.print("N");
-			// }
-			// if(this.needsRepaint) System.out.print("R");
-			// if(this.needsPick) System.out.print("P");
-
-			// if(!this.needsPick) {
-			// System.err.flush();
-			// }
-
 			final GL gl = drawable.getGL();
 
 			final SceneController sceneController = AppBase.sgetSceneController();
@@ -921,13 +913,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 										sceneController.getDebugSettings().blurFactor
 												* sceneController.getDebugSettings().JITTER_ARRAY[jitter][1],
 										5f);
-						// JoglUtils.accPerspective(gl, glu, glut, fovy, 1.0 /
-						// aspect, zNear, zFar, 0, 0,
-						// Model.getSingleton().getDebugSettings().blurFactor *
-						// Model.getSingleton().getDebugSettings().JITTER_ARRAY[jitter][0],
-						// Model.getSingleton().getDebugSettings().blurFactor *
-						// Model.getSingleton().getDebugSettings().JITTER_ARRAY[jitter][1],
-						// Model.getSingleton().getDebugSettings().blurPlane);
+						
 						this.drawOrPick(gl, this.glu, this.glut, drawable,
 								false, false, false);
 						// gl.glFlush();
@@ -948,27 +934,6 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			}
 
 			this.needsRepaint = this.needsPick = false;
-
-			/*
-			 * int error = gl.glGetError(); if(error != 0) {
-			 * System.err.println("OpenGL error code: " + error); }
-			 */
-			/* **
-			 * not using AccessableSurfaceGeometry...
-			if (!this.hasRenderedAtLeastOnce) {
-				System.err.println("*** vertex count: "
-						+ Extrusion.VERTEX_COUNT + "; vertex cache hits: "
-						+ Extrusion.VERTEX_CACHE_HITS + " ***");
-				System.err.println("*** toroid count: "
-						+ AccessableSurfaceGeometry.TOTAL_TOROID_PATCHES + "; toroid cache hits: "
-						+ AccessableSurfaceGeometry.TOROID_CACHE_HITS + " ***");
-				System.err.println("*** concave count: "
-						+ AccessableSurfaceGeometry.TOTAL_CONCAVE_PATCHES + "; concave cache hits: "
-						+ AccessableSurfaceGeometry.CONCAVE_CACHE_HITS + " ***");
-			}
-			*/
-
-			this.hasRenderedAtLeastOnce = true;
 
 		} catch (final Exception e) {
 			e.printStackTrace();
@@ -1060,8 +1025,6 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 		}
 	}
-
-	public boolean hasRenderedAtLeastOnce = false;
 
 	protected void drawScene(final GL gl, final GLU glu, final GLUT glut,
 			final boolean canModifyProjectionMatrix,
@@ -2006,10 +1969,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				// atoms/bonds invisible.
 				// set all protein chains visible, and all non-protein chains
 				// invisible.
-				final Iterator chainIt = sm.getChains().iterator();
-				while (chainIt.hasNext()) {
-					final Chain c = (Chain) chainIt.next();
-
+				for (Chain c : sm.getChains())
+				{
 					if (c.getResidueCount() > 0
 							&& c.getResidue(0).getClassification() == Residue.Classification.AMINO_ACID) {
 
@@ -2017,19 +1978,14 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 					} else {
 						ss.setVisible(c, false);
 					}
-
-					final Iterator fragIt = c.getFragments().iterator();
-					while (fragIt.hasNext()) {
-						final Fragment f = (Fragment) fragIt.next();
-
-						final Iterator resIt = f.getResidues().iterator();
-						while (resIt.hasNext()) {
-							final Residue r = (Residue) resIt.next();
-
-							final Vector atoms = r.getAtoms();
-							final Iterator atomsIt = atoms.iterator();
-							while (atomsIt.hasNext()) {
-								final Atom a = (Atom) atomsIt.next();
+						
+					for (Fragment f : c.getFragments())
+					{
+						for (Residue r : f.getResidues())
+						{
+							Vector<Atom> atoms = r.getAtoms();
+							for (Atom a : atoms)
+							{
 								if (r.getClassification() != Residue.Classification.AMINO_ACID
 										&& !r.getCompoundCode().equals("HOH")) {
 									ss.setVisible(a, true);
@@ -2038,11 +1994,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 								}
 							}
 
-							final Iterator bondsIt = sm.getBonds(atoms)
-									.iterator();
-							while (bondsIt.hasNext()) {
-								final Bond b = (Bond) bondsIt.next();
-
+							for (Bond b : sm.getBonds(atoms))
+							{
 								if (r.getClassification() != Residue.Classification.AMINO_ACID &&
 									r.getClassification() != Residue.Classification.WATER ) {
 									ss.setVisible(b, true);
@@ -2254,17 +2207,6 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		this.structureAdded(struc);
 	}
 
-	public void setHasRenderedFlag() {
-		this.hasRenderedAtLeastOnce = false;
-	}
-
-	/**
-	 * Use setHasRenderedFlag() first.
-	 */
-	public boolean hasRenderedAtLeastOnce() {
-		return this.hasRenderedAtLeastOnce;
-	}
-	
 	protected boolean createVertexShader(final GL gl, final GLU glu,
 			final GLUT glut)
 	{

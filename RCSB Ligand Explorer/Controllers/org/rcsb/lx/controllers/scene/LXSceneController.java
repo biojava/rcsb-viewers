@@ -30,6 +30,9 @@ public class LXSceneController extends SceneController
 
 	private InteractionCalculator interactionsCalculator = new InteractionCalculator();
 	
+	private boolean newDocument = true;
+	public void setNewDocument(boolean flag) { newDocument = flag; }
+	
 	public void processLeftPanelEvent(final Structure structure,
 			final float ligwaterbondlower, final float ligwaterbondupper, final boolean ligWaterProOn, final float intLigandBondupper, final float intLigandBondlower, final boolean intLigandOn, final boolean hbondflag,
 			final float hbondlower, final float hbondupper, final boolean hydroflag,
@@ -121,8 +124,11 @@ public class LXSceneController extends SceneController
 			update.unblockListener(activeFrame);
 			
 			LXGlGeometryViewer glViewer = LigandExplorer.sgetGlGeometryViewer();
-			if (glViewer.getNumberTimesDisplayed() == 1)
-				glViewer.resetView(true, true);
+			if (newDocument)
+			{
+				glViewer.resetView(true, false);
+				newDocument = false;
+			}
 
 			final ChainStyle cs = (ChainStyle) structureStyles.getStyle(structureMap
 					.getChain(0)); // **JB assume that all chain styles are the
@@ -240,6 +246,9 @@ public class LXSceneController extends SceneController
 			
 		if (evt.action == UpdateEvent.Action.STRUCTURE_REMOVED)
 			clearStructure(transitory);
+		
+		if (evt.action == UpdateEvent.Action.STRUCTURE_ADDED)
+			if (!transitory) newDocument = true;
 		
 		super.handleUpdateEvent(evt);
 	}

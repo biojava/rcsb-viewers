@@ -71,8 +71,6 @@ public class LXState extends StateBase
 			intermediateOrientation = new double[3];
 			intermediatePosition = new double[3];
 			intermediateUpArray = new double[3];
-			
-			LigandExplorer.sgetGlGeometryViewer().setHasRenderedFlag();
 		}
 		
 		public boolean isTerminated = false;
@@ -82,7 +80,8 @@ public class LXState extends StateBase
 
 		private boolean isAnimationStarted = false;
 		@Override
-		public void run() {
+		public void run()
+		{
 			long startTime = -1;
 			final LXModel model = LigandExplorer.sgetModel();
 			final LXSceneNode node = (LXSceneNode)model.getStructures().get(0).getStructureMap().getUData();
@@ -95,9 +94,6 @@ public class LXState extends StateBase
 					e.printStackTrace();
 				}
 				
-				if(!glViewer.hasRenderedAtLeastOnce) {
-					continue;
-				}
 				if(!isAnimationStarted) {
 					isAnimationStarted = true;
 					startTime = System.currentTimeMillis();

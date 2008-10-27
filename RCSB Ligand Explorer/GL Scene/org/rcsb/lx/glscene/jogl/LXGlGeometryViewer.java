@@ -10,7 +10,6 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import org.rcsb.lx.controllers.app.LXState;
 import org.rcsb.lx.controllers.app.LigandExplorer;
-import org.rcsb.lx.controllers.scene.InteractionCalculator;
 import org.rcsb.lx.controllers.update.LXUpdateEvent;
 import org.rcsb.lx.model.Interaction;
 import org.rcsb.lx.model.InteractionConstants;
@@ -71,7 +70,8 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 	 */
 	public void requestRedrawInitialLigand()
 	{
-		this.numberTimesDisplayed = 0;
+		if (numberTimesDisplayed > 1)
+			numberTimesDisplayed = 0;
 		requestRepaint();
 	}
 
@@ -96,13 +96,11 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 
 
 		super.display(drawable);
+/* **/
 		try
 		{
-			if(this.numberTimesDisplayed < 3)
+			if(this.numberTimesDisplayed < 2)
 				this.numberTimesDisplayed++;
-
-			if(this.numberTimesDisplayed == 1)
-				;
 
 			else if(this.numberTimesDisplayed == 0)
 				this.requestRepaint();	// make sure it reaches the above logic
@@ -115,6 +113,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 	
 			this.screenshotFailed = true;
 		}
+/* **/
 	}
 	
 	@Override
