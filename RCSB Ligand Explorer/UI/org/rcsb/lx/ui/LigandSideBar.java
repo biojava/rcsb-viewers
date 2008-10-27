@@ -264,7 +264,7 @@ public class LigandSideBar extends JPanel
 							residues[ix] = (Residue)nodeValue;
 						}
 						
-						glViewer.setLigandResidues(residues);
+						LigandExplorer.sgetSceneController().setLigandResidues(residues);
 					}
 				}
 
@@ -290,7 +290,7 @@ public class LigandSideBar extends JPanel
 				// public void run() {
 				try
 				{
-					glViewer.processLeftPanelEvent(structure,
+					LigandExplorer.sgetSceneController().processLeftPanelEvent(structure,
 							l_h2o_pf1, l_h2o_pf2,
 							box.isSelected(),
 							interLigandf1,interLigandf2,

@@ -103,14 +103,13 @@ public class ContactMap_ContactingResiduesPane extends JPanel
 
 		final Structure struc = model.getStructures().get(0);
 		final StructureMap sm = struc.getStructureMap();
-		final StructureStyles ss = sm.getStructureStyles();
 		final PdbToNdbConverter converter = sm.getPdbToNdbConverter();
 		
 		// initialize, if necessary...
 		if(!this.isInitialized) {
 			final InteractionMap im = model.getInteractionMap();
 			final Iterator residues = im.getResidues().iterator();
-			final Residue currentLigandResidues[] = LigandExplorer.sgetGlGeometryViewer().currentLigandResidues;
+			final Residue currentLigandResidues[] = LigandExplorer.sgetSceneController().getLigandResidues();
 			
 			// if no ligand has been specified, bail.
 			if(currentLigandResidues == null) {
@@ -118,6 +117,7 @@ public class ContactMap_ContactingResiduesPane extends JPanel
 			}
 			
 			// sift into chain arrays, sorted by residue number
+			@SuppressWarnings("serial")
 			class ByResidueId extends TreeMap<Comparable, Residue>{}
 			final HashMap<String, ByResidueId> byChain = new HashMap<String, ByResidueId>(); // key: String chainId; value: TreeMap byResidueId <= Integer residueId; value: Residue
 			while(residues.hasNext())
@@ -200,7 +200,7 @@ public class ContactMap_ContactingResiduesPane extends JPanel
 			this.image = new BufferedImage(this.fullSize.width, this.fullSize.height, BufferedImage.TYPE_INT_RGB);
 			final Graphics2D buf = (Graphics2D)this.image.getGraphics();
 			
-			buf.setBackground(LigandExplorer.sgetActiveFrame().sidebarColor);
+			buf.setBackground(LXDocumentFrame.sidebarColor);
 			buf.clearRect(0, 0, this.image.getWidth(), this.image.getHeight());
 			
 //			buf.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

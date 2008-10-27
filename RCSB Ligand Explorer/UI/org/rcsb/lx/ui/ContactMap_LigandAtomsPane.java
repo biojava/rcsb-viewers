@@ -85,9 +85,9 @@ public class ContactMap_LigandAtomsPane extends JPanel {
 		final int padding = 3;
 		
 		// initialize, if necessary...
-		if(!this.isInitialized) {
-			final PdbToNdbConverter converter = sm.getPdbToNdbConverter();
-			final Residue currentLigandResidues[] = LigandExplorer.sgetGlGeometryViewer().currentLigandResidues;
+		if(!this.isInitialized)
+		{
+			final Residue currentLigandResidues[] = LigandExplorer.sgetSceneController().getLigandResidues();
 			
 			if(ContactMap_LigandAtomsPane.letterMetrics == null) {
 				ContactMap_LigandAtomsPane.letterMetrics = ResidueFontInfo.contactsResidueFont.getLineMetrics("M",g2.getFontRenderContext());

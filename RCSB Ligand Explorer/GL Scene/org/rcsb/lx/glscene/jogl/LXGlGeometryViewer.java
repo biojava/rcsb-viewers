@@ -3,28 +3,20 @@ package org.rcsb.lx.glscene.jogl;
 import java.awt.Dimension;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.io.PrintWriter;
-import java.io.IOException;
-import java.util.HashSet;
 import java.util.Vector;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
-
 import org.rcsb.lx.controllers.app.LXState;
 import org.rcsb.lx.controllers.app.LigandExplorer;
-import org.rcsb.lx.controllers.update.LXUpdateController;
+import org.rcsb.lx.controllers.scene.InteractionCalculator;
 import org.rcsb.lx.controllers.update.LXUpdateEvent;
 import org.rcsb.lx.model.Interaction;
 import org.rcsb.lx.model.InteractionConstants;
 import org.rcsb.lx.model.LXModel;
-import org.rcsb.lx.ui.LXDocumentFrame;
 import org.rcsb.lx.ui.dialogs.IPickInfoReceiver;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
-import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.glscene.jogl.AtomGeometry;
 import org.rcsb.mbt.glscene.jogl.BondGeometry;
 import org.rcsb.mbt.glscene.jogl.ChainGeometry;
@@ -54,10 +46,9 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 {
 	private static final long serialVersionUID = -2533795368689609713L;
 
-	public Residue[] currentLigandResidues = null;
-	
 	private int numberTimesDisplayed = -1;
-		
+	public int getNumberTimesDisplayed() { return numberTimesDisplayed; }
+	
 	public LXGlGeometryViewer()
 	{
 		this.do_glFinishInShaders = true;
@@ -657,16 +648,9 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		// this.requestRepaint();
 	}
 
-	public void setLigandResidues(final Residue[] residues)
-	{
-		this.currentLigandResidues = residues;
-	}
-	
 	public void clearStructure(boolean transitory)
 	{
 		super.clearStructure();
-		if (!transitory)
-			currentLigandResidues = null;
 	}
 	
 	public void handleModelChangedEvent(LXUpdateEvent evt)
@@ -694,7 +678,8 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		// this.setTransform(trans3D);
 		// }
 
-		final double[][] ligandBounds = this.getLigandBounds(structure, this.currentLigandResidues);
+		final double[][] ligandBounds =
+			getLigandBounds(structure, LigandExplorer.sgetSceneController().getLigandResidues());
 
 		if (ligandBounds == null) {
 			return;
@@ -821,159 +806,6 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 	public void setDisplayLevel(final String level) {
 	}
 
-	// public Vector3f getVectorInfo() {
-	// // **JB note: hack that only works for the first structure.
-	// JoglSceneNode node = Model.getSingleton().getStructures()[0]
-	// .getStructureMap().getSceneNode();
-	// Vector3f vecInfo = new Vector3f(x, y, zDist);
-	// // System.out.println(zDis);
-	// return vecInfo;
-	// }
-
-	public void processLeftPanelEvent(final Structure structure,
-			final float ligwaterbondlower, final float ligwaterbondupper, final boolean ligWaterProOn, final float intLigandBondupper, final float intLigandBondlower, final boolean intLigandOn, final boolean hbondflag,
-			final float hbondlower, final float hbondupper, final boolean hydroflag,
-			final float hydrolower, final float hydroupper, final boolean otherflag,
-			final float otherlower, final float otherupper, final boolean displayDisLabel,
-			boolean saveInteractionsToFile) {
-		// XXX Status.progress(0.3f, "StructureViewer adding structure...Please wait");
-
-		PrintWriter interactionsOut = null;
-		if (saveInteractionsToFile) {
-			final JFileChooser chooser = new JFileChooser();
-			// chooser.addChoosableFileFilter(new FileFilter() {
-			// public boolean accept(File f) {
-			// return true;
-			// }
-			//
-			// public String getDescription() {
-			// return "Everything";
-			// }
-			// });
-
-			chooser.addChoosableFileFilter (
-				new FileFilter()
-				{
-					@Override
-					public boolean accept(final File f)
-					{
-						if (f.isDirectory())
-							return true;
-	
-						final String name = f.getName();
-						final String lastFour = name.length() > 4 ? name.substring(name
-								.length() - 4) : null;
-						if (lastFour == null) {
-							return false;
-						}
-	
-						return lastFour.equalsIgnoreCase(".txt");
-					}
-	
-					@Override
-					public String getDescription()
-						{ return ".txt (tab delimited)"; }
-				});
-
-			if (chooser.showSaveDialog(LigandExplorer.sgetActiveFrame()) == JFileChooser.APPROVE_OPTION) {
-				File file = chooser.getSelectedFile();
-				if (file != null) {
-					try {
-						if (file.getName().indexOf('.') < 0) {
-							file = new File(file.getAbsolutePath() + ".txt");
-						}
-
-						interactionsOut = new PrintWriter(new java.io.FileWriter(file));
-
-						interactionsOut
-								.println("Atom 1\tAtom 2\tDistance\tType");
-					} catch (final IOException e) {
-						e.printStackTrace();
-						return;
-					}
-				}
-			}
-		}
-
-		if (!saveInteractionsToFile)
-		{
-			LXModel model = LigandExplorer.sgetModel();
-			model.getInteractionMap().clear();
-
-			final StructureMap structureMap = structure.getStructureMap();
-			final StructureStyles structureStyles = structureMap.getStructureStyles();
-
-			structureStyles.clearSelections();
-			
-			//
-			// Notify the viewers that structures have been removed and added.
-			// We don't want to remove the model, so we just use the update
-			// controller to send a 'remove all' signal and then an 'add all'
-			// signal.
-			//
-			// This is really pretty wanky - should look this over and fix.
-			//
-			LXDocumentFrame activeFrame = LigandExplorer.sgetActiveFrame();
-			LXUpdateController update = LigandExplorer.sgetActiveFrame().getUpdateController();
-			update.blockListener(activeFrame);
-			update.removeStructure(true);
-			update.fireStructureAdded(structure, false, true);
-			update.unblockListener(activeFrame);
-			
-			if (this.numberTimesDisplayed == 1)
-				resetView(true, true);
-
-			final ChainStyle cs = (ChainStyle) structureStyles.getStyle(structureMap
-					.getChain(0)); // **JB assume that all chain styles are the
-			// same.
-			cs.resetBinding(structure);
-		}
-
-		final StructureMap structureMap = structure.getStructureMap();
-
-		// If its just sequence data lets bail out!
-		if (structureMap.getAtomCount() < 0) {
-			return;
-		}
-
-		// XXX Status.progress(0.5f, "Continue loading structure... please wait...");
-		final int totalResidues = structureMap.getResidueCount();
-		int onePercent = (int) (totalResidues / 100.0f);
-		if (onePercent <= 0) {
-			onePercent = 1;
-		}
-
-		// added for protein-ligand interaction. calculate interaction with H2O
-		// in the binding site
-		if (ligWaterProOn) {
-			this.calWaterInteractions(structure, ligwaterbondlower, ligwaterbondupper, displayDisLabel, interactionsOut);
-		}
-
-		// added for protein-ligand interactions
-		if (intLigandOn) {
-			this.calInterLigInteractions(structure, intLigandBondlower, intLigandBondupper, displayDisLabel, interactionsOut);
-		}
-
-		// added for protein-ligand interactions
-		this.calculateInteractions(structure, hbondflag, hydroflag, otherflag,
-				hbondupper, hbondlower, hydroupper, hydrolower, otherupper,
-				otherlower, displayDisLabel, interactionsOut);
-
-		// Center the view at the ligand
-		// Status.progress(0.95f, "Centering the view at the ligand" +
-		// inLigName+"...Please wait");
-		if (!saveInteractionsToFile) {
-			this.ligandView(structure);
-		}
-
-		if (interactionsOut != null) {
-			interactionsOut.close();
-		}
-		
-		LigandExplorer.sgetUpdateController().fireInteractionChanged();
-
-		// XXX Status.progress(1.0f, null);
-	}
 
 	// added for protein-ligand interactions
 	/**
@@ -998,187 +830,6 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		return dist;
 	}
 
-	public void calculateInteractions(final Structure structure, boolean hbondflag,
-			boolean hydroflag, boolean otherflag, final double hbondupper,
-			final double hbondlower, final double hydroupper, final double hydrolower,
-			final double otherupper, final double otherlower, final boolean displayDisLabel,
-			final PrintWriter interactionsOut) {
-		int count = 0;
-		int count_hydro = 0;
-		int count_other = 0;
-		final StructureMap structureMap = structure.getStructureMap();
-		Vector<Atom> ligandAtoms = new Vector<Atom>();
-		for (Residue residue : currentLigandResidues)
-			ligandAtoms.addAll(residue.getAtoms());
-		
-		final Vector<Atom> proteinAtoms = new Vector<Atom>();
-
-		String interactionType = null;
-		String distString = null;
-
-		if (!hbondflag && !hydroflag && !otherflag) {
-			return;
-		}
-
-		for (Chain chain : structureMap.getChains())
-			if (chain.getClassification() == Residue.Classification.AMINO_ACID)
-				proteinAtoms.addAll(chain.getAtoms());
-
-		final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry
-				.get(StructureComponentRegistry.TYPE_ATOM);
-		final AtomStyle as = (AtomStyle) structure.getStructureMap()
-				.getStructureStyles().getDefaultStyle(
-						StructureComponentRegistry.TYPE_ATOM);
-		final BondGeometry bg = (BondGeometry) GlGeometryViewer.defaultGeometry
-				.get(StructureComponentRegistry.TYPE_BOND);
-		final BondStyle bs = (BondStyle) structure.getStructureMap()
-				.getStructureStyles().getDefaultStyle(
-						StructureComponentRegistry.TYPE_BOND);
-
-		for (int i = 0; i < ligandAtoms.size(); i++) {
-			double distance = 0.0;
-
-			final Atom atom_i = ligandAtoms.get(i);
-
-			for (int j = i + 1; j < proteinAtoms.size(); j++) {
-				final Atom atom_j = proteinAtoms.get(j);
-
-				/*
-				 * if (!atom_i.chain_id.equals(atom_j.chain_id)) distance =
-				 * distance(atom_i, atom_j);
-				 */
-				// String label1 = null;
-				// String label2 = null;
-				// String name_i = getResidueName(atom_i);
-				// String name_j = getResidueName(atom_j);
-				// hbond
-				if (hbondflag) {
-
-					if ((atom_i.element.equals("N") || atom_i.element
-							.equals("O"))
-							&& (atom_j.element.equals("N") || atom_j.element
-									.equals("O"))) {
-
-						distance = Algebra.distance(atom_i.coordinate,
-								atom_j.coordinate);
-
-						if (distance <= hbondupper && distance >= hbondlower) {
-							interactionType = InteractionConstants.hydrophilicType;
-							distString = LXGlGeometryViewer.getDistString(distance);
-
-							// if (!node.isRendered(atom_j)) {
-							// DisplayListRenderable renderable = new
-							// DisplayListRenderable(atom_j, as, ag);
-							// node.addRenderable(renderable);
-							// }
-							if (interactionsOut == null) {
-								this.renderResidue(structureMap.getResidue(atom_j), as, ag, bs, bg,true);
-							}
-
-							count++;
-
-							this.drawInteraction(structure, atom_i, atom_j,
-									interactionType, displayDisLabel,
-									distString, distance, interactionsOut);
-							// label1 =
-							// atom_i.chain_id
-							// + ":"
-							// + atom_i.compound
-							// + ":"
-							// + atom_i.number
-							// + ":"
-							// + atom_i.name;
-							// label2 =
-							// atom_j.chain_id
-							// + ":"
-							// + atom_j.compound
-							// + ":"
-							// + atom_j.number
-							// + ":"
-							// + atom_j.name;
-
-							/*
-							 * System.out.println( label1 + "\t " + label2 + "\t " +
-							 * distString);
-							 */
-
-						}
-					}
-				}
-				if (hydroflag) {
-
-					if (atom_i.element.equals("C")
-							&& atom_j.element.equals("C")) {
-						distance = Algebra.distance(atom_i.coordinate,
-								atom_j.coordinate);
-						if (distance <= hydroupper && distance >= hydrolower) {
-							interactionType = InteractionConstants.hydrophobicType;
-							distString = LXGlGeometryViewer.getDistString(distance);
-
-							count_hydro++;
-
-							// if (!node.isRendered(atom_j)) {
-							// DisplayListRenderable renderable = new
-							// DisplayListRenderable(atom_j, as, ag);
-							// node.addRenderable(renderable);
-							// }
-							if (interactionsOut == null) {
-								this.renderResidue(structureMap
-										.getResidue(atom_j), as, ag, bs, bg,
-										true);
-							}
-
-							// Display distance label
-
-							this.drawInteraction(structure, atom_i, atom_j,
-									interactionType, displayDisLabel,
-									distString, distance, interactionsOut);
-						}
-					}
-				}
-				if (otherflag) {
-
-					if (!(atom_i.element.equals("C") && atom_j.element
-							.equals("C"))
-							&& !((atom_i.element.equals("N") || atom_i.element
-									.equals("O")) && (atom_j.element
-									.equals("N") || atom_j.element.equals("O")))) {
-						distance = Algebra.distance(atom_i.coordinate,
-								atom_j.coordinate);
-						if (distance <= otherupper && distance >= otherlower) {
-							interactionType = InteractionConstants.otherType;
-							distString = LXGlGeometryViewer.getDistString(distance);
-
-							count_other++;
-
-							// if (!node.isRendered(atom_j)) {
-							// DisplayListRenderable renderable = new
-							// DisplayListRenderable(atom_j, as, ag);
-							// node.addRenderable(renderable);
-							// }
-							if (interactionsOut == null) {
-								this.renderResidue(structureMap
-										.getResidue(atom_j), as, ag, bs, bg,
-										true);
-							}
-
-							this.drawInteraction(structure, atom_i, atom_j,
-									interactionType, displayDisLabel,
-									distString, distance, interactionsOut);
-
-						}
-
-					}
-				}
-
-			}
-		}
-		// System.out.println("countH is " + count);
-		// System.out.println("count hydro is " + count_hydro);
-		// System.out.println("count other is " + count_other);
-
-	}
-
 	public void renderResidue(final Residue r, final AtomStyle as, final AtomGeometry ag,
 			final BondStyle bs, final BondGeometry bg, final boolean showLabel) {
 		final StructureMap sm = r.structure.getStructureMap();
@@ -1187,7 +838,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		final Vector<Atom> atoms = r.getAtoms();
 		final Vector<Bond> bonds = sm.getBonds(atoms);
 		for (int i = 0; i < atoms.size(); i++) {
-			final Atom a = (Atom) atoms.get(i);
+			final Atom a = atoms.get(i);
 			if (!node.isRendered(a)) {
 				final DisplayListRenderable renderable = new DisplayListRenderable(a,
 						as, ag);
@@ -1195,7 +846,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 			}
 		}
 		for (int i = 0; i < bonds.size(); i++) {
-			final Bond b = (Bond) bonds.get(i);
+			final Bond b = bonds.get(i);
 			if (!node.isRendered(b))
 			{
 				final DisplayListRenderable renderable = new DisplayListRenderable(b, bs, bg);
@@ -1256,7 +907,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 	 *            interactions will still be (re)created visually in the
 	 *            viewer).
 	 */
-	private void drawInteraction(final Structure structure, final Atom a, final Atom b,
+	public void drawInteraction(final Structure structure, final Atom a, final Atom b,
 			final String interactionType, final boolean displayDisLabel, final String distString, final double distDouble,
 			final PrintWriter interactionsOut) {
 
@@ -1344,183 +995,5 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		final String label = structure.getStructureMap().getChain(atom).getChainId()
 				+ ":" + r.getCompoundCode() + r.getResidueId();
 		node.lxCreateAndAddLabel(r, label, InteractionConstants.hydrophilicBondColor);
-	}
-
-
-
-	public void calWaterInteractions(final Structure structure, final float lowerBound, final float upperBound,
-			final boolean displayDisLabel, final PrintWriter interactionsOut) {
-		final StructureMap structureMap = structure.getStructureMap();
-
-		double distance = 0.0;
-		String distString = null;
-		final String interactionType = InteractionConstants.waterMediatedType;
-		final HashSet<Atom> waterAtoms = new HashSet<Atom>();
-		
-		for (Chain hohChain : structureMap.getChains())
-		{
-			if (hohChain.getResidue(0).getClassification() != Residue.Classification.WATER
-				&& hohChain.getChainId() != "_") continue;
-						// find the water chain
-
-			//
-			// First, find the closest waters to any of the atoms in the the current ligand.
-			// Traverse all the atoms in the current ligand and compare against all the water
-			// atoms
-			//
-			for (Residue residue : currentLigandResidues)
-				for (Atom ligAtom : residue.getAtoms())
-					for (Residue hohResidue : hohChain.getResidues())
-						if (hohResidue.getClassification() == Residue.Classification.WATER)
-						{
-							Atom hohAtom = hohResidue.getAtom(0);
-										// water residue only contains a single 'O'
-							
-							distance = Algebra.distance(hohAtom.coordinate,
-														ligAtom.coordinate);
-							if (distance < upperBound && distance > lowerBound)
-							{
-								distString = LXGlGeometryViewer.getDistString(distance);
-								this.drawInteraction(structure, ligAtom, hohAtom,
-										interactionType, displayDisLabel, distString, distance,
-										interactionsOut);
-								
-								waterAtoms.add(hohAtom);
-							}							
-						}
-		}
-		
-		this.calWaterProInt(structure, waterAtoms, lowerBound, upperBound, displayDisLabel, interactionsOut);
-					// now calculate the protein interactions with the located water atoms
-
-		if (interactionsOut == null) {
-			final LXSceneNode node = (LXSceneNode)structure.getStructureMap().getUData();
-
-			final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry
-					.get(StructureComponentRegistry.TYPE_ATOM);
-			final AtomStyle as = (AtomStyle) structure.getStructureMap()
-					.getStructureStyles().getDefaultStyle(
-							StructureComponentRegistry.TYPE_ATOM);
-
-			for (Atom a : waterAtoms)
-			{
-				if (!node.isRendered(a)) {
-					final DisplayListRenderable renderable = new DisplayListRenderable(
-							a, as, ag);
-					node.addRenderable(renderable);
-				}
-			}
-		}
-	}
-
-	/*
-	 * Calculate the water protein interactions.  The waters are traversed and compared against the
-	 * amino acid atoms.
-	 */
-	public void calWaterProInt(final Structure structure, final HashSet<Atom> waterAtoms, final float lowerBound, final float upperBound,
-			final boolean displayDisLabel, final PrintWriter interactionsOut) {
-		final StructureMap structureMap = structure.getStructureMap();
-		final int atomCt = structureMap.getAtomCount();
-		Vector<Atom> proAtoms = new Vector<Atom>();
-		double distance = 0.0;
-		String distString = null;
-		final String interactionType = InteractionConstants.waterMediatedType;
-		HashSet<Residue> uniqRes = new HashSet<Residue>();
-		int ct = 0;
-
-		for (int i = 0; i < atomCt; i++) {
-			final Atom atom = structureMap.getAtom(i);
-			if (structureMap.getChain(atom).getClassification() ==
-				Residue.Classification.AMINO_ACID)
-					proAtoms.add(atom);
-		}
-
-		final LXSceneNode node = (LXSceneNode)structure.getStructureMap().getUData();
-		final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry
-				.get(StructureComponentRegistry.TYPE_ATOM);
-		final AtomStyle as = (AtomStyle) structure.getStructureMap()
-				.getStructureStyles().getDefaultStyle(
-						StructureComponentRegistry.TYPE_ATOM);
-		final BondGeometry bg = (BondGeometry) GlGeometryViewer.defaultGeometry
-				.get(StructureComponentRegistry.TYPE_BOND);
-		final BondStyle bs = (BondStyle) structure.getStructureMap()
-				.getStructureStyles().getDefaultStyle(
-						StructureComponentRegistry.TYPE_BOND);
-
-		for (Atom atom_j : waterAtoms)
-		{
-			for (int k = 0; k < proAtoms.size(); k++) {
-				final Atom atom_k = proAtoms.get(k);
-				distance = Algebra.distance(atom_j.coordinate,
-						atom_k.coordinate);
-				distString = LXGlGeometryViewer.getDistString(distance);
-				final Residue res = structureMap.getResidue(atom_k);
-				if (!uniqRes.contains(res)) {
-
-					if (distance < upperBound && distance > lowerBound) {
-						this.drawInteraction(structure, atom_j, atom_k,
-								interactionType, displayDisLabel, distString, distance,
-								interactionsOut);
-
-						if (interactionsOut == null) {
-							if (!node.isRendered(atom_j)) {
-								final DisplayListRenderable renderable = new DisplayListRenderable(
-										atom_j, as, ag);
-								node.addRenderable(renderable);
-							}
-
-							this.renderResidue(res, as, ag, bs, bg, true);
-						}
-
-						ct++;
-					}
-					uniqRes.add(res);
-				}
-			}
-		}
-	}
-
-	public void calInterLigInteractions(final Structure structure, final float lowerBound, final float upperBound,
-			final boolean displayDisLabel, final PrintWriter interactionsOut) {
-		final StructureMap structureMap = structure.getStructureMap();
-		final int ligCount = structureMap.getLigandCount();
-		// System.out.println("lig count is " + ligCount);
-
-		final Vector<Atom> atoms = new Vector<Atom>();
-		double distance = 0.0;
-		String distString = null;
-		final String interactionType = InteractionConstants.interLigandType;
-		for (int i = 0; i < ligCount; i++) {
-			final int ligAtomCt = structureMap.getLigandResidue(i).getAtomCount();
-			for (int j = 0; j < ligAtomCt; j++) {
-				atoms.add(structureMap.getLigandResidue(i).getAtom(j));
-			}
-		}
-
-		for (int m = 0; m < atoms.size(); m++) {
-			final Atom atom_m = atoms.get(m);
-			final Residue atomResidueM = structureMap.getResidue(atom_m);
-			Atom atom_n = null;
-			for (int n = m + 1; n < atoms.size(); n++) {
-				atom_n = atoms.get(n);
-				final Residue atomResidueN = structureMap.getResidue(atom_n);
-				
-				if (!atom_m.compound.equals("HOH")
-						&& !atom_n.compound.equals("HOH")
-						&& (atomResidueM != atomResidueN) &&
-							(atomResidueM.getChainId().equals(currentLigandResidues[0].getChainId()) ||
-							 atomResidueN.getChainId().equals(currentLigandResidues[0].getChainId()))) {
-					distance = Algebra.distance(atom_m.coordinate,
-							atom_n.coordinate);
-					distString = LXGlGeometryViewer.getDistString(distance);
-
-					if (distance < upperBound && distance > lowerBound) {
-						this.drawInteraction(structure, atom_m, atom_n,
-								interactionType, displayDisLabel, distString, distance,
-								interactionsOut);
-					}
-				}
-			}
-		}
 	}
 }

@@ -11,7 +11,7 @@ import org.rcsb.mbt.model.StructureComponent;
  * somewhere in the protein.
  * 
  * This is derived from LineSegment because that's a low level base available to the display
- * list caller.  Not a good mechanism, but this will get us by.
+ * list caller.
  * 
  * @author rickb
  */
