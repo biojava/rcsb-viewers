@@ -6,14 +6,11 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.prefs.Preferences;
 
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -21,6 +18,7 @@ import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Structure;
+import org.rcsb.mbt.ui.mainframe.UIBuilder;
 import org.rcsb.sv.controllers.app.SVVersionInformation;
 import org.rcsb.sv.controllers.app.SimpleViewer;
 import org.rcsb.vf.controllers.app.VFAppBase;
@@ -30,7 +28,7 @@ import org.rcsb.vf.ui.VFDocumentFrameBase;
 
 public class SVDocumentFrame extends VFDocumentFrameBase
 {
-	public class SimpleViewerUIBuilder extends VFDocumentFrameBase.UIBuilder
+	public class SimpleViewerUIBuilder extends UIBuilder
 	{
 		@Override
 		public void run()

@@ -40,36 +40,9 @@ import org.rcsb.mbt.model.util.Status;
 public abstract class DocumentFrameBase extends JFrame
 {
 	private static final long serialVersionUID = 682613576170299667L;	
-	/**
-	 * This is a swing runnable - it is invoked to build the ActiveFrame UI at the appropriate
-	 * moment.  Derived frames will derive from this, as well, and override 'run()'.
-	 * 
-	 * App-specific UI gets created in the overridden 'run()' function.
-	 * 
-	 * @author rickb
-	 *
-	 */
-	
-	protected class UIBuilder implements Runnable
-	{
-		/**
-		 * Swing thread runner.  Override and implement app-specific ActiveFrame UI, here.
-		 */
-		public void run()
-		{
-			if (!AppBase.backgroundScreenshotOnly)
-			{
-				if (AppBase.getApp().isApplication())
-				{
-					Status.progress(-1, "Creating UI...");
-					//////////////////////////////////////////////////////////////////////
-					setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-				}
-			}
-		}
-	}
 	
 	protected boolean _showFrame;
+	public boolean showFrame() { return _showFrame; }
 	
 	/**
 	 * The doc controller has all the machinery to load, save, and parse documents (files).

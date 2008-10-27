@@ -17,13 +17,13 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.app.ProgressPanelController;
 import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.util.Status;
+import org.rcsb.mbt.ui.mainframe.UIBuilder;
 import org.rcsb.pw.controllers.app.PWVersionInformation;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.PWSceneController;
@@ -38,7 +38,9 @@ import org.rcsb.vf.ui.VFDocumentFrameBase;
 public class PWDocumentFrame extends VFDocumentFrameBase 
 {
 	private static final long serialVersionUID = -2377835483763485353L;
+	@Override
 	public PWGlGeometryViewer getGlGeometryViewer() { return (PWGlGeometryViewer)super.getGlGeometryViewer(); }
+	@Override
 	public PWSceneController getSceneController() { return (PWSceneController)super.getSceneController(); }
 	
 	class HorizontalSplitPaneListener implements AncestorListener
@@ -69,6 +71,7 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 			this.parent = parent;
 		}
 	
+		@Override
 		public void componentResized(final ComponentEvent e)
 		{
 			final JFrame frame = (JFrame) e.getSource();
@@ -80,8 +83,9 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 		}
 	}
 	
-	class ProteinWorkshopUIBuilder extends VFDocumentFrameBase.UIBuilder
+	class ProteinWorkshopUIBuilder extends UIBuilder
 	{
+		@Override
 		public void run()
 		{
 			super.run();
@@ -287,6 +291,7 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 		super(title, iconUrl);
 	}
 
+	@Override
 	public void initialize(boolean showFrame)
 	{
 		super.initialize(showFrame);

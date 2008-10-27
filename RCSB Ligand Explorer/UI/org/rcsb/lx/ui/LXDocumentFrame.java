@@ -47,6 +47,7 @@ import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.util.Status;
+import org.rcsb.mbt.ui.mainframe.UIBuilder;
 import org.rcsb.mbt.ui.views.StructureComponentInspector;
 import org.rcsb.vf.controllers.app.BBBrowserLauncher;
 import org.rcsb.vf.controllers.app.VFAppBase;
@@ -67,7 +68,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 	@Override
 	public LXSceneController getSceneController() { return (LXSceneController)super.getSceneController(); }
 	
-	class LigandExplorerUIBuilder extends VFDocumentFrameBase.UIBuilder
+	class LigandExplorerUIBuilder extends UIBuilder
 	{
 		/**
 		 * Receive notification if a display dialog is destroyed.
