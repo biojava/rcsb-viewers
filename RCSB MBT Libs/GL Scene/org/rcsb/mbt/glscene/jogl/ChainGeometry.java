@@ -147,9 +147,6 @@ public class ChainGeometry
 		//
 
 		DisplayLists[] lists = null;
-		
-		final float quality = this.getQuality( );
-		final int form = this.getForm( );
 
 		final Chain chain = (Chain)structureComponent;
 		
@@ -160,15 +157,6 @@ public class ChainGeometry
 		final Structure structure = chain.getStructure( );
 		final StructureMap structureMap = structure.getStructureMap( );
 		final StructureStyles structureStyles = structureMap.getStructureStyles( );
-
-		// Create or over-write this chain geometry's display list.
-//		if ( displayList < 0 )
-//			displayList = gl.glGenLists( 1 );
-//		else
-//			gl.glDeleteLists( displayList, 1 );
-//		gl.glNewList( displayList, GL.GL_COMPILE );
-
-//		gl.glPushMatrix( );
 
 		try {
 			boolean ribbon = false;

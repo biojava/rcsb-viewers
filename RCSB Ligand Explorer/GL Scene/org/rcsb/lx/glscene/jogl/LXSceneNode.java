@@ -421,63 +421,69 @@ public class LXSceneNode extends JoglSceneNode
 	protected boolean innerDraw(final GL gl, final GLU glu, final GLUT glut, boolean isPick,
 			final Structure struc, final FloatBuffer nc_transform)
 	{
-		gl.glPushMatrix();
+		try {
+			gl.glPushMatrix();
 
-		final GlGeometryViewer glViewer = AppBase.sgetGlGeometryViewer();
+			final GlGeometryViewer glViewer = AppBase.sgetGlGeometryViewer();
 
-		if (nc_transform != null)
-		{
-			nc_transform.rewind();
-			gl.glMultMatrixf(nc_transform);
-		}
-
-		synchronized (this.renderables)
-		{
-			for (final DisplayListRenderable renderable : renderables.values())
+			if (nc_transform != null)
 			{
-				renderable.draw(gl, glu, glut, isPick);
-
-				// pick cycles do not need to finish, and paints get priority.
-				if (isPick && glViewer.needsRepaint) {
-					gl.glPopMatrix(); // make sure we clean up the stack...
-					return false;
-				}
+				nc_transform.rewind();
+				gl.glMultMatrixf(nc_transform);
 			}
-		}
 
-		if (!isPick)
-		{
-			synchronized (this.labels)
+			synchronized (this.renderables)
 			{
-				final Collection values = this.labels.values();
-				if (!values.isEmpty()) {
-					gl.glDisable(GL.GL_DEPTH_TEST);
+				for (final DisplayListRenderable renderable : renderables.values())
+				{
+					renderable.draw(gl, glu, glut, isPick);
 
-					if (LXGlGeometryViewer.currentProgram != 0)
-						gl.glUseProgram(0);
-
-					gl.glDisable(GL.GL_LIGHTING);
-
-					final Iterator it = this.labels.values().iterator();
-					final Iterator keyIt = this.labels.keySet().iterator();
-					while (it.hasNext()) {
-						final Object[] tmp = (Object[]) it.next();
-						final Integer label = (Integer) tmp[0];
-						final float[] color = (float[]) tmp[1];
-						gl.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, color, 0);
-
-						final Object key = keyIt.next();
-						drawTypeLabels(gl, key, label);
+					// pick cycles do not need to finish, and paints get priority.
+					if (isPick && glViewer.needsRepaint) {
+						gl.glPopMatrix(); // make sure we clean up the stack...
+						return false;
 					}
-
-					gl.glEnable(GL.GL_DEPTH_TEST);
-
-					if (GlGeometryViewer.currentProgram != 0)
-						gl.glUseProgram(GlGeometryViewer.currentProgram);
-
-					gl.glEnable(GL.GL_LIGHTING);
 				}
 			}
+
+			if (!isPick)
+			{
+				synchronized (this.labels)
+				{
+					final Collection values = this.labels.values();
+					if (!values.isEmpty()) {
+						gl.glDisable(GL.GL_DEPTH_TEST);
+
+						if (LXGlGeometryViewer.currentProgram != 0)
+							gl.glUseProgram(0);
+
+						gl.glDisable(GL.GL_LIGHTING);
+
+						final Iterator it = this.labels.values().iterator();
+						final Iterator keyIt = this.labels.keySet().iterator();
+						while (it.hasNext()) {
+							final Object[] tmp = (Object[]) it.next();
+							final Integer label = (Integer) tmp[0];
+							final float[] color = (float[]) tmp[1];
+							gl.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, color, 0);
+
+							final Object key = keyIt.next();
+							drawTypeLabels(gl, key, label);
+						}
+
+						gl.glEnable(GL.GL_DEPTH_TEST);
+
+						if (GlGeometryViewer.currentProgram != 0)
+							gl.glUseProgram(GlGeometryViewer.currentProgram);
+
+						gl.glEnable(GL.GL_LIGHTING);
+					}
+				}
+			}
+		} catch (Exception e)
+		{
+			if (AppBase.isDebug())
+				e.printStackTrace();
 		}
 
 		gl.glPopMatrix();
@@ -611,23 +617,29 @@ public class LXSceneNode extends JoglSceneNode
 			final int list = label.intValue();
 			if (list >= 0)
 			{
-				gl.glPushMatrix();
+				try {
+					gl.glPushMatrix();
 
-				for (int i = 0; i < line.getFirstAtom().coordinate.length; i++)
+					for (int i = 0; i < line.getFirstAtom().coordinate.length; i++)
+					{
+						this.tempMidpoint[i] = (line
+								.getFirstAtom().coordinate[i] + line
+								.getSecondAtom().coordinate[i]) / 2;
+					}
+					gl.glTranslated(this.tempMidpoint[0] + .5f,
+							this.tempMidpoint[1] - .5f,
+							this.tempMidpoint[2] + .5f);
+					// constants represent arbitrary displacement to separate
+					// the label from the line.
+
+					gl.glRasterPos3f(0, 0, 0);
+
+					gl.glCallList(list);
+				} catch (Exception e)
 				{
-					this.tempMidpoint[i] = (line
-							.getFirstAtom().coordinate[i] + line
-							.getSecondAtom().coordinate[i]) / 2;
+					if (AppBase.isDebug())
+						e.printStackTrace();
 				}
-				gl.glTranslated(this.tempMidpoint[0] + .5f,
-						this.tempMidpoint[1] - .5f,
-						this.tempMidpoint[2] + .5f);
-				// constants represent arbitrary displacement to separate
-				// the label from the line.
-
-				gl.glRasterPos3f(0, 0, 0);
-
-				gl.glCallList(list);
 				gl.glPopMatrix();
 			}
 		}

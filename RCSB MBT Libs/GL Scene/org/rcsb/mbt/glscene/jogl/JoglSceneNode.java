@@ -408,132 +408,150 @@ public class JoglSceneNode
 	protected boolean innerDraw(final GL gl, final GLU glu, final GLUT glut, boolean isPick,
 			final Structure struc, final FloatBuffer inTransform)
 	{
-		gl.glPushMatrix();
+		try {
+			gl.glPushMatrix();
 
-		final GlGeometryViewer viewer = AppBase.sgetGlGeometryViewer();
-		/**
-		 * This only works because this function is completely overridden for the NC (LX)
-		 * version.
-		 */
-		
-		BiologicUnitTransforms.BiologicalUnitGenerationMapByChain buMatrices = null;
-		
-		StructureMap sm = struc.getStructureMap();
+			final GlGeometryViewer viewer = AppBase.sgetGlGeometryViewer();
+			/**
+			 * This only works because this function is completely overridden for the NC (LX)
+			 * version.
+			 */
+			
+			BiologicUnitTransforms.BiologicalUnitGenerationMapByChain buMatrices = null;
+			
+			StructureMap sm = struc.getStructureMap();
 
-		if (inTransform != null)
-						// supplied transform overrides anything else(?)
-		{
-			inTransform.rewind();
-			gl.glMultMatrixf(inTransform);
-		}
-		
-		else if (sm.hasBiologicUnitTransforms() &&
-				!(AppBase.sgetSceneController().areGlobalTransformsDisabled() ||
-				  AppBase.sgetSceneController().showAsymmetricUnitOnly()))
-		{
-			StructureMap.BiologicUnitTransforms bu = sm.getBiologicUnitTransforms();
-			buMatrices = bu.getBiologicalUnitGenerationMatricesByChain();
-		}
-
-		synchronized (this.renderables)
-		{
-			for (StructureComponent sc : renderables.keySet())
+			if (inTransform != null)
+							// supplied transform overrides anything else(?)
 			{
-				DisplayListRenderable renderable = renderables.get(sc);
-				
-				if (buMatrices != null)
-				{
-					String chainId = null;
-					if (sc.getStructureComponentType() == StructureComponentRegistry.TYPE_ATOM) {
-						final Atom a = (Atom) sc;
-						chainId = a.chain_id;
-					} else if (sc.getStructureComponentType() == StructureComponentRegistry.TYPE_BOND) {
-						final Bond b = (Bond) sc;
-						chainId = b.getAtom(0).chain_id;
-					} else if (sc.getStructureComponentType() == StructureComponentRegistry.TYPE_CHAIN) {
-						final Chain c = (Chain) sc;
-						chainId = c.getChainId();
-					} 
+				inTransform.rewind();
+				gl.glMultMatrixf(inTransform);
+			}
+			
+			else if (sm.hasBiologicUnitTransforms() &&
+					!(AppBase.sgetSceneController().areGlobalTransformsDisabled() ||
+					  AppBase.sgetSceneController().showAsymmetricUnitOnly()))
+			{
+				StructureMap.BiologicUnitTransforms bu = sm.getBiologicUnitTransforms();
+				buMatrices = bu.getBiologicalUnitGenerationMatricesByChain();
+			}
 
-					// if the chain id is not listed, don't draw this.
-					if (AppBase.sgetSceneController().showAsymmetricUnitOnly() || sc.getStructureComponentType() == Surface.COMPONENT_TYPE)
+			synchronized (this.renderables)
+			{
+				for (StructureComponent sc : renderables.keySet())
+				{
+					DisplayListRenderable renderable = renderables.get(sc);
+					
+					if (buMatrices != null)
 					{
-						gl.glPushMatrix();
-						renderable.draw(gl, glu, glut, isPick);
-						gl.glPopMatrix();
+						String chainId = null;
+						if (sc.getStructureComponentType() == StructureComponentRegistry.TYPE_ATOM) {
+							final Atom a = (Atom) sc;
+							chainId = a.chain_id;
+						} else if (sc.getStructureComponentType() == StructureComponentRegistry.TYPE_BOND) {
+							final Bond b = (Bond) sc;
+							chainId = b.getAtom(0).chain_id;
+						} else if (sc.getStructureComponentType() == StructureComponentRegistry.TYPE_CHAIN) {
+							final Chain c = (Chain) sc;
+							chainId = c.getChainId();
+						} 
+
+						// if the chain id is not listed, don't draw this.
+						if (AppBase.sgetSceneController().showAsymmetricUnitOnly() || sc.getStructureComponentType() == Surface.COMPONENT_TYPE)
+						{
+							try {
+								gl.glPushMatrix();
+								renderable.draw(gl, glu, glut, isPick);
+							} catch (Exception e)
+							{
+								if (AppBase.isDebug())
+									e.printStackTrace();
+							}
+							gl.glPopMatrix();
+						}
+						
+						else
+						{
+							final GLTransformationList matricesVec =
+								GLTransformationList.fromModelTransformationList(buMatrices.get(chainId));
+							
+							if (matricesVec != null) {
+								for (int i = 0; i < matricesVec.size(); i++) {
+									final FloatBuffer transformation = matricesVec.get(i);
+
+									try {
+										gl.glPushMatrix();
+										transformation.rewind();
+										gl.glMultMatrixf(transformation);
+										renderable.draw(gl, glu, glut, isPick);
+									} catch (Exception e)
+									{
+										if (AppBase.isDebug())
+											e.printStackTrace();
+									}
+									gl.glPopMatrix();
+								}
+							}
+						}
+//					System.err.println("End " + sc.getStructureComponentType() + "\n\n");
 					}
 					
 					else
-					{
-						final GLTransformationList matricesVec =
-							GLTransformationList.fromModelTransformationList(buMatrices.get(chainId));
-						
-						if (matricesVec != null) {
-							for (int i = 0; i < matricesVec.size(); i++) {
-								final FloatBuffer transformation = matricesVec.get(i);
-	
-								gl.glPushMatrix();
-								transformation.rewind();
-								gl.glMultMatrixf(transformation);
-								renderable.draw(gl, glu, glut, isPick);
-								gl.glPopMatrix();
-							}
-						}
-					}
-//					System.err.println("End " + sc.getStructureComponentType() + "\n\n");
-				}
-				
-				else
-					renderable.draw(gl, glu, glut, isPick);
+						renderable.draw(gl, glu, glut, isPick);
 
-				// pick cycles do not need to finish, and paints get priority.
-				if (isPick && viewer.needsRepaint) {
-					gl.glPopMatrix(); // make sure we clean up the stack...
-					return false;
+					// pick cycles do not need to finish, and paints get priority.
+					if (isPick && viewer.needsRepaint) {
+						gl.glPopMatrix(); // make sure we clean up the stack...
+						return false;
+					}
 				}
 			}
-		}
 
-		if (!isPick)
-		{
-			synchronized (this.labels)
+			if (!isPick)
 			{
-				final Collection values = this.labels.values();
-				if (!values.isEmpty()) {
-					gl.glDisable(GL.GL_DEPTH_TEST);
+				synchronized (this.labels)
+				{
+					final Collection values = this.labels.values();
+					if (!values.isEmpty()) {
+						gl.glDisable(GL.GL_DEPTH_TEST);
 
-					if (GlGeometryViewer.currentProgram != 0) {
-						gl.glUseProgram(0);
+						if (GlGeometryViewer.currentProgram != 0) {
+							gl.glUseProgram(0);
+						}
+						gl.glDisable(GL.GL_LIGHTING);
+
+						gl.glColorMaterial(GL.GL_FRONT, GL.GL_EMISSION);
+						gl.glEnable(GL.GL_COLOR_MATERIAL);
+						
+						final Iterator it = this.labels.values().iterator();
+						final Iterator keyIt = this.labels.keySet().iterator();
+						while (it.hasNext()) {
+							final Object[] tmp = (Object[]) it.next();
+							final Integer label = (Integer) tmp[0];
+							final float[] color = (float[]) tmp[1];
+							gl.glColor3fv(color, 0);
+
+							final Object key = keyIt.next();
+							drawTypeLabels(gl, key, label);
+						}
+
+						gl.glDisable(GL.GL_COLOR_MATERIAL);
+						
+						gl.glEnable(GL.GL_DEPTH_TEST);
+
+						if (GlGeometryViewer.currentProgram != 0)
+							gl.glUseProgram(GlGeometryViewer.currentProgram);
+
+						gl.glEnable(GL.GL_LIGHTING);
 					}
-					gl.glDisable(GL.GL_LIGHTING);
-
-					gl.glColorMaterial(GL.GL_FRONT, GL.GL_EMISSION);
-					gl.glEnable(GL.GL_COLOR_MATERIAL);
-					
-					final Iterator it = this.labels.values().iterator();
-					final Iterator keyIt = this.labels.keySet().iterator();
-					while (it.hasNext()) {
-						final Object[] tmp = (Object[]) it.next();
-						final Integer label = (Integer) tmp[0];
-						final float[] color = (float[]) tmp[1];
-						gl.glColor3fv(color, 0);
-
-						final Object key = keyIt.next();
-						drawTypeLabels(gl, key, label);
-					}
-
-					gl.glDisable(GL.GL_COLOR_MATERIAL);
-					
-					gl.glEnable(GL.GL_DEPTH_TEST);
-
-					if (GlGeometryViewer.currentProgram != 0)
-						gl.glUseProgram(GlGeometryViewer.currentProgram);
-
-					gl.glEnable(GL.GL_LIGHTING);
 				}
 			}
+		} catch (Exception e)
+		{
+			if (AppBase.isDebug())
+				e.printStackTrace();
 		}
-
+		
 		gl.glPopMatrix();
 
 		return true;
@@ -554,12 +572,19 @@ public class JoglSceneNode
 			final int list = label.intValue();
 			if (list >= 0) {
 
-				gl.glPushMatrix();
-				gl.glTranslated(atom.coordinate[0],
-						atom.coordinate[1], atom.coordinate[2]);
-				gl.glRasterPos3f(0, 0, 0);
+				try {
+					gl.glPushMatrix();
+					gl.glTranslated(atom.coordinate[0],
+							atom.coordinate[1], atom.coordinate[2]);
+					gl.glRasterPos3f(0, 0, 0);
 
-				gl.glCallList(list);
+					gl.glCallList(list);
+				} catch (Exception e)
+				{
+					if (AppBase.isDebug())
+						e.printStackTrace();
+				}
+				
 				gl.glPopMatrix();
 			}
 		}
@@ -575,12 +600,19 @@ public class JoglSceneNode
 			
 			if (list >= 0)
 			{
-				gl.glPushMatrix();
-				gl.glTranslated(atom.coordinate[0],
-						atom.coordinate[1], atom.coordinate[2]);
-				gl.glRasterPos3f(0, 0, 0);
+				try {
+					gl.glPushMatrix();
+					gl.glTranslated(atom.coordinate[0],
+							atom.coordinate[1], atom.coordinate[2]);
+					gl.glRasterPos3f(0, 0, 0);
 
-				gl.glCallList(list);
+					gl.glCallList(list);
+				} catch (Exception e)
+				{
+					if (AppBase.isDebug())
+						e.printStackTrace();
+				}
+				
 				gl.glPopMatrix();
 			}
 		}
@@ -591,22 +623,28 @@ public class JoglSceneNode
 
 			final int list = label.intValue();
 			if (list >= 0) {
-				gl.glPushMatrix();
+				try {
+					gl.glPushMatrix();
 
-				for (int i = 0; i < line.getFirstPoint().vector.length; i++) {
-					this.tempMidpoint[i] = (line
-							.getFirstPoint().vector[i] + line
-							.getSecondPoint().vector[i]) / 2;
+					for (int i = 0; i < line.getFirstPoint().vector.length; i++) {
+						this.tempMidpoint[i] = (line
+								.getFirstPoint().vector[i] + line
+								.getSecondPoint().vector[i]) / 2;
+					}
+					gl.glTranslated(this.tempMidpoint[0] + .5f,
+							this.tempMidpoint[1] - .5f,
+							this.tempMidpoint[2] + .5f);
+					// constants represent an arbitrary displacement to separate
+					// the label from the line.
+
+					gl.glRasterPos3f(0, 0, 0);
+
+					gl.glCallList(list);
+				} catch (Exception e) {
+					if (AppBase.isDebug())
+						e.printStackTrace();
 				}
-				gl.glTranslated(this.tempMidpoint[0] + .5f,
-						this.tempMidpoint[1] - .5f,
-						this.tempMidpoint[2] + .5f);
-				// constants represent an arbitrary displacement to separate
-				// the label from the line.
-
-				gl.glRasterPos3f(0, 0, 0);
-
-				gl.glCallList(list);
+				
 				gl.glPopMatrix();
 			}
 		}

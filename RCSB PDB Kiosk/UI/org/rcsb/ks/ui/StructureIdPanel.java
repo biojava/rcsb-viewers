@@ -1,4 +1,4 @@
-package org.rcsb.ks.controllers.app;
+package org.rcsb.ks.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -14,8 +14,12 @@ import org.rcsb.ks.model.PrimaryCitation;
 import org.rcsb.mbt.model.Structure;
 
 
-public class StructureIdPanel extends JPanel {
-
+@SuppressWarnings("serial")
+/*
+ * This is the panel on the left.
+ */
+public class StructureIdPanel extends JPanel
+{
 	private Structure structure = null;
 
 	private JTextArea author_area = new JTextArea ();
@@ -25,30 +29,24 @@ public class StructureIdPanel extends JPanel {
 	public StructureIdPanel() {
 	
 		setLayout ( new BoxLayout ( this, BoxLayout.Y_AXIS ));
-		
-		add ( author_area );
-		add ( journal_area );
-		
+		setBackground(Color.black);
+			
 		author_area.setFont( new Font ( "Helvetica", Font.BOLD, 15 ));
-		author_area.setBackground ( Color.black );
+		author_area.setBackground ( Color.black);
 		author_area.setForeground( Color.orange );
 		author_area.setWrapStyleWord( true );
 		author_area.setLineWrap( true );
+		
 		journal_area.setFont( new Font ( "Helvetica", Font.PLAIN, 12 ));
 		journal_area.setBackground ( Color.black);
 		journal_area.setForeground( Color.white );
 		journal_area.setWrapStyleWord( true );
-		journal_area.setLineWrap( true );		
+		journal_area.setLineWrap( true );	
+		
+		add( author_area );
+		add ( journal_area );
 	}
 	
-
-	
-
-
-//	public void setBounds ( int _x, int _y, int _w, int _h ){
-//		super.setBounds ( _x, _y, _w, _h );
-//		System.out.println ( " set the bounds " + _x);
-//	}
 	
 	public Structure getStructure ()
 	{
@@ -79,7 +77,6 @@ public class StructureIdPanel extends JPanel {
 		journal_area.setText( journalIndex.getTitle () );
 		journal_area.append( "\n");
 		journal_area.append ( journalIndex.getJournalInfo () + "  "+journalIndex.getYear () );
-//		StructureMap smap = structure.getStructureMap();
 
 		repaint();
 	}

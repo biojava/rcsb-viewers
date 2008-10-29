@@ -5,26 +5,34 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import org.rcsb.ks.controllers.app.KSState;
 import org.rcsb.ks.controllers.doc.KSDocController;
 import org.rcsb.ks.glscene.jogl.KSGlGeometryViewer;
-import org.rcsb.ks.glscene.jogl.StructurePanel;
+import org.rcsb.mbt.controllers.scene.SceneState;
+import org.rcsb.mbt.controllers.update.IUpdateListener;
+import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.util.PickUtils;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 
 
-public class KSDocumentFrame extends DocumentFrameBase
+@SuppressWarnings("serial")
+public class KSDocumentFrame extends DocumentFrameBase implements IUpdateListener, KeyEventDispatcher
 {
 	@Override
 	public KSGlGeometryViewer getGlGeometryViewer() { return (KSGlGeometryViewer)super.getGlGeometryViewer(); }
@@ -63,15 +71,25 @@ public class KSDocumentFrame extends DocumentFrameBase
 	 * 
 	 * @param name
 	 */
-	public KSDocumentFrame(String name, URL iconUrl) { super(name, iconUrl); }
+	public KSDocumentFrame(String name, URL iconUrl)
+	{
+		super(name, iconUrl);
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
+	}
 	
 	@Override
 	public void setVisible(boolean _value) {
 
-		if (_value) {
+		if (_value)
+		{
 			super.setVisible(_value);
-			
-		} else {
+			setCursor(getToolkit().createCustomCursor(
+					new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB),
+					new Point(0, 0), "null"));
+		}
+		
+		else
+		{
 			super.setVisible(_value);
 			System.exit(1);
 		}
@@ -118,6 +136,7 @@ public class KSDocumentFrame extends DocumentFrameBase
 		// this.structureViewer.setBackgroundColor(new float[] {255,255,255 });
 
 		// Status.bringBackToTop();
+		getUpdateController().registerListener(this);
 	}
 
 	public void setFullScreen()
@@ -138,8 +157,6 @@ public class KSDocumentFrame extends DocumentFrameBase
 				KSGlGeometryViewer glViewer = getGlGeometryViewer();
 				glViewer.setPreferredSize( new Dimension ( size.width-10, size.height-20 ) );
 				glViewer.setBackground( Color.blue );
-//				glViewer.setFocusable( true );
-//				glViewer.setFocusCycleRoot( true );
 
 				container.add(glViewer);
 
@@ -147,20 +164,10 @@ public class KSDocumentFrame extends DocumentFrameBase
 				structurePanel.setDoubleBuffered(true);
 				container.add(structurePanel);
 //				pack();
-//				structurePanel.requestFocus();
-				// glViewer.requestFocus();
-				// KioskViewer.this.add();
 
-				// {{ the default screen size }}
 				setSize(size);
-				// Dimension prefsize = new Dimension ( size.width,
-				// size.height);
-				 gDevice.setFullScreenWindow(KSDocumentFrame.this);
-				// int x_location = (size.width - prefsize.width) / 2;
-				// int y_location = (size.height - prefsize.height) / 2;
+				gDevice.setFullScreenWindow(KSDocumentFrame.this);
 
-				// setSize( prefsize );
-				// setLocation( 0, 0 );
 				setResizable( false );
 				setVisible(true);
 			}
@@ -177,7 +184,7 @@ public class KSDocumentFrame extends DocumentFrameBase
 		getGlGeometryViewer().resetView(false, false);
 	}
 	
-	public void updateState(Structure _structure, KSState _state) {
+	public void updateState(Structure _structure, SceneState _state) {
 		structurePanel.updateState(_structure, _state);
 	}
 
@@ -185,5 +192,31 @@ public class KSDocumentFrame extends DocumentFrameBase
 	{
 		structurePanel.updateStructure(structure2);
 		getGlGeometryViewer().repaint();
+	}
+	
+	
+	public void clear()
+	{
+		getModel().clear();
+		resetView();
+	}
+	
+	/* (non-Javadoc)
+	 * @see edu.sdsc.mbt.views_controller.IViewUpdateListener#handleModelChangedEvent(edu.sdsc.mbt.views_controller.ViewUpdateEvent)
+	 */
+	public void handleUpdateEvent(UpdateEvent evt)
+	{
+		if (evt.action == UpdateEvent.Action.CLEAR_ALL) clear();
+	}
+	
+	/*
+	 * quit on ctrl-q
+	 */
+	public boolean dispatchKeyEvent(KeyEvent e)
+	{
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+			setVisible(false);
+
+		return true;
 	}
 }

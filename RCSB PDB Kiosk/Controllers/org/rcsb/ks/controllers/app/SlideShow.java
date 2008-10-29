@@ -11,11 +11,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
 
-import org.rcsb.ks.controllers.app.KSState;
+import org.rcsb.mbt.controllers.scene.SceneState;
+import org.rcsb.mbt.controllers.scene.ViewMovementThread;
 import org.rcsb.ks.glscene.jogl.KSGlGeometryViewer;
 import org.rcsb.ks.model.AnnotatedAtom;
 import org.rcsb.ks.model.EntityDescriptor;
@@ -39,7 +39,16 @@ import org.rcsb.mbt.model.attributes.IResidueColor;
 import org.rcsb.mbt.model.attributes.ResidueColorByRgb;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 
-public class SlideShow extends Thread {
+/*
+ * Set up a thread to run a slide show.  Collects all the filenames from a directory
+ * specified in a 'screensaver.properties' file, then insures they're retrieved if
+ * on the net to a local area, and runs through them, displaying them in various states.
+ * 
+ * @author rickb
+ *
+ */
+public class SlideShow extends Thread
+{
 	private boolean slideShow = true;
 
 	private ArrayList<String> pdbIdList = new ArrayList<String>();
@@ -51,8 +60,8 @@ public class SlideShow extends Thread {
 
 	private boolean threadSuspended = false;
 
-	public SlideShow() {
-		new KioskViewer();
+	public SlideShow(String args[]) {
+		new KioskViewer(args);
 		loadList();
 	}
 
@@ -101,7 +110,6 @@ public class SlideShow extends Thread {
 			}
 			startPreemptiveListLoadingThread();
 		} catch (Exception e) {
-			// TODO: handle exceptio
 			e.printStackTrace();
 		}
 	}
@@ -114,7 +122,15 @@ public class SlideShow extends Thread {
 		return fileDirectory;
 	}
 
-	public void startPreemptiveListLoadingThread() {
+	/*
+	 * Make sure files are local somewhere.  The only reason I can see this for being in
+	 * it's own thread is that it can download files (if it has to) in background while the
+	 * viewer can get started.
+	 * 
+	 * 28-Oct-08 - rickb
+	 */
+	public void startPreemptiveListLoadingThread()
+	{
 		Thread t = new Thread() {
 			@Override
 			public void run() {
@@ -159,7 +175,6 @@ public class SlideShow extends Thread {
 							}
 							out.flush();
 						} catch (Exception e) {
-							// TODO: handle exception
 							e.printStackTrace();
 							failureIndex++;
 							if (failureIndex >= 5)
@@ -172,6 +187,11 @@ public class SlideShow extends Thread {
 		t.start();
 	}
 
+	/*
+	 * Trigger the slideshow.
+	 * 
+	 * @see java.lang.Thread#run()
+	 */
 	@Override
 	public void run()
 	{
@@ -187,6 +207,10 @@ public class SlideShow extends Thread {
 			}
 		}
 		int index = 0;
+		int movementDuration = 5000;  // milliseconds
+		int pause = 1000;
+		
+		ViewMovementThread.setDuration(movementDuration);
 
 		StructureModel model = AppBase.sgetModel();
 
@@ -216,8 +240,6 @@ public class SlideShow extends Thread {
 			
 			KSGlGeometryViewer gviewer = KioskViewer.sgetGlGeometryViewer();
 			KioskViewer.sgetActiveFrame().updateStructure(model.getStructures().get(0));
-			
-////			if (true) break;  // XXX TEMPORARY - DEBUGGING
 
 			// {{ check the size of the structure. If it is too big then we will
 			// punt }}
@@ -229,41 +251,58 @@ public class SlideShow extends Thread {
 			// .getAtomCoordinateAverage();
 			while (model == null) {
 				try {
-					sleep(2000l);
+					sleep(100L);
 				} catch (Exception _e) {
 
 				}
 				System.err.println(" failed... failed ... failed ");
 			}
 			gviewer.suspendAllPainting();
-			ArrayList states = generateStates();
+			ArrayList<SceneState> states = generateStates();
 			gviewer.resumePainting();
 
-			for (Iterator iter = states.iterator(); iter.hasNext();)
+			for (SceneState state : states)
 			{
-				KSState element = (KSState) iter.next();
-				KioskViewer.sgetActiveFrame().updateState(model.getStructures().get(0), element);
+				KioskViewer.sgetActiveFrame().updateState(model.getStructures().get(0), state);
 
- 				element.enact();
+ 				state.enact();
 
-				System.out.println ( " enacting " + element.toString());
+ 				if (AppBase.isDebug())
+ 					System.out.println ( "Slideshow awake: enacting " + state.toString());
 				// {{ check to make sure the thread is not suspended by calling
 				// suspendThread }}
-				synchronized (this) {
+				synchronized (this)
+				{
 					while (threadSuspended) {
-						try {
+						try
+						{
 							wait();
-						} catch (InterruptedException _ie) {
+						}
+						
+						catch (InterruptedException _ie)
+						{
+							if (AppBase.isDebug())
+								System.err.println("Slideshow interrupted.");
 						}
 					}
 				}
 
-				try {
-					sleep(10000l);
-
-				} catch (Exception _e) {
+/* **/
+				try
+				{
+					sleep(movementDuration + pause);
+								// ok - it triggers the state change, which then animates.
+								// when this times out, it goes to the next state, regardless of
+								// whether the animation is complete or not...
 				}
-
+				
+				catch (Exception _e)
+				{
+					if (AppBase.isDebug())
+						System.err.println("Exception: Slideshow waken up from sleep?");
+				}
+/* **/
+				ViewMovementThread.terminateMovementThread();
 			}
 
 			// System.out.println(" \n\n Loading the structure : "
@@ -273,8 +312,6 @@ public class SlideShow extends Thread {
 			if (index >= size) {
 				index = 0;
 			}
-			
-// XXX	KioskViewer.clearMemory();
 		}
 	}
 
@@ -310,6 +347,7 @@ public class SlideShow extends Thread {
 		AppBase.sgetDocController().loadStructure(url, _id);
 	}
 
+/* **
 	private StateAnnotationPanel createStateAnnotationPanel() {
 		return new StateAnnotationPanel();
 	}
@@ -328,32 +366,33 @@ public class SlideShow extends Thread {
 		generateState(pivot, list, "");
 		return list;
 	}
+* **/
 
-	private ArrayList generateStates() {
+	private ArrayList<SceneState> generateStates()
+	{
 
-		ArrayList statelist = new ArrayList();
+		ArrayList<SceneState> statelist = new ArrayList<SceneState>();
 		StructureModel model = AppBase.sgetModel();
 		KSGlGeometryViewer gl = KioskViewer.sgetGlGeometryViewer();
 		double[] pivot = model.getStructures().get(0).getStructureMap()
 				.getAtomCoordinateAverage();
 		
 		generateState(pivot, statelist, "");
+		
+/* **
+// uncomment if you want only the pivot states generated.
+		if (AppBase.isDebug())
+			return(statelist);
+* **/
 
-		// {{ }}
-		StructureMap map = model.getStructures().get(0).getStructureMap();
-
-//		System.out.println(" the structure class "
-//				+ model.getStructures()[0].getClass().toString());
-
-		Vector chains = map.getChains();
 		KSStructureInfo structureInfo = (KSStructureInfo)model.getStructures().get(0).getStructureInfo();
-		ArrayList ligands = structureInfo.getDescriptors();
 
-		StructureMap structureMap = model.getStructures().get(0).getStructureMap();
-		int ligandCount = structureMap.getLigandCount();
-		if (ligandCount <= 4) {
+		StructureMap sm = model.getStructures().get(0).getStructureMap();
+		int ligandCount = sm.getLigandCount();
+		if (ligandCount <= 4)
+		{
 			for (int j = 0; j < ligandCount; j++) {
-				Residue r = structureMap.getLigandResidue(j);
+				Residue r = sm.getLigandResidue(j);
 				if (!r.getCompoundCode().equalsIgnoreCase("HOH")) {
 					if (r.getAtoms().size() > 5) {
 						Atom atom = r.getAtom(0);
@@ -362,7 +401,7 @@ public class SlideShow extends Thread {
 						eye[0] = c[0] - 20;
 						eye[1] = c[1] - 20;
 						eye[2] = c[2] - 20;
-						KSState viewerState = new KSState();
+						SceneState viewerState = new SceneState();
 
 						// EntityDescriptor ed = structureInfo.getDescriptor( r
 						// );
@@ -389,11 +428,12 @@ public class SlideShow extends Thread {
 		
 		else
 		{
-			KSState orig = new KSState();
+			SceneState orig = new SceneState();
 			orig.captureCurrentState("");
 			statelist.add(orig);
-			for (int j = 0; j < ligandCount; j++) {
-				Residue r = structureMap.getLigandResidue(j);
+			for (int j = 0; j < ligandCount; j++)
+			{
+				Residue r = sm.getLigandResidue(j);
 
 				if (!r.getCompoundCode().equalsIgnoreCase("HOH")) {
 					if (r.getAtoms().size() > 5) {
@@ -414,7 +454,7 @@ public class SlideShow extends Thread {
 								descr = ee.getDescription();
 
 						}
-						KSState viewerState = new KSState();
+						SceneState viewerState = new SceneState();
 						generateOscilatingState(c, 40, statelist, descr);
 						gl.lookAt(eye, c);
 
@@ -433,10 +473,6 @@ public class SlideShow extends Thread {
 			}
 		}
 
-		Structure s = model.getStructures().get(0);
-		StructureMap sm = s.getStructureMap();
-		StructureStyles ss = sm.getStructureStyles();
-
 		int chainCount = sm.getChainCount();
 		for (int i = 0; i < chainCount; i++) {
 			double colorv = Math.random();
@@ -449,7 +485,7 @@ public class SlideShow extends Thread {
 			changeColor(c, colorf);
 		}
 
-		KSState viewerState1 = new KSState();
+		SceneState viewerState1 = new SceneState();
 		try {
 			// viewer.requestRepaint();
 			viewerState1.captureCurrentState("");
@@ -457,14 +493,14 @@ public class SlideShow extends Thread {
 		} catch (Exception _ee) {
 			_ee.printStackTrace();
 		}
-		double coords[] = structureMap.getAtomCoordinateAverage();
+		double coords[] = sm.getAtomCoordinateAverage();
 		double[] eye = new double[3];
 		eye[0] = coords[0] - 20;
 		eye[1] = coords[1] - 20;
 		eye[2] = coords[2] - 20;
 
 		generateOscilatingState(coords, 140, statelist, "");
-		KSState viewerState = new KSState();
+		SceneState viewerState = new SceneState();
 		try {
 			gl.lookAt(eye, coords);
 			viewerState.captureCurrentState("");
@@ -488,28 +524,22 @@ public class SlideShow extends Thread {
 		StructureMap sm = struc.getStructureMap();
 		StructureStyles ss = sm.getStructureStyles();
 
-		switch (PickLevel.pickLevel) {
+		switch (PickLevel.pickLevel)
+		{
 		case PickLevel.COMPONENTS_ATOMS_BONDS:
-			Vector atoms = r.getAtoms();
+			Vector<Atom> atoms = r.getAtoms();
 
-			Iterator atomIt = atoms.iterator();
-			while (atomIt.hasNext()) {
-				Atom a = (Atom) atomIt.next();
+			for (Atom a : atoms)
 				this.changeColor(a, _color);
-			}
 
-			Vector bonds = sm.getBonds(atoms);
-			Iterator bondsIt = bonds.iterator();
-			while (bondsIt.hasNext()) {
-				Bond b = (Bond) bondsIt.next();
+			for (Bond b : sm.getBonds(atoms))
 				this.changeColor(b, _color);
-			}
 			break;
+			
 		default:
 		case PickLevel.COMPONENTS_RIBBONS:
 			Chain c = sm.getChain(r.getChainId());
 			
-			KSGlGeometryViewer viewer = KioskViewer.sgetGlGeometryViewer();
 			DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(c);
 			if (renderable != null) {
 				// this.options.getCurrentColor().getColorComponents(colorFl);
@@ -552,7 +582,6 @@ public class SlideShow extends Thread {
 		case PickLevel.COMPONENTS_ATOMS_BONDS:
 			// this.options.getCurrentColor().getColorComponents(colorFl);
 
-			KSGlGeometryViewer viewer = KioskViewer.sgetGlGeometryViewer();
 			DisplayListRenderable renderable = sn.getRenderable(a);
 			if (renderable != null) {
 				AtomStyle oldStyle = (AtomStyle) renderable.style;
@@ -583,7 +612,6 @@ public class SlideShow extends Thread {
 	{
 		Structure struc = b.structure;
 		StructureMap sm = struc.getStructureMap();
-		StructureStyles ss = sm.getStructureStyles();
 
 		switch (PickLevel.pickLevel)
 		{
@@ -614,9 +642,8 @@ public class SlideShow extends Thread {
 
 
 	private void generateOscilatingState(double[] pivot,
-			double _distance, ArrayList _list, String _title)
+			double _distance, ArrayList<SceneState> _list, String _title)
 	{
-		double radius = 10; // back about 10 angstroms
 		double[] c = pivot;
 		double[] eye = new double[3];
 		// double[] centerPoint = new double[3];
@@ -638,7 +665,7 @@ public class SlideShow extends Thread {
 			x = (distance * Math.sin(theta)) * Math.cos(phi);
 			y = (distance * Math.sin(theta)) * Math.sin(phi);
 			z = (distance * Math.cos(theta));
-			KSState state = new KSState();
+			SceneState state = new SceneState();
 
 			if (i > 90) {
 				y *= (-1);
@@ -665,54 +692,7 @@ public class SlideShow extends Thread {
 		}
 	}
 
-	private void generateState(Chain _c, Residue _r, ArrayList _list)
-	{
-		double radius = 10; // back about 10 angstroms
-		Atom a = _r.getAtom(0);
-		double[] c = a.coordinate;
-		double[] eye = new double[3];
-		// double[] centerPoint = new double[3];
-		eye[0] = c[0] - 5;
-		eye[1] = c[1] - 5;
-		eye[2] = c[2] - 5;
-
-		double distance = 10;// Math.sqrt(eye[0]*eye[0] + eye[1]*eye[1] +
-		// eye[2]*eye[2]);
-		double phi = 0;
-		double theta = Math.PI;
-		double x = (distance * Math.sin(theta)) * Math.cos(phi);
-		double y = (distance * Math.sin(theta)) * Math.sin(phi);
-		double z = (distance * Math.cos(theta));
-
-		for (double i = 0; i < 360.0; i += 80) {
-			theta = Math.toRadians(i);
-			x = (distance * Math.sin(theta)) * Math.cos(phi);
-			y = (distance * Math.sin(theta)) * Math.sin(phi);
-			z = (distance * Math.cos(theta));
-			KSState state = new KSState();
-
-			if (i > 90) {
-				y *= (-1);
-			} else if (i > 180) {
-				y *= (-1);
-				x *= (-1);
-			} else if (i > 270) {
-				x *= (-1);
-			} else {
-
-			}
-
-			eye[0] = c[0] - x;
-			eye[1] = c[1] - y;
-			eye[2] = c[2] - z;
-
-			KioskViewer.sgetGlGeometryViewer().lookAt(eye, c);
-			state.captureCurrentState("Residue View: " + _r.getCompoundCode());
-			_list.add(state);
-		}
-	}
-
-	private void generateState(double[] pivot, ArrayList _list,
+	private void generateState(double[] pivot, ArrayList<SceneState> _list,
 			String _title) {
 		// distance = sqrt( x*x + y*y + z*z )
 		// x /= distance;
@@ -739,12 +719,13 @@ public class SlideShow extends Thread {
 		double y = (distance * Math.sin(theta)) * Math.sin(phi);
 		double z = (distance * Math.cos(theta));
 
-		for (double i = 0; i < 360.0; i += 120) {
+		for (double i = 0.0; i < 360.0; i += 120.0)
+		{
 			theta = Math.toRadians(i);
 			x = (distance * Math.sin(theta)) * Math.cos(phi);
 			y = (distance * Math.sin(theta)) * Math.sin(phi);
 			z = (distance * Math.cos(theta));
-			KSState state = new KSState();
+			SceneState state = new SceneState();
 
 			if (i > 90) {
 				y *= (-1);
@@ -764,13 +745,24 @@ public class SlideShow extends Thread {
 			try {
 				state.captureCurrentState(_title);
 				_list.add(state);
-			} catch (Exception _ee) {
 			}
+			
+			catch (Exception _ee)
+			{
+				if (AppBase.isDebug())
+					System.err.println("Exception: Error trying to add pivot state to state list.");
+			}
+			
+/* ** 
+// XXX_DEBUG - uncomment if you want to return after single state generated.
+			if (AppBase.isDebug())
+				return;
+* **/
 		}
 	}
 
 	private void generateState(double[] pivot, double _distance,
-			ArrayList _list, String _title) {
+			ArrayList<SceneState> _list, String _title) {
 		// distance = sqrt( x*x + y*y + z*z )
 		// x /= distance;
 		// y /= distance;
@@ -780,7 +772,6 @@ public class SlideShow extends Thread {
 		// latitude = atan2( xz_dist, y ) * RADIANS
 		// longitude = atan2( x, z ) * RADIANS
 
-		double radius = 10; // back about 10 angstroms
 		double[] c = pivot;
 		double[] eye = new double[3];
 		// double[] centerPoint = new double[3];
@@ -801,7 +792,7 @@ public class SlideShow extends Thread {
 			x = (distance * Math.sin(theta)) * Math.cos(phi);
 			y = (distance * Math.sin(theta)) * Math.sin(phi);
 			z = (distance * Math.cos(theta));
-			KSState state = new KSState();
+			SceneState state = new SceneState();
 
 			if (i > 90) {
 				y *= (-1);

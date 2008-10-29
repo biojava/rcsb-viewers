@@ -8,13 +8,14 @@ import java.util.Vector;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
-import org.rcsb.lx.controllers.app.LXState;
 import org.rcsb.lx.controllers.app.LigandExplorer;
+import org.rcsb.lx.controllers.scene.LXViewMovementThread;
 import org.rcsb.lx.controllers.update.LXUpdateEvent;
 import org.rcsb.lx.model.Interaction;
 import org.rcsb.lx.model.InteractionConstants;
 import org.rcsb.lx.model.LXModel;
 import org.rcsb.lx.ui.dialogs.IPickInfoReceiver;
+import org.rcsb.mbt.controllers.scene.ViewMovementThread;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.glscene.jogl.AtomGeometry;
 import org.rcsb.mbt.glscene.jogl.BondGeometry;
@@ -276,10 +277,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 			return;
 		}
 
-		// disable the movement animation if it's active.
-		if (LXState.movementThread != null) {
-			LXState.movementThread.terminate();
-		}
+		ViewMovementThread.terminateMovementThread();
 
 		final StructureMap sm = struc.getStructureMap();
 		final LXSceneNode sn = (LXSceneNode)sm.getUData();
@@ -713,13 +711,8 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		final double[] currentPosition = node.getCenter();
 		final double[] currentUp = node.getUp();
 
-		if (LXState.movementThread != null) {
-			LXState.movementThread.terminate();
-		}
-
-		LXState.movementThread = new LXState.ViewMovementThread(currentOrientation,
-				eye, currentPosition, center, currentUp, up, 0, 0, 0, 0);
-		LXState.movementThread.start();
+		LXViewMovementThread.createMovementThread(
+				currentOrientation, eye, currentPosition, center, currentUp, up, 0, 0, 0, 0).start();
 
 		requestRepaint();
 	}

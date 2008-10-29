@@ -183,7 +183,6 @@ public class BondGeometry
 		final int form = this.getForm( );
 		final String dlKey = form + ":" + quality;
 		DisplayLists cylinderList = (DisplayLists) BondGeometry.sharedDisplayLists.get( dlKey );
-//		int cylinderDl = -1;
 
 		final ArrayList<DisplayLists> allLists = new ArrayList<DisplayLists>();
 		
@@ -195,9 +194,7 @@ public class BondGeometry
 				BondGeometry.minSlices + (int) ((BondGeometry.maxSlices - BondGeometry.minSlices) * quality);
 			final int segments =
 				BondGeometry.minSegments + (int) ((BondGeometry.maxSegments - BondGeometry.minSegments) * quality);
-//System.err.println("Bond: slices " + slices + ", segments " + segments);
-//			cylinderDl = gl.glGenLists( 1 );
-//			gl.glNewList( cylinderDl, GL.GL_COMPILE );
+
 			cylinderList = new DisplayLists(bond);
 			cylinderList.setupLists(1);
 			cylinderList.startDefine(0, gl, glu, glut);
@@ -335,26 +332,6 @@ public class BondGeometry
 				interSegmentGap + halfBondSegmentLength;
 		}
 
-		// Get split bond colors
-		/*final float colors[][] = {
-			{
-				0.8f, 0.8f, 0.8f, 1.0f
-			},
-			{
-				0.8f, 0.8f, 0.8f, 1.0f
-			}
-		};*/
-        /*if ( structureStyles.isSelected( bond ) )
-		{
-            structureStyles.getSelectionColor( colors[0] );
-            structureStyles.getSelectionColor( colors[1] );
-		}
-        else
-		{
-			bondStyle.getBondColor( bond, colors[0] );
-			bondStyle.getSplitBondColor( bond, colors[1] );
-		}*/
-
 		// Get bond length and radius
         double bondRadius = bondStyle.getBondRadius( bond );
 		double bondScale = bondRadius / 2.0f;
@@ -370,44 +347,12 @@ public class BondGeometry
 				nBondParts = 1;
 		}
 
-		// Get bond label
-//		String label = bondStyle.getBondLabel( bond );
-
-		//
-		// Generate the display List
-		//
-
-		// Create or over-write this bond geometry's display list.
-//		if ( displayList < 0 )
-//			displayList = gl.glGenLists( 1 );
-//		else
-//			gl.glDeleteLists( displayList, 1 );
-//		gl.glNewList( displayList, GL.GL_COMPILE );
-
-//		gl.glPushMatrix( );
-
-	/*
-		// Draw bond label (if there is one).
-		if ( label != null )
-		{
-			// gl.glPushMatrix( );
-			// gl.glGetFloatv( GL.GL_MODELVIEW_MATRIX, mat );
-			// gl.glMultMatrixf( mat );
-			gl.glTranslatef( 0.0f, 0.0f, 1.1f );
-			gl.glRasterPos3f( 0.0f, 0.0f, 0.0f );
-			glut.glutBitmapString( gl, GLUT.BITMAP_HELVETICA_12, label );
-			// gl.glPopMatrix( );
-		}
-	*/
-
 		// Draw the bond
 
 		cylinderList.specularColor = Constants.mat_specular;
 		cylinderList.shininess = Constants.atomHighShininess;
 		cylinderList.emissiveColor = Constants.black;
-//		gl.glMaterialfv( GL.GL_FRONT, GL.GL_SPECULAR, mat_specular, 0 );
-//		gl.glMaterialfv( GL.GL_FRONT, GL.GL_SHININESS, high_shininess, 0 );
-//		gl.glMaterialfv( GL.GL_FRONT, GL.GL_EMISSION, black, 0 );
+
 
 		// If order == 1 OR !showOrder then
 		// nBondParts == 1 and we'll only go through the outer loop once.
@@ -439,34 +384,17 @@ public class BondGeometry
 			{
 				final DisplayLists currentList = cylinderList.copy();
 				currentList.isLeftSideOfBond = s == 0 ? true : false;
-//				currentList.setupLists(1);
+
 				if (  form == Geometry.FORM_POINTS || form == Geometry.FORM_LINES )
 				{
-//					currentList.ambientColor = Constants.black;
-//					currentList.diffuseColor = Constants.black;
-//					currentList.specularColor = Constants.black;
 					currentList.mutableColorType = GL.GL_EMISSION;
 					currentList.emissiveColor = null;
 					currentList.disableLigting = true;
-//					gl.glMaterialfv( GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, black, 0 );
-//					gl.glMaterialfv( GL.GL_FRONT, GL.GL_SPECULAR, black, 0 );
-//					gl.glMaterialfv( GL.GL_FRONT, GL.GL_EMISSION, colors[s], 0 );
-					//gl.glColor3fv(colors[s]);
 				}
 				else
 				{
 					currentList.mutableColorType = GL.GL_AMBIENT_AND_DIFFUSE;
-//					currentList.specularColor = Constants.mat_specular;
-//					currentList.shininess = Constants.atomHighShininess;
-//					currentList.emissiveColor = Constants.black;
-//					gl.glMaterialfv( GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, colors[s], 0 );
-					//gl.glColor3fv(colors[s]);
 				}
-
-//				gl.glPushMatrix( );
-				// Position the split bond segment (s=0 VS s=1).
-				// final boolean oddOrder = ( ((int) (bondOrder / 0.5)) % 2 == 0 );
-							// odd calculation...
 				
 				if ( this.showOrder && bondPartIX == partialIX )
 				{
@@ -484,9 +412,6 @@ public class BondGeometry
 						atom0.coordinate[2] + direction[2] * segmentDistance1;
 				}
 				currentList.translation = new float[] {(float)locations[s][0], (float)locations[s][1], (float)locations[s][2]};
-//				gl.glTranslated( locations[s][0], locations[s][1], locations[s][2]);
-				// Orient the split bond segment (same for both s=0 and s=1).
-//				gl.glRotated( rotAngle, rotation[0], rotation[1], rotation[2] );
 				currentList.rotation = new float[] {(float)rotAngle, (float)rotation[0], (float)rotation[1], (float)rotation[2]};
 
 				if ( this.showOrder )
@@ -497,7 +422,6 @@ public class BondGeometry
 					// make the geometry "broken" by shrinking the two pieces
 					// of the split geometry vertically to leave gaps.
 					if ( bondPartIX == partialIX ) {
-//						gl.glScaled( 1.0, bondSegmentFraction, 1.0 );
 						currentList.scale = new float[] {1f, bondSegmentFraction, 1f};
 					}
 				}
@@ -509,15 +433,10 @@ public class BondGeometry
 					currentList.scale[1] *= bondSplitLen;
 					currentList.scale[2] *= bondScale;
 				}
-//				gl.glScaled( bondScale, bondSplitLen, bondScale );
-//				gl.glCallList( cylinderDl );
-//				gl.glPopMatrix( );
+
 				allLists.add(currentList);
 			}
 		}
-
-//		gl.glPopMatrix( );
-//		gl.glEndList( );	
 		
 		DisplayLists displayLists[] = new DisplayLists[allLists.size()];
 		for (int ix = 0; ix < allLists.size(); ix++)
@@ -539,7 +458,6 @@ public class BondGeometry
 	{
 		double halfHeight = height / 2.0f;
 
-//		gl.glPushMatrix( );
 		// Transform the GLU Z-Out cylinder orientation to a Y-Up orientation,
 		// and change it's center from the base to its mid-point!
 		gl.glTranslated( 0.0, halfHeight, 0.0 );
@@ -578,8 +496,6 @@ public class BondGeometry
 			glu.gluDisk( disk, 0.0, bottomRadius, slices, 1 );
 			glu.gluDeleteQuadric( disk );
 		}
-
-//		gl.glPopMatrix( );
 	}
 }
 

@@ -139,6 +139,7 @@ public class StructureModel
 	/**
 	 * Stores the repository of Structure objects in this StructureDocument.
 	 */
+	@SuppressWarnings("serial")
 	public class StructureList extends ArrayList<Structure>{};
 	
 	private StructureList structures = new StructureList();

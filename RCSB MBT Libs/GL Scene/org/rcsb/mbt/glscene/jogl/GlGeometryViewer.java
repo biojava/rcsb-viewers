@@ -1209,9 +1209,17 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			StructureList structures = AppBase.sgetModel().getStructures();
 			for (Structure structure : structures)
 			{
-				gl.glPushMatrix();
-				JoglSceneNode sceneNode = (JoglSceneNode)structure.getStructureMap().getUData();
-				boolean continuePick = sceneNode.draw(gl, glu, glut, isPick, structure);
+				boolean continuePick = false;
+				try {
+					gl.glPushMatrix();
+					JoglSceneNode sceneNode = (JoglSceneNode)structure.getStructureMap().getUData();
+					continuePick = sceneNode.draw(gl, glu, glut, isPick, structure);
+				} catch (Exception e)
+				{
+					if (AppBase.isDebug())
+						e.printStackTrace();
+				}
+				
 				gl.glPopMatrix();
 
 				// pick cycles do not need to finish, and paints get

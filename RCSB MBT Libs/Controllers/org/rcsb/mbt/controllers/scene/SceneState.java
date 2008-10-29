@@ -1,4 +1,4 @@
-package org.rcsb.mbt.controllers.app;
+package org.rcsb.mbt.controllers.scene;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,8 +23,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-
-import org.rcsb.mbt.controllers.scene.RangeMap2;
+import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.glscene.jogl.AtomGeometry;
 import org.rcsb.mbt.glscene.jogl.BondGeometry;
 import org.rcsb.mbt.glscene.jogl.ChainGeometry;
@@ -81,14 +80,15 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class StateBase
+public class SceneState
 {
 	public class AtomStyleMap
 	{
 		public class TreeBelowColors
 		{
-			public class TreeBelowLabel {
-				private final HashMap<Class, TreeBelowRadius> byRadiusClass = new HashMap<Class, TreeBelowRadius>(); // key: Class atomRadius. value: TreeBelowRadius.
+			public class TreeBelowLabel
+			{
+				private final HashMap<Class<Object>, TreeBelowRadius> byRadiusClass = new HashMap<Class<Object>, TreeBelowRadius>(); // key: Class atomRadius. value: TreeBelowRadius.
 				
 				public class TreeBelowRadius {
 					public class TreeBelowForm {
@@ -694,8 +694,11 @@ public class StateBase
 	protected Element environment;
 	protected Element background;
 	protected Element titleElement;
+	protected Element fog;
 	
-	protected StateBase()
+
+	
+	public SceneState()
 	{
 		document = null;
 		title = "null";
@@ -750,6 +753,7 @@ public class StateBase
 			environment = appendChild(document, structureViewer, "Environment");
 			background = appendChild(document, environment, "Background");
 			titleElement = appendChild(document, root, "Title");
+			fog = appendChild(document, environment, "Fog");		
 			
 			titleElement.setAttribute("value", title);
 			
@@ -819,8 +823,11 @@ public class StateBase
 	
 	protected void setViewerInfo()
 	{
-		final GlGeometryViewer viewer = AppBase.sgetGlGeometryViewer();
-		setViewerInfo(viewer.getEye(), viewer.getCenter(), viewer.getUp());		
+		final GlGeometryViewer glViewer = AppBase.sgetGlGeometryViewer();
+		setViewerInfo(glViewer.getEye(), glViewer.getCenter(), glViewer.getUp());	
+		fog.setAttribute("is_enabled", "false");  // glViewer.isFogEnabled ? "true" : "false");
+		fog.setAttribute("start", "-1.0"); // glViewer.fogStart + "");
+		fog.setAttribute("end", "-1.0"); // glViewer.fogEnd + "");		
 	}	
 	
 	protected void setViewerInfo(final double[] eye, final double[] center, final double[] up)
@@ -1111,8 +1118,8 @@ public class StateBase
 	/**
 	 * Causes a mutation in the application so it matches this state.
 	 */
-	public void enact() {
-		StructureModel model = AppBase.sgetModel();
+	public void enact()
+	{
 		final GlGeometryViewer glViewer = AppBase.sgetGlGeometryViewer();
 		
 		enactVisibility();
@@ -1186,11 +1193,16 @@ public class StateBase
 					continue;
 				}
 				
-				for(int j = startIndex; j <= endIndex; j++) {
-					if(isAtom) {
+				for(int j = startIndex; j <= endIndex; j++)
+				{
+					if (isAtom) 
+					{
 						final Atom a = sm.getAtom(j);
 						visibleAtoms.put(a, exists);
-					} else if(isResidue) {
+					}
+					
+					else if (isResidue)
+					{
 						final Residue r = sm.getResidue(j);
 						visibleResidues.put(r, exists);
 					}
@@ -1200,7 +1212,8 @@ public class StateBase
 			// find all bonds for visible atoms...
 			Iterator atomIt = visibleAtoms.keySet().iterator();
 			final HashMap visibleBonds = new HashMap();
-			while(atomIt.hasNext()) {
+			while(atomIt.hasNext())
+			{
 				final Atom a = (Atom)atomIt.next();
 				final Vector bondsVec = sm.getBonds(a);
 				if(bondsVec != null) {
@@ -1231,19 +1244,29 @@ public class StateBase
 					{
 						final DisplayListRenderable renderable = renderables.get(comp);
 						
-						if(comp.getStructureComponentType() == StructureComponentRegistry.TYPE_ATOM) {
+						if(comp.getStructureComponentType() == StructureComponentRegistry.TYPE_ATOM)
+						{
 							final Atom a = (Atom)comp;
-							if(visibleAtoms.remove(a) != exists) {
+							if(visibleAtoms.remove(a) != exists)
+							{
 								glViewer.renderablesToDestroy.add(renderable);
 								renderables.remove(comp);
 							}
-						} else if(comp.getStructureComponentType() == StructureComponentRegistry.TYPE_BOND) {
+							
+						}
+						
+						else if(comp.getStructureComponentType() == StructureComponentRegistry.TYPE_BOND)
+						{
 							final Bond b = (Bond)comp;
-							if(visibleBonds.remove(b) != exists) {
+							if (visibleBonds.remove(b) != exists)
+							{
 								glViewer.renderablesToDestroy.add(renderable);
 								renderables.remove(comp);
 							}
-						} else if(comp.getStructureComponentType() == StructureComponentRegistry.TYPE_CHAIN) {
+						}
+						
+						else if(comp.getStructureComponentType() == StructureComponentRegistry.TYPE_CHAIN)
+						{
 							final Chain c = (Chain)comp;
 							
 							final int residueCount = c.getResidueCount();
@@ -1781,9 +1804,126 @@ public class StateBase
 			}
 		}
 	}
-	
-	protected void enactViewerOptions()
-	{		
-	}
 
+	
+	protected double[] currentOrientation, currentPosition, currentUp;
+	protected float curFogStart, curFogEnd;
+	protected boolean isFogEnabled;
+
+	protected void enactViewerOptions()
+	{	
+		try {
+			final NodeList viewpoints = document.getElementsByTagName("Viewpoint");
+			final NodeList fogs = document.getElementsByTagName("Fog");
+			
+			if(viewpoints != null && viewpoints.getLength() != 0 /* && fogs != null && fogs.getLength() != 0 */)
+			{
+				final Element viewpoint = (Element)viewpoints.item(0);
+/* **
+// no fog, yet...
+				final Element fog = (Element)fogs.item(0);
+* **/
+				
+/* **
+// XXX_DEBUG uncomment for debugging
+				String name = viewpoint.getAttribute("name");
+* **/
+				
+				final String orientation = viewpoint.getAttribute("orientation");
+				final String position = viewpoint.getAttribute("position");
+				final String up = viewpoint.getAttribute("up");
+
+/* **
+// no fog, yet...
+				final String fogEnabledSt = fog.getAttribute("is_enabled");
+				final String fogStartSt = fog.getAttribute("start");
+				final String fogEndSt = fog.getAttribute("end");
+* **/
+				
+				if (orientation != null && position != null && up != null /* && fogEnabledSt != null && fogEndSt != null && fogStartSt != null */) {
+					final String[] orientationSplit = spaces.split(orientation);
+					final String[] positionSplit = spaces.split(position);
+					final String[] upSplit = spaces.split(up);
+					
+					if(upSplit.length >= 3 && orientationSplit.length >= 3 && positionSplit.length >= 3) {
+						final double[] orientationArray = new double[orientationSplit.length];
+						final double[] positionArray = new double[positionSplit.length];
+						final double[] upArray = new double[upSplit.length];
+						
+						for(int i = 0; i < orientationSplit.length; i++) {
+							orientationArray[i] = Double.parseDouble(orientationSplit[i]);
+							positionArray[i] = Double.parseDouble(positionSplit[i]);
+							upArray[i] = Double.parseDouble(upSplit[i]);
+						}
+						
+//						if(movementThread != null && movementThread.isRunning()) {
+//							movementThread.stop();
+//						}
+						
+//						final boolean newIsFogEnabled = false;  //// fogEnabledSt.equals("true");
+						final float newFogStart = -1.0f;   //// Float.parseFloat(fogStartSt);
+						final float newFogEnd = -1.0f;    //// Float.parseFloat(fogEndSt);
+
+/* **
+// no fog, yet...
+						isFogEnabled = newIsFogEnabled;	// just set this - no reason to transition to the new state, etc.
+						final float curFogStart = fogStart;
+						final float curFogEnd = fogEnd;
+* **/
+						
+						
+						
+//						viewer.lookAt(orientationArray, positionArray, upArray);
+						
+						fillLookInfo();
+						
+						ViewMovementThread.createMovementThread(currentOrientation, orientationArray,
+								currentPosition, positionArray,
+								currentUp, upArray,
+								curFogStart, newFogStart,
+								curFogEnd, newFogEnd).start();
+					}
+				}
+			}
+		} catch(final Exception e) {}
+		
+		try {
+							// do we do this if fog is enabled??
+			final NodeList backgrounds = document.getElementsByTagName("Background");
+			if(backgrounds != null && backgrounds.getLength() != 0) {
+				final Element background = (Element)backgrounds.item(0);
+				
+				final String color = background.getAttribute("color");
+				
+				if(color != null) {
+					final String[] colorSplit = spaces.split(color);
+					
+					if(colorSplit.length >= 3) {
+						final float[] colorArray = new float[colorSplit.length];
+						
+						for(int i = 0; i < colorSplit.length; i++) {
+							colorArray[i] = Float.parseFloat(colorSplit[i]);
+						}
+						
+						AppBase.sgetGlGeometryViewer().setBackgroundColor(colorArray[0], colorArray[1], colorArray[2], 1);
+					}
+				}
+			}
+		} catch(final Exception e) {}
+	}
+	
+	/*
+	 * default implementation.  Note that LigandExplorer overrides this to get the information from the node.
+	 */
+	protected void fillLookInfo()
+	{
+		GlGeometryViewer glViewer = AppBase.sgetGlGeometryViewer();
+		
+		currentOrientation = glViewer.getEye();
+		currentPosition = glViewer.getCenter();
+		currentUp = glViewer.getUp();
+		
+		curFogStart = -1.0f;
+		curFogEnd = -1.0f;
+	}
 }

@@ -333,8 +333,7 @@ public class SceneController implements GvPickEventListener, IUpdateListener
 		AtomGeometry.sharedDisplayLists.clear();
 		BondGeometry.sharedDisplayLists.clear();
 		if (AppBase.isDebug())
-			System.err.println("--> SceneController.clearMemory() - Available memory: " + 
-					Runtime.getRuntime().freeMemory());
+			System.err.println("--> SceneController.clearMemory() (cleared display lists.)");
 	}
 
 	/**

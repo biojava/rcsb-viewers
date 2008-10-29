@@ -71,10 +71,7 @@ import org.rcsb.ks.glscene.jogl.KSGlGeometryViewer;
 import org.rcsb.ks.ui.KSDocumentFrame;
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.doc.DocController;
-import org.rcsb.mbt.controllers.update.IUpdateListener;
-import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
-import org.rcsb.mbt.structLoader.IStructureLoader;
 import org.rcsb.mbt.structLoader.StructureXMLHandler;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 
@@ -87,7 +84,7 @@ import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
  * @copyright SDSC
  * @see
  */
-public class KioskViewer extends AppBase implements IUpdateListener
+public class KioskViewer extends AppBase
 {
 	public class KSAppModuleFactory extends AppBase.AppModuleFactory
 	{
@@ -127,19 +124,18 @@ public class KioskViewer extends AppBase implements IUpdateListener
 		
 	}
 	
-	public KioskViewer()
+	public KioskViewer(String args[])
 	{
-		super();
+		super(args);
 		initialize();
+		sgetSceneController().setShowAsymmetricUnitOnly(true);
 	}
 	
 	private void initialize()
 	{
 		appModuleFactory = new KSAppModuleFactory();
 		activeFrame = appModuleFactory.createDocFrame("PDB Kiosk (Powered by the MBT)", null);
-	
 		((KSDocumentFrame)activeFrame).initialize(true, true);
-		activeFrame.getUpdateController().registerListener(this);
 	}
 
 	public static KioskViewer getApp() { return (KioskViewer)_theJApp; }	
@@ -159,21 +155,7 @@ public class KioskViewer extends AppBase implements IUpdateListener
 
 	public static void main(String[] _args)
 	{
-		SlideShow s = new SlideShow();
+		SlideShow s = new SlideShow(_args);
 		s.start();
-	}
-	
-	public void reset()
-	{
-		getActiveFrame().getModel().clear();
-		getActiveFrame().resetView();
-	}
-	
-	/* (non-Javadoc)
-	 * @see edu.sdsc.mbt.views_controller.IViewUpdateListener#handleModelChangedEvent(edu.sdsc.mbt.views_controller.ViewUpdateEvent)
-	 */
-	public void handleUpdateEvent(UpdateEvent evt)
-	{
-		if (evt.action == UpdateEvent.Action.VIEW_RESET) reset();
 	}
 }

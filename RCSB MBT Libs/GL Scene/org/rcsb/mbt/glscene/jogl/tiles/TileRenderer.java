@@ -7,6 +7,8 @@ import java.nio.Buffer;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
+import org.rcsb.mbt.controllers.app.AppBase;
+
 
 /**
  * A fairly direct port of Brian Paul's tile rendering library, found
@@ -611,23 +613,28 @@ public class TileRenderer
 			if( glu.gluProject( x, y, z, modelview, 0, proj, 0, viewport, 0, winCoords, 0 ) )
 			{
 
-				/* set raster pos to window coord (0,0) */
-				gl.glMatrixMode( GL.GL_MODELVIEW );
-				gl.glPushMatrix();
-				gl.glLoadIdentity();
-				gl.glMatrixMode( GL.GL_PROJECTION );
-				gl.glPushMatrix();
-				gl.glLoadIdentity();
-				gl.glOrtho( 0.0, this.currentTileWidth, 0.0, this.currentTileHeight, 0.0, 1.0 );
-				gl.glRasterPos3d( 0.0, 0.0, -winCoords[2] );
+				try {
+					/* set raster pos to window coord (0,0) */
+					gl.glMatrixMode( GL.GL_MODELVIEW );
+					gl.glPushMatrix();
+					gl.glLoadIdentity();
+					gl.glMatrixMode( GL.GL_PROJECTION );
+					gl.glPushMatrix();
+					gl.glLoadIdentity();
+					gl.glOrtho( 0.0, this.currentTileWidth, 0.0, this.currentTileHeight, 0.0, 1.0 );
+					gl.glRasterPos3d( 0.0, 0.0, -winCoords[2] );
 
-				/*
-				 * Now use empty bitmap to adjust raster position to
-				 * (winX,winY)
-				 */
-				{
-					final byte[] bitmap = { 0 };
-					gl.glBitmap( 1, 1, 0.0f, 0.0f, ( float ) winCoords[0], ( float ) winCoords[1], bitmap, 0);
+					/*
+					 * Now use empty bitmap to adjust raster position to
+					 * (winX,winY)
+					 */
+					{
+						final byte[] bitmap = { 0 };
+						gl.glBitmap( 1, 1, 0.0f, 0.0f, ( float ) winCoords[0], ( float ) winCoords[1], bitmap, 0);
+					}
+				} catch (Exception e) {
+					if (AppBase.isDebug())
+						e.printStackTrace();
 				}
 
 				/* restore original matrices */

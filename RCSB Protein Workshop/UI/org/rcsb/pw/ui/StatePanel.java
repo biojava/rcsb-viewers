@@ -24,8 +24,8 @@ import javax.swing.event.ListSelectionListener;
 
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.doc.DocController;
+import org.rcsb.mbt.controllers.scene.SceneState;
 import org.rcsb.mbt.model.util.Status;
-import org.rcsb.pw.controllers.app.PWState;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 
 
@@ -144,7 +144,7 @@ public class StatePanel extends JPanel implements LayoutManager, ActionListener,
 		DocController docController = AppBase.sgetDocController();
 		
 		if(source == this.captureCurrentViewerStateButton) {
-			final PWState state = new PWState();
+			final SceneState state = new SceneState();
 			state.captureCurrentState(this.titleField.getText());
 			this.listModel.addElement(state);
 		}
@@ -152,7 +152,7 @@ public class StatePanel extends JPanel implements LayoutManager, ActionListener,
 		else if(source == this.loadStateButton)
 		{
 			final File file = docController.askUserForXmlFile("Load");
-			final PWState state = new PWState();
+			final SceneState state = new SceneState();
 			if (state.loadState(file))
 				this.listModel.addElement(state);
 			
@@ -172,7 +172,7 @@ public class StatePanel extends JPanel implements LayoutManager, ActionListener,
 		
 		else if(source == this.writeButton)
 		{
-			final PWState state = (PWState)this.stateList.getSelectedValue();
+			final SceneState state = (SceneState)this.stateList.getSelectedValue();
 			if(state != null) {
 				File file = docController.askUserForXmlFile("Write");
 				if(file != null) {
@@ -190,7 +190,7 @@ public class StatePanel extends JPanel implements LayoutManager, ActionListener,
 
 	public void valueChanged(final ListSelectionEvent e) {
 		if(!e.getValueIsAdjusting()) {
-			final PWState state = (PWState)this.stateList.getSelectedValue();
+			final SceneState state = (SceneState)this.stateList.getSelectedValue();
 			if(state != null) {
 				state.enact();
 			}

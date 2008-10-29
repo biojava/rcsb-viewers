@@ -264,95 +264,112 @@ public class DisplayLists
 
 	public void drawSimple(final GL gl, final GLU glu, final GLUT glut,
 			final boolean isPickMode) {
-		gl.glPushMatrix();
+		try {
+			gl.glPushMatrix();
 
-		if (this.translation != null) {
-			gl.glTranslatef(this.translation[0], this.translation[1],
-					this.translation[2]);
-		}
-		if (this.rotation != null) {
-			gl.glRotatef(this.rotation[0], this.rotation[1], this.rotation[2],
-					this.rotation[3]);
-		}
-		if (this.scale != null) {
-			// Radius
-			gl.glScalef(this.scale[0], this.scale[1], this.scale[2]);
-		}
-
-		final StructureStyles ss = this.structureComponent.structure
-				.getStructureMap().getStructureStyles();
-		final GlGeometryViewer viewer = AppBase.sgetGlGeometryViewer();
-
-		if (this.structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_FRAGMENT) {
-			// each display list represents the corresponding residue in the
-			// fragment.
-
-			if (!this.memoryReferencesAreToDisplayLists) {
-				gl.glBindBuffer(GL.GL_ARRAY_BUFFER, this.normalReference);
-				gl.glNormalPointer(GL.GL_FLOAT,0, 0);
-				gl.glBindBuffer(GL.GL_ARRAY_BUFFER, this.vertexReference);
-				gl.glVertexPointer(3, GL.GL_FLOAT,0, 0);
+			if (this.translation != null) {
+				gl.glTranslatef(this.translation[0], this.translation[1],
+						this.translation[2]);
+			}
+			if (this.rotation != null) {
+				gl.glRotatef(this.rotation[0], this.rotation[1], this.rotation[2],
+						this.rotation[3]);
+			}
+			if (this.scale != null) {
+				// Radius
+				gl.glScalef(this.scale[0], this.scale[1], this.scale[2]);
 			}
 
-			final Fragment f = (Fragment) this.structureComponent;
-			final int resCount = f.getResidueCount();
-			for (int i = 0; i < resCount; i++) {
-				final Residue r = f.getResidue(i);
+			final StructureStyles ss = this.structureComponent.structure
+					.getStructureMap().getStructureStyles();
+			final GlGeometryViewer viewer = AppBase.sgetGlGeometryViewer();
 
-				if (ss.isVisible(r)) {
+			if (this.structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_FRAGMENT) {
+				// each display list represents the corresponding residue in the
+				// fragment.
 
-					if (isPickMode) {
-						if (viewer.alphaBits == 0) {
-							gl.glColor3ubv(this.uniqueColors[i].color, 0);
-						} else {
-							gl.glColor4ubv(this.uniqueColors[i].color, 0);
+				if (!this.memoryReferencesAreToDisplayLists) {
+					gl.glBindBuffer(GL.GL_ARRAY_BUFFER, this.normalReference);
+					gl.glNormalPointer(GL.GL_FLOAT,0, 0);
+					gl.glBindBuffer(GL.GL_ARRAY_BUFFER, this.vertexReference);
+					gl.glVertexPointer(3, GL.GL_FLOAT,0, 0);
+				}
+
+				final Fragment f = (Fragment) this.structureComponent;
+				final int resCount = f.getResidueCount();
+				for (int i = 0; i < resCount; i++)
+				{
+					boolean glPush = false;
+					final Residue r = f.getResidue(i);
+
+					if (ss.isVisible(r)) {
+
+						if (isPickMode) {
+							if (viewer.alphaBits == 0) {
+								gl.glColor3ubv(this.uniqueColors[i].color, 0);
+							} else {
+								gl.glColor4ubv(this.uniqueColors[i].color, 0);
+							}
+						} else
+						try
+						{
+							{
+								glPush = true;
+								gl.glPushMatrix();
+								this.enactMutableColor(r, gl, glu, glut);
+							}
+
+							if (this.memoryReferencesAreToDisplayLists) {
+								gl.glCallList(this.videoMemoryReferences[i]);
+							} else {
+								this.indexArrays[i].rewind();
+								gl.glDrawRangeElements(GL.GL_TRIANGLE_STRIP, this.ranges[i][0], this.ranges[i][1], this.indexArrays[i].capacity(),
+										GL.GL_UNSIGNED_INT, this.indexArrays[i]);
+							}
 						}
-					} else {
-						gl.glPushMatrix();
-						this.enactMutableColor(r, gl, glu, glut);
-					}
+						catch (Exception e)
+						{
+							if (AppBase.isDebug())
+								e.printStackTrace();
+						}
 
-					if (this.memoryReferencesAreToDisplayLists) {
-						gl.glCallList(this.videoMemoryReferences[i]);
-					} else {
-						this.indexArrays[i].rewind();
-						gl.glDrawRangeElements(GL.GL_TRIANGLE_STRIP, this.ranges[i][0], this.ranges[i][1], this.indexArrays[i].capacity(),
-								GL.GL_UNSIGNED_INT, this.indexArrays[i]);
-					}
-					
-					if(!isPickMode) {
-						gl.glPopMatrix();
+						if (glPush)
+							gl.glPopMatrix();
 					}
 				}
 			}
-		}
-		
-		else if (this.structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_ATOM
-				|| this.structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_BOND
-				|| this.structureComponent.getStructureComponentType() == Surface.COMPONENT_TYPE
-				|| this.structureComponent instanceof LineSegment)
-						// Not a good mechanism.  Should be an overrideable query to base class or
-						// interface.
-	{
-			if (isPickMode) {
-				// just use the first color.
-				if (viewer.alphaBits == 0) {
-					gl.glColor3ubv(this.uniqueColors[0].color, 0);
+			
+			else if (this.structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_ATOM
+					|| this.structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_BOND
+					|| this.structureComponent.getStructureComponentType() == Surface.COMPONENT_TYPE
+					|| this.structureComponent instanceof LineSegment)
+							// Not a good mechanism.  Should be an overrideable query to base class or
+							// interface.
+{
+				if (isPickMode) {
+					// just use the first color.
+					if (viewer.alphaBits == 0) {
+						gl.glColor3ubv(this.uniqueColors[0].color, 0);
+					} else {
+						gl.glColor4ubv(this.uniqueColors[0].color, 0);
+					}
 				} else {
-					gl.glColor4ubv(this.uniqueColors[0].color, 0);
+					this.enactMutableColor(this.structureComponent, gl, glu, glut);
 				}
-			} else {
-				this.enactMutableColor(this.structureComponent, gl, glu, glut);
-			}
 
-			if (this.videoMemoryReferences != null) {
-				for (int i = 0; i < this.videoMemoryReferences.length; i++) {
-					if (this.videoMemoryReferences[i] >= 0) {
-						gl.glCallList(this.videoMemoryReferences[i]);
+				if (this.videoMemoryReferences != null) {
+					for (int i = 0; i < this.videoMemoryReferences.length; i++) {
+						if (this.videoMemoryReferences[i] >= 0) {
+							gl.glCallList(this.videoMemoryReferences[i]);
+						}
 					}
 				}
-			}
 
+			}
+		} catch (Exception e)
+		{
+			if (AppBase.isDebug())
+				e.printStackTrace();
 		}
 
 		gl.glPopMatrix();

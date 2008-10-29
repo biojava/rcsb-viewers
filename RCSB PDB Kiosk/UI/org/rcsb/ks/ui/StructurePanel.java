@@ -1,21 +1,19 @@
-package org.rcsb.ks.glscene.jogl;
+package org.rcsb.ks.ui;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-import org.rcsb.ks.controllers.app.KSState;
-import org.rcsb.ks.controllers.app.StateAnnotationPanel;
-import org.rcsb.ks.controllers.app.StructureIdPanel;
+import org.rcsb.mbt.controllers.scene.SceneState;
 import org.rcsb.mbt.model.Structure;
 
 
-
-public class StructurePanel extends JPanel {
+@SuppressWarnings("serial")
+public class StructurePanel extends Box
+{
 	private StructureIdPanel structureIdPanel = new StructureIdPanel();
 	private StateAnnotationPanel stateAnnotationPanel = new StateAnnotationPanel();
 	private JPanel panel = null;
@@ -25,9 +23,13 @@ public class StructurePanel extends JPanel {
 	 *   - structureIdPanel (displays the author and id of the structure)
 	 *   - stateAnnotationPanel (displays information about the state.)
 	 */
-	public StructurePanel() {
-		setLayout( new BoxLayout ( this, BoxLayout.X_AXIS) );
+	public StructurePanel()
+	{
+		super(BoxLayout.X_AXIS);
+
+		
 		panel = new JPanel(){
+			@Override
 			public void setBounds ( int _x, int _y, int _w, int _h)
 			{
 				super.setBounds ( _x, _y, _w, _h );
@@ -40,10 +42,14 @@ public class StructurePanel extends JPanel {
 
 		panel.add(structureIdPanel);
 		panel.add(stateAnnotationPanel);
+		add(createHorizontalStrut(10));
 		add( panel);
+		add(createHorizontalStrut(10));
+		
 		panel.setPreferredSize(new Dimension ( 880, 150));
 	}
 	
+	@Override
 	public void setBounds ( int _x, int _y, int _w, int _h )
 	{
 		super.setBounds ( _x,  _y, _w, _h );
@@ -51,7 +57,7 @@ public class StructurePanel extends JPanel {
 	}
 	
 	
-	public void updateState(Structure _structure, KSState _state) {
+	public void updateState(Structure _structure, SceneState _state) {
 		if (structureIdPanel.getStructure() != _structure) {
 			structureIdPanel.updateStructure(_structure);
 		}

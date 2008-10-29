@@ -77,10 +77,6 @@ public class DocController
 		final Vector<Structure> structuresVec = new Vector<Structure>();
 		Structure structureTmp = null;
 		
-		if (AppBase.isDebug())
-			System.err.println("--> DocController: Available memory: " +
-					Runtime.getRuntime().freeMemory());
-	
 		final String[] datasets = structureUrlParam.split(",");
 		for (int i = 0; i < datasets.length; i++)
 		{
@@ -161,6 +157,10 @@ public class DocController
 			structures[i].getStructureMap().setImmutable();
 		}
 		
+		if (AppBase.isDebug())
+			System.err.println("--> DocController: Memory used: " +
+					(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
+	
 		return structures;
 	}
 
