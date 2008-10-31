@@ -124,11 +124,11 @@ public class AminoAcidInfo
 		new AminoAcid( ".", "end", "End Chain",     0.000f, 0.0f )
 	};
 
-	private static final Hashtable letterHash = new Hashtable( );
-	private static final Hashtable codeHash = new Hashtable( );
-	private static final Hashtable nameHash = new Hashtable( );
+	private static final Hashtable<String, AminoAcid> letterHash = new Hashtable<String, AminoAcid>( );
+	private static final Hashtable<String, AminoAcid> codeHash = new Hashtable<String, AminoAcid>( );
+	private static final Hashtable<String, AminoAcid> nameHash = new Hashtable<String, AminoAcid>( );
 
-	private static final Hashtable nonStandardCodes = new Hashtable( );
+	private static final Hashtable<String, String> nonStandardCodes = new Hashtable<String, String>( );
 
 	static
 	{
@@ -485,21 +485,21 @@ public class AminoAcidInfo
 		}
 
 		// Add the non-standard codes to the codeHash.
-		final Enumeration keys = AminoAcidInfo.nonStandardCodes.keys( );
+		final Enumeration<String> keys = AminoAcidInfo.nonStandardCodes.keys( );
 		while ( keys.hasMoreElements( ) )
 		{
 			final String nsCode = (String) keys.nextElement( );
-			if ( nsCode == null ) {
+			if ( nsCode == null )
 				continue;
-			}
+
 			final String parentCode = (String) AminoAcidInfo.nonStandardCodes.get( nsCode );
-			if ( parentCode == null ) {
+			if ( parentCode == null )
 				continue;
-			}
+
 			final AminoAcid aminoAcid = (AminoAcid) AminoAcidInfo.codeHash.get( parentCode );
-			if ( aminoAcid == null ) {
+			if ( aminoAcid == null )
 				continue;
-			}
+
 			AminoAcidInfo.codeHash.put( nsCode, aminoAcid );
 		}
 	}
@@ -622,7 +622,7 @@ public class AminoAcidInfo
 	/**
 	 *  Returns an enumeration of Amino Acid 3-letter codes.
 	 */
-	public static Enumeration getCodes( )
+	public static Enumeration<String> getCodes( )
 	{
 		return AminoAcidInfo.codeHash.keys( );
 	}
@@ -630,7 +630,7 @@ public class AminoAcidInfo
 	/**
 	 *  Returns an enumeration of Amino Acid letters.
 	 */
-	public static Enumeration getLetters( )
+	public static Enumeration<String> getLetters( )
 	{
 		return AminoAcidInfo.letterHash.keys( );
 	}
@@ -638,7 +638,7 @@ public class AminoAcidInfo
 	/**
 	 *  Returns an enumeration of Amino Acid names.
 	 */
-	public static Enumeration getNames( )
+	public static Enumeration<String> getNames( )
 	{
 		return AminoAcidInfo.nameHash.keys( );
 	}

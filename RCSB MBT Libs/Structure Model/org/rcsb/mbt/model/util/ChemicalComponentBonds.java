@@ -1,4 +1,4 @@
-//  $Id: ChemicalComponentBonds.java,v 1.1 2007/02/08 02:38:52 jbeaver Exp $
+//  $Id: java,v 1.1 2007/02/08 02:38:52 jbeaver Exp $
 //
 //  Copyright 2000-2004 The Regents of the University of California.
 //  All Rights Reserved.
@@ -31,36 +31,6 @@
 //
 //  For further information, please see:  http://mbt.sdsc.edu
 //
-//  History:
-//  $Log: ChemicalComponentBonds.java,v $
-//  Revision 1.1  2007/02/08 02:38:52  jbeaver
-//  version 1.50
-//
-//  Revision 1.1  2006/09/20 16:50:43  jbeaver
-//  first commit - branched from ProteinWorkshop
-//
-//  Revision 1.1  2006/08/24 17:39:03  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/03/09 00:18:55  jbeaver
-//  Initial commit
-//
-//  Revision 1.4  2005/11/08 20:58:33  moreland
-//  Switched style code to new StructureStyles API.
-//
-//  Revision 1.3  2004/10/22 23:35:55  moreland
-//  Added support for tripple bond orders.
-//  Changed separator character from space to tab.
-//
-//  Revision 1.2  2004/08/16 16:21:36  moreland
-//  Now uses SharedObjects class to reduce memory usage.
-//
-//  Revision 1.1  2004/04/15 20:46:54  moreland
-//  Added chemical component bond dictionary.
-//
-//  Revision 1.0  2004/04/06 19:11:48  moreland
-//
-
 
 package org.rcsb.mbt.model.util;
 
@@ -68,6 +38,7 @@ package org.rcsb.mbt.model.util;
 import java.util.*;
 import java.io.*;
 
+import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.*;
 
 
@@ -87,56 +58,111 @@ import org.rcsb.mbt.model.*;
  */
 public class ChemicalComponentBonds
 {
-	/**
-	 * Value returned by the bondType method when nothing is known
-	 * about the existance of a bond between two atoms.
-	 */
-	public static final String BOND_TYPE_UNKNOWN  = "UNKN";
+	public enum BondType
+	{
+		/**
+		 * Value returned by the bondType method when nothing is known
+		 * about the existance of a bond between two atoms.
+		 */
+		UNKNOWN
+		{
+			{
+				shortName = "UNKN";
+			}
+		},
+		
+		/**
+		 * Value returned by the bondType method when it recognizes a compound
+		 * and determines that there should be no bond between two atoms.
+		 */
+		NONE
+		{
+			{
+				shortName = "NONE";				
+			}
+		},
+		
+		/**
+		 * Value returned by the bondType method when it recognizes a compound
+		 * and determines that there should be a single bond between two atoms.
+		 */
+		SINGLE
+		{
+			{
+				order = 1.0f;
+				shortName = "SING";
+			}
+		},
+		
+		/**
+		 * Value returned by the bondType method when it recognizes a compound
+		 * and determines that there should be a double bond between two atoms.
+		 */
+		DOUBLE
+		{
+			{
+				order = 2.0f;
+				shortName = "DOUB";
+			}
+		},
+		
+		/**
+		 * Value returned by the bondType method when it recognizes a compound
+		 * and determines that there should be a tripple bond between two atoms.
+		 */
+		TRIPLE
+		{
+			{
+				order = 3.0f;
+				shortName = "TRIP";
+			}
+		},
+	
+		/**
+		 * Value returned by the bondType method when it recognizes a compound
+		 * and determines that there should be an aromatic bond between two atoms.
+		 */
+		AROMATIC
+		{
+			{
+				order = 1.0f;
+				shortName = "AROM";
+			}
+		};
+		
+		protected float order = -1.0f;
+		protected String shortName;
+		
+		static public BondType valueByShortName (String pfx)
+		{
+			for (BondType bondType : BondType.values())
+				if (pfx.startsWith(bondType.shortName))
+						return bondType;
+				
+			return NONE;				
+		}
+	}
+	
+	private enum ItemParts { COMPOUND_CODE, ATOM0, ATOM1, BOND_TYPE }
+					// keys into the split strings.
 
-	/**
-	 * Value returned by the bondType method when it recognizes a compound
-	 * and determines that there should be no bond between two atoms.
-	 */
-	public static final String BOND_TYPE_NONE     = "NONE";
-
-	/**
-	 * Value returned by the bondType method when it recognizes a compound
-	 * and determines that there should be a single bond between two atoms.
-	 */
-	public static final String BOND_TYPE_SINGLE   = "SING";
-
-	/**
-	 * Value returned by the bondType method when it recognizes a compound
-	 * and determines that there should be a double bond between two atoms.
-	 */
-	public static final String BOND_TYPE_DOUBLE   = "DOUB";
-
-	/**
-	 * Value returned by the bondType method when it recognizes a compound
-	 * and determines that there should be a tripple bond between two atoms.
-	 */
-	public static final String BOND_TYPE_TRIPPLE   = "TRIP";
-
-	/**
-	 * Value returned by the bondType method when it recognizes a compound
-	 * and determines that there should be an aromatic bond between two atoms.
-	 */
-	public static final String BOND_TYPE_AROMATIC = "AROM";
-
-
-	//
-	// Maintains A hash of hashes to a string value in the form:
-	// bonds{compound_code}->compound{atomName:atomName}->bondType
-	//
-	private static final Hashtable bonds = ChemicalComponentBonds.load( "ChemicalComponentBonds.dat" );
+	@SuppressWarnings("serial")
+	static private class CompoundMap extends Hashtable<String, BondType> {}
+			// "<atom0>:<atom1>" -> BondType
+	
+	@SuppressWarnings("serial")
+	static private class BondsMap extends Hashtable<String, CompoundMap> {}
+			// compound code -> CompoundMap
+	
+	static private final BondsMap bonds = load( "ChemicalComponentBonds.dat" );
 
 
 	/**
 	 *  Attempt to initialize the chemical component bond dictionary.
 	 */
-	private static Hashtable load( final String dictionaryFile )
+	static private BondsMap load( final String dictionaryFile )
 	{
-		final Hashtable bonds = new Hashtable( );
+		BondsMap bonds = new BondsMap( );
 
 		//
 		// Read the bond dictionary
@@ -160,61 +186,48 @@ public class ChemicalComponentBonds
 		SharedObjects sharedStrings = new SharedObjects( );
 
 		String line = null;
-		while ( true )
+		try
 		{
-			try
+			while ( (line = br.readLine()) != null )
 			{
-				line = br.readLine( );
-			}
-			catch ( final java.io.IOException e )
-			{
-				e.printStackTrace( );
-				break; // At least return what we have so far.
-			}
-			if ( line == null ) {
-				break; // We're done reading!
-			}
-
-			// ALA N CA SING
-			final String items[] = line.split( "\t" );
-			if ( (items == null) || (items.length != 4) )
-			{
-				Status.output( Status.LEVEL_WARNING, "ChemicalComponentBonds: No dictionary: " + dictionaryFile );
-				return null;
-			}
-
-			//
-			// Check the bond dictionary for the compound
-			//
-
-			Hashtable compound = (Hashtable) bonds.get( items[0] );
-			if ( compound == null )
-			{
-				compound = new Hashtable( );
-				bonds.put( items[0], compound );
-			}
-
-			//
-			// Check the compound for the bond
-			//
-
-			String bondKey = items[1] + ":" + items[2];
-			bondKey = sharedStrings.share( bondKey );
-			final String bondType = (String) compound.get( bondKey );
-			if ( bondType == null )
-			{
-				if ( items[3].startsWith( ChemicalComponentBonds.BOND_TYPE_AROMATIC ) ) {
-					items[3] = ChemicalComponentBonds.BOND_TYPE_AROMATIC;
-				} else if ( items[3].startsWith( ChemicalComponentBonds.BOND_TYPE_SINGLE ) ) {
-					items[3] = ChemicalComponentBonds.BOND_TYPE_SINGLE;
-				} else if ( items[3].startsWith( ChemicalComponentBonds.BOND_TYPE_DOUBLE ) ) {
-					items[3] = ChemicalComponentBonds.BOND_TYPE_DOUBLE;
-				} else if ( items[3].startsWith( ChemicalComponentBonds.BOND_TYPE_TRIPPLE ) ) {
-					items[3] = ChemicalComponentBonds.BOND_TYPE_TRIPPLE;
+				// ALA N CA SING
+				// items[0] = compoundName
+				// items[1] = atom 1
+				// items[2] = atom 2
+				// items[3] = bond type
+				
+				final String items[] = line.split( "\t" );
+				if ( (items == null) || (items.length != 4) )
+				{
+					Status.output( Status.LEVEL_WARNING, "ChemicalComponentBonds: Dictionary is corrupt: " + dictionaryFile );
+					return null;
 				}
+	
+				//
+				// Check the bond dictionary for the compound
+				//
+				String compoundKey = items[ItemParts.COMPOUND_CODE.ordinal()];
+				CompoundMap compoundMap = (bonds.containsKey(compoundKey))? bonds.get(compoundKey) : null;
 
-				compound.put( bondKey, items[3] );
+				if (compoundMap == null)
+				{
+					compoundMap = new CompoundMap( );
+					bonds.put( sharedStrings.share(compoundKey), compoundMap );
+				}
+	
+				//
+				// Check the compound for the bond
+				//	
+				String bondKey = items[ItemParts.ATOM0.ordinal()] + ':' + items[ItemParts.ATOM1.ordinal()];
+				if (!compoundMap.containsKey(sharedStrings.share(bondKey)))
+					compoundMap.put( bondKey, BondType.valueByShortName(items[ItemParts.BOND_TYPE.ordinal()].substring(0, 4)) );
+								// only the first four characters count
 			}
+		}
+		catch ( final java.io.IOException e )
+		{
+			if (AppBase.isDebug())
+				e.printStackTrace( );
 		}
 
 		sharedStrings = null;
@@ -225,61 +238,49 @@ public class ChemicalComponentBonds
 
 	/**
 	 *  Try to determine what type of bond might exist between the two atoms
-	 *  using a dictionary of know chemical compounds.
+	 *  using a dictionary of known chemical compounds.
 	 *
 	 *  See BOND_TYPE_* fields for possible return values.
 	 *
 	 *  @exception	NullPointerException	if either atom argument is null.
 	 */
-	public static String bondType( final Atom atom0, final Atom atom1 )
+	public static BondType bondType( final Atom atom0, final Atom atom1 )
 	{
-		if ( ChemicalComponentBonds.bonds == null ) {
-			return ChemicalComponentBonds.BOND_TYPE_UNKNOWN;
+		if ( bonds == null )
+			return BondType.UNKNOWN;
+		
+		if (atom0 == null || atom1 == null)
+			throw new NullPointerException( "Error: atom " + ((atom0 == null)? "0" : "1") + " is null in ChemicalComponentBonds.bondType." );
+							// can't have a null atom - illegal call...
+
+		if ( atom0.getStructure() != atom1.getStructure() ||
+			 atom0.residue_id != atom1.residue_id ||
+			 !atom0.compound.equals( atom1.compound ) ||
+			 !atom0.chain_id.equals( atom1.chain_id )
+			 ) {
+			return BondType.UNKNOWN;
+							// constrain atoms to same structure, chain, residue, and compound
+							// TODO: I think we want cross-chain, residue, and compound bonds to be enabled, if possible
+							// 30-Oct-08 - rickb
 		}
 
-		if ( atom0 == null ) {
-			throw new NullPointerException( "atom0 is null" );
-		}
-		if ( atom1 == null ) {
-			throw new NullPointerException( "atom1 is null" );
+		if (bonds.containsKey(atom0.compound))
+		{
+			final CompoundMap compoundMap = bonds.get( atom0.compound );
+		
+			for (int ix = 0; ix < 2; ix++)
+			{
+				String bondKey = (ix == 0)? atom0.name + ":" + atom1.name : atom1.name + ":" + atom0.name;
+							// try natural, then reverse atom orders
+				
+				if (compoundMap.containsKey(bondKey))
+					return compoundMap.get( bondKey );
+			}
+
+			return BondType.UNKNOWN;
 		}
 
-		if ( atom0.getStructure() != atom1.getStructure() ) {
-			return ChemicalComponentBonds.BOND_TYPE_UNKNOWN;
-		}
-
-		if ( atom0.residue_id != atom1.residue_id ) {
-			return ChemicalComponentBonds.BOND_TYPE_UNKNOWN;
-		}
-
-		if ( ! atom0.compound.equals( atom1.compound ) ) {
-			return ChemicalComponentBonds.BOND_TYPE_UNKNOWN;
-		}
-
-		if ( ! atom0.chain_id.equals( atom1.chain_id ) ) {
-			return ChemicalComponentBonds.BOND_TYPE_UNKNOWN;
-		}
-
-		final Hashtable compound = (Hashtable) ChemicalComponentBonds.bonds.get( atom0.compound );
-		if ( compound == null ) {
-			return ChemicalComponentBonds.BOND_TYPE_UNKNOWN;
-		}
-
-		// Try natural atom order
-		String bondKey = atom0.name + ":" + atom1.name;
-		String bondType = (String) compound.get( bondKey );
-		if ( bondType != null ) {
-			return bondType;
-		}
-
-		// Try reverse atom order
-		bondKey = atom1.name + ":" + atom0.name;
-		bondType = (String) compound.get( bondKey );
-		if ( bondType != null ) {
-			return bondType;
-		}
-
-		return ChemicalComponentBonds.BOND_TYPE_NONE;
+		return BondType.NONE;
 	}
 
 
@@ -291,12 +292,12 @@ public class ChemicalComponentBonds
 	 *
 	 *  @exception	NullPointerException	if the bond argument is null.
 	 */
-	public static String bondType( final Bond bond )
+	public static BondType bondType( final Bond bond )
 	{
 		if ( bond == null ) {
 			throw new NullPointerException( "bond is null" );
 		}
-		return ChemicalComponentBonds.bondType( bond.getAtom(0), bond.getAtom(1) );
+		return bondType( bond.getAtom(0), bond.getAtom(1) );
 	}
 
 
@@ -306,52 +307,8 @@ public class ChemicalComponentBonds
 	 */
 	public static boolean knownCompound( final String compoundCode )
 	{
-		if ( compoundCode == null ) {
-			return false;
-		}
-		if ( ChemicalComponentBonds.bonds == null ) {
-			return false;
-		}
-		final Hashtable hash = (Hashtable) ChemicalComponentBonds.bonds.get( compoundCode );
-		if ( hash == null ) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-
-	// Unit testing
-	public static void main( final String args[] )
-	{
-		final Atom atom0 = new Atom( );
-		atom0.chain_id = "A";
-		atom0.compound = "ALA";
-		atom0.name = "CA";
-
-		final Atom atom1 = new Atom( );
-		atom1.chain_id = "A";
-		atom1.compound = "ALA";
-		atom1.name = "CB";
-
-		final Atom atom2 = new Atom( );
-		atom2.chain_id = "A";
-		atom2.compound = "ALA";
-		atom2.name = "O";
-
-		final Atom atom3 = new Atom( );
-		atom3.chain_id = "A";
-		atom3.compound = "XXX";
-		atom3.name = "C";
-
-		final Atom atom4 = new Atom( );
-		atom4.chain_id = "A";
-		atom4.compound = "XXX";
-		atom4.name = "N";
-
-		System.err.println( "type = " + ChemicalComponentBonds.bondType( atom0, atom1 ) );
-		System.err.println( "type = " + ChemicalComponentBonds.bondType( atom0, atom2 ) );
-		System.err.println( "type = " + ChemicalComponentBonds.bondType( atom3, atom4 ) );
+		return compoundCode != null && bonds != null &&
+			   bonds.containsKey(compoundCode);
 	}
 }
 

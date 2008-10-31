@@ -299,6 +299,7 @@ package org.rcsb.mbt.model;
 // Core
 import java.util.*;
 
+import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.attributes.*;
 import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
@@ -644,27 +645,9 @@ public class StructureMap
 
 			String chainKeyId = atom.chain_id + atom.residue_id;
 
-			assert(atom.chain_id.length() > 0);
+			if (AppBase.isDebug())
+				assert(atom.chain_id.length() > 0);
 						// with new structure loader paradigm, this should never happen
-/* **
-			// If the chain_id is empty, replace it by a default value.
-			if ( atom.chain_id.length() <= 0 )
-			{
-				if (true /* atom.compound.equals("HOH") * / )
-					atom.chain_id = StructureMap.defaultChainId;
-				
-				else
-				{
-					if (atom.residue_id != lastResidueId)
-					{
-						defaultChainIX++;
-						lastResidueId = atom.residue_id;
-					}
-					
-					atom.chain_id = StructureMap.defaultChainId + defaultChainIX;
-				}
-			}
- * **/
 			
 			boolean newChain = false;
 			Chain chain = this.chainById.get( atom.chain_id );

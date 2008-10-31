@@ -74,6 +74,12 @@ package org.rcsb.mbt.model.util;
  *  @author	John L. Moreland
  *  @see	org.rcsb.mbt.model.Residue
  */
+/*
+ *  Hmm.  This is a growing list and we don't use all of them at the same time.
+ *  Some sort of lazy creation scheme would save resources.
+ *
+ *  30-Oct-08 - rickb
+ */
 public class AminoAcid
 {
 	public String letter = null;           // eg: "A"

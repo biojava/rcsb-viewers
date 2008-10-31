@@ -205,7 +205,7 @@ public class BondFactory
 		final int atomCount = structure.getStructureComponentCount(
 			StructureComponentRegistry.TYPE_ATOM );
 
-		final Hashtable occupiedCells = new Hashtable( atomCount );
+		final Hashtable<Integer,Integer> occupiedCells = new Hashtable<Integer,Integer>( atomCount );
 		final int cellCoord[] = new int[3];
 		int cellIndex = -1;
 
@@ -409,13 +409,6 @@ public class BondFactory
 			final Residue residue = structureMap.getResidue( r );
 			final String compoundCode = residue.getCompoundCode( );
 			final Residue.Classification classification = residue.getClassification( );
-			final Atom alphaAtom = residue.getAlphaAtom( );
-
-			//
-			// Handle inter-residue bonds (ie: polypeptide,
-			// nucleotide, and disulphide).
-			//
-
 			if ( (classification == Residue.Classification.AMINO_ACID) ||
 				(classification == Residue.Classification.NUCLEIC_ACID) )
 			{
@@ -470,28 +463,28 @@ public class BondFactory
 			if ( ChemicalComponentBonds.knownCompound( compoundCode ) )
 			{
 				final int atomCount = residue.getAtomCount( );
-				if ( atomCount <= 1 ) {
+				
+				if ( atomCount <= 1 )
 					continue;  // Ignore single-atom compounds (eg: HOH).
-				}
-				for ( int a0=0; a0<atomCount; a0++ )
+				
+				for ( int a0 = 0; a0 < atomCount; a0++ )
+								// loop through all the atoms in the residue
 				{
 					final Atom atom0 = residue.getAtom( a0 );
-					if ( atom0 == null ) {
+					
+					if ( atom0 == null )
 						continue;  // Shouldn't happen
-					}
-					for ( int a1=a0 + 1; a1<atomCount; a1++ )
+
+					for ( int a1 = a0 + 1; a1<atomCount; a1++ )
+									// loop through all the atoms following a0
 					{
 						final Atom atom1 = residue.getAtom( a1 );
-						if ( atom1 == null ) {
+						if ( atom1 == null)
 							continue;  // Shouldn't happen
-						}
-						if ( atom0 == atom1 ) {
-							continue;  // Shouldn't happen
-						}
+						
 						final Bond bond = new Bond( atom0, atom1 );
-						if ( bond == null ) {
+						if ( bond == null )
 							continue;  // Shouldn't happen
-						}
 
 						// Don't allow an atom to bond to itself
 						if ( atom0 == atom1 )
@@ -500,38 +493,21 @@ public class BondFactory
 							continue;
 						}
 
-						final String bondType =
+						final ChemicalComponentBonds.BondType bondType =
 							ChemicalComponentBonds.bondType( atom0, atom1 );
 
-						if ( bondType == null ) {
-							continue; // Should not happen.
-						}
-						if ( bondType == ChemicalComponentBonds.BOND_TYPE_UNKNOWN ) {
-							continue;
-						}
-
-						// System.err.println( "BondFactory.generateCovalentBonds: bond " + atom0.compound + "_" + atom0.name + ":" + atom1.name );
-						if ( bondType == ChemicalComponentBonds.BOND_TYPE_NONE )
+						switch (bondType)
 						{
-							structureMap.removeBond( bond );
-						}
-						else
-						{
-							// Assign a bond order from the dictionary.
-							if ( bondType == ChemicalComponentBonds.BOND_TYPE_SINGLE ) {
-								bond.setOrder( 1.0f );
-							} else if ( bondType == ChemicalComponentBonds.BOND_TYPE_DOUBLE ) {
-								bond.setOrder( 2.0f );
-							} else if ( bondType == ChemicalComponentBonds.BOND_TYPE_TRIPPLE ) {
-								bond.setOrder( 3.0f );
-							} else if ( bondType == ChemicalComponentBonds.BOND_TYPE_AROMATIC ) {
-								bond.setOrder( 1.5f );
-							}
+							case UNKNOWN: continue;
+							case NONE: structureMap.removeBond( bond ); break;
 
-							// If the bond is a "sane" distance, then add it.
-							if ( bond.getDistance() < BondFactory.peptideBondLimit ) {
-								structureMap.addBond( bond );
-							}
+							default:
+								// Assign a bond order from the dictionary.
+								bond.setOrder(bondType.order);
+	
+								// If the bond is a "sane" distance, then add it.
+								if ( bond.getDistance() < BondFactory.peptideBondLimit )
+									structureMap.addBond( bond );
 						}
 					}
 				}

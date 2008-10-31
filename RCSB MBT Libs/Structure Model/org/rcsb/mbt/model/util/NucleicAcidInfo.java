@@ -74,7 +74,6 @@
 
 package org.rcsb.mbt.model.util;
 
-import java.util.HashMap;
 import java.util.HashSet;
 
 

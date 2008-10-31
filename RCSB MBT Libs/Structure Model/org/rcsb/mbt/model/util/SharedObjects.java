@@ -65,7 +65,7 @@ public class SharedObjects
 	/**
 	 *  The cache of shared objects.
 	 */
-	private final Hashtable shared = new Hashtable( );
+	private final Hashtable<Object, Object> shared = new Hashtable<Object, Object>( );
 
 
 	/**
@@ -82,14 +82,10 @@ public class SharedObjects
 	 */
 	public Object share( final Object object )
 	{
-		Object cached = this.shared.get( object );
-		if ( cached == null )
-		{
-			this.shared.put( object, object );
-			cached = object;
-		}
-
-		return cached;
+		if (!shared.containsKey(object))
+			shared.put(object, object);
+		
+		return shared.get(object);
 	}
 
 	/**

@@ -391,21 +391,6 @@ public class Residue
 			atoms = new Vector<Atom>( );
 			setClassification( atom );
 		}
-		else
-		{
-			/*
-			JLM DEBUG: DRAT! It looks like there is no standard
-			for keeping residue records "clean" (ie: single compound)!!!
-			So, why bother with compound codes for a residue?!?!
-			// Make sure the new atom's compound code matches!
-			if ( ! compoundCode.equals( atom.compound ) )
-			{
-				// EXCEPT, allow water to be added
-				// if ( ! atom.compound.equals( "HOH" ) )
-					throw new IllegalArgumentException( "compound mismatch: " + compoundCode + " != " + atom.compound );
-			}
-			*/
-		}
 
 		// Do a binary search to determine where this atom should be added.
 
