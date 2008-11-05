@@ -17,10 +17,11 @@
 #title-block .sub-info {color:blue;font-size:130%; }
 
 #ext h1,h2,h3,h4,h5 { font-family:arial,helvetica,sans-serif; font-weight:100; color:green;
-											border-bottom:thin solid green; padding:0; margin-top:20px; margin-bottom:10px;}
+					  border-bottom:thin solid green; padding:0; margin-top:20px; margin-bottom:10px;}
 
 #ext h1 { font-size:200%; }
-#ext h2 { font-size:150%; }
+#ext h2 { margin-left:50px;font-size:150%; }
+#ext h3 { margin-left:100px;font-size:120%; }
 
 #ext img { border:none; margin:20px auto; text-align:center; display:block; }
 
@@ -36,6 +37,9 @@
 .abstract em { font-style:normal; }
 
 #ext dl ul { margin-left:10px; }
+
+#ext dl dl { margin-left:50px; }
+#ext dl dl dt { font-weight:normal;font-style:italic;text-decoration:underline }
 
 #ext ul { margin-top:12px; margin-bottom:12px; }
 
