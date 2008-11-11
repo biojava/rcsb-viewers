@@ -17,6 +17,7 @@ import org.rcsb.lx.model.Interaction;
 import org.rcsb.lx.model.LXModel;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Residue;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
 
 
@@ -289,11 +290,7 @@ public class ContactMap_InformationPane extends JScrollPane
 				atomResId = (String)resPdbIds[1];
 			}
 			
-			String conformation = res.getConformationType();
-			final int lastDot = conformation.lastIndexOf('.');
-			if(lastDot >= 0) {
-				conformation = conformation.substring(lastDot + 1);
-			}
+			ComponentType conformation = res.getConformationType();
 			
 			int curIndex = 0;
 			if(atomChainId != null && atomChainId.length() != 0) {

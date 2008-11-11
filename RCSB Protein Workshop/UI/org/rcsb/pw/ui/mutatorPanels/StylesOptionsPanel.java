@@ -12,11 +12,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.PickLevel;
+import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.glscene.jogl.ChainGeometry;
 import org.rcsb.mbt.glscene.jogl.Geometry;
+import org.rcsb.mbt.glscene.jogl.ChainGeometry.RibbonForm;
 import org.rcsb.mbt.model.attributes.AtomRadiusByCpk;
 import org.rcsb.mbt.model.attributes.AtomRadiusByScaledCpk;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
@@ -34,7 +35,7 @@ public class StylesOptionsPanel extends JPanel implements IUpdateListener
 		public void actionPerformed(final ActionEvent e) {
 			final JComboBox source = (JComboBox)e.getSource();
 			
-			ProteinWorkshop.sgetSceneController().getMutatorEnum().getStylesMutator().getOptions().setCurrentRibbonForm(source.getSelectedIndex());
+			ProteinWorkshop.sgetSceneController().getMutatorEnum().getStylesMutator().getOptions().setCurrentRibbonForm(RibbonForm.values()[source.getSelectedIndex()]);
 		}
 	}
 	
@@ -155,9 +156,9 @@ public class StylesOptionsPanel extends JPanel implements IUpdateListener
         // note that the indices of these JComboBoxes must conform to the indices of the constants in StylesOptions.
         this.ribbonFormLabel = new JLabel("Ribbon style:  ");
         this.ribbonFormStyles = new JComboBox();
-        this.ribbonFormStyles.addItem(ChainGeometry.RIBBON_SIMPLE_LINE_DESCRIPTION);
-        this.ribbonFormStyles.addItem(ChainGeometry.RIBBON_TRADITIONAL_DESCRIPTION);
-        this.ribbonFormStyles.addItem(ChainGeometry.RIBBON_CYLINDRICAL_HELICES_DESCRIPTION);
+        this.ribbonFormStyles.addItem(RibbonForm.RIBBON_SIMPLE_LINE.getDescription());
+        this.ribbonFormStyles.addItem(RibbonForm.RIBBON_TRADITIONAL.getDescription());
+        this.ribbonFormStyles.addItem(RibbonForm.RIBBON_CYLINDRICAL_HELICES.getDescription());
         this.setCurrentRibbonForm();
         this.ribbonFormStyles.addActionListener(new RibbonFormComboListener());
         
@@ -177,7 +178,7 @@ public class StylesOptionsPanel extends JPanel implements IUpdateListener
     }
 
     // mode corresponds to the index in AVAILABLE_MODE_LABELS.
-    public void updatePickLevel(final int pickLevel) {
+    public void updatePickLevel(final PickLevel pickLevel) {
 //    	this.atomFormComboDescriptor.setVisible(false);
     	this.atomRadiusComboDescriptor.setVisible(false);
     	this.bondOrderComboDescriptor.setVisible(false);
@@ -185,17 +186,17 @@ public class StylesOptionsPanel extends JPanel implements IUpdateListener
     	this.areRibbonsSmoothedBox.setVisible(false);
     	
     	switch(pickLevel) {
-    	case PickLevel.COMPONENTS_ATOMS_BONDS:	// atoms and bonds
+    	case ATOMS:	// atoms and bonds
     		this.bondOrderComboDescriptor.setVisible(true);
 //    		this.atomFormComboDescriptor.setVisible(true);
     		this.atomRadiusComboDescriptor.setVisible(true);
     		break;
-    	case PickLevel.COMPONENTS_RIBBONS:	// ribbons
+    	case RIBBONS:	// ribbons
         	this.ribbonFormComboDescriptor.setVisible(true);
         	this.areRibbonsSmoothedBox.setVisible(true);
     		break;
     	default:
-    		(new Exception(PickLevel.pickLevel + " is an invalid pick level")).printStackTrace();
+    		(new Exception(pickLevel + " is an invalid pick level")).printStackTrace();
     	}
     	
     	super.revalidate();
@@ -239,7 +240,7 @@ public class StylesOptionsPanel extends JPanel implements IUpdateListener
     public void setCurrentRibbonForm() {
     	final StylesOptions options = ProteinWorkshop.sgetSceneController().getMutatorEnum().getStylesMutator().getOptions();
     	
-    	this.ribbonFormStyles.setSelectedIndex(options.getCurrentRibbonForm());
+    	this.ribbonFormStyles.setSelectedIndex(options.getCurrentRibbonForm().ordinal());
     }
     
     public void setCurrentAreRibbonsSmoothed() {
@@ -266,7 +267,7 @@ public class StylesOptionsPanel extends JPanel implements IUpdateListener
     	this.ribbonFormStyles.setSelectedIndex(1);
     	
     	// enact the default mode
-    	this.updatePickLevel(PickLevel.COMPONENTS_ATOMS_BONDS);
+    	this.updatePickLevel(PickLevel.ATOMS);
     }
 
 	/* (non-Javadoc)

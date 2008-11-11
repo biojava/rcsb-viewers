@@ -1,6 +1,7 @@
 package org.rcsb.mbt.model;
 
 import org.rcsb.mbt.glscene.geometry.Point3d;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 /**
  * Simple line segment, defining two points.
@@ -37,7 +38,7 @@ public class LineSegment extends StructureComponent {
 
 	}
 	
-	public String getStructureComponentType() {
+	public ComponentType getStructureComponentType() {
 		return null;
 	}
 	

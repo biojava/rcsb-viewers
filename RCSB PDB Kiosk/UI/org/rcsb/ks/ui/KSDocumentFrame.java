@@ -23,11 +23,12 @@ import javax.swing.SwingUtilities;
 
 import org.rcsb.ks.controllers.doc.KSDocController;
 import org.rcsb.ks.glscene.jogl.KSGlGeometryViewer;
+import org.rcsb.mbt.controllers.scene.PickController;
 import org.rcsb.mbt.controllers.scene.SceneState;
+import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.model.Structure;
-import org.rcsb.mbt.model.util.PickUtils;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 
 
@@ -109,8 +110,6 @@ public class KSDocumentFrame extends DocumentFrameBase implements IUpdateListene
 	{
 		super.initialize(showFrame);
 		
-		PickUtils.setPickLevel(PickUtils.PICK_RESIDUES);
-
 		try
 		{
 			SwingUtilities.invokeAndWait(

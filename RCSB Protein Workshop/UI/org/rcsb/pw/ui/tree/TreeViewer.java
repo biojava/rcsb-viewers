@@ -148,21 +148,20 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.PickLevel;
+import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
-import org.rcsb.mbt.model.Conformation;
 import org.rcsb.mbt.model.Fragment;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.ExternChain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
-import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
 import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
@@ -319,29 +318,24 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 						.getStructureMap();
 				final StructureStyles structureStyles = structureMap
 						.getStructureStyles();
-				final String type = structureComponent
-						.getStructureComponentType();
-				componentText = type; // Default
+				final ComponentType type = structureComponent.getStructureComponentType();
+				componentText = type.toString(); // Default
 
 				// determine if we should worry about atom mode or backbone
 				// mode.
 				boolean isAtomMode = false;
 				boolean isBackboneMode = false;
 				final boolean disableVisibilityCheck = false;
-				// switch(mutatorModel.getCurrentMutatorId()) {
-				// case MutatorModel.VISIBILITY_MUTATOR:
-				// StructureElement_VisibilityMutator curMutator =
-				// (StructureElement_VisibilityMutator)mutatorModel.getCurrentMutator();
-				// if(curMutator != null) {
-				switch (PickLevel.pickLevel) {
-				case PickLevel.COMPONENTS_ATOMS_BONDS:
+
+				PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+				switch (pickLevel)
+				{
+				case ATOMS:
 					isAtomMode = true;
 					break;
-				case PickLevel.COMPONENTS_RIBBONS:
+				default:
 					isBackboneMode = true;
 					break;
-				default:
-					(new Exception()).printStackTrace();
 				}
 				// }
 				// break;
@@ -357,7 +351,7 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 					component.setBackgroundNonSelectionColor(Color.WHITE);
 				}
 
-				if (type == StructureComponentRegistry.TYPE_ATOM) {
+				if (type == ComponentType.ATOM) {
 					final Atom atom = (Atom) structureComponent;
 					componentText = atom.number + " " + atom.name;
 					imageIcon = this.atomIcon;
@@ -379,7 +373,7 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 						component.setForeground(Color.lightGray);
 
 					}
-				} else if (type == StructureComponentRegistry.TYPE_RESIDUE) {
+				} else if (type == ComponentType.RESIDUE) {
 					final Residue residue = (Residue) value;
 
 					// StructureMap structureMap =
@@ -424,17 +418,10 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 					} else {
 						component.setForeground(Color.lightGray);
 					}
-				} else if (type == StructureComponentRegistry.TYPE_FRAGMENT) {
+				} else if (type == ComponentType.FRAGMENT) {
 					final Fragment fragment = (Fragment) value;
-					String conformation = fragment.getConformationType();
+					ComponentType conformation = fragment.getConformationType();
 
-					// remove the fully qualified path.
-					if (conformation == Conformation.TYPE_UNDEFINED) {
-						conformation = "";
-					} else {
-						final int lastDot = conformation.lastIndexOf('.');
-						conformation = conformation.substring(lastDot + 1);
-					}
 					final PdbToNdbConverter converter = fragment.structure
 							.getStructureMap().getPdbToNdbConverter();
 					final Chain c = fragment.getChain();
@@ -454,7 +441,7 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 						componentText = "<nonpolymer>";
 					}
 					// setToolTipText( chain.getClassification() );
-				} else if (type == StructureComponentRegistry.TYPE_CHAIN) {
+				} else if (type == ComponentType.CHAIN) {
 					final Chain chain = (Chain) value;
 					componentText = chain.structure.getStructureMap()
 							.getPdbToNdbConverter().getFirstPdbChainId(
@@ -465,7 +452,7 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 						componentText = "(no chain id)";
 					}
 					// setToolTipText( chain.getClassification() );
-				} else if (type == StructureComponentRegistry.TYPE_BOND) {
+				} else if (type == ComponentType.BOND) {
 					final Bond bond = (Bond) value;
 					final Atom atom0 = bond.getAtom(0);
 					final Atom atom1 = bond.getAtom(1);

@@ -9,6 +9,7 @@ import java.util.Vector;
 
 import org.rcsb.mbt.glscene.geometry.Matrix3f;
 import org.rcsb.mbt.glscene.geometry.Vector3f;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Structure;
@@ -141,7 +142,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
     
     UnitCell unitCell = null;
     
-    private Hashtable<String, Vector<Atom>> componentsHash = new Hashtable<String, Vector<Atom>>();
+    private Hashtable<ComponentType, Vector<Atom>> componentsHash = new Hashtable<ComponentType, Vector<Atom>>();
     protected Structure structure = null;
     private PdbToNdbConverter idConverter = new PdbToNdbConverter();
     
@@ -328,7 +329,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
 	public void endDocument() throws SAXException
 	{
         this.atomVector.trimToSize();
-        this.componentsHash.put(StructureComponentRegistry.TYPE_ATOM, this.atomVector );
+        this.componentsHash.put(ComponentType.ATOM, this.atomVector );
         
         //
         // Create the Structure object
@@ -1278,13 +1279,13 @@ class CustomStructure extends Structure {
     //  A hashtable of vectors where
     // each hash KEY is the StructureComponent type String.
     // each hash VALUE is a Vector of StructureComponent objects.
-    protected Hashtable<String, Vector<Atom>> structureComponents = null;
+    protected Hashtable<ComponentType, Vector<Atom>> structureComponents = null;
 
     // To free up the global state for another load call.
     private String localUrlString;
 
     // public Structure()  Anonymous inner class constructor.
-    public CustomStructure(final Hashtable<String, Vector<Atom>> structureComponents, final String localUrlString) {
+    public CustomStructure(final Hashtable<ComponentType, Vector<Atom>> structureComponents, final String localUrlString) {
         super();
         this.structureComponents = structureComponents;
 
@@ -1300,7 +1301,7 @@ class CustomStructure extends Structure {
 
     
 	@Override
-	public int getStructureComponentCount( final String scType )
+	public int getStructureComponentCount( final ComponentType scType )
     {
         final Vector<?> records = this.structureComponents.get( scType );
         if ( records == null ) {
@@ -1312,7 +1313,7 @@ class CustomStructure extends Structure {
     
     
 	@Override
-	public StructureComponent getStructureComponentByIndex( final String type,
+	public StructureComponent getStructureComponentByIndex( final ComponentType type,
         final int index )
         throws IndexOutOfBoundsException, IllegalArgumentException
     {

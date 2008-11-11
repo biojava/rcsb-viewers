@@ -152,8 +152,8 @@ public class TestStructureLoader
 				return "file://c:/myFiles/5ebx.pdb";
 			}
 
-			
-			public int getStructureComponentCount( String scType )
+			@Override
+			public int getStructureComponentCount( ComponentType scType )
 			{
 				if ( StructureComponentRegistry.getTypeName( scType ) != null ) {
 					return this.sc_count;

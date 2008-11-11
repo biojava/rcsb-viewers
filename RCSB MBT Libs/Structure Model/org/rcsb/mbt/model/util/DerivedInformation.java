@@ -131,8 +131,8 @@ import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
-import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 
 
@@ -185,7 +185,7 @@ public class DerivedInformation
 	 * Kabsch-Sander algorithm.
 	 */
 	public Object[] setSsExtendedFlags() {
-		Vector bondList = null; // Candidate H bonds
+		Vector<BondInfo> bondList = null; // Candidate H bonds
 		
 	try {
 		int aaCount = 0;
@@ -271,7 +271,6 @@ public class DerivedInformation
 
 		final double[] cCoordM1 = new double[3];
 		final double[] oCoordM1 = new double[3];
-		long first = System.currentTimeMillis();
 
 		// Assign the hydrogen bonds. First, select from the aaCount^2
 		// candidates only those within
@@ -284,9 +283,8 @@ public class DerivedInformation
 		// this.
 		//
 		Atom atom1 = new Atom();
-		final Atom atom2 = new Atom();
-		final Vector chainStarts = new Vector();
-		final Vector chainEnds = new Vector();
+		final Vector<Integer> chainStarts = new Vector<Integer>();
+		final Vector<Integer> chainEnds = new Vector<Integer>();
 		final double[][] caCoord = new double[aaCount][3];
 		int resStart, resEnd, resCa;
 		final OctreeAtomItem[] treeData = new OctreeAtomItem[aaCount];
@@ -329,22 +327,15 @@ public class DerivedInformation
 		chainEnds.trimToSize();
 		this.chains = new int[chainStarts.size()][2];
 		// chainBreaks = new int[chainStarts.size()];
-		final ListIterator startIterator = chainStarts.listIterator();
-		final ListIterator endIterator = chainEnds.listIterator();
+		final ListIterator<Integer> startIterator = chainStarts.listIterator();
+		final ListIterator<Integer> endIterator = chainEnds.listIterator();
 		int chn = 0;
 		while (startIterator.hasNext()) {
-			this.chains[chn][0] = ((Integer) startIterator.next()).intValue();
-			this.chains[chn][1] = ((Integer) endIterator.next()).intValue();
+			this.chains[chn][0] = (startIterator.next()).intValue();
+			this.chains[chn][1] = (endIterator.next()).intValue();
 			chn++;
 		}
 
-		float second = System.currentTimeMillis();
-		// System.out.println( " Total time to create the coordinate array: " +
-		// ( second - first ) + " millis " );
-
-		// Object[] bondList;
-
-		first = System.currentTimeMillis();
 		// Build the octree
 		//
 		final float[] margin = new float[3];
@@ -365,12 +356,7 @@ public class DerivedInformation
 		// System.out.println( " Size of the Potential bond list: " +
 		// bondList.size() );
 
-		second = System.currentTimeMillis();
-		// System.out.println( " Total time to build the tree and get bonds: " +
-		// ( second - first ) + " millis " );
-
-		final ListIterator iterator = bondList.listIterator();
-		final ListIterator iterator2 = bondList.listIterator();
+		final ListIterator<BondInfo> iterator = bondList.listIterator();
 
 		double time1, time2, time;
 		time = 0.0;
@@ -378,7 +364,6 @@ public class DerivedInformation
 
 		int atIded;
 
-		first = System.currentTimeMillis();
 		// Now, select only the bonds that satisfy the energy < -0.5 kcal/mol
 		// criterion
 		//
@@ -390,7 +375,7 @@ public class DerivedInformation
 		boolean rem1, rem2, cFound, oFound;
 		// Residue residue = null;
 		while (iterator.hasNext()) {
-			bondData = (BondInfo) iterator.next();
+			bondData = iterator.next();
 			index1 = bondData.index1;
 			index2 = bondData.index2;
 			/*
@@ -627,14 +612,7 @@ public class DerivedInformation
 			if (rem1 & rem2) {
 				iterator.remove();
 			}
-
 		}
-		second = System.currentTimeMillis();
-		// System.out.println( " Total time to iterate over aa and get final H
-		// bonds: " + ( second - first ) + " millis" );
-		// System.out.println( " Total time to get atom data from structure
-		// associated with second index: " + time + " millis" );
-		// System.out.println( " Number of structure calls: " + strCalls );
 
 		/*
 		 * System.out.println( "Bonds and HBonds pointers" ); for( int i = 0; i <
@@ -1119,14 +1097,13 @@ public class DerivedInformation
 	 * <P>
 	 * Here, the fragments generated share in general connecting residues.
 	 */
-	public boolean getFragments(final Vector fragments, final Vector conformationType) {
+	public boolean getFragments(final Vector<int[]> fragments, final Vector<ComponentType> conformationType) {
 
 		if (this.chains.length == 0) {
 			// System.err.println( " No chains in this structure " );
 			return false;
 		}
 
-		final int resCount = this.structureMap.getResidueCount();
 		// ssFlags is the array of characters denoting the extended secondary
 		// structure flags
 		//
@@ -1146,7 +1123,7 @@ public class DerivedInformation
 		 * i + " " + ssFlags[i] ); }
 		 */
 		int[] fragment;
-		String confType = new String();
+		ComponentType confType = ComponentType.UNDEFINED_CONFORMATION;
 		int start = 0;
 		char ss = this.ssFlags[0];
 		if (ss == '-') {
@@ -1183,7 +1160,7 @@ public class DerivedInformation
 					break;
 
 				case ' ':
-					confType = StructureComponentRegistry.TYPE_COIL;
+					confType = ComponentType.COIL;
 					fragment[0] = start;
 					ss1 = Character.toUpperCase(this.ssFlags[i]);
 					switch (ss1) {
@@ -1207,7 +1184,7 @@ public class DerivedInformation
 					break;
 
 				case 'T':
-					confType = StructureComponentRegistry.TYPE_TURN;
+					confType = ComponentType.TURN;
 					fragment[0] = start;
 					ss1 = Character.toUpperCase(this.ssFlags[i]);
 					switch (ss1) {
@@ -1230,7 +1207,7 @@ public class DerivedInformation
 					break;
 
 				case 'H':
-					confType = StructureComponentRegistry.TYPE_HELIX;
+					confType = ComponentType.HELIX;
 					fragment[0] = start;
 					ss1 = Character.toUpperCase(this.ssFlags[i]);
 					switch (ss1) {
@@ -1257,7 +1234,7 @@ public class DerivedInformation
 						fragment = new int[2];
 						fragment[0] = i - 1;
 						fragment[1] = i;
-						confType = StructureComponentRegistry.TYPE_TURN;
+						confType = ComponentType.TURN;
 						start = i;
 						fragments.add(fragment);
 						conformationType.add(confType);
@@ -1267,7 +1244,7 @@ public class DerivedInformation
 					break;
 
 				case 'E':
-					confType = StructureComponentRegistry.TYPE_STRAND;
+					confType = ComponentType.STRAND;
 					fragment[0] = start;
 					ss1 = Character.toUpperCase(this.ssFlags[i]);
 					switch (ss1) {
@@ -1294,7 +1271,7 @@ public class DerivedInformation
 						fragment = new int[2];
 						fragment[0] = i - 1;
 						fragment[1] = i;
-						confType = StructureComponentRegistry.TYPE_TURN;
+						confType = ComponentType.TURN;
 						start = i;
 						fragments.add(fragment);
 						conformationType.add(confType);
@@ -1311,8 +1288,6 @@ public class DerivedInformation
 			return false;
 		}
 
-		final ListIterator fIt = fragments.listIterator();
-		final ListIterator cIt = conformationType.listIterator();
 		this.openDistanceGaps(fragments, conformationType);
 
 		/*
@@ -1330,15 +1305,14 @@ public class DerivedInformation
 	 * Generate the fragments and their associated main conformation types.
 	 * Here, the fragments generated DO NOT share connecting residues.
 	 */
-	public boolean getDisjointFragments(final Vector fragments,
-			final Vector conformationType) {
+	public boolean getDisjointFragments(final Vector<int[]> fragments,
+			final Vector<ComponentType> conformationType) {
 
 		if (this.chains.length == 0) {
 			// System.err.println( " No chains in this structure " );
 			return false;
 		}
 
-		final int resCount = this.structureMap.getResidueCount();
 		// ssFlags is the array of characters denoting the extended secondary
 		// structure flags
 		//
@@ -1363,7 +1337,7 @@ public class DerivedInformation
 		 */
 
 		int[] fragment;
-		String confType = new String();
+		ComponentType confType = ComponentType.UNDEFINED_CONFORMATION;
 		int start = 0;
 		char ss = this.ssFlags[0];
 		if (ss == '-') {
@@ -1403,7 +1377,7 @@ public class DerivedInformation
 					break;
 
 				case ' ':
-					confType = StructureComponentRegistry.TYPE_COIL;
+					confType = ComponentType.COIL;
 					fragment[0] = start;
 					ss1 = Character.toUpperCase(this.ssFlags[i]);
 					switch (ss1) {
@@ -1444,7 +1418,7 @@ public class DerivedInformation
 					break;
 
 				case 'T':
-					confType = StructureComponentRegistry.TYPE_TURN;
+					confType = ComponentType.TURN;
 					fragment[0] = start;
 					ss1 = Character.toUpperCase(this.ssFlags[i]);
 					switch (ss1) {
@@ -1477,7 +1451,7 @@ public class DerivedInformation
 					break;
 
 				case 'H':
-					confType = StructureComponentRegistry.TYPE_HELIX;
+					confType = ComponentType.HELIX;
 					fragment[0] = start;
 					ss1 = Character.toUpperCase(this.ssFlags[i]);
 					switch (ss1) {
@@ -1518,7 +1492,7 @@ public class DerivedInformation
 					break;
 
 				case 'E':
-					confType = StructureComponentRegistry.TYPE_STRAND;
+					confType = ComponentType.STRAND;
 					fragment[0] = start;
 					ss1 = Character.toUpperCase(this.ssFlags[i]);
 					switch (ss1) {
@@ -1564,7 +1538,7 @@ public class DerivedInformation
 			fragment[0] = start;
 			fragment[1] = this.ssFlags.length - 1;
 			fragments.add(fragment);
-			conformationType.add(StructureComponentRegistry.TYPE_COIL);
+			conformationType.add(ComponentType.COIL);
 		}
 
 		// It may happen that the last residue in the chain has a new
@@ -1576,7 +1550,7 @@ public class DerivedInformation
 			fragment[0] = start;
 			fragment[1] = this.ssFlags.length - 1;
 			fragments.add(fragment);
-			conformationType.add(StructureComponentRegistry.TYPE_COIL); // Too
+			conformationType.add(ComponentType.COIL); // Too
 																		// short
 																		// for a
 																		// turn,
@@ -1589,8 +1563,6 @@ public class DerivedInformation
 			return false;
 		}
 
-		final ListIterator fIt = fragments.listIterator();
-		final ListIterator cIt = conformationType.listIterator();
 		this.openDistanceGaps(fragments, conformationType);
 
 		/*
@@ -1697,7 +1669,7 @@ public class DerivedInformation
 	// Example 1b25
 	// Typically this is a coil but this doesn't matter
 	//
-	private void openDistanceGaps(final Vector fragments, final Vector conformationType) {
+	private void openDistanceGaps(final Vector<int[]> fragments, final Vector<ComponentType> conformationType) {
 		final float distCutOff = 5.1f;
 		int[] newFrag;
 		int[] frag = null;
@@ -1707,7 +1679,7 @@ public class DerivedInformation
 		Atom caAtom = new Atom();
 		int resCount;
 		int fragIndex = 0;
-		String conf = null;
+		ComponentType conf = null;
 		final double[] coords1 = new double[3];
 		final double[] coords2 = new double[3];
 		Residue residue = null;
@@ -1715,7 +1687,7 @@ public class DerivedInformation
 		fragments.trimToSize();
 		conformationType.trimToSize();
 
-		frag = (int[]) fragments.get(fragIndex);
+		frag = fragments.get(fragIndex);
 		while (frag != null) {
 			gap = false;
 			startIndex = frag[0];
@@ -1750,7 +1722,7 @@ public class DerivedInformation
 					// 2 separate fragments if enough long.
 					//
 					gap = true;
-					conf = (String) conformationType.elementAt(fragIndex);
+					conf = conformationType.elementAt(fragIndex);
 					frag[1] = startIndex + i - 1;
 
 					if (((frag[1] - frag[0]) <= 1) && (!gap)
@@ -1758,7 +1730,7 @@ public class DerivedInformation
 					) { // Too short, extend the previous if connected and
 						// discard
 
-						adjacentFrag = (int[]) fragments.get(fragIndex - 1);
+						adjacentFrag = fragments.get(fragIndex - 1);
 						if (adjacentFrag[1] >= frag[0] - 1) {
 							adjacentFrag[1] = frag[1];
 							fragments.remove(fragIndex);
@@ -1768,7 +1740,7 @@ public class DerivedInformation
 							// fragments.remove( fragIndex );
 							// conformationType.remove( fragIndex );
 							// newStartIndex = fragIndex;
-							conformationType.set(fragIndex, "NONE");
+							conformationType.set(fragIndex, ComponentType.NONE);
 						}
 					}
 
@@ -1792,7 +1764,7 @@ public class DerivedInformation
 						fragments.add(newStartIndex, newFrag);
 						conformationType.insertElementAt(conf, newStartIndex);
 					} else {
-						adjacentFrag = (int[]) fragments.get(fragIndex + 1);
+						adjacentFrag = fragments.get(fragIndex + 1);
 						adjacentFrag[0] = startIndex + i;
 					}
 					break;
@@ -1800,7 +1772,7 @@ public class DerivedInformation
 			}
 			if (fragIndex < fragments.size() - 1) {
 				fragIndex++;
-				frag = (int[]) fragments.get(fragIndex);
+				frag = fragments.get(fragIndex);
 			} else {
 				frag = null;
 			}
@@ -1810,20 +1782,20 @@ public class DerivedInformation
 		// resulted from opening distance-based gaps
 		//
 		fragIndex = 0;
-		frag = (int[]) fragments.get(fragIndex);
+		frag = fragments.get(fragIndex);
 		while (frag != null) {
 			resCount = frag[1] - frag[0] + 1;
 			if (resCount < 3) {
-				if ((conformationType.elementAt(fragIndex) == StructureComponentRegistry.TYPE_HELIX)
-						|| (conformationType.elementAt(fragIndex) == StructureComponentRegistry.TYPE_STRAND)) {
+				if ((conformationType.elementAt(fragIndex) == ComponentType.HELIX)
+						|| (conformationType.elementAt(fragIndex) == ComponentType.STRAND)) {
 					conformationType.set(fragIndex,
-							StructureComponentRegistry.TYPE_COIL);
+							ComponentType.COIL);
 				}
 			}
 
 			if (fragIndex < fragments.size() - 1) {
 				fragIndex++;
-				frag = (int[]) fragments.get(fragIndex);
+				frag = fragments.get(fragIndex);
 			} else {
 				frag = null;
 			}
@@ -1836,31 +1808,31 @@ public class DerivedInformation
 	 * Given a RangeMap object, it sets its Value according to the set of
 	 * Secondary Structures as derived via the Kabsch-Sander algorithm.
 	 */
-	public void setConformationType(final Vector residues) {
-		final Vector fragments = new Vector();
-		final Vector confTypes = new Vector();
+	public void setConformationType(final Vector<Residue> residues) {
+		final Vector<int[]> fragmentRanges = new Vector<int[]>();
+		final Vector<ComponentType> confTypes = new Vector<ComponentType>();
 		this.setSsExtendedFlags();
-		this.getDisjointFragments(fragments, confTypes);
+		this.getDisjointFragments(fragmentRanges, confTypes);
 		// getFragments( fragments, confTypes );
-		fragments.trimToSize();
+		fragmentRanges.trimToSize();
 		confTypes.trimToSize();
 		// System.err.println( "Generating Range Map: " + fragments.size() );
 		int[] frag;
 		int globalIndex;
-		String cType;
+		ComponentType cType;
 		String chainId;
 		Residue residue = null;
 		Chain chain;
-		for (int i = 0; i < fragments.size(); i++) {
-			frag = (int[]) fragments.elementAt(i);
-			cType = (String) confTypes.elementAt(i);
-			residue = (Residue) residues.elementAt(frag[0]);
+		for (int i = 0; i < fragmentRanges.size(); i++) {
+			frag = fragmentRanges.elementAt(i);
+			cType = confTypes.elementAt(i);
+			residue = residues.elementAt(frag[0]);
 			chainId = residue.getChainId();
 			// System.err.println( "Fragment from " + frag[0] + " to " + frag[1]
 			// + " Type " + cType + " chainId " + chainId );
 			chain = this.structureMap.getChain(chainId);
 			globalIndex = chain.getResidueIndex(residue);
-			chain.setFragment(globalIndex, globalIndex + frag[1] - frag[0],
+			chain.setFragmentRange(globalIndex, globalIndex + frag[1] - frag[0],
 					cType);
 
 		}

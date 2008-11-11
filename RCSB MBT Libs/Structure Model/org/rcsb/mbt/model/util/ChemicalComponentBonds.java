@@ -38,7 +38,6 @@ package org.rcsb.mbt.model.util;
 import java.util.*;
 import java.io.*;
 
-import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.*;
 
 
@@ -58,7 +57,7 @@ import org.rcsb.mbt.model.*;
  */
 public class ChemicalComponentBonds
 {
-	public enum BondType
+	public enum BondOrder
 	{
 		/**
 		 * Value returned by the bondType method when nothing is known
@@ -133,9 +132,9 @@ public class ChemicalComponentBonds
 		protected float order = -1.0f;
 		protected String shortName;
 		
-		static public BondType valueByShortName (String pfx)
+		static public BondOrder valueByShortName (String pfx)
 		{
-			for (BondType bondType : BondType.values())
+			for (BondOrder bondType : BondOrder.values())
 				if (pfx.startsWith(bondType.shortName))
 						return bondType;
 				
@@ -147,7 +146,7 @@ public class ChemicalComponentBonds
 					// keys into the split strings.
 
 	@SuppressWarnings("serial")
-	static private class CompoundMap extends Hashtable<String, BondType> {}
+	static private class CompoundMap extends Hashtable<String, BondOrder> {}
 			// "<atom0>:<atom1>" -> BondType
 	
 	@SuppressWarnings("serial")
@@ -220,13 +219,13 @@ public class ChemicalComponentBonds
 				//	
 				String bondKey = items[ItemParts.ATOM0.ordinal()] + ':' + items[ItemParts.ATOM1.ordinal()];
 				if (!compoundMap.containsKey(sharedStrings.share(bondKey)))
-					compoundMap.put( bondKey, BondType.valueByShortName(items[ItemParts.BOND_TYPE.ordinal()].substring(0, 4)) );
+					compoundMap.put( bondKey, BondOrder.valueByShortName(items[ItemParts.BOND_TYPE.ordinal()].substring(0, 4)) );
 								// only the first four characters count
 			}
 		}
 		catch ( final java.io.IOException e )
 		{
-			if (AppBase.isDebug())
+			if (DebugState.isDebug())
 				e.printStackTrace( );
 		}
 
@@ -244,10 +243,10 @@ public class ChemicalComponentBonds
 	 *
 	 *  @exception	NullPointerException	if either atom argument is null.
 	 */
-	public static BondType bondType( final Atom atom0, final Atom atom1 )
+	public static BondOrder bondType( final Atom atom0, final Atom atom1 )
 	{
 		if ( bonds == null )
-			return BondType.UNKNOWN;
+			return BondOrder.UNKNOWN;
 		
 		if (atom0 == null || atom1 == null)
 			throw new NullPointerException( "Error: atom " + ((atom0 == null)? "0" : "1") + " is null in ChemicalComponentBonds.bondType." );
@@ -258,7 +257,7 @@ public class ChemicalComponentBonds
 			 !atom0.compound.equals( atom1.compound ) ||
 			 !atom0.chain_id.equals( atom1.chain_id )
 			 ) {
-			return BondType.UNKNOWN;
+			return BondOrder.UNKNOWN;
 							// constrain atoms to same structure, chain, residue, and compound
 							// TODO: I think we want cross-chain, residue, and compound bonds to be enabled, if possible
 							// 30-Oct-08 - rickb
@@ -277,10 +276,10 @@ public class ChemicalComponentBonds
 					return compoundMap.get( bondKey );
 			}
 
-			return BondType.UNKNOWN;
+			return BondOrder.UNKNOWN;
 		}
 
-		return BondType.NONE;
+		return BondOrder.NONE;
 	}
 
 
@@ -292,7 +291,7 @@ public class ChemicalComponentBonds
 	 *
 	 *  @exception	NullPointerException	if the bond argument is null.
 	 */
-	public static BondType bondType( final Bond bond )
+	public static BondOrder bondType( final Bond bond )
 	{
 		if ( bond == null ) {
 			throw new NullPointerException( "bond is null" );

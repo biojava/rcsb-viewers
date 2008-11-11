@@ -59,11 +59,12 @@ package org.rcsb.mbt.glscene.jogl;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
+import org.rcsb.mbt.glscene.StructureViewerImpl.CrossSectionStyle;
+import org.rcsb.mbt.glscene.StructureViewerImpl.SsGeometry;
+import org.rcsb.mbt.glscene.StructureViewerImpl.CrossSectionStyle.CrossSectionType;
+import org.rcsb.mbt.glscene.StructureViewerImpl.SsGeometry.ConformationShape;
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.attributes.*;
-import org.rcsb.mbt.ui.views.StructureViewerImpl.CrossSectionStyle;
-import org.rcsb.mbt.ui.views.StructureViewerImpl.HelixGeometry;
-import org.rcsb.mbt.ui.views.StructureViewerImpl.SsGeometry;
 
 
 
@@ -88,14 +89,18 @@ public class ChainGeometry
 	/**
 	 * TODO: These should be enums.
 	 */
-	public static final int RIBBON_SIMPLE_LINE = 0;
-	public static final String RIBBON_SIMPLE_LINE_DESCRIPTION = "Simple Line";
-	public static final int RIBBON_TRADITIONAL = 1;
-	public static final String RIBBON_TRADITIONAL_DESCRIPTION = "Traditional";
-	public static final int RIBBON_CYLINDRICAL_HELICES = 2;
-	public static final String RIBBON_CYLINDRICAL_HELICES_DESCRIPTION = "Traditional / Cylinders";
+	public enum RibbonForm
+	{
+		RIBBON_SIMPLE_LINE ("Simple Line"),
+		RIBBON_TRADITIONAL ("Traditional"),
+		RIBBON_CYLINDRICAL_HELICES ("Traditional / Cylinders");
+		
+		private RibbonForm(String in_description) { description = in_description; }
+		protected String description;
+		public String getDescription() { return description; }
+	}
 	
-	private int ribbonForm = RIBBON_TRADITIONAL;
+	private RibbonForm ribbonForm = RibbonForm.RIBBON_TRADITIONAL;
 	private boolean ribbonsAreSmoothed = true;
 					// these were set from defaults specified in the mutators.  Problem is,
 					// that requires bringing the mutator suite into this project, which
@@ -171,12 +176,12 @@ public class ChainGeometry
 	        int turnSmoothingSteps = -1;
 	        int coilSmoothingSteps = -1;
 	        
-	        int helixCsType = -1;
-	        //int helixCsType = CrossSectionStyle.RECTANGULAR_RIBBON;
-	        int strandCsType = -1;
-	        int turnCsType = -1;
-	        int coilCsType = -1;
-	        int helixSsShape = -1;
+	        CrossSectionType helixCsType = null;
+	        //int helixCsType = CrossSectionType.RECTANGULAR_RIBBON;
+	        CrossSectionType strandCsType = null;
+	        CrossSectionType turnCsType = null;
+	        CrossSectionType coilCsType = null;
+	        ConformationShape helixSsShape = null;
 			
 	        if(this.ribbonsAreSmoothed) {
 	        	coilSmoothingSteps = 2;
@@ -192,29 +197,29 @@ public class ChainGeometry
 	        
 			switch(this.ribbonForm) {
         	case RIBBON_CYLINDRICAL_HELICES:
-                coilCsType = CrossSectionStyle.ROUNDED_TUBE;
-                turnCsType = CrossSectionStyle.ROUNDED_TUBE;
-                helixCsType = CrossSectionStyle.REGULAR_POLYGON;
-                helixSsShape = HelixGeometry.CYLINDER;
-            	strandCsType = CrossSectionStyle.RECTANGULAR_RIBBON;
+                coilCsType = CrossSectionType.ROUNDED_TUBE;
+                turnCsType = CrossSectionType.ROUNDED_TUBE;
+                helixCsType = CrossSectionType.REGULAR_POLYGON;
+                helixSsShape = ConformationShape.CYLINDER;
+            	strandCsType = CrossSectionType.RECTANGULAR_RIBBON;
                 
                 ribbon = true;
         		break;
         	case RIBBON_TRADITIONAL:
-        		coilCsType = CrossSectionStyle.ROUNDED_TUBE;
-                turnCsType = CrossSectionStyle.ROUNDED_TUBE;
-                helixCsType = CrossSectionStyle.REGULAR_POLYGON;
-                helixSsShape = HelixGeometry.RIBBON;
-                strandCsType = CrossSectionStyle.RECTANGULAR_RIBBON;
+        		coilCsType = CrossSectionType.ROUNDED_TUBE;
+                turnCsType = CrossSectionType.ROUNDED_TUBE;
+                helixCsType = CrossSectionType.REGULAR_POLYGON;
+                helixSsShape = ConformationShape.RIBBON;
+                strandCsType = CrossSectionType.RECTANGULAR_RIBBON;
             	
                 ribbon = true;
         		break;
         	case RIBBON_SIMPLE_LINE:
-        		coilCsType = CrossSectionStyle.ROUNDED_TUBE;
-                turnCsType = CrossSectionStyle.ROUNDED_TUBE;
-                helixCsType = CrossSectionStyle.REGULAR_POLYGON;
-                helixSsShape = HelixGeometry.RIBBON;
-            	strandCsType = CrossSectionStyle.RECTANGULAR_RIBBON;
+        		coilCsType = CrossSectionType.ROUNDED_TUBE;
+                turnCsType = CrossSectionType.ROUNDED_TUBE;
+                helixCsType = CrossSectionType.REGULAR_POLYGON;
+                helixSsShape = ConformationShape.RIBBON;
+            	strandCsType = CrossSectionType.RECTANGULAR_RIBBON;
             	
             	ribbon = false;
         		break;
@@ -234,12 +239,12 @@ public class ChainGeometry
 	}
 
 
-	public int getRibbonForm() {
+	public RibbonForm getRibbonForm() {
 		return this.ribbonForm;
 	}
 
 
-	public void setRibbonForm(final int ribbonForm) {
+	public void setRibbonForm(final RibbonForm ribbonForm) {
 		this.ribbonForm = ribbonForm;
 	}
 

@@ -42,6 +42,7 @@ import java.io.*;
 import java.net.*;
 import java.util.zip.*;
 
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.util.*;
@@ -134,7 +135,7 @@ public class PdbStructureLoader
 	// be re-used for the next load request. This is not thread-safe
 	// but there doesn't seem to be any other way to enable an
 	// anonymous class to be handed state (asside from parameters).
-	protected Hashtable<String, Vector<StructureComponent>> passComponents = null;
+	protected Hashtable<ComponentType, Vector<StructureComponent>> passComponents = null;
 
 	// Container for any general meta-data that describes the structure.
 	protected StructureInfo structureInfo = null;
@@ -353,7 +354,7 @@ public class PdbStructureLoader
 		SharedObjects sharedStrings = new SharedObjects( );
 		Integer currentPseudoChainId = 0;
 
-		this.passComponents = new Hashtable<String, Vector<StructureComponent>>( );
+		this.passComponents = new Hashtable<ComponentType, Vector<StructureComponent>>( );
 		final long expectedBytes = this.expectedInputBytes;
 		// System.err.println( "PdbStructureLoader.load: expectedBytes = " + expectedBytes );
 
@@ -545,13 +546,13 @@ public class PdbStructureLoader
 				str = line.substring(60, 66 ).trim();
 				atom.bfactor = ( str.length() == 0 )? 0.0f : Float.parseFloat( str );
 
-				Vector<StructureComponent> records = this.passComponents.get(StructureComponentRegistry.TYPE_ATOM);
+				Vector<StructureComponent> records = this.passComponents.get(ComponentType.ATOM);
 				
 				if ( records == null )
 				{
 					records = new Vector<StructureComponent>( );
 					this.passComponents.put(
-							StructureComponentRegistry.TYPE_ATOM, records );
+							ComponentType.ATOM, records );
 				}
 				
 				records.add( atom );
@@ -587,7 +588,7 @@ public class PdbStructureLoader
 		if ( conectCount > 0 )
 		{
 			final Vector<StructureComponent> bonds = new Vector<StructureComponent>( );
-			this.passComponents.put( StructureComponentRegistry.TYPE_BOND, bonds );
+			this.passComponents.put( ComponentType.BOND, bonds );
 
 			for ( int i=0; i<conectCount; i++ )
 			{
@@ -617,14 +618,14 @@ public class PdbStructureLoader
 			// A hashtable of vectors where
 			// each hash KEY is the StructureComponent type String.
 			// each hash VALUE is a Vector of StructureComponent objects.
-			protected Hashtable<String, Vector<StructureComponent>> structureComponents = null;
+			protected Hashtable<ComponentType, Vector<StructureComponent>> structureComponents = null;
 
 			// To free up the global state for another load call.
 			private String localUrlString;
 
 			// public Structure()  Anonymous inner class constructor.
 			{
-				this.structureComponents = PdbStructureLoader.this.passComponents;
+				this.structureComponents = passComponents;
 				PdbStructureLoader.this.passComponents = null;
 
 				this.localUrlString = PdbStructureLoader.this.urlString;
@@ -641,8 +642,8 @@ public class PdbStructureLoader
 				return this.localUrlString;
 			}
 
-			
-			public int getStructureComponentCount( String scType )
+			@Override
+			public int getStructureComponentCount( ComponentType scType )
 			{
 				Vector<StructureComponent> records = this.structureComponents.get( scType );
 				if ( records == null ) {
@@ -652,7 +653,8 @@ public class PdbStructureLoader
 				}
 			}
 
-			public StructureComponent getStructureComponentByIndex( String type,
+			@Override
+			public StructureComponent getStructureComponentByIndex( ComponentType type,
 				int index )
 				throws IndexOutOfBoundsException, IllegalArgumentException
 			{

@@ -124,6 +124,7 @@ package org.rcsb.mbt.model;
 import java.util.*;
 
 import org.rcsb.mbt.controllers.app.AppBase;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.util.*;
 
 
@@ -165,7 +166,7 @@ public class Residue
 	private Classification classification = Classification.LIGAND;
 
 	// The secondary structure conformation type assigned to this residue.
-	private String conformationType = Conformation.TYPE_UNDEFINED;
+	private ComponentType conformationType = ComponentType.UNDEFINED_CONFORMATION;
 
 	// The polymer "head" and "tail" atoms for this amino acid or nucleic acid
 	// residue (or null for ligands) can be used to form polymer bonds
@@ -254,9 +255,9 @@ public class Residue
 	 */
 	
 	@Override
-	public String getStructureComponentType( )
+	public ComponentType getStructureComponentType( )
 	{
-		return Residue.className;
+		return ComponentType.RESIDUE;
 	}
 
 	/**
@@ -598,7 +599,7 @@ public class Residue
 	 * Set the secondary structure conformation type that should be assigned
 	 * to this residue.
 	 */
-	public void setConformationType( final String type )
+	public void setConformationType( final ComponentType type )
 	{
 		if ( type == null ) {
 			throw new IllegalArgumentException( "null type" );
@@ -613,7 +614,7 @@ public class Residue
 	 * Get the secondary structure conformation type that is assigned
 	 * to this residue.
 	 */
-	public String getConformationType( )
+	public ComponentType getConformationType( )
 	{
 		return conformationType;
 	}

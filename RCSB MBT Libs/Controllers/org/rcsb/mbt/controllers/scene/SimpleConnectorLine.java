@@ -1,6 +1,7 @@
 package org.rcsb.mbt.controllers.scene;
 
 import org.rcsb.mbt.model.StructureComponent;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 // a simple line connecting two components. Not necessarily any structural significance.
 public class SimpleConnectorLine extends StructureComponent {
@@ -25,7 +26,7 @@ public class SimpleConnectorLine extends StructureComponent {
     }
 
     
-	public String getStructureComponentType() {
+	public ComponentType getStructureComponentType() {
         return null;
     }
 

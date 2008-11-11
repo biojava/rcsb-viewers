@@ -1,6 +1,6 @@
 package org.rcsb.mbt.glscene.jogl;
 
-//  $Id: GlGeometryViewer.java,v 1.6 2007/07/02 04:29:08 jbeaver Exp $
+//  $Id: java,v 1.6 2007/07/02 04:29:08 jbeaver Exp $
 //
 //  Copyright 2000-2004 The Regents of the University of California.
 //  All Rights Reserved.
@@ -32,97 +32,7 @@ package org.rcsb.mbt.glscene.jogl;
 //
 //  For further information, please see:  http://mbt.sdsc.edu
 //
-//  History:
-//  $Log: GlGeometryViewer.java,v $
-//  Revision 1.6  2007/07/02 04:29:08  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.5  2007/04/09 22:36:41  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.4  2007/03/01 00:41:50  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.3  2007/02/15 21:53:02  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.2  2007/02/09 13:18:37  jbeaver
-//  fixed black protein bug and miscolored protein bug
-//
-//  Revision 1.1  2007/02/08 02:38:52  jbeaver
-//  version 1.50
-//
-//  Revision 1.7  2007/01/06 19:47:53  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.6  2007/01/03 19:33:49  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.5  2006/10/08 17:19:02  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.4  2006/10/04 17:21:06  jbeaver
-//  Lots of changes from surfaces to improved picking
-//
-//  Revision 1.3  2006/09/21 20:56:01  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.2  2006/09/20 22:52:48  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/09/20 16:50:42  jbeaver
-//  first commit - branched from ProteinWorkshop
-//
-//  Revision 1.3  2006/09/06 04:46:12  jbeaver
-//  Added initial capability for labeling ribbons
-//
-//  Revision 1.2  2006/09/02 18:52:28  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/08/24 17:39:03  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.13  2006/07/18 21:06:38  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.12  2006/06/21 21:00:53  jbeaver
-//  fixed fog so it works with states
-//
-//  Revision 1.11  2006/06/08 23:52:16  jbeaver
-//  added partial surface translation (edu.utexas.*)
-//
-//  Revision 1.10  2006/06/06 23:30:24  psteeger
-//  hooked fog to protein
-//
-//  Revision 1.9  2006/06/06 22:06:34  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.8  2006/06/02 23:41:24  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.7  2006/05/30 09:43:44  jbeaver
-//  Added lines and fog
-//
-//  Revision 1.6  2006/05/16 17:57:02  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.5  2006/04/14 23:37:33  jbeaver
-//  Update with some (very broken) surface rendering stuff
-//
-//  Revision 1.4  2006/03/25 02:11:22  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.3  2006/03/24 06:25:55  jbeaver
-//  Added a state interpolation feature
-//
-//  Revision 1.2  2006/03/13 15:06:23  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/03/09 00:18:55  jbeaver
-//  Initial commit
-//
-//  Revision 1.0 2005/04/04 00:12:54  moreland
-//
+
 
 // CORE JAVA
 import java.awt.AWTException;
@@ -166,6 +76,7 @@ import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
+import org.rcsb.mbt.glscene.jogl.ChainGeometry.RibbonForm;
 import org.rcsb.mbt.glscene.jogl.tiles.TileRenderer;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
@@ -176,6 +87,7 @@ import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.StructureModel.StructureList;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
@@ -184,6 +96,7 @@ import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
 import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
 import org.rcsb.mbt.model.geometry.Algebra;
+import org.rcsb.mbt.model.util.DebugState;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.mbt.model.util.Status;
 
@@ -236,7 +149,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	public List<Integer> simpleDisplayListsToDestroy = Collections.synchronizedList(new ArrayList<Integer>());
 
 	// Default geometry for new Renderables defaultGeometry{scType} = Geometry
-	public static Hashtable<String, DisplayListGeometry> defaultGeometry = new Hashtable<String, DisplayListGeometry>();
+	public static Hashtable<ComponentType, DisplayListGeometry> defaultGeometry = new Hashtable<ComponentType, DisplayListGeometry>();
 
 	// Mouse state
 	protected int prevMouseX, prevMouseY;
@@ -269,13 +182,13 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 	public static final float blue[] = { 0.0f, 0.0f, 1.0f, 0.0f };
 
-	public static final float[] DEFAULT_SPECULAR_COLOR = GlGeometryViewer.black;
+	public static final float[] DEFAULT_SPECULAR_COLOR = black;
 
-	public static final float[] DEFAULT_EMISSION_COLOR = GlGeometryViewer.black;
+	public static final float[] DEFAULT_EMISSION_COLOR = black;
 
-	public static final float[] DEFAULT_AMBIENT_COLOR = GlGeometryViewer.black;
+	public static final float[] DEFAULT_AMBIENT_COLOR = black;
 
-	public static final float[] DEFAULT_DIFFUSE_COLOR = GlGeometryViewer.black;
+	public static final float[] DEFAULT_DIFFUSE_COLOR = black;
 
 /* **
 	// Frame rate and other drawing statistics
@@ -592,24 +505,20 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		super(new BorderLayout());
 		super.setBackground(Color.black);
 		
-		GlGeometryViewer.atomGeometry = new AtomGeometry();
+		atomGeometry = new AtomGeometry();
 		// atomGeometry.setForm( Geometry.FORM_LINES ); // JLM DEBUG
-		GlGeometryViewer.defaultGeometry.put(Atom.getClassName(),
-				GlGeometryViewer.atomGeometry);
-		GlGeometryViewer.bondGeometry = new BondGeometry();
-		GlGeometryViewer.bondGeometry.setShowOrder(true);
+		defaultGeometry.put(ComponentType.ATOM, atomGeometry);
+		bondGeometry = new BondGeometry();
+		bondGeometry.setShowOrder(true);
 		// bondGeometry.setForm( Geometry.FORM_LINES ); // JLM DEBUG
 		// bondGeometry.setShowOrder( true ); // JLM DEBUG
-		GlGeometryViewer.defaultGeometry.put(Bond.getClassName(),
-				GlGeometryViewer.bondGeometry);
-		GlGeometryViewer.chainGeometry = new ChainGeometry();
-		GlGeometryViewer.chainGeometry.setForm(Geometry.FORM_THICK); // JLM
+		defaultGeometry.put(ComponentType.BOND, bondGeometry);
+		chainGeometry = new ChainGeometry();
+		chainGeometry.setForm(Geometry.FORM_THICK); // JLM
 		// DEBUG
-		GlGeometryViewer.defaultGeometry.put(Chain.getClassName(),
-				GlGeometryViewer.chainGeometry);
+		defaultGeometry.put(ComponentType.CHAIN, chainGeometry);
 
-		AppBase.sgetSceneController().setDefaultGeometry(
-				GlGeometryViewer.defaultGeometry);
+		AppBase.sgetSceneController().setDefaultGeometry(defaultGeometry);
 		
 		// Set up a GL Canvas
 		this.glCapabilities = new GLCapabilities();
@@ -681,10 +590,10 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			}
 		}
 		
-		GlGeometryViewer.currentProgram = 0;
-		GlGeometryViewer.vertexShader = 0;
-		GlGeometryViewer.fragmentShader = 0;
-		GlGeometryViewer.shaderProgram = 0;
+		currentProgram = 0;
+		vertexShader = 0;
+		fragmentShader = 0;
+		shaderProgram = 0;
 		
 		this.backBufferContainsPickData = false;
 	}
@@ -904,8 +813,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 										this.glut,
 										50f,
 										1.0 / this.aspect,
-										GlGeometryViewer.zNear,
-										GlGeometryViewer.zFar,
+										zNear,
+										zFar,
 										0,
 										0,
 										sceneController.getDebugSettings().blurFactor
@@ -973,8 +882,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			}
 			tr.setImageSize(this.screenshotWidth, this.screenshotHeight);
 			tr.setImageBuffer(GL.GL_BGR, GL.GL_UNSIGNED_BYTE, imageBuffer);
-			tr.trPerspective(GlGeometryViewer.fovy, 1.0 / this.aspect,
-					GlGeometryViewer.zNear, GlGeometryViewer.zFar);
+			tr.trPerspective(fovy, 1.0 / this.aspect,
+					zNear, zFar);
 
 			do {
 				tr.beginTile(gl);
@@ -1118,11 +1027,11 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				// gl.glDisable(GL.GL_FOG);
 				gl.glShadeModel(GL.GL_FLAT);
 
-				if (this.supportsShaderPrograms && GlGeometryViewer.currentProgram != 0
-						&& GlGeometryViewer.shaderProgram != 0)
+				if (this.supportsShaderPrograms && currentProgram != 0
+						&& shaderProgram != 0)
 				{
 					gl.glUseProgram(0);
-					GlGeometryViewer.currentProgram = 0;
+					currentProgram = 0;
 				}
 				
 			}
@@ -1138,22 +1047,22 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				if (this.supportsShaderPrograms)
 				{
 					boolean successful = true;
-					if (GlGeometryViewer.vertexShader == 0)
+					if (vertexShader == 0)
 						successful = this.createVertexShader(gl, glu, glut);
 
-					if (GlGeometryViewer.fragmentShader == 0 && successful)
+					if (fragmentShader == 0 && successful)
 						successful = this.createFragmentShader(gl, glu, glut);
 
-					if (GlGeometryViewer.shaderProgram == 0 && successful)
+					if (shaderProgram == 0 && successful)
 					{
 						successful = this.createShaderProgram(gl, glu, glut);
-						GlGeometryViewer.currentProgram = GlGeometryViewer.shaderProgram;
+						currentProgram = shaderProgram;
 					}
 
-					if (GlGeometryViewer.currentProgram == 0 && GlGeometryViewer.shaderProgram != 0 && successful)
+					if (currentProgram == 0 && shaderProgram != 0 && successful)
 					{
-						gl.glUseProgram(GlGeometryViewer.shaderProgram);
-						GlGeometryViewer.currentProgram = GlGeometryViewer.shaderProgram;
+						gl.glUseProgram(shaderProgram);
+						currentProgram = shaderProgram;
 					}
 
 					// if one or more steps for creating the shader failed,
@@ -1161,9 +1070,9 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 					if (!successful)
 					{
 						this.supportsShaderPrograms = false;
-						GlGeometryViewer.shaderProgram = 0;
-						GlGeometryViewer.vertexShader = 0;
-						GlGeometryViewer.fragmentShader = 0;
+						shaderProgram = 0;
+						vertexShader = 0;
+						fragmentShader = 0;
 					}
 				}
 			}
@@ -1173,8 +1082,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			//
 
 			if (canModifyProjectionMatrix)
-				glu.gluPerspective(GlGeometryViewer.fovy, 1.0 / this.aspect,
-						GlGeometryViewer.zNear, GlGeometryViewer.zFar);
+				glu.gluPerspective(fovy, 1.0 / this.aspect,
+						zNear, zFar);
 
 			// gl.glFrustum( left, right, bottom, top, zNear, zFar );
 
@@ -1216,7 +1125,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 					continuePick = sceneNode.draw(gl, glu, glut, isPick, structure);
 				} catch (Exception e)
 				{
-					if (AppBase.isDebug())
+					if (DebugState.isDebug())
 						e.printStackTrace();
 				}
 				
@@ -1261,8 +1170,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				if (value == null)
 					Status.output(Status.LEVEL_REMARK, " "); // clear the
 					// status
-				else if (value.lists.structureComponent
-						.getStructureComponentType() == StructureComponentRegistry.TYPE_FRAGMENT)
+				else if (value.lists.structureComponent.getStructureComponentType() == ComponentType.FRAGMENT)
 				{
 					final Fragment f = (Fragment) value.lists.structureComponent;
 					final Residue r = f.getResidue(value.index);
@@ -1318,9 +1226,9 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	// private boolean resizeFinished = false;
 
 	private void reportAtComponent(final StructureComponent structureComponent) {
-		final String scType = structureComponent.getStructureComponentType();
+		final ComponentType scType = structureComponent.getStructureComponentType();
 
-		if (scType == StructureComponentRegistry.TYPE_ATOM) {
+		if (scType == ComponentType.ATOM) {
 			final Atom atom = (Atom) structureComponent;
 
 			final Object[] pdbIds = atom.structure.getStructureMap()
@@ -1345,7 +1253,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 										+ atom.chain_id + ", ndb residue id: "
 										+ atom.residue_id);
 			}
-		} else if (scType == StructureComponentRegistry.TYPE_BOND) {
+		} else if (scType == ComponentType.BOND) {
 			final Bond bond = (Bond) structureComponent;
 
 			final Atom a1 = bond.getAtom(0);
@@ -1387,18 +1295,18 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 										+ a2.chain_id
 										+ ". * Could not determine Pdb IDs. Ndb IDs shown instead.");
 			}
-		} else if (scType == StructureComponentRegistry.TYPE_RESIDUE) {
+		} else if (scType == ComponentType.RESIDUE) {
 			final Residue r = (Residue) structureComponent;
 			final Fragment f = r.getFragment();
-			final String conformationTypeIdentifier = f.getConformationType();
+			final ComponentType conformationTypeIdentifier = f.getConformationType();
 			String conformationType = "Unknown";
-			if (conformationTypeIdentifier == StructureComponentRegistry.TYPE_COIL) {
+			if (conformationTypeIdentifier == ComponentType.COIL) {
 				conformationType = "Coil";
-			} else if (conformationTypeIdentifier == StructureComponentRegistry.TYPE_HELIX) {
+			} else if (conformationTypeIdentifier == ComponentType.HELIX) {
 				conformationType = "Helix";
-			} else if (conformationTypeIdentifier == StructureComponentRegistry.TYPE_STRAND) {
+			} else if (conformationTypeIdentifier == ComponentType.STRAND) {
 				conformationType = "Strand";
-			} else if (conformationTypeIdentifier == StructureComponentRegistry.TYPE_TURN) {
+			} else if (conformationTypeIdentifier == ComponentType.TURN) {
 				conformationType = "Turn";
 			}
 
@@ -1427,13 +1335,11 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 										+ r.getCompoundCode()
 										+ " compound. * Could not determine Pdb IDs. Ndb IDs shown instead.");
 			}
-		} else if (scType == StructureComponentRegistry.TYPE_FRAGMENT) {
+		} else if (scType == ComponentType.FRAGMENT) {
 			final Fragment f = (Fragment) structureComponent;
 
 			// remove all but the local name for the secondary structure class.
-			String conformation = f.getConformationType();
-			final int lastDot = conformation.lastIndexOf('.');
-			conformation = conformation.substring(lastDot + 1);
+			ComponentType conformation = f.getConformationType();
 
 			final String ndbChainId = f.getChain().getChainId();
 			final int startNdbResidueId = f.getResidue(0).getResidueId();
@@ -1471,7 +1377,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			}
 
 			// structureMap.getStructureStyles().setResidueColor(res, yellow);
-		} else if (scType == StructureComponentRegistry.TYPE_CHAIN) {
+		} else if (scType == ComponentType.CHAIN) {
 			final Chain c = (Chain) structureComponent;
 
 			// remove all but the local name for the secondary structure class.
@@ -1959,7 +1865,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	public void reset() { reset(false); }
 	public void reset(boolean forceRecalculation)
 	{
-		this.backgroundColor = GlGeometryViewer.black;
+		this.backgroundColor = black;
 
 		if (AppBase.sgetModel().hasStructures())
 		{
@@ -2033,7 +1939,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	 */
 	public void structureAdded(final Structure str)
 	{
-		structureAdded(str, ChainGeometry.RIBBON_TRADITIONAL, true);
+		structureAdded(str, RibbonForm.RIBBON_TRADITIONAL, true);
 	}
 	
 	/**
@@ -2044,26 +1950,21 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	 * @param ribbonForm - the default ribbon form
 	 * @param doAtoms - whether or no to do the atom styles.
 	 */
-	protected void structureAdded(final Structure str, int ribbonForm, boolean doAtoms)
+	protected void structureAdded(final Structure str, RibbonForm ribbonForm, boolean doAtoms)
 	{
 		final StructureMap structureMap = str.getStructureMap();
 		final StructureStyles structureStyles = structureMap
 				.getStructureStyles();
 		final JoglSceneNode sn = (JoglSceneNode)structureMap.getUData();
 
-		final ChainGeometry defaultChainGeometry = (ChainGeometry) GlGeometryViewer.defaultGeometry
-				.get(StructureComponentRegistry.TYPE_CHAIN);
-		final AtomGeometry defaultAtomGeometry = (AtomGeometry) GlGeometryViewer.defaultGeometry
-				.get(StructureComponentRegistry.TYPE_ATOM);
-		final BondGeometry defaultBondGeometry = (BondGeometry) GlGeometryViewer.defaultGeometry
-				.get(StructureComponentRegistry.TYPE_BOND);
+		final ChainGeometry defaultChainGeometry = (ChainGeometry) defaultGeometry.get(ComponentType.CHAIN);
+		final AtomGeometry defaultAtomGeometry = (AtomGeometry) defaultGeometry.get(ComponentType.ATOM);
+		final BondGeometry defaultBondGeometry = (BondGeometry) defaultGeometry.get(ComponentType.BOND);
 
-		final ChainStyle defaultChainStyle = (ChainStyle) structureStyles
-				.getDefaultStyle(StructureComponentRegistry.TYPE_CHAIN);
-		final AtomStyle defaultAtomStyle = (AtomStyle) structureStyles
-				.getDefaultStyle(StructureComponentRegistry.TYPE_ATOM);
-		final BondStyle defaultBondStyle = (BondStyle) structureStyles
-				.getDefaultStyle(StructureComponentRegistry.TYPE_BOND);
+//		TODO: Fix default chain style (comes up null for the type)
+		final ChainStyle defaultChainStyle = (ChainStyle) structureStyles.getDefaultStyle(ComponentType.CHAIN);
+		final AtomStyle defaultAtomStyle = (AtomStyle) structureStyles.getDefaultStyle(ComponentType.ATOM);
+		final BondStyle defaultBondStyle = (BondStyle) structureStyles.getDefaultStyle(ComponentType.BOND);
 
 		str.getStructureMap().getStructureStyles()
 				.removeStructureStylesEventListener(this);
@@ -2222,9 +2123,9 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		// final String[] lines = this.getReaderLines("test_v.glsl");
 		final int[] lengths = this.createLengthArray(lines);
 
-		GlGeometryViewer.vertexShader = gl.glCreateShader(GL.GL_VERTEX_SHADER);
-		gl.glShaderSource(GlGeometryViewer.vertexShader, lines.length, lines, lengths, 0);
-		gl.glCompileShader(GlGeometryViewer.vertexShader);
+		vertexShader = gl.glCreateShader(GL.GL_VERTEX_SHADER);
+		gl.glShaderSource(vertexShader, lines.length, lines, lengths, 0);
+		gl.glCompileShader(vertexShader);
 
 		if (this.do_glFinishInShaders)
 			gl.glFinish();
@@ -2232,10 +2133,10 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		    gl.glFlush();
 		
 		final IntBuffer buf = BufferUtil.newIntBuffer(1);
-		gl.glGetShaderiv(GlGeometryViewer.vertexShader, GL.GL_INFO_LOG_LENGTH, buf);
+		gl.glGetShaderiv(vertexShader, GL.GL_INFO_LOG_LENGTH, buf);
 		int logLength = buf.get(0);
 		buf.rewind();
-		gl.glGetShaderiv(GlGeometryViewer.vertexShader, GL.GL_COMPILE_STATUS, buf);
+		gl.glGetShaderiv(vertexShader, GL.GL_COMPILE_STATUS, buf);
 		final int status = buf.get(0);
 
 /* ** DEBUGGING - output shader information
@@ -2249,7 +2150,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 		final int[] length = new int[1];
 		final byte[] bufArray = new byte[logLength];
-		gl.glGetShaderInfoLog(GlGeometryViewer.vertexShader, logLength, length, 0, bufArray, 0);
+		gl.glGetShaderInfoLog(vertexShader, logLength, length, 0, bufArray, 0);
 
 		final StringBuffer s = new StringBuffer();
 		for (int i = 0; i < length[0]; i++) {
@@ -2267,8 +2168,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			return false;
 		}
 		if (log.indexOf("software") >= 0) {
-			if (GlGeometryViewer.vertexShader > 0) {
-				gl.glDeleteShader(GlGeometryViewer.vertexShader);
+			if (vertexShader > 0) {
+				gl.glDeleteShader(vertexShader);
 			}
 			return false;
 		}
@@ -2282,9 +2183,9 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		// final String[] lines = this.getReaderLines("test_f.glsl");
 		final int[] lengths = this.createLengthArray(lines);
 
-		GlGeometryViewer.fragmentShader = gl.glCreateShader(GL.GL_FRAGMENT_SHADER);
-		gl.glShaderSource(GlGeometryViewer.fragmentShader, lines.length, lines, lengths, 0);
-		gl.glCompileShader(GlGeometryViewer.fragmentShader);
+		fragmentShader = gl.glCreateShader(GL.GL_FRAGMENT_SHADER);
+		gl.glShaderSource(fragmentShader, lines.length, lines, lengths, 0);
+		gl.glCompileShader(fragmentShader);
 
 		if (this.do_glFinishInShaders)
 			gl.glFinish();
@@ -2292,10 +2193,10 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		    gl.glFlush();
 		
 		final IntBuffer buf = BufferUtil.newIntBuffer(1);
-		gl.glGetShaderiv(GlGeometryViewer.fragmentShader, GL.GL_INFO_LOG_LENGTH, buf);
+		gl.glGetShaderiv(fragmentShader, GL.GL_INFO_LOG_LENGTH, buf);
 		int logLength = buf.get(0);
 		buf.rewind();
-		gl.glGetShaderiv(GlGeometryViewer.fragmentShader, GL.GL_COMPILE_STATUS, buf);
+		gl.glGetShaderiv(fragmentShader, GL.GL_COMPILE_STATUS, buf);
 		final int status = buf.get(0);
 /* ** DEBUGGING - output fragment shader informaiton
 		System.err.println("Fragment shader creation...");
@@ -2308,7 +2209,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 		final int[] length = new int[1];
 		final byte[] bufArray = new byte[logLength];
-		gl.glGetShaderInfoLog(GlGeometryViewer.fragmentShader, logLength, length, 0,
+		gl.glGetShaderInfoLog(fragmentShader, logLength, length, 0,
 						bufArray, 0);
 
 		final StringBuffer s = new StringBuffer();
@@ -2324,8 +2225,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			return false;
 		}
 		if (log.indexOf("software") >= 0) {
-			if (GlGeometryViewer.fragmentShader > 0) {
-				gl.glDeleteShader(GlGeometryViewer.fragmentShader);
+			if (fragmentShader > 0) {
+				gl.glDeleteShader(fragmentShader);
 			}
 			return false;
 		}
@@ -2335,11 +2236,11 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 	private boolean createShaderProgram(final GL gl, final GLU glu,
 			final GLUT glut) {
-		GlGeometryViewer.shaderProgram = gl.glCreateProgram();
-		gl.glAttachShader(GlGeometryViewer.shaderProgram, GlGeometryViewer.vertexShader);
-		gl.glAttachShader(GlGeometryViewer.shaderProgram, GlGeometryViewer.fragmentShader);
-		gl.glLinkProgram(GlGeometryViewer.shaderProgram);
-		gl.glUseProgram(GlGeometryViewer.shaderProgram);
+		shaderProgram = gl.glCreateProgram();
+		gl.glAttachShader(shaderProgram, vertexShader);
+		gl.glAttachShader(shaderProgram, fragmentShader);
+		gl.glLinkProgram(shaderProgram);
+		gl.glUseProgram(shaderProgram);
 
 		if (this.do_glFinishInShaders)
 			gl.glFinish();
@@ -2347,10 +2248,10 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		    gl.glFlush();
 		
 		final IntBuffer buf = BufferUtil.newIntBuffer(1);
-		gl.glGetProgramiv(GlGeometryViewer.shaderProgram, GL.GL_INFO_LOG_LENGTH, buf);
+		gl.glGetProgramiv(shaderProgram, GL.GL_INFO_LOG_LENGTH, buf);
 		int logLength = buf.get(0);
 		buf.rewind();
-		gl.glGetProgramiv(GlGeometryViewer.shaderProgram, GL.GL_LINK_STATUS, buf);
+		gl.glGetProgramiv(shaderProgram, GL.GL_LINK_STATUS, buf);
 		final int status = buf.get(0);
 /* ** DEBUGGING - output shader program information
 		System.err.println("Shader program creation...");
@@ -2364,7 +2265,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		final int[] length = new int[1];
 		final byte[] bufArray = new byte[logLength];
 		gl
-				.glGetProgramInfoLog(GlGeometryViewer.shaderProgram, logLength, length, 0,
+				.glGetProgramInfoLog(shaderProgram, logLength, length, 0,
 						bufArray, 0);
 
 		final StringBuffer s = new StringBuffer();
@@ -2380,8 +2281,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			return false;
 		}
 		if (log.indexOf("software") >= 0) {
-			if (GlGeometryViewer.shaderProgram > 0) {
-				gl.glDeleteProgram(GlGeometryViewer.shaderProgram);
+			if (shaderProgram > 0) {
+				gl.glDeleteProgram(shaderProgram);
 			}
 			return false;
 		}

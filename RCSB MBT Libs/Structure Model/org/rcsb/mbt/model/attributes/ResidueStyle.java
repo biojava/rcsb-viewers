@@ -58,6 +58,7 @@ package org.rcsb.mbt.model.attributes;
 
 
 import org.rcsb.mbt.model.*;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 
 /**
@@ -79,7 +80,6 @@ public class ResidueStyle
 	 *  ResidueColor defines the color applied to each end of a residue.
 	 */
 	private IResidueColor residueColor = ResidueColorRegistry.getDefault( );
-	public static int PROPERTY_COLOR = 1;
 
 
 	//
@@ -194,9 +194,9 @@ public class ResidueStyle
 	 * @throws
 	 */
 	
-	public final boolean isTypeSafe( final String scType )
+	public final boolean isTypeSafe( final ComponentType scType )
 	{
-		return (scType == StructureComponentRegistry.TYPE_RESIDUE);
+		return (scType == ComponentType.RESIDUE);
 	}
 
 

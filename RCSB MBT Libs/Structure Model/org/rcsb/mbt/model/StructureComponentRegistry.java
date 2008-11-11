@@ -112,159 +112,55 @@ import java.util.Hashtable;
  */
 public class StructureComponentRegistry
 {
-	// The StructureComponent types.
-	private static final Hashtable<String, String> types = new Hashtable<String, String>();
-
 	// The StructureComponent relations.
-	private static final Hashtable<String, StructureComponentRelation> relations = new Hashtable<String, StructureComponentRelation>();
+	private static final Hashtable<String, StructureComponentRelation> relations =
+		new Hashtable<String, StructureComponentRelation>();
 
 	//
 	// TYPE_ field values
 	//
 
-	/**
-	 *  This is a static convenience field provided so that user code does
-	 *  not have to create a local variable name to store a cached type.
-	 */
-    public static final String TYPE_STRUCTURE = null;
-
-	/**
-	 *  This is a static convenience field provided so that user code does
-	 *  not have to create a local variable name to store a cached type.
-	 */
-	public static final String TYPE_CHAIN;
-
-	/**
-	 *  Secondary structure conformation for a Coil.
-	 *  This is a static convenience field provided so that user code does
-	 *  not have to create a local variable name to store a cached type.
-	 */
-	public static final String TYPE_COIL;
-
-	/**
-	 *  Secondary structure conformation for a Helix.
-	 *  This is a static convenience field provided so that user code does
-	 *  not have to create a local variable name to store a cached type.
-	 */
-	public static final String TYPE_HELIX;
-
-	/**
-	 *  Secondary structure conformation for a Strand.
-	 *  This is a static convenience field provided so that user code does
-	 *  not have to create a local variable name to store a cached type.
-	 */
-	public static final String TYPE_STRAND;
-
-	/**
-	 *  Secondary structure conformation for a Turn.
-	 *  This is a static convenience field provided so that user code does
-	 *  not have to create a local variable name to store a cached type.
-	 */
-	public static final String TYPE_TURN;
-
-	/**
-	 *  This is a static convenience field provided so that user code does
-	 *  not have to create a local variable name to store a cached type.
-	 */
-	public static final String TYPE_RESIDUE;
-
-	/**
-	 *  This is a static convenience field provided so that user code does
-	 *  not have to create a local variable name to store a cached type.
-	 */
-	public static final String TYPE_FRAGMENT;
-
-	/**
-	 *  This is a static convenience field provided so that user code does
-	 *  not have to create a local variable name to store a cached type.
-	 */
-	public static final String TYPE_ATOM;
-
-	/**
-	 *  This is a static convenience field provided so that user code does
-	 *  not have to create a local variable name to store a cached type.
-	 */
-	public static final String TYPE_BOND;
-
-	/**
-	 *  This is a static convenience field provided so that user code does
-	 *  not have to create a local variable name to store a cached type.
-	 */
-	public static final String TYPE_MODEL = null;
-
-	/**
-	 *  This is a static convenience field provided so that user code does
-	 *  not have to create a local variable name to store a cached type.
-	 */
-	public static final String TYPE_ACTIVE_SITE = null;
-
-	/**
-	 *  This is a static convenience field provided so that user code does
-	 *  not have to create a local variable name to store a cached type.
-	 */
-	public static final String TYPE_POLYMER = null;
-
-	/**
-	 *  This is a static convenience field provided so that user code does
-	 *  not have to create a local variable name to store a cached type.
-	 */
-	public static final String TYPE_NONPOLYMER = null;
-
-	/**
-	 *  This is a static convenience field provided so that user code does
-	 *  not have to create a local variable name to store a cached type.
-	 */
-	public static final String TYPE_DISULPHIDE = null;
-
-	/**
-	 *  This is a static convenience field provided so that user code does
-	 *  not have to create a local variable name to store a cached type.
-	 */
-	public static final String TYPE_SALT_BRIDGE = null;
+	public enum ComponentType
+	{
+		NONE,
+    	STRUCTURE,
+		CHAIN,
+		COIL,
+		HELIX,
+		STRAND,
+		TURN,
+		UNDEFINED_CONFORMATION,
+		RESIDUE,
+		FRAGMENT,
+		ATOM,
+		BOND,
+		MODEL,
+		SYMMETRY,
+		SURFACE,
+		ACTIVE_SITE,
+		POLYMER,
+		NONPOLYMER,
+		DISULPHIDE,
+		SALT_BRIDGE,
+		RELATION_CONFORMATION_ATOMS,
+		EXTENDED;
+		
+		public boolean isConformationType() { return this.ordinal() >= COIL.ordinal() &&
+											  ordinal() < UNDEFINED_CONFORMATION.ordinal(); }
+	}
 
 	//
 	// RELATION_ field values
 	//
 
-	/**
-	 *  This is a static convenience field provided so that user code does
-	 *  not have to create a local variable name to store a cached relation.
-	 */
-	public static final String RELATION_CONFORMATION_ATOMS;
 
 	// Since this is a static class, do initialization in a static block:
-	static
-	{
-		//
-		// Add the well-known StructureComponent types.
-		//
-
-		// addType( TYPE_STRUCTURE = Structure.getClassName() );
-		StructureComponentRegistry.addType( TYPE_ATOM = Atom.getClassName() );
-		StructureComponentRegistry.addType( TYPE_BOND = Bond.getClassName() );
-		StructureComponentRegistry.addType( TYPE_RESIDUE = Residue.getClassName() );
-		StructureComponentRegistry.addType( TYPE_FRAGMENT = Fragment.getClassName() );
-		StructureComponentRegistry.addType( TYPE_CHAIN = Chain.getClassName() );
-		StructureComponentRegistry.addType( TYPE_COIL = Coil.getClassName() );
-		StructureComponentRegistry.addType( TYPE_HELIX = Helix.getClassName() );
-		StructureComponentRegistry.addType( TYPE_STRAND = Strand.getClassName() );
-		StructureComponentRegistry.addType( TYPE_TURN = Turn.getClassName() );
-		// Add other StructureComponent types as they're implemented...
-		// addType( TYPE_MODEL = Model.getClassName() );
-		// addType( TYPE_SALT_BRIDGE = SaltBridge.getClassName() );
-		// addType( TYPE_DISULPHIDE = Disulphide.getClassName() );
-		// addType( TYPE_NON_POLYMER = NonPolymer.getClassName() );
-		// addType( TYPE_POLYMER = Polymer.getClassName() );
-		// addType( TYPE_ACTIVE_SITE = ActiveSite.getClassName() );
-
+    static
+    {
 		//
 		// Add the well-known StructureComponent relations.
 		//
-
-		StructureComponentRelation relation;
-
-		StructureComponentRegistry.addRelation( relation = new Relation_Conformation_Atom() );
-		RELATION_CONFORMATION_ATOMS = relation.getName();
+		StructureComponentRegistry.addRelation( new Relation_Conformation_Atom() );
 
 		// Add other StructureComponent relations as they're implemented...
 	}
@@ -278,46 +174,7 @@ public class StructureComponentRegistry
 	 */
 	public static int getTypeCount()
 	{
-		return StructureComponentRegistry.types.size();
-	}
-
-	/**
-	 *  Register a new StructureComponent type.
-	 */
-	public static void addType( final String name )
-	{
-		// System.err.println( "StructureComponentRegistry.addType: name = " + name );
-		StructureComponentRegistry.types.put( name, name );
-	}
-
-	/**
-	 *  Un-register an existing StructureComponent type.
-	 */
-	public static void removeType( final String name )
-	{
-		StructureComponentRegistry.types.remove( name );
-	}
-
-	/**
-	 *  Get an existing StructureComponent type name for the given String.
-	 *  Note that while the "name" parameter may contain the same characters,
-	 *  the returned String object is the actual registered String instance.
-	 *  This enables fast "==" comparisons throughout the toolkit.
-	 *  This method is also handy to check whether a type is registered,
-	 *  since a "null" value is returned if it is not registered.
-	 */
-	public static String getTypeName( final String name )
-	{
-		return (String) StructureComponentRegistry.types.get( name );
-	}
-
-	/**
-	 *  Return an Enumeration of String values for all registered
-	 *  StructureComponent types.
-	 */
-	public static Enumeration<String> getTypeNames( )
-	{
-		return StructureComponentRegistry.types.keys( );
+		return ComponentType.values().length;
 	}
 
 	//

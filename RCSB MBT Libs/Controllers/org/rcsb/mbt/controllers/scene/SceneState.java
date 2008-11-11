@@ -33,6 +33,7 @@ import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
 import org.rcsb.mbt.glscene.jogl.Geometry;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
+import org.rcsb.mbt.glscene.jogl.ChainGeometry.RibbonForm;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -42,6 +43,7 @@ import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.AtomColorByBFactor;
 import org.rcsb.mbt.model.attributes.AtomColorByElement;
 import org.rcsb.mbt.model.attributes.AtomColorByRandom;
@@ -485,9 +487,9 @@ public class SceneState
 				}
 			}
 			
-			public HashMap<Integer, TreeBelowForm> byForm = new HashMap<Integer, TreeBelowForm>();	// key: Integer form. value: TreeBelowForm.
+			public HashMap<RibbonForm, TreeBelowForm> byForm = new HashMap<RibbonForm, TreeBelowForm>();	// key: Integer form. value: TreeBelowForm.
 			
-			public TreeBelowForm getSubtree(final Integer form) {
+			public TreeBelowForm getSubtree(final RibbonForm form) {
 				TreeBelowForm subtree = (TreeBelowForm)byForm.get(form);
 				if(subtree == null) {
 					subtree = new TreeBelowForm();
@@ -499,11 +501,11 @@ public class SceneState
 			
 			public void appendEntries(final Vector entries, final Entry sampleEntry)
 			{
-				for (Integer form : byForm.keySet())
+				for (RibbonForm form : byForm.keySet())
 				{
 					final TreeBelowForm subtree = byForm.get(form);
 					
-					sampleEntry.geometryForm = form.intValue();
+					sampleEntry.geometryForm = form;
 					
 					subtree.appendEntries(entries, sampleEntry);
 				}
@@ -651,7 +653,7 @@ public class SceneState
 			public int[] range = null;
 			public Class residueColorClass = null;
 			public float[] rgb = null;	// used only when residueColor == ResidueColorByRgb.class.
-			public int geometryForm = -1;
+			public RibbonForm geometryForm = null;
 			public float geometryQuality = -1;
 			public Class residueLabelClass = null;
 			public String customLabel = null;	// used when residueLabelClass == ResidueLabelCustom.class.
@@ -860,15 +862,15 @@ public class SceneState
 		JoglSceneNode.RenderablesMap renderables = node.getRenderablesMap();
 		for (StructureComponent sc : renderables.keySet())
 		{			
-			if(sc.getStructureComponentType() == StructureComponentRegistry.TYPE_ATOM) {
+			if(sc.getStructureComponentType() == ComponentType.ATOM) {
 				final Atom a = (Atom)sc;
 				final int atomIndex = sm.getAtomIndex(a);
 				atoms.addValue(atomIndex);
-//			} else if(sc.getStructureComponentType() == StructureComponentRegistry.TYPE_BOND) {
+//			} else if(sc.getStructureComponentType() == ComponentType.BOND) {
 //				Bond b = (Bond)sc;
 //				int bondIndex = sm.getBondIndex(b);
 //				bonds.addValue(bondIndex);
-			} else if(sc.getStructureComponentType() == StructureComponentRegistry.TYPE_CHAIN) {
+			} else if(sc.getStructureComponentType() == ComponentType.CHAIN) {
 				chains.add(sc);
 			}
 		}
@@ -965,7 +967,7 @@ public class SceneState
 		{
 			final DisplayListRenderable renderable = renderables.get(sc);
 			
-			if(sc.getStructureComponentType() == StructureComponentRegistry.TYPE_ATOM) {
+			if(sc.getStructureComponentType() == ComponentType.ATOM) {
 				final Atom a = (Atom)sc;
 				final AtomStyle style = (AtomStyle)renderable.style;
 				final AtomGeometry geometry = (AtomGeometry)renderable.geometry;
@@ -975,9 +977,9 @@ public class SceneState
 				final AtomStyleMap.TreeBelowColors.TreeBelowLabel.TreeBelowRadius.TreeBelowForm formSubtree = radiusSubtree.getSubtree(new Integer(geometry.getForm()));
 				final RangeMap2 indices = formSubtree.getSubtree(new Float(geometry.getQuality()));
 				indices.addValue(sm.getAtomIndex(a));
-			} else if(sc.getStructureComponentType() == StructureComponentRegistry.TYPE_BOND) {
+			} else if(sc.getStructureComponentType() == ComponentType.BOND) {
 				// don't record bond styles...
-			} else if(sc.getStructureComponentType() == StructureComponentRegistry.TYPE_CHAIN) {
+			} else if(sc.getStructureComponentType() == ComponentType.CHAIN) {
 				final Chain c = (Chain)sc;
 				final ChainStyle style = (ChainStyle)renderable.style;
 				final ChainGeometry geometry = (ChainGeometry)renderable.geometry;
@@ -988,7 +990,7 @@ public class SceneState
 //					if(ss.isVisible(r)) {
 						final ResidueStyleMap.TreeBelowColors colorSubtree = residueStyleMap.getSubtree(style.getResidueColor(), r);
 						if(colorSubtree != null) {
-							final ResidueStyleMap.TreeBelowColors.TreeBelowForm formSubtree = colorSubtree.getSubtree(new Integer(geometry.getRibbonForm()));
+							final ResidueStyleMap.TreeBelowColors.TreeBelowForm formSubtree = colorSubtree.getSubtree(geometry.getRibbonForm());
 							if(formSubtree != null) {
 								final ResidueStyleMap.TreeBelowColors.TreeBelowForm.TreeBelowQuality qualitySubtree = formSubtree.getSubtree(new Float(geometry.getQuality()));
 								if(qualitySubtree != null) {
@@ -1089,15 +1091,8 @@ public class SceneState
 			
 			geometryClassElement.setAttribute("type", ChainGeometry.class.getName());
 			ribbonFormElement.setAttribute("name", "ribbonForm");
-			String formString = null;
-			if(entry.geometryForm == ChainGeometry.RIBBON_CYLINDRICAL_HELICES) {
-				formString = "RIBBON_CYLINDRICAL_HELICES";
-			} else if(entry.geometryForm == ChainGeometry.RIBBON_SIMPLE_LINE) {
-				formString = "RIBBON_SIMPLE_LINE";
-			} else if(entry.geometryForm == ChainGeometry.RIBBON_TRADITIONAL) {
-				formString = "RIBBON_TRADITIONAL";
-			}
-			ribbonFormElement.setAttribute("value", formString);
+
+			ribbonFormElement.setAttribute("value", entry.geometryForm.toString());
 			
 			// all residues have a ResidueLabelCustom class associated with them. Only put a label if there is one.
 			if(entry.residueLabelClass != ResidueLabelCustom.class || (entry.customLabel != null && entry.customLabel.length() != 0)) {
@@ -1244,7 +1239,7 @@ public class SceneState
 					{
 						final DisplayListRenderable renderable = renderables.get(comp);
 						
-						if(comp.getStructureComponentType() == StructureComponentRegistry.TYPE_ATOM)
+						if(comp.getStructureComponentType() == ComponentType.ATOM)
 						{
 							final Atom a = (Atom)comp;
 							if(visibleAtoms.remove(a) != exists)
@@ -1255,7 +1250,7 @@ public class SceneState
 							
 						}
 						
-						else if(comp.getStructureComponentType() == StructureComponentRegistry.TYPE_BOND)
+						else if(comp.getStructureComponentType() == ComponentType.BOND)
 						{
 							final Bond b = (Bond)comp;
 							if (visibleBonds.remove(b) != exists)
@@ -1265,7 +1260,7 @@ public class SceneState
 							}
 						}
 						
-						else if(comp.getStructureComponentType() == StructureComponentRegistry.TYPE_CHAIN)
+						else if(comp.getStructureComponentType() == ComponentType.CHAIN)
 						{
 							final Chain c = (Chain)comp;
 							
@@ -1723,24 +1718,15 @@ public class SceneState
 								}
 								
 								if(name.equals("ribbonForm")) {
-									int form = -1;
-									
-									if(value.equals("RIBBON_CYLINDRICAL_HELICES")) {
-										form = ChainGeometry.RIBBON_CYLINDRICAL_HELICES;
-									} else if(value.equals("RIBBON_SIMPLE_LINE")) {
-										form = ChainGeometry.RIBBON_SIMPLE_LINE;
-									} else if(value.equals("RIBBON_TRADITIONAL")) {
-										form = ChainGeometry.RIBBON_TRADITIONAL;
-									} else {
-										continue;
-									}
+									RibbonForm form = RibbonForm.valueOf(value);
+									if (form == null) continue;
 									
 									for (Chain c : uniqueChains.keySet())
 									{
 										final DisplayListRenderable renderable = renderables.get(c);
 										final ChainGeometry geom = (ChainGeometry)renderable.geometry;
 										
-										final int oldForm = geom.getRibbonForm();
+										final RibbonForm oldForm = geom.getRibbonForm();
 										boolean oldRibbonsSmoothed = geom.isRibbonsAreSmoothed();
 										geom.setRibbonForm(form);
 										geom.setRibbonsAreSmoothed(true);

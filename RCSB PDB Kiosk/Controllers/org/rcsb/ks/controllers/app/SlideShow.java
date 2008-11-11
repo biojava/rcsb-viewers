@@ -21,7 +21,7 @@ import org.rcsb.ks.model.AnnotatedAtom;
 import org.rcsb.ks.model.EntityDescriptor;
 import org.rcsb.ks.model.KSStructureInfo;
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.PickLevel;
+import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Atom;
@@ -38,6 +38,7 @@ import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.attributes.IResidueColor;
 import org.rcsb.mbt.model.attributes.ResidueColorByRgb;
 import org.rcsb.mbt.model.attributes.StructureStyles;
+import org.rcsb.mbt.model.util.DebugState;
 
 /*
  * Set up a thread to run a slide show.  Collects all the filenames from a directory
@@ -267,7 +268,7 @@ public class SlideShow extends Thread
 
  				state.enact();
 
- 				if (AppBase.isDebug())
+ 				if (DebugState.isDebug())
  					System.out.println ( "Slideshow awake: enacting " + state.toString());
 				// {{ check to make sure the thread is not suspended by calling
 				// suspendThread }}
@@ -281,7 +282,7 @@ public class SlideShow extends Thread
 						
 						catch (InterruptedException _ie)
 						{
-							if (AppBase.isDebug())
+							if (DebugState.isDebug())
 								System.err.println("Slideshow interrupted.");
 						}
 					}
@@ -298,7 +299,7 @@ public class SlideShow extends Thread
 				
 				catch (Exception _e)
 				{
-					if (AppBase.isDebug())
+					if (DebugState.isDebug())
 						System.err.println("Exception: Slideshow waken up from sleep?");
 				}
 /* **/
@@ -381,7 +382,7 @@ public class SlideShow extends Thread
 		
 /* **
 // uncomment if you want only the pivot states generated.
-		if (AppBase.isDebug())
+		if (DebugState.isDebug())
 			return(statelist);
 * **/
 
@@ -524,9 +525,10 @@ public class SlideShow extends Thread
 		StructureMap sm = struc.getStructureMap();
 		StructureStyles ss = sm.getStructureStyles();
 
-		switch (PickLevel.pickLevel)
+		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+		switch (pickLevel)
 		{
-		case PickLevel.COMPONENTS_ATOMS_BONDS:
+		case ATOMS:
 			Vector<Atom> atoms = r.getAtoms();
 
 			for (Atom a : atoms)
@@ -537,7 +539,7 @@ public class SlideShow extends Thread
 			break;
 			
 		default:
-		case PickLevel.COMPONENTS_RIBBONS:
+		case RIBBONS:
 			Chain c = sm.getChain(r.getChainId());
 			
 			DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(c);
@@ -577,9 +579,10 @@ public class SlideShow extends Thread
 		StructureStyles ss = sm.getStructureStyles();
 		JoglSceneNode sn = (JoglSceneNode)sm.getUData();
 
-		switch (PickLevel.pickLevel)
+		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+		switch (pickLevel)
 		{
-		case PickLevel.COMPONENTS_ATOMS_BONDS:
+		case ATOMS:
 			// this.options.getCurrentColor().getColorComponents(colorFl);
 
 			DisplayListRenderable renderable = sn.getRenderable(a);
@@ -598,13 +601,13 @@ public class SlideShow extends Thread
 			}
 			break;
 			
-		case PickLevel.COMPONENTS_RIBBONS:
+		case RIBBONS:
 			Residue r = sm.getResidue(a);
 			changeColor(r.getFragment(), _color);
 			break;
 			
 		default:
-			(new Exception()).printStackTrace();
+            (new Exception("Invalid option: " + pickLevel)).printStackTrace();            
 		}
 	}
 
@@ -613,15 +616,16 @@ public class SlideShow extends Thread
 		Structure struc = b.structure;
 		StructureMap sm = struc.getStructureMap();
 
-		switch (PickLevel.pickLevel)
+		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+		switch (pickLevel)
 		{
-		case PickLevel.COMPONENTS_ATOMS_BONDS:
+		case ATOMS:
 			// delegate to atoms...
 			this.changeColor(b.getAtom(0), _color);
 			this.changeColor(b.getAtom(1), _color);
 			break;
 			
-		case PickLevel.COMPONENTS_RIBBONS:
+		case RIBBONS:
 			// even if this is between fragments, just change one of them
 			// arbitrarily.
 			Residue r = sm.getResidue(b.getAtom(0));
@@ -629,7 +633,7 @@ public class SlideShow extends Thread
 			break;
 			
 		default:
-			(new Exception()).printStackTrace();
+            (new Exception("Invalid option: " + pickLevel)).printStackTrace();            
 		}
 	}
 
@@ -749,13 +753,13 @@ public class SlideShow extends Thread
 			
 			catch (Exception _ee)
 			{
-				if (AppBase.isDebug())
+				if (DebugState.isDebug())
 					System.err.println("Exception: Error trying to add pivot state to state list.");
 			}
 			
 /* ** 
 // XXX_DEBUG - uncomment if you want to return after single state generated.
-			if (AppBase.isDebug())
+			if (DebugState.isDebug())
 				return;
 * **/
 		}

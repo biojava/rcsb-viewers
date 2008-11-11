@@ -108,8 +108,8 @@
 package org.rcsb.mbt.model;
 
 
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.geometry.Algebra;
-import org.rcsb.mbt.model.util.*;
 
 
 /**
@@ -124,21 +124,24 @@ public class Bond
 	extends StructureComponent
 	implements java.lang.Cloneable
 {
+	public enum BondType
+	{
 	/**
 	 * Type for a covalent bond (bonding interaction due to electron sharing).
 	 */
-	public static final String TYPE_COVALENT = "Covalent";
+		COVALENT,
 
 	/**
 	 * Type for a hydrogen bond (bonding interaction due to partial charges).
 	 */
-	public static final String TYPE_HYDROGEN = "Hydrogen";
+		HYDROGEN,
 
 	/**
 	 * Type for an ionic bond (bonding interaction due to electrostatic
 	 * attraction between cations and anions).
 	 */
-	public static final String TYPE_IONIC = "Ionic";
+		IONIC
+	}
 
 
 	// The two atoms forming the bond.
@@ -147,6 +150,12 @@ public class Bond
 	// The order of the bond (how many electron pairs are shared).
 	private float order = 0.0f;
 
+/* **/
+			// XXX_DEBUG - comment this out (and the code that sets/accesses it)
+			// for normal deployment (could use a pre-processor, here...)
+	
+	public boolean isCalculated = false;
+/* **/
 
 	//
 	// Constructors
@@ -179,6 +188,7 @@ public class Bond
 	/**
 	 *  Copy all of the field values from the parameter object into "this".
 	 */
+	@Override
 	public void copy( final StructureComponent structureComponent )
 	{
 		this.setStructure( structureComponent.getStructure() );
@@ -191,6 +201,7 @@ public class Bond
 	/**
 	 *  Clone this object.
 	 */
+	@Override
 	public Object clone( )
 		throws CloneNotSupportedException
 	{
@@ -202,6 +213,7 @@ public class Bond
 	 *  One Bond is equal to another Bond if they hashCode values are equal.
 	 *  That is if they contain (in either order) the same two Atom objects.
 	 */
+	@Override
 	public boolean equals( final Object o )
 	{
 		if ( ! (o instanceof Bond) ) {
@@ -239,9 +251,10 @@ public class Bond
 	/**
 	 *  This method returns the fully qualified name of this class.
 	 */
-	public String getStructureComponentType( )
+	@Override
+	public ComponentType getStructureComponentType( )
 	{
-		return Bond.className;
+		return ComponentType.BOND;
 	}
 
 	//
@@ -252,7 +265,7 @@ public class Bond
 	 * Get the type of bond (ie: covalent or hydrogen)
 	 * based upon atom distances and element types.
 	 */
-	public String getBondType( )
+	public BondType getBondType( )
 	{
 		if ( this.atoms == null ) {
 			return null;
@@ -269,23 +282,23 @@ public class Bond
 
 		// If both atoms are hydrogens then it has to be a hydrogen bond.
 		if ( a0Hydrogen && a1Hydrogen ) {
-			return Bond.TYPE_HYDROGEN;
+			return BondType.HYDROGEN;
 		}
 
 		// If neither atoms are hydrogen then it can't be a hydrogen bond
 		if ( (! a0Hydrogen) && (! a1Hydrogen) )
 		{
 			// JLM DEBUG: it could be a covalent OR ionic bond (need a check)!
-			return Bond.TYPE_COVALENT;
+			return BondType.COVALENT;
 		}
 
 		// Exactly one of the atoms is a hydrogen.
 
 		// JLM DEBUG: Hmmm, is this rule always true?
 		if ( this.atoms[0].residue_id == this.atoms[1].residue_id ) {
-			return Bond.TYPE_COVALENT; // Bond atoms are in the same compound
+			return BondType.COVALENT; // Bond atoms are in the same compound
 		} else {
-			return Bond.TYPE_HYDROGEN; // Bond atoms are in different compounds
+			return BondType.HYDROGEN; // Bond atoms are in different compounds
 		}
 	}
 

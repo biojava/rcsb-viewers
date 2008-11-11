@@ -6,12 +6,13 @@ import java.net.URL;
 import java.util.Properties;
 
 import org.rcsb.mbt.controllers.doc.DocController;
+import org.rcsb.mbt.controllers.scene.PickController;
 import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.controllers.update.UpdateController;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.StructureModel;
-import org.rcsb.mbt.structLoader.IStructureLoader;
+import org.rcsb.mbt.model.util.DebugState;
 import org.rcsb.mbt.structLoader.StructureXMLHandler;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 
@@ -82,6 +83,7 @@ public abstract class AppBase
 		public DocController createDocController() { return new DocController(); }
 		public UpdateController createUpdateController() { return new UpdateController(); }
 		public SceneController createSceneController() { return new SceneController(); }
+		public PickController createPickController() { return new PickController(); }
 		public StructureModel createModel() { return new StructureModel(); }
 		public GlGeometryViewer createGlGeometryViewer() { return new GlGeometryViewer(); }
 		public JoglSceneNode createSceneNode() { return new JoglSceneNode(); }
@@ -112,6 +114,7 @@ public abstract class AppBase
 	public static SceneController sgetSceneController() { return sgetActiveFrame().getSceneController(); }
 	public static GlGeometryViewer sgetGlGeometryViewer() { return sgetActiveFrame().getGlGeometryViewer(); }
 	public static StructureModel sgetModel() { return sgetActiveFrame().getModel(); }
+	public static PickController sgetPickController() { return sgetActiveFrame().getPickController(); }
 	public DocumentFrameBase getActiveFrame() { return activeFrame; }
 
 	
@@ -128,12 +131,6 @@ public abstract class AppBase
 	 */
 	public boolean isSimpleViewer() { return false; }
 	public boolean isLigandExplorer () { return false; }
-	
-	public static boolean isDebug()
-	{
-		String debugVal = (String)getApp().properties.get("debug");
-		return debugVal != null && debugVal.equalsIgnoreCase("true");
-	}
 	
 	/**
 	 * The singleton app
@@ -172,19 +169,17 @@ public abstract class AppBase
 	public AppBase(String args[])
 	{
 		super();
-		boolean isDebug = false;
 		
 		if (args != null)
 			for (int i = 0; i < args.length; i++)
 			{
-				isDebug = args[i].equals("-debug");
-				if (isDebug)
-					properties.setProperty("debug", "true");
+				if (args[i].equals("-debug"))
+					DebugState.setDebugState(true);
 			}
 		
 		_theJApp = this;
 		
-		if (isDebug)
+		if (DebugState.isDebug())
 			System.err.println("-->AppBase - Free memory: " +
 					Runtime.getRuntime().freeMemory());
 	}

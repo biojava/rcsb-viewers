@@ -1,5 +1,6 @@
 package org.rcsb.mbt.glscene.surfaces;
 
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.Style;
 
 public class SurfaceStyle extends Style {
@@ -9,7 +10,7 @@ public class SurfaceStyle extends Style {
 	}
 
 	
-	public boolean isTypeSafe(final String scType) {
+	public boolean isTypeSafe(final ComponentType scType) {
 		return true;
 	}
 

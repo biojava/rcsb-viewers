@@ -2,8 +2,8 @@ package org.rcsb.mbt.controllers.update;
 
 import java.util.Vector;
 
-import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.Structure;
+import org.rcsb.mbt.model.util.DebugState;
 
 
 /**
@@ -227,10 +227,8 @@ public class UpdateController
 			inUpdate = 0;
 							// no lower than zero
 		
-		if (AppBase.isDebug() && evt.action == UpdateEvent.Action.CLEAR_ALL && inUpdate == 0)
+		if (DebugState.isDebug() && evt.action == UpdateEvent.Action.CLEAR_ALL && inUpdate == 0)
 		{
-			System.gc();
-			System.gc();
 			System.gc();
 			System.err.println("Update CLEAR_ALL sent.  Memory Used: " + 
 					(Runtime.getRuntime().maxMemory() - Runtime.getRuntime().freeMemory()));

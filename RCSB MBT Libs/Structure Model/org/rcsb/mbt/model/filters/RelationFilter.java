@@ -62,6 +62,7 @@ package org.rcsb.mbt.model.filters;
 
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureComponentRelation;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 
 /**
@@ -101,7 +102,7 @@ public class RelationFilter
 	/**
 	 *  Return the StructureComponentRegistry type for returned object types.
 	 */
-	public String type( )
+	public ComponentType type( )
 	{
 		return this.relation.getObjectType();
 	}

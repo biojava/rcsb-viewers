@@ -96,6 +96,8 @@
 
 package org.rcsb.mbt.model;
 
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+
 
 /**
  *  Implements a StructureComponent container for atom data.
@@ -182,9 +184,9 @@ public class Atom
 	/**
 	 *  This method returns the fully qualified name of this class.
 	 */
-	public String getStructureComponentType( )
+	public ComponentType getStructureComponentType( )
 	{
-		return Atom.getClassName();
+		return ComponentType.ATOM;
 	}
 
 	//

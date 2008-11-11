@@ -217,10 +217,10 @@ public class PeriodicTable
 		new Element( "Ununoctium", "Uuo", 118, 0.0, 0, "-", -1, PeriodicTable.PBLOCK )
 	};
 
-	private static Hashtable symbolToElementHash = null;
+	private static Hashtable<String, Element> symbolToElementHash = null;
 	static
 	{
-		PeriodicTable.symbolToElementHash = new Hashtable( );
+		PeriodicTable.symbolToElementHash = new Hashtable<String, Element>( );
 		for ( int i=0; i<PeriodicTable.elements.length; i++ )
 		{
 			// Mixed case

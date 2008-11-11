@@ -69,6 +69,7 @@ package org.rcsb.mbt.model.filters;
 
 
 import org.rcsb.mbt.model.StructureComponent;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 
 /**
@@ -114,7 +115,7 @@ public interface IStructureComponentFilter
 	 *  and return. See the StructureComponentRegistry class for valid TYPE
 	 *  values.
 	 */
-	public String type( );
+	public ComponentType type( );
 
 	/**
 	 *  Return the StructureComponent type that this filter will match

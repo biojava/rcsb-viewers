@@ -22,6 +22,7 @@ import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.geometry.Algebra;
+import org.rcsb.mbt.model.util.DebugState;
 
 import com.sun.opengl.util.GLUT;
 
@@ -482,7 +483,7 @@ public class LXSceneNode extends JoglSceneNode
 			}
 		} catch (Exception e)
 		{
-			if (AppBase.isDebug())
+			if (DebugState.isDebug())
 				e.printStackTrace();
 		}
 
@@ -637,7 +638,7 @@ public class LXSceneNode extends JoglSceneNode
 					gl.glCallList(list);
 				} catch (Exception e)
 				{
-					if (AppBase.isDebug())
+					if (DebugState.isDebug())
 						e.printStackTrace();
 				}
 				gl.glPopMatrix();

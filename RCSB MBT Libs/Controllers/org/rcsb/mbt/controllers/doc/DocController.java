@@ -14,6 +14,7 @@ import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.util.DebugState;
 import org.rcsb.mbt.model.util.Status;
 import org.rcsb.mbt.structLoader.IFileStructureLoader;
 import org.rcsb.mbt.structLoader.IStructureLoader;
@@ -157,7 +158,7 @@ public class DocController
 			structures[i].getStructureMap().setImmutable();
 		}
 		
-		if (AppBase.isDebug())
+		if (DebugState.isDebug())
 			System.err.println("--> DocController: Memory used: " +
 					(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
 	

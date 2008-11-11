@@ -107,6 +107,8 @@ package org.rcsb.mbt.model;
 
 import java.util.*;
 
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+
 
 /**
  *  Implements a StructureComponent container for secondary structure fragment
@@ -132,7 +134,7 @@ public class Fragment
 	private int endResidueIndex = -1;
 
 	// The secondary structure conformation type assigned to this Fragment.
-	private String conformationType = Conformation.TYPE_UNDEFINED;
+	private ComponentType conformationType = ComponentType.UNDEFINED_CONFORMATION;
 
 	//
 	// Constructors
@@ -144,7 +146,7 @@ public class Fragment
 	 * The Residue index is a Chain-level index (not a Structure-level index).
 	 * This is protected because only Chain can manage Fragments.
 	 */
-	protected Fragment( final int startResidueIndex, final int endResidueIndex, final String conformationType )
+	protected Fragment( final int startResidueIndex, final int endResidueIndex, final ComponentType conformationType )
 	{
 		this.startResidueIndex = startResidueIndex;
 		this.endResidueIndex = endResidueIndex;
@@ -159,7 +161,7 @@ public class Fragment
 	{
 		this.startResidueIndex = -1;
 		this.endResidueIndex = -1;
-		this.conformationType = Conformation.TYPE_UNDEFINED;
+		this.conformationType = ComponentType.UNDEFINED_CONFORMATION;
 	}
 
 	/**
@@ -228,9 +230,9 @@ public class Fragment
 	 *  This method returns the fully qualified name of this class.
 	 */
 	
-	public String getStructureComponentType( )
+	public ComponentType getStructureComponentType( )
 	{
-		return Fragment.className;
+		return ComponentType.FRAGMENT;
 	}
 
 
@@ -337,7 +339,7 @@ public class Fragment
 	/**
 	 * Set the Conformation type for this Fragment.
 	 */
-	public void setConformationType( final String conformationType )
+	public void setConformationType( final ComponentType conformationType )
 	{
 		this.conformationType = conformationType;
 	}
@@ -345,7 +347,7 @@ public class Fragment
 	/**
 	 * Get the Conformation type for this Fragment.
 	 */
-	public String getConformationType( )
+	public ComponentType getConformationType( )
 	{
 		return this.conformationType;
 	}

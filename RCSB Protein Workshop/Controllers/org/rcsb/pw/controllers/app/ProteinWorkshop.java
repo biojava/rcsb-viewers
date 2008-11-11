@@ -8,10 +8,11 @@ import javax.swing.SwingUtilities;
 
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.app.ProgressPanelController;
+import org.rcsb.mbt.controllers.scene.PickController;
 import org.rcsb.mbt.controllers.scene.SceneController;
+import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.StructureModel;
-import org.rcsb.mbt.model.util.PickUtils;
 import org.rcsb.mbt.model.util.Status;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 import org.rcsb.pw.controllers.scene.PWSceneController;
@@ -85,8 +86,6 @@ public class ProteinWorkshop extends VFAppBase
 													  ProteinWorkshop.class.getResource("images/icon_128_PW.png"));
 		
 		super.initialize(isApplication);
-		
-		PickUtils.setPickLevel(PickUtils.PICK_RESIDUES);
 	
 		final String structureUrlParam = this.properties.getProperty("structure_url");
 		

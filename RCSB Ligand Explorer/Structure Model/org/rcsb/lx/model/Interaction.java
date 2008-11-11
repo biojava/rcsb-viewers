@@ -1,9 +1,11 @@
 package org.rcsb.lx.model;
 
+import org.rcsb.lx.model.LXStructureComponentRegistry.LXComponentType;
 import org.rcsb.mbt.glscene.geometry.Point3d;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.LineSegment;
 import org.rcsb.mbt.model.StructureComponent;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 
 /**
@@ -23,7 +25,9 @@ public class Interaction extends LineSegment {
 	private String distance;
 	private double distanceDouble;
 	
-	public static final String componentType = "Interaction";
+	public static final ComponentType componentType = ComponentType.EXTENDED;
+	public static final LXComponentType lxComponentType = LXComponentType.INTERACTION;
+						// extended ComponentType
 
 	public Interaction(final Atom fAtom, final Atom sAtom, final String interactionType, final String distance, final double distanceDouble) {
 		super(new Point3d(fAtom.coordinate[0], fAtom.coordinate[1], fAtom.coordinate[2]),
@@ -39,7 +43,7 @@ public class Interaction extends LineSegment {
 
 	}
 	
-	public String getStructureComponentType() {
+	public ComponentType getStructureComponentType() {
 		return Interaction.componentType;
 	}
 	

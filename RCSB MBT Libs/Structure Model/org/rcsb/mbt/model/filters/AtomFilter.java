@@ -67,6 +67,7 @@ package org.rcsb.mbt.model.filters;
 
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureComponentRegistry;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 
 /**
@@ -84,9 +85,9 @@ public class AtomFilter
 	/**
 	 *  Return the StructureComponentRegistry type for the Atom object.
 	 */
-	public String type( )
+	public ComponentType type( )
 	{
-		return StructureComponentRegistry.TYPE_ATOM;
+		return ComponentType.ATOM;
 	}
 
 	/**

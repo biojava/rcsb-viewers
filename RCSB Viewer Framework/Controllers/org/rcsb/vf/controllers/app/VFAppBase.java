@@ -97,6 +97,7 @@ import java.util.Properties;
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.doc.DocController;
 import org.rcsb.mbt.controllers.scene.SceneController;
+import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.vf.controllers.doc.VFDocController;
 import org.rcsb.vf.glscene.jogl.VFGlGeometryViewer;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
@@ -259,6 +260,8 @@ public abstract class VFAppBase extends AppBase
 		
 		else
 			sceneController.setDebugEnabled(false);
+		
+		sgetPickController().setPickLevel(PickLevel.RIBBONS);
 	}
 
 

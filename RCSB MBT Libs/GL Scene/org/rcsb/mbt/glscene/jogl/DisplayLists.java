@@ -7,7 +7,6 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.glscene.surfaces.Surface;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -15,12 +14,13 @@ import org.rcsb.mbt.model.Fragment;
 import org.rcsb.mbt.model.LineSegment;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.StructureComponent;
-import org.rcsb.mbt.model.StructureComponentRegistry;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
 import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.attributes.LineStyle;
 import org.rcsb.mbt.model.attributes.StructureStyles;
+import org.rcsb.mbt.model.util.DebugState;
 
 
 import com.sun.opengl.util.BufferUtil;
@@ -114,7 +114,7 @@ public class DisplayLists
 
 	public static Color3b nextColor = DisplayLists.firstColor;
 
-	public static TreeMap uniqueColorMap = new TreeMap(); // maps names to
+	public static TreeMap<Color3b,UniqueColorMapValue> uniqueColorMap = new TreeMap<Color3b,UniqueColorMapValue>(); // maps names to
 															// arrayLists.
 
 	// public static int COLOR_DIMENSIONS = 3;
@@ -284,7 +284,7 @@ public class DisplayLists
 					.getStructureMap().getStructureStyles();
 			final GlGeometryViewer viewer = AppBase.sgetGlGeometryViewer();
 
-			if (this.structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_FRAGMENT) {
+			if (this.structureComponent.getStructureComponentType() == ComponentType.FRAGMENT) {
 				// each display list represents the corresponding residue in the
 				// fragment.
 
@@ -329,7 +329,7 @@ public class DisplayLists
 						}
 						catch (Exception e)
 						{
-							if (AppBase.isDebug())
+							if (DebugState.isDebug())
 								e.printStackTrace();
 						}
 
@@ -339,9 +339,9 @@ public class DisplayLists
 				}
 			}
 			
-			else if (this.structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_ATOM
-					|| this.structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_BOND
-					|| this.structureComponent.getStructureComponentType() == Surface.COMPONENT_TYPE
+			else if (this.structureComponent.getStructureComponentType() == ComponentType.ATOM
+					|| this.structureComponent.getStructureComponentType() == ComponentType.BOND
+					|| this.structureComponent.getStructureComponentType() == ComponentType.SURFACE
 					|| this.structureComponent instanceof LineSegment)
 							// Not a good mechanism.  Should be an overrideable query to base class or
 							// interface.
@@ -368,7 +368,7 @@ public class DisplayLists
 			}
 		} catch (Exception e)
 		{
-			if (AppBase.isDebug())
+			if (DebugState.isDebug())
 				e.printStackTrace();
 		}
 
@@ -385,7 +385,7 @@ public class DisplayLists
 //			// tempColorFloat[3] = .5f;
 //			gl.glColor3fv(DisplayLists.tempColorFloat, 0);
 //		} else 
-		if (sc.getStructureComponentType() == StructureComponentRegistry.TYPE_RESIDUE) {
+		if (sc.getStructureComponentType() == ComponentType.RESIDUE) {
 			final Residue r = (Residue) sc;
 
 			final Fragment f = (Fragment) this.structureComponent;
@@ -395,14 +395,14 @@ public class DisplayLists
 			// tempColorFloat[3] = .5f;
 			gl.glMaterialfv(GL.GL_FRONT, this.mutableColorType, DisplayLists.tempColorFloat, 0);
 			gl.glColor3fv(DisplayLists.tempColorFloat, 0);
-		} else if (sc.getStructureComponentType() == StructureComponentRegistry.TYPE_ATOM) {
+		} else if (sc.getStructureComponentType() == ComponentType.ATOM) {
 			final Atom a = (Atom) sc;
 
 			final AtomStyle style = (AtomStyle) ss.getStyle(a);
 			style.getAtomColor(a, DisplayLists.tempColorFloat);
 			// tempColorFloat[3] = 1f;
 			gl.glMaterialfv(GL.GL_FRONT, this.mutableColorType, DisplayLists.tempColorFloat, 0);
-		} else if (sc.getStructureComponentType() == StructureComponentRegistry.TYPE_BOND) {
+		} else if (sc.getStructureComponentType() == ComponentType.BOND) {
 			final Bond b = (Bond) sc;
 
 			final BondStyle style = (BondStyle) ss.getStyle(b);
@@ -413,7 +413,7 @@ public class DisplayLists
 			}
 			DisplayLists.tempColorFloat[3] = 1f;
 			gl.glMaterialfv(GL.GL_FRONT, this.mutableColorType, DisplayLists.tempColorFloat, 0);
-		} else if(sc.getStructureComponentType() == Surface.COMPONENT_TYPE) {
+		} else if(sc.getStructureComponentType() == ComponentType.SURFACE) {
 			gl.glColor3fv(Constants.transparentWhite, 0);
 		} else if (sc instanceof LineSegment) {
 			final LineStyle style = (LineStyle) ss.getStyle(sc);
@@ -428,8 +428,6 @@ public class DisplayLists
 
 	public void draw(final GL gl, final GLU glu, final GLUT glut,
 			final boolean isPickMode) {
-
-		final GlGeometryViewer viewer = AppBase.sgetGlGeometryViewer();
 
 		if (this.disableLigting && !isPickMode) {
 			if (GlGeometryViewer.currentProgram != 0) {
@@ -507,8 +505,11 @@ public class DisplayLists
 		}
 	}
 
-	public static UniqueColorMapValue getDisplayLists(final Color3b color) {
-		return (UniqueColorMapValue) DisplayLists.uniqueColorMap.get(color);
+	public static UniqueColorMapValue getDisplayLists(final Color3b color)
+	{
+		if (color.color[0] + color.color[1] + color.color[2] > 0)
+			return (UniqueColorMapValue) DisplayLists.uniqueColorMap.get(color);
+		return null;
 	}
 
 	public void startDefine(final int index, final GL gl, final GLU glu,

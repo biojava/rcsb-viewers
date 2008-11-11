@@ -18,6 +18,7 @@ import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.LineStyle;
 import org.rcsb.mbt.model.geometry.Algebra;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
@@ -104,9 +105,9 @@ public class LinesMutator extends Mutator
 		
 		if(mutee instanceof StructureComponent) {
 			final StructureComponent structureComponent = (StructureComponent)mutee;
-			final String scType = structureComponent.getStructureComponentType();
+			final ComponentType scType = structureComponent.getStructureComponentType();
 			
-			if (scType == StructureComponentRegistry.TYPE_ATOM) {
+			if (scType == ComponentType.ATOM) {
 				final Atom atom = (Atom) structureComponent;
 	
 				final Object[] pdbIds = AppBase.sgetModel().getStructures().get(0).getStructureMap().getPdbToNdbConverter().getPdbIds(
@@ -127,7 +128,7 @@ public class LinesMutator extends Mutator
 				}
 			}
 			
-			else if (scType == StructureComponentRegistry.TYPE_BOND)
+			else if (scType == ComponentType.BOND)
 			{
 				final Bond bond = (Bond) structureComponent;
 	
@@ -167,21 +168,13 @@ public class LinesMutator extends Mutator
 				}
 			}
 			
-			else if (scType == StructureComponentRegistry.TYPE_RESIDUE)
+			else if (scType == ComponentType.RESIDUE)
 			{
 				final Residue r = (Residue) structureComponent;
 				final Fragment f = r.getFragment();
-				final String conformationTypeIdentifier = f.getConformationType();
-				String conformationType = "Unknown";
-				if (conformationTypeIdentifier == StructureComponentRegistry.TYPE_COIL) {
-					conformationType = "Coil";
-				} else if (conformationTypeIdentifier == StructureComponentRegistry.TYPE_HELIX) {
-					conformationType = "Helix";
-				} else if (conformationTypeIdentifier == StructureComponentRegistry.TYPE_STRAND) {
-					conformationType = "Strand";
-				} else if (conformationTypeIdentifier == StructureComponentRegistry.TYPE_TURN) {
-					conformationType = "Turn";
-				}
+				final ComponentType conformationTypeIdentifier = f.getConformationType();
+				ComponentType conformationType = (f.getConformationType().isConformationType())? 
+						f.getConformationType() : ComponentType.UNDEFINED_CONFORMATION;
 	
 				final Object[] tmp = converter.getPdbIds(r.getChainId(), new Integer(r.getResidueId()));
 				if (tmp != null)
@@ -209,14 +202,12 @@ public class LinesMutator extends Mutator
 				}
 			}
 			
-			else if (scType == StructureComponentRegistry.TYPE_FRAGMENT)
+			else if (scType == ComponentType.FRAGMENT)
 			{
 				final Fragment f = (Fragment) structureComponent;
 	
 				// remove all but the local name for the secondary structure class.
-				String conformation = f.getConformationType();
-				final int lastDot = conformation.lastIndexOf('.');
-				conformation = conformation.substring(lastDot + 1);
+				ComponentType conformation = f.getConformationType();
 	
 				final String ndbChainId = f.getChain().getChainId();
 				final int startNdbResidueId = f.getResidue(0).getResidueId();
@@ -248,7 +239,7 @@ public class LinesMutator extends Mutator
 				}
 	
 				// structureMap.getStructureStyles().setResidueColor(res, yellow);
-			} else if (scType == StructureComponentRegistry.TYPE_CHAIN) {
+			} else if (scType == ComponentType.CHAIN) {
 				final Chain c = (Chain) structureComponent;
 	
 				// remove all but the local name for the secondary structure class.
@@ -287,13 +278,13 @@ public class LinesMutator extends Mutator
 		
 		if(mutee instanceof StructureComponent) {
 			final StructureComponent structureComponent = (StructureComponent)mutee;
-			final String scType = structureComponent.getStructureComponentType();
+			final ComponentType scType = structureComponent.getStructureComponentType();
 			
-			if (scType == StructureComponentRegistry.TYPE_ATOM) {
+			if (scType == ComponentType.ATOM) {
 				final Atom atom = (Atom) structureComponent;
 	
 				System.arraycopy(atom.coordinate, 0, coordinates, 0, atom.coordinate.length);
-			} else if (scType == StructureComponentRegistry.TYPE_BOND) {
+			} else if (scType == ComponentType.BOND) {
 				final Bond bond = (Bond) structureComponent;
 	
 				final Atom a1 = bond.getAtom(0);
@@ -303,7 +294,7 @@ public class LinesMutator extends Mutator
 				for(int i = 0; i < a1.coordinate.length; i++) {
 					coordinates[i] = (a1.coordinate[i] + a2.coordinate[i]) / 2;
 				}
-			} else if (scType == StructureComponentRegistry.TYPE_RESIDUE) {
+			} else if (scType == ComponentType.RESIDUE) {
 				final Residue r = (Residue) structureComponent;
 				Atom atom;
 				if(r.getAlphaAtomIndex() >= 0) {
@@ -313,12 +304,12 @@ public class LinesMutator extends Mutator
 				}
 				
 				return this.getCoordinates(atom);
-			} else if (scType == StructureComponentRegistry.TYPE_FRAGMENT) {
+			} else if (scType == ComponentType.FRAGMENT) {
 				final Fragment f = (Fragment) structureComponent;
 				final Residue r = f.getResidue(f.getResidueCount() / 2);
 				
 				return this.getCoordinates(r);
-			} else if (scType == StructureComponentRegistry.TYPE_CHAIN) {
+			} else if (scType == ComponentType.CHAIN) {
 				final Chain c = (Chain) structureComponent;
 				final Residue r = c.getResidue(c.getResidueCount() / 2);
 				

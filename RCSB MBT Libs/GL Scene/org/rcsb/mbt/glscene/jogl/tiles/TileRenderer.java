@@ -7,8 +7,7 @@ import java.nio.Buffer;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
-import org.rcsb.mbt.controllers.app.AppBase;
-
+import org.rcsb.mbt.model.util.DebugState;
 
 /**
  * A fairly direct port of Brian Paul's tile rendering library, found
@@ -633,7 +632,7 @@ public class TileRenderer
 						gl.glBitmap( 1, 1, 0.0f, 0.0f, ( float ) winCoords[0], ( float ) winCoords[1], bitmap, 0);
 					}
 				} catch (Exception e) {
-					if (AppBase.isDebug())
+					if (DebugState.isDebug())
 						e.printStackTrace();
 				}
 

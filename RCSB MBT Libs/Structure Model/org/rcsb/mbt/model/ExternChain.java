@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+
 /*
  * Previously called: pdbChain
  * <p>
@@ -14,7 +16,7 @@ import java.util.Vector;
  * This was in the viewers and I've pushed it down into the MBT.  It appears to be lighter weight than
  * the Chain class.  I'm not sure if it can't ultimately either be derived from Chain or if Chain can't
  * be derived from it.  It also seems to have something to do with the mutator mechanism, so I'm hesitant
- * to blow it off or simply derive it out of Chain, initially.</p>
+ * to blow it off or simply derive it out of Chain, initially without further study.</p>
  * <p>
  * Note also the presence of a residues set and a residues vector and the mbt chain set.  Suggests this
  * can hold arbitrary lists of residues that cut across MBT Chain Boundaries.</p>
@@ -112,7 +114,7 @@ public class ExternChain extends StructureComponent
 	}
 	
 	@Override
-	public String getStructureComponentType() { return chainType.name() + " Chain"; }
+	public ComponentType getStructureComponentType() { return ComponentType.CHAIN; }
 	public Iterator<Chain> getMbtChainIterator() { return mbtChains.iterator(); }
 	public Residue getResidue(final int index) { return this.residuesVec.get(index); }
 	public int getResidueCount() { return this.residuesSet.size(); }

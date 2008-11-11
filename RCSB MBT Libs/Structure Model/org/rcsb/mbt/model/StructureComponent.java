@@ -79,6 +79,8 @@
 
 package org.rcsb.mbt.model;
 
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+
 
 /**
  *  Defines the abstract base class for a StructureComponent data container.
@@ -177,6 +179,6 @@ public abstract class StructureComponent
 	 *  sub-classes/types. The name is also used to create instances
 	 *  of any sublcass dynamically from this name.
 	 */
-	public abstract String getStructureComponentType( );
+	public abstract ComponentType getStructureComponentType( );
 }
 

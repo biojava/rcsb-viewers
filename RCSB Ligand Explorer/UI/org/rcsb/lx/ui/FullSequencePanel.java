@@ -30,8 +30,8 @@ import org.rcsb.mbt.model.ExternChain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
-import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
 import org.rcsb.mbt.model.attributes.ChainStyle;
@@ -361,12 +361,10 @@ class SequenceMouseListener extends MouseAdapter
         final Residue r = owner.getResidueAt(p);
         if (r != null)
         {
-        	final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry.get(StructureComponentRegistry.TYPE_ATOM);
-    		final AtomStyle as = (AtomStyle) ss.getDefaultStyle(
-    				StructureComponentRegistry.TYPE_ATOM);
-    		final BondGeometry bg = (BondGeometry) GlGeometryViewer.defaultGeometry.get(StructureComponentRegistry.TYPE_BOND);
-    		final BondStyle bs = (BondStyle) ss.getDefaultStyle(
-    				StructureComponentRegistry.TYPE_BOND);
+        	final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry.get(ComponentType.ATOM);
+    		final AtomStyle as = (AtomStyle) ss.getDefaultStyle(ComponentType.ATOM);
+    		final BondGeometry bg = (BondGeometry) GlGeometryViewer.defaultGeometry.get(ComponentType.BOND);
+    		final BondStyle bs = (BondStyle) ss.getDefaultStyle(ComponentType.BOND);
             // toggle between adding and removing
     		
         	if(ss.isSelected(r))

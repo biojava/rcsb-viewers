@@ -87,6 +87,7 @@ import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureComponentRegistry;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 /**
  *  This class impements a custom TreeModel for the TreeViewer class.
@@ -141,8 +142,8 @@ public class TreeViewerModel
 		else if ( parent instanceof StructureComponent )
 		{
 			final StructureComponent structureComponent = (StructureComponent) parent;
-			final String type = structureComponent.getStructureComponentType( );
-			if ( type == StructureComponentRegistry.TYPE_CHAIN )
+			final ComponentType type = structureComponent.getStructureComponentType( );
+			if ( type == ComponentType.CHAIN )
 			{
 				final Chain chain = (Chain) structureComponent;
                 
@@ -152,12 +153,12 @@ public class TreeViewerModel
                 
                 return chain.getFragment( index );
 			}
-            else if ( type == StructureComponentRegistry.TYPE_FRAGMENT )
+            else if ( type == ComponentType.FRAGMENT )
             {
                 final Fragment fragment = (Fragment) structureComponent;
                 return fragment.getResidue( index );
             }
-			else if ( type == StructureComponentRegistry.TYPE_RESIDUE )
+			else if ( type == ComponentType.RESIDUE )
 			{
 				final Residue residue = (Residue) structureComponent;
 				return residue.getAtom( index );
@@ -189,8 +190,8 @@ public class TreeViewerModel
 		else if ( parent instanceof StructureComponent )
 		{
 			final StructureComponent structureComponent = (StructureComponent) parent;
-			final String type = structureComponent.getStructureComponentType( );
-			if ( type == StructureComponentRegistry.TYPE_CHAIN )
+			final ComponentType type = structureComponent.getStructureComponentType( );
+			if ( type == ComponentType.CHAIN )
 			{
                 final Chain chain = (Chain) structureComponent;
                 
@@ -200,12 +201,12 @@ public class TreeViewerModel
                 
 				return chain.getFragmentCount( );
 			}
-            else if ( type == StructureComponentRegistry.TYPE_FRAGMENT )
+            else if ( type == ComponentType.FRAGMENT )
             {
                 final Fragment fragment = (Fragment) structureComponent;
                 return fragment.getResidueCount( );
             }
-			else if ( type == StructureComponentRegistry.TYPE_RESIDUE )
+			else if ( type == ComponentType.RESIDUE )
 			{
 				final Residue residue = (Residue) structureComponent;
 				return residue.getAtomCount( );
@@ -250,8 +251,8 @@ public class TreeViewerModel
 		else if ( parent instanceof StructureComponent )
 		{
 			final StructureComponent structureComponent = (StructureComponent) parent;
-			final String parentType = structureComponent.getStructureComponentType( );
-			if ( parentType == StructureComponentRegistry.TYPE_CHAIN )
+			final ComponentType parentType = structureComponent.getStructureComponentType( );
+			if ( parentType == ComponentType.CHAIN )
 			{
 				final Chain chain = (Chain) structureComponent;
 				final int fragment = chain.getFragmentCount( );
@@ -263,7 +264,7 @@ public class TreeViewerModel
 				}
 				return -1;
 			}
-            else if ( parentType == StructureComponentRegistry.TYPE_FRAGMENT )
+            else if ( parentType == ComponentType.FRAGMENT )
             {
                 final Fragment fragment = (Fragment) structureComponent;
                 final int residueCount = fragment.getResidueCount( );
@@ -275,7 +276,7 @@ public class TreeViewerModel
                 }
                 return -1;
             }
-			else if ( parentType == StructureComponentRegistry.TYPE_RESIDUE )
+			else if ( parentType == ComponentType.RESIDUE )
 			{
 				final Residue residue = (Residue) structureComponent;
 				final int atomCount = residue.getAtomCount( );

@@ -81,6 +81,8 @@
 
 package org.rcsb.mbt.model;
 
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+
 
 /**
  *  Implements a StructureComponent container for Symmetry data.
@@ -177,13 +179,10 @@ public class Symmetry
 		return Symmetry.className;
 	}
 
-	/**
-	 *  This method returns the fully qualified name of this class.
-	 */
 	
-	public String getStructureComponentType( )
+	public ComponentType getStructureComponentType( )
 	{
-		return Symmetry.className;
+		return ComponentType.SYMMETRY;
 	}
 
 	//

@@ -75,6 +75,7 @@ package org.rcsb.mbt.model;
 // Core
 import java.util.NoSuchElementException;
 
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.filters.*;
 
 
@@ -119,7 +120,7 @@ public class StructureComponentIterator
 {
 	private Structure structure;
 	private IStructureComponentFilter filter;
-	private String type;
+	private ComponentType type;
 	private int count;
 	private int index;
 	private boolean foundNext;

@@ -104,6 +104,7 @@ import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.model.*;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.*;
 import org.rcsb.mbt.model.util.*;
 
@@ -275,7 +276,7 @@ public class StructureComponentInspector
 			final Structure structure = structureComponent.getStructure( );
 			final StructureMap structureMap = structure.getStructureMap( );
 			final StructureStyles structureStyles = structureMap.getStructureStyles( );
-			final String structureComponentType = structureComponent.getStructureComponentType( );
+			final ComponentType structureComponentType = structureComponent.getStructureComponentType( );
 
 			int row = 0;
 			JLabel label = null;
@@ -351,7 +352,7 @@ public class StructureComponentInspector
 			label.setForeground( Color.black );
 			row++;
 
-			if ( structureComponentType == StructureComponentRegistry.TYPE_ATOM )
+			if ( structureComponentType == ComponentType.ATOM )
 			{
 				final Atom atom = (Atom) structureComponent;
 				final int atomIndex = structureMap.getAtomIndex( atom );
@@ -360,7 +361,7 @@ public class StructureComponentInspector
 					label = (JLabel) this.table.getValueAt( row, 0 );
 					label.setText( "MBT Type:" );
 					label = (JLabel) this.table.getValueAt( row, 1 );
-					label.setText( structureComponentType );
+					label.setText( structureComponentType.toString() );
 					row++;
 
 					label = (JLabel) this.table.getValueAt( row, 0 );
@@ -425,7 +426,7 @@ public class StructureComponentInspector
 					row++;
 				}
 			}
-			else if ( structureComponentType == StructureComponentRegistry.TYPE_BOND )
+			else if ( structureComponentType == ComponentType.BOND )
 			{
 				final Bond bond = (Bond) structureComponent;
 				final int bondIndex = structureMap.getBondIndex( bond );
@@ -434,7 +435,7 @@ public class StructureComponentInspector
 					label = (JLabel) this.table.getValueAt( row, 0 );
 					label.setText( "MBT Type:" );
 					label = (JLabel) this.table.getValueAt( row, 1 );
-					label.setText( structureComponentType );
+					label.setText( structureComponentType.toString() );
 					row++;
 
 					label = (JLabel) this.table.getValueAt( row, 0 );
@@ -465,7 +466,7 @@ public class StructureComponentInspector
 					row++;
 				}
 			}
-			else if ( structureComponentType == StructureComponentRegistry.TYPE_RESIDUE )
+			else if ( structureComponentType == ComponentType.RESIDUE )
 			{
 				final Residue residue = (Residue) structureComponent;
 				final int residueIndex = structureMap.getResidueIndex( residue );
@@ -474,7 +475,7 @@ public class StructureComponentInspector
 					label = (JLabel) this.table.getValueAt( row, 0 );
 					label.setText( "MBT Type:" );
 					label = (JLabel) this.table.getValueAt( row, 1 );
-					label.setText( structureComponentType );
+					label.setText( structureComponentType.toString() );
 					row++;
 
 					label = (JLabel) this.table.getValueAt( row, 0 );
@@ -517,7 +518,7 @@ public class StructureComponentInspector
 					label = (JLabel) this.table.getValueAt( row, 0 );
 					label.setText( "Conformation:" );
 					label = (JLabel) this.table.getValueAt( row, 1 );
-					label.setText( residue.getConformationType() );
+					label.setText( residue.getConformationType().toString() );
 					row++;
 
 					label = (JLabel) this.table.getValueAt( row, 0 );
@@ -527,7 +528,7 @@ public class StructureComponentInspector
 					row++;
 				}
 			}
-			else if ( structureComponentType == StructureComponentRegistry.TYPE_FRAGMENT )
+			else if ( structureComponentType == ComponentType.FRAGMENT )
 			{
 				final Fragment fragment = (Fragment) structureComponent;
 				final int fragmentIndex = structureMap.getFragmentIndex( fragment );
@@ -538,7 +539,7 @@ public class StructureComponentInspector
 					label = (JLabel) this.table.getValueAt( row, 0 );
 					label.setText( "MBT Type:" );
 					label = (JLabel) this.table.getValueAt( row, 1 );
-					label.setText( structureComponentType );
+					label.setText( structureComponentType.toString() );
 					row++;
 
 					label = (JLabel) this.table.getValueAt( row, 0 );
@@ -556,11 +557,11 @@ public class StructureComponentInspector
 					label = (JLabel) this.table.getValueAt( row, 0 );
 					label.setText( "Type:" );
 					label = (JLabel) this.table.getValueAt( row, 1 );
-					label.setText( fragment.getConformationType() );
+					label.setText( fragment.getConformationType().toString() );
 					row++;
 				}
 			}
-			else if ( structureComponentType == StructureComponentRegistry.TYPE_CHAIN )
+			else if ( structureComponentType == ComponentType.CHAIN )
 			{
 				final Chain chain = (Chain) structureComponent;
 				final int chainIndex = structureMap.getChainIndex( chain );
@@ -569,7 +570,7 @@ public class StructureComponentInspector
 					label = (JLabel) this.table.getValueAt( row, 0 );
 					label.setText( "MBT Type:" );
 					label = (JLabel) this.table.getValueAt( row, 1 );
-					label.setText( structureComponentType );
+					label.setText( structureComponentType.toString() );
 					row++;
 
 					label = (JLabel) this.table.getValueAt( row, 0 );

@@ -195,6 +195,7 @@ package org.rcsb.mbt.model.attributes;
 import java.util.*;
 
 import org.rcsb.mbt.model.*;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.util.*;
 
 /**
@@ -291,7 +292,7 @@ public class StructureStyles
 	private final HashMap<StructureComponent, Object> selection = new HashMap<StructureComponent, Object>();
 
 	// Holds a default style object for a given StructureComponent type.
-	private final Hashtable<String, Object> defaultStyle = new Hashtable<String, Object>();
+	private final Hashtable<ComponentType, Object> defaultStyle = new Hashtable<ComponentType, Object>();
 
 	// Holds Style objects.
 	private final Hashtable<StructureComponent, Style> styles = new Hashtable<StructureComponent, Style>();
@@ -325,21 +326,20 @@ public class StructureStyles
 		this.structureMap = structureMap;
 
 		// Create default styles (if available) for registered SC types.
-		final Enumeration<String> scTypeNames = StructureComponentRegistry.getTypeNames();
 		String styleClassName = null;
-		while (scTypeNames.hasMoreElements()) {
+		for (ComponentType ctype : ComponentType.values())
+		{
 			try {
 				// Build the expected Style class name for the given SC.
-				String scTypeName = (String) scTypeNames.nextElement();
-				String scBaseTypeName = scTypeName.substring(scTypeName.lastIndexOf('.') + 1);
-				styleClassName = myPackagePrefix + scBaseTypeName + "Style";
+				String scTypeName = ctype.toString().charAt(0) + ctype.toString().substring(1).toLowerCase();
+				styleClassName = myPackagePrefix + scTypeName + "Style";
 
 				// Try to load the expected Style class.
 				final ClassLoader classLoader = Style.class.getClassLoader();
 				final Class styleClass = classLoader.loadClass(styleClassName);
 				final Object style = styleClass.newInstance();
 				// Set the default style
-				this.defaultStyle.put(scTypeName, style);
+				this.defaultStyle.put(ctype, style);
 			} catch (final ClassNotFoundException cnfe) {
 				// We couldn't find a corresponding Style class.
 				// Status.output( Status.LEVEL_REMARK, styleClassName + " not
@@ -465,7 +465,7 @@ public class StructureStyles
 				structureStylesEvent.structureComponent = structureComponent;
 				structureStylesEvent.style = style;
 				structureStylesEvent.attribute = StructureStyles.ATTRIBUTE_STYLE;
-				structureStylesEvent.property = -1;
+				structureStylesEvent.property = null;
 				this.styles.put(structureComponent, style);
 				// style.addStructureStylesEventListener( this ); JLM DEBUG
 				// JLM DEBUG: We need to loop through the styles
@@ -479,7 +479,7 @@ public class StructureStyles
 			structureStylesEvent.structureComponent = structureComponent;
 			structureStylesEvent.style = (Style) this.styles.get(structureComponent);
 			structureStylesEvent.attribute = StructureStyles.ATTRIBUTE_STYLE;
-			structureStylesEvent.property = -1;
+			structureStylesEvent.property = null;
 			this.styles.remove(structureComponent);
 			if (structureStylesEvent.style != null) {
 				; // structureStylesEvent.style.removeStructureStylesEventListener(
@@ -529,7 +529,7 @@ public class StructureStyles
 	 * @return NA
 	 * @throws NA
 	 */
-	public void setDefaultStyle(final String scType, final Style style) {
+	public void setDefaultStyle(final ComponentType scType, final Style style) {
 		if (scType == null) {
 			throw new NullPointerException("null scType");
 		}
@@ -558,7 +558,7 @@ public class StructureStyles
 	 * @return NA
 	 * @throws NA
 	 */
-	public Style getDefaultStyle(final String scType) {
+	public Style getDefaultStyle(final ComponentType scType) {
 		if (scType == null) {
 			throw new NullPointerException("null scType");
 		}
@@ -613,7 +613,7 @@ public class StructureStyles
 		structureStylesEvent.structureComponent = structureComponent;
 		structureStylesEvent.style = (Style) this.styles.get(structureComponent);
 		structureStylesEvent.attribute = StructureStyles.ATTRIBUTE_VISIBILITY;
-		structureStylesEvent.property = -1;
+		structureStylesEvent.property = null;
 		this.processStructureStylesEvent(structureStylesEvent);
 	}
 
@@ -659,7 +659,7 @@ public class StructureStyles
 		structureStylesEvent.structureComponent = null;
 		structureStylesEvent.style = null;
 		structureStylesEvent.attribute = StructureStyles.ATTRIBUTE_VISIBILITY;
-		structureStylesEvent.property = -1;
+		structureStylesEvent.property = null;
 		structureStylesEvent.flag = this.visibilityFlag;
 		this.processStructureStylesEvent(structureStylesEvent);
 	}
@@ -677,17 +677,17 @@ public class StructureStyles
 			final SelectionNode node = (SelectionNode)selection.get(comp);
 				// what if it's an Integer??
 			
-			if(comp.getStructureComponentType() == StructureComponentRegistry.TYPE_ATOM) {
+			if(comp.getStructureComponentType() == ComponentType.ATOM) {
 				items.add(comp);
-			} else if(comp.getStructureComponentType() == StructureComponentRegistry.TYPE_RESIDUE) {
+			} else if(comp.getStructureComponentType() == ComponentType.RESIDUE) {
 				if(node.completeChildren == ((Residue)comp).getAtomCount()) {
 					items.add(comp);
 				}
-			} else if(comp.getStructureComponentType() == StructureComponentRegistry.TYPE_FRAGMENT) {
+			} else if(comp.getStructureComponentType() == ComponentType.FRAGMENT) {
 				if(node.completeChildren == ((Fragment)comp).getResidueCount()) {
 					items.add(comp);
 				}
-			} else if(comp.getStructureComponentType() == StructureComponentRegistry.TYPE_CHAIN) {
+			} else if(comp.getStructureComponentType() == ComponentType.CHAIN) {
 				if(node.completeChildren == ((Chain)comp).getFragmentCount()) {
 					items.add(comp);
 				}
@@ -715,7 +715,7 @@ public class StructureStyles
 		structureStylesEvent.structureComponent = null;
 		structureStylesEvent.style = null;
 		structureStylesEvent.attribute = StructureStyles.ATTRIBUTE_VISIBILITY;
-		structureStylesEvent.property = -1;
+		structureStylesEvent.property = null;
 		structureStylesEvent.flag = this.visibilityFlag;
 		this.processStructureStylesEvent(structureStylesEvent);
 	}
@@ -751,23 +751,23 @@ public class StructureStyles
 	 */
 	public void setSelected(final StructureComponent structureComponent,
 			final boolean newState) {
-		if (structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_ATOM) {
+		if (structureComponent.getStructureComponentType() == ComponentType.ATOM) {
 			final Atom a = (Atom) structureComponent;
 			this.setSelected(a, newState, true);
-		} else if (structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_BOND) {
+		} else if (structureComponent.getStructureComponentType() == ComponentType.BOND) {
 			final Bond b = (Bond) structureComponent;
 			this.setSelected(b, newState);
-		} else if (structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_RESIDUE) {
+		} else if (structureComponent.getStructureComponentType() == ComponentType.RESIDUE) {
 			final Residue r = (Residue) structureComponent;
 			this
 					.setSelected(r, newState, null, null, false, false, true,
 							false);
-		} else if (structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_FRAGMENT) {
+		} else if (structureComponent.getStructureComponentType() == ComponentType.FRAGMENT) {
 			final Fragment f = (Fragment) structureComponent;
 			this
 					.setSelected(f, newState, null, null, false, false, true,
 							false);
-		} else if (structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_CHAIN) {
+		} else if (structureComponent.getStructureComponentType() == ComponentType.CHAIN) {
 			final Chain c = (Chain) structureComponent;
 			this
 					.setSelected(c, newState, null, null, false, false, true,
@@ -779,7 +779,7 @@ public class StructureStyles
 		structureStylesEvent.structureComponent = structureComponent;
 		structureStylesEvent.style = (Style) this.styles.get(structureComponent);
 		structureStylesEvent.attribute = StructureStyles.ATTRIBUTE_SELECTION;
-		structureStylesEvent.property = -1;
+		structureStylesEvent.property = null;
 		this.processStructureStylesEvent(structureStylesEvent);
 	}
 
@@ -1461,7 +1461,7 @@ public class StructureStyles
 		structureStylesEvent.structureComponent = null;
 //		structureStylesEvent.style = (Style) styles.get(comp);
 		structureStylesEvent.attribute = StructureStyles.ATTRIBUTE_SELECTION;
-		structureStylesEvent.property = -1;
+		structureStylesEvent.property = null;
 		this.processStructureStylesEvent(structureStylesEvent);
 	}
 
@@ -1489,29 +1489,29 @@ public class StructureStyles
 		final SelectionNode node = (SelectionNode) this.selection.get(structureComponent);
 		;
 		if (node != null) {
-			if (structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_ATOM) {
+			if (structureComponent.getStructureComponentType() == ComponentType.ATOM) {
 				isSelected = true;
-			} else if (structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_RESIDUE) {
+			} else if (structureComponent.getStructureComponentType() == ComponentType.RESIDUE) {
 				final Residue r = (Residue) structureComponent;
 				isSelected = r.getAtomCount() == node.completeChildren;
-			} else if (structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_FRAGMENT) {
+			} else if (structureComponent.getStructureComponentType() == ComponentType.FRAGMENT) {
 				final Fragment f = (Fragment) structureComponent;
 				isSelected = f.getResidueCount() == node.completeChildren;
-			} else if (structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_CHAIN) {
+			} else if (structureComponent.getStructureComponentType() == ComponentType.CHAIN) {
 				final Chain c = (Chain) structureComponent;
 				isSelected = c.getFragmentCount() == node.completeChildren;
 			}
-		} else if (structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_ATOM) {
+		} else if (structureComponent.getStructureComponentType() == ComponentType.ATOM) {
 			final Atom a = (Atom) structureComponent;
 			isSelected = this.isSelected(this.structureMap.getResidue(a));
-		} else if (structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_BOND) {
+		} else if (structureComponent.getStructureComponentType() == ComponentType.BOND) {
 			final Bond b = (Bond) structureComponent;
 			isSelected = this.isSelected(b.getAtom(0))
 					&& this.isSelected(b.getAtom(1));
-		} else if (structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_RESIDUE) {
+		} else if (structureComponent.getStructureComponentType() == ComponentType.RESIDUE) {
 			final Residue r = (Residue) structureComponent;
 			isSelected = this.isSelected(r.getFragment());
-		} else if (structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_FRAGMENT) {
+		} else if (structureComponent.getStructureComponentType() == ComponentType.FRAGMENT) {
 			final Fragment f = (Fragment) structureComponent;
 			isSelected = this.isSelected(f.getChain());
 		}
@@ -1546,16 +1546,16 @@ public class StructureStyles
 
 			if (childCount != null) {
 				break;
-			} else if (structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_ATOM) {
+			} else if (structureComponent.getStructureComponentType() == ComponentType.ATOM) {
 				final Atom a = (Atom) structureComponent;
 				curComp = this.structureMap.getResidue(a);
-			} else if (structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_RESIDUE) {
+			} else if (structureComponent.getStructureComponentType() == ComponentType.RESIDUE) {
 				final Residue r = (Residue) structureComponent;
 				curComp = r.getFragment();
-			} else if (structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_FRAGMENT) {
+			} else if (structureComponent.getStructureComponentType() == ComponentType.FRAGMENT) {
 				final Fragment f = (Fragment) structureComponent;
 				curComp = f.getChain();
-			} else if (structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_CHAIN) {
+			} else if (structureComponent.getStructureComponentType() == ComponentType.CHAIN) {
 				path.add(new Object());
 				break;
 			}
@@ -1679,7 +1679,7 @@ public class StructureStyles
 			structureStylesEvent.structureComponent = structureComponent;
 			structureStylesEvent.style = (Style) this.styles.get(structureComponent);
 			structureStylesEvent.attribute = StructureStyles.ATTRIBUTE_VISIBILITY;
-			structureStylesEvent.property = -1;
+			structureStylesEvent.property = null;
 			this.processStructureStylesEvent(structureStylesEvent);
 		}
 	}

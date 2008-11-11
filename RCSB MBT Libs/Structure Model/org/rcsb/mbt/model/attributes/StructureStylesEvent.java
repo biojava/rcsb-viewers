@@ -69,6 +69,7 @@ package org.rcsb.mbt.model.attributes;
 
 
 import org.rcsb.mbt.model.*;
+import org.rcsb.mbt.model.attributes.Style.StyleProperty;
 
 
 /**
@@ -102,7 +103,7 @@ public class StructureStylesEvent
 	 *  (see each Style sub-classes for a list of valid states). For example:
 	 *  color, radius, label, etc.
 	 */
-	public int property;
+	public StyleProperty property;
 
 	/**
 	 *  The style that was changed in the StructureStyles object

@@ -109,6 +109,7 @@ import javax.swing.border.*;
 
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.*;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.*;
 
 /**
@@ -122,13 +123,10 @@ import org.rcsb.mbt.model.attributes.*;
  *  @author	John L. Moreland
  *  @see	org.rcsb.mbt.model.attributes.StructureStyles
  */
+@SuppressWarnings("serial")
 public class StyleEditor
 	extends JPanel
 {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1730663507132155580L;
 	private static final String NO_CHANGE = "No Change";
 	private static final String SHOW = "Show";
 	private static final String HIDE = "Hide";
@@ -1120,9 +1118,9 @@ public class StyleEditor
 			{
 				final StructureComponent sc = (StructureComponent)
 					scEnum.nextElement();
-				final String scType = sc.getStructureComponentType( );
+				final ComponentType scType = sc.getStructureComponentType( );
 
-				if ( scType == StructureComponentRegistry.TYPE_ATOM )
+				if ( scType == ComponentType.ATOM )
 				{
 					final Atom atom = (Atom) sc;
 
@@ -1151,7 +1149,7 @@ public class StyleEditor
 					}
 				}
 
-				if ( scType == StructureComponentRegistry.TYPE_BOND )
+				if ( scType == ComponentType.BOND )
 				{
 					final Bond bond = (Bond) sc;
 
@@ -1214,9 +1212,9 @@ public class StyleEditor
 			{
 				final StructureComponent sc = (StructureComponent)
 					scEnum.nextElement();
-				final String scType = sc.getStructureComponentType( );
+				final ComponentType scType = sc.getStructureComponentType( );
 
-				if ( scType == StructureComponentRegistry.TYPE_RESIDUE )
+				if ( scType == ComponentType.RESIDUE )
 				{
 					if ( residuesColor != StyleEditor.NO_CHANGE )
 					{
@@ -1226,7 +1224,7 @@ public class StyleEditor
 						residueStyle.setResidueColor( ResidueColorRegistry.get( residuesColor ) );
 					}
 				}
-				else if ( scType == StructureComponentRegistry.TYPE_FRAGMENT )
+				else if ( scType == ComponentType.FRAGMENT )
 				{
 					final Fragment fragment = (Fragment) sc;
 

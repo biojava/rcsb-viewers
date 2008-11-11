@@ -62,6 +62,7 @@ package org.rcsb.mbt.model.attributes;
 import java.util.*;
 
 import org.rcsb.mbt.model.*;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 
 
@@ -93,23 +94,23 @@ public class ResidueColorByFragmentType
 	{
     	this.fragmentHash = new Hashtable( );
 
-    	this.fragmentHash.put( StructureComponentRegistry.TYPE_COIL,
+    	this.fragmentHash.put( ComponentType.COIL,
 			new float [] { 1.00f, 0.50f, 0.50f }  // Red (Sat=50%)
 		);
 
-    	this.fragmentHash.put( StructureComponentRegistry.TYPE_HELIX,
+    	this.fragmentHash.put( ComponentType.HELIX,
 			new float [] { 0.50f, 1.00f, 0.50f }   // Green (Sat=50%)
 		);
 
-    	this.fragmentHash.put( StructureComponentRegistry.TYPE_STRAND,
+    	this.fragmentHash.put( ComponentType.STRAND,
 			new float [] { 0.50f, 0.50f, 1.00f }   // Blue (Sat=50%)
 		);
 
-    	this.fragmentHash.put( StructureComponentRegistry.TYPE_TURN,
+    	this.fragmentHash.put( ComponentType.TURN,
 			new float [] { 0.50f, 1.00f, 1.00f }   // Cyan (Sat=50%)
 		);
 
-    	this.fragmentHash.put( Conformation.TYPE_UNDEFINED,
+    	this.fragmentHash.put( ComponentType.UNDEFINED_CONFORMATION,
 			new float [] { 0.66f, 0.66f, 0.66f }   // Gray (Bri=66%)
 		);
 	}

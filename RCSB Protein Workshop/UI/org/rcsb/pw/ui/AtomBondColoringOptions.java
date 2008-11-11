@@ -101,16 +101,16 @@ public class AtomBondColoringOptions extends JPanel implements IUpdateListener, 
 		        final StructureStyles ss = sm.getStructureStyles();
 		        final JoglSceneNode sn = (JoglSceneNode)sm.getUData();
 		        
-		        final Vector atoms = sm.getAtoms();
-		        final Iterator atomIt = atoms.iterator();
-		        while(atomIt.hasNext()) {
-		        	final Atom a = (Atom)atomIt.next();
+		        for (Atom a : sm.getAtoms())
+		        {
 		        	final DisplayListRenderable renderable = sn.getRenderable(a);
-		        	if(renderable != null) {
+		        	if(renderable != null)
+		        	{
 		        		final AtomStyle newAtomStyle = new AtomStyle();
 		        		final AtomStyle oldAtomStyle = (AtomStyle)renderable.style;
 		                newAtomStyle.setAtomColor(atomColor);
-		                if(oldAtomStyle != null) {
+		                if (oldAtomStyle != null)
+		                {
 			                newAtomStyle.setAtomLabel(oldAtomStyle.getAtomLabel());
 			                newAtomStyle.setAtomRadius(oldAtomStyle.getAtomRadius());
 		                }
@@ -121,9 +121,8 @@ public class AtomBondColoringOptions extends JPanel implements IUpdateListener, 
 		        	}
 		        }
 		        
-		        final Iterator bondsIt = sm.getBonds(atoms).iterator();
-		        while(bondsIt.hasNext()) {
-		        	final Bond b = (Bond)bondsIt.next();
+		        for (Bond b : sm.getBonds())
+		        {
 		        	final DisplayListRenderable renderable = sn.getRenderable(b);
 		        	if(renderable != null) {
 		        		final BondStyle oldBondStyle = (BondStyle)renderable.style;

@@ -82,6 +82,8 @@
 
 package org.rcsb.mbt.model;
 
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+
 
 /**
  *  Implements a StructureComponent container for Helix conformation
@@ -125,9 +127,9 @@ public class Helix
 	 *  This method returns the fully qualified name of this class.
 	 */
 	
-	public String getStructureComponentType( )
+	public ComponentType getStructureComponentType( )
 	{
-		return Helix.className;
+		return ComponentType.HELIX;
 	}
 
 	//

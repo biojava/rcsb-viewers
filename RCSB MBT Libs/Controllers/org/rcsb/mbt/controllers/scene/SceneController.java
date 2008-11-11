@@ -17,11 +17,13 @@ import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms.BiologicalUnitGenerationMapByChain;
 import org.rcsb.mbt.model.geometry.Algebra;
 import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
+import org.rcsb.mbt.model.util.DebugState;
 
 
 /**
@@ -59,7 +61,7 @@ public class SceneController implements GvPickEventListener, IUpdateListener
 //			public final float[][] JITTER_ARRAY = {{0.375f, 0.25f}, {0.125f, 0.75f}, {0.875f, 0.25f}, {0.625f, 0.75f}};
 	}
 	
-    private Hashtable<String, DisplayListGeometry> defaultGeometry = null;
+    private Hashtable<ComponentType, DisplayListGeometry> defaultGeometry = null;
 //	    private ArrayListStateOrganizer stateOrganizer = new ArrayListStateOrganizer();
     
     private boolean isBatchMode = false;	// otherwise, immediate mode.
@@ -103,11 +105,11 @@ public class SceneController implements GvPickEventListener, IUpdateListener
 		this.areSelectionsEnabled = areSelectionsEnabled;
 	}
 
-	public Hashtable<String, DisplayListGeometry> getDefaultGeometry() {
+	public Hashtable<ComponentType, DisplayListGeometry> getDefaultGeometry() {
 		return this.defaultGeometry;
 	}
 
-	public void setDefaultGeometry(final Hashtable<String, DisplayListGeometry> defaultGeometry) {
+	public void setDefaultGeometry(final Hashtable<ComponentType, DisplayListGeometry> defaultGeometry) {
 		this.defaultGeometry = defaultGeometry;
 	}
 
@@ -332,7 +334,7 @@ public class SceneController implements GvPickEventListener, IUpdateListener
 		DisplayLists.uniqueColorMap.clear();
 		AtomGeometry.sharedDisplayLists.clear();
 		BondGeometry.sharedDisplayLists.clear();
-		if (AppBase.isDebug())
+		if (DebugState.isDebug())
 			System.err.println("--> SceneController.clearMemory() (cleared display lists.)");
 	}
 

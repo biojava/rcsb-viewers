@@ -62,6 +62,7 @@
 package org.rcsb.mbt.model.util;
 
 import org.rcsb.mbt.model.*;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 
 /**
@@ -91,7 +92,7 @@ public class AtomStats
 		}
 
 		final int atomCount = structure.getStructureComponentCount(
-			StructureComponentRegistry.TYPE_ATOM );
+			ComponentType.ATOM );
 
 		final double coordinateBounds[][] = new double[2][3];
 		if ( atomCount <= 0 ) {
@@ -99,7 +100,7 @@ public class AtomStats
 		}
 
 		Atom atom = (Atom) structure.getStructureComponentByIndex(
-			StructureComponentRegistry.TYPE_ATOM, 0 );
+			ComponentType.ATOM, 0 );
 
 		coordinateBounds[0][0] = atom.coordinate[0];  // min x
 		coordinateBounds[0][1] = atom.coordinate[1];  // min y
@@ -111,7 +112,7 @@ public class AtomStats
 		for ( int i=1; i<atomCount; i++ )
 		{
 			atom = (Atom) structure.getStructureComponentByIndex(
-				StructureComponentRegistry.TYPE_ATOM, i );
+				ComponentType.ATOM, i );
 
 			if ( atom.coordinate[0] < coordinateBounds[0][0] ) {
 				coordinateBounds[0][0] = atom.coordinate[0];  // min x
@@ -157,7 +158,7 @@ public class AtomStats
 		}
 
 		final int atomCount = structure.getStructureComponentCount(
-			StructureComponentRegistry.TYPE_ATOM );
+			ComponentType.ATOM );
 
 		final double coordinateAverage[] = new double[3];
 		if ( atomCount <= 0 ) {
@@ -165,12 +166,12 @@ public class AtomStats
 		}
 
 		Atom atom = (Atom) structure.getStructureComponentByIndex(
-				StructureComponentRegistry.TYPE_ATOM, 0 );
+				ComponentType.ATOM, 0 );
 
 		for ( int i=1; i<atomCount; i++ )
 		{
 			atom = (Atom) structure.getStructureComponentByIndex(
-				StructureComponentRegistry.TYPE_ATOM, i );
+				ComponentType.ATOM, i );
 
 			coordinateAverage[0] += atom.coordinate[0];
 			coordinateAverage[1] += atom.coordinate[1];

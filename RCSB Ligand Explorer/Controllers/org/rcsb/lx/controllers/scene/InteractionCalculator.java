@@ -16,8 +16,8 @@ import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
-import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
 import org.rcsb.mbt.model.geometry.Algebra;
@@ -59,15 +59,15 @@ public class InteractionCalculator
 				proteinAtoms.addAll(chain.getAtoms());
 
 		final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry
-				.get(StructureComponentRegistry.TYPE_ATOM);
+				.get(ComponentType.ATOM);
 		final AtomStyle as = (AtomStyle) structure.getStructureMap()
 				.getStructureStyles().getDefaultStyle(
-						StructureComponentRegistry.TYPE_ATOM);
+						ComponentType.ATOM);
 		final BondGeometry bg = (BondGeometry) GlGeometryViewer.defaultGeometry
-				.get(StructureComponentRegistry.TYPE_BOND);
+				.get(ComponentType.BOND);
 		final BondStyle bs = (BondStyle) structure.getStructureMap()
 				.getStructureStyles().getDefaultStyle(
-						StructureComponentRegistry.TYPE_BOND);
+						ComponentType.BOND);
 
 		for (int i = 0; i < ligandAtoms.size(); i++) {
 			double distance = 0.0;
@@ -212,10 +212,10 @@ public class InteractionCalculator
 			final LXSceneNode node = (LXSceneNode)structure.getStructureMap().getUData();
 
 			final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry
-					.get(StructureComponentRegistry.TYPE_ATOM);
+					.get(ComponentType.ATOM);
 			final AtomStyle as = (AtomStyle) structure.getStructureMap()
 					.getStructureStyles().getDefaultStyle(
-							StructureComponentRegistry.TYPE_ATOM);
+							ComponentType.ATOM);
 
 			for (Atom a : waterAtoms)
 			{
@@ -254,15 +254,15 @@ public class InteractionCalculator
 
 		final LXSceneNode node = (LXSceneNode)structure.getStructureMap().getUData();
 		final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry
-				.get(StructureComponentRegistry.TYPE_ATOM);
+				.get(ComponentType.ATOM);
 		final AtomStyle as = (AtomStyle) structure.getStructureMap()
 				.getStructureStyles().getDefaultStyle(
-						StructureComponentRegistry.TYPE_ATOM);
+						ComponentType.ATOM);
 		final BondGeometry bg = (BondGeometry) GlGeometryViewer.defaultGeometry
-				.get(StructureComponentRegistry.TYPE_BOND);
+				.get(ComponentType.BOND);
 		final BondStyle bs = (BondStyle) structure.getStructureMap()
 				.getStructureStyles().getDefaultStyle(
-						StructureComponentRegistry.TYPE_BOND);
+						ComponentType.BOND);
 
 		for (Atom atom_j : waterAtoms)
 		{

@@ -6,6 +6,7 @@
 	<classpathentry kind="src" path="Controllers"/>
 	<classpathentry kind="src" path="Structure Loader"/>
 	<classpathentry kind="src" path="UnitTests"/>
+	<classpathentry kind="src" path="Demos"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/3rd Party Libs/jogl/gluegen-rt.jar">
 		<attributes>

@@ -23,8 +23,10 @@ import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms;
 import org.rcsb.mbt.model.attributes.ChainStyle;
+import org.rcsb.mbt.model.util.DebugState;
 
 
 import com.sun.opengl.util.GLUT;
@@ -445,26 +447,26 @@ public class JoglSceneNode
 					if (buMatrices != null)
 					{
 						String chainId = null;
-						if (sc.getStructureComponentType() == StructureComponentRegistry.TYPE_ATOM) {
+						if (sc.getStructureComponentType() == ComponentType.ATOM) {
 							final Atom a = (Atom) sc;
 							chainId = a.chain_id;
-						} else if (sc.getStructureComponentType() == StructureComponentRegistry.TYPE_BOND) {
+						} else if (sc.getStructureComponentType() == ComponentType.BOND) {
 							final Bond b = (Bond) sc;
 							chainId = b.getAtom(0).chain_id;
-						} else if (sc.getStructureComponentType() == StructureComponentRegistry.TYPE_CHAIN) {
+						} else if (sc.getStructureComponentType() == ComponentType.CHAIN) {
 							final Chain c = (Chain) sc;
 							chainId = c.getChainId();
 						} 
 
 						// if the chain id is not listed, don't draw this.
-						if (AppBase.sgetSceneController().showAsymmetricUnitOnly() || sc.getStructureComponentType() == Surface.COMPONENT_TYPE)
+						if (AppBase.sgetSceneController().showAsymmetricUnitOnly() || sc.getStructureComponentType() == ComponentType.SURFACE)
 						{
 							try {
 								gl.glPushMatrix();
 								renderable.draw(gl, glu, glut, isPick);
 							} catch (Exception e)
 							{
-								if (AppBase.isDebug())
+								if (DebugState.isDebug())
 									e.printStackTrace();
 							}
 							gl.glPopMatrix();
@@ -486,7 +488,7 @@ public class JoglSceneNode
 										renderable.draw(gl, glu, glut, isPick);
 									} catch (Exception e)
 									{
-										if (AppBase.isDebug())
+										if (DebugState.isDebug())
 											e.printStackTrace();
 									}
 									gl.glPopMatrix();
@@ -548,7 +550,7 @@ public class JoglSceneNode
 			}
 		} catch (Exception e)
 		{
-			if (AppBase.isDebug())
+			if (DebugState.isDebug())
 				e.printStackTrace();
 		}
 		
@@ -581,7 +583,7 @@ public class JoglSceneNode
 					gl.glCallList(list);
 				} catch (Exception e)
 				{
-					if (AppBase.isDebug())
+					if (DebugState.isDebug())
 						e.printStackTrace();
 				}
 				
@@ -609,7 +611,7 @@ public class JoglSceneNode
 					gl.glCallList(list);
 				} catch (Exception e)
 				{
-					if (AppBase.isDebug())
+					if (DebugState.isDebug())
 						e.printStackTrace();
 				}
 				
@@ -641,7 +643,7 @@ public class JoglSceneNode
 
 					gl.glCallList(list);
 				} catch (Exception e) {
-					if (AppBase.isDebug())
+					if (DebugState.isDebug())
 						e.printStackTrace();
 				}
 				

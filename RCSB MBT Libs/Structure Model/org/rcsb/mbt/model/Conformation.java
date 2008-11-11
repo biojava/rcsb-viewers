@@ -96,12 +96,6 @@ public abstract class Conformation
 	extends StructureComponent
 	implements java.lang.Cloneable
 {
-	/**
-	 *  If a residue conformation / chain fragment type is not defined, use this value.
-	 *  That is, assign this value when secondary structure has not been assigned.
-	 */
-	public static final String TYPE_UNDEFINED = "UNDEFINED_CONFORMATION";
-
 	//
 	// StructureComponent methods
 	//

@@ -24,13 +24,14 @@ import org.rcsb.mbt.glscene.jogl.Constants;
 import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
+import org.rcsb.mbt.glscene.jogl.ChainGeometry.RibbonForm;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
-import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
 import org.rcsb.mbt.model.attributes.ChainStyle;
@@ -132,7 +133,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 			String description = null;
 
 			if (this.lastComponentMouseWasOver != null) {
-				if (this.lastComponentMouseWasOver.getStructureComponentType() == StructureComponentRegistry.TYPE_ATOM) {
+				if (this.lastComponentMouseWasOver.getStructureComponentType() == ComponentType.ATOM) {
 					final Atom a = (Atom) this.lastComponentMouseWasOver;
 
 					final PdbToNdbConverter converter = a.structure.getStructureMap()
@@ -155,7 +156,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 							+ (chainId == null ? "" : chainId + "/") + resId
 							+ "/" + a.number;
 				} else if (this.lastComponentMouseWasOver
-						.getStructureComponentType() == StructureComponentRegistry.TYPE_BOND) {
+						.getStructureComponentType() == ComponentType.BOND) {
 					final Bond b = (Bond) this.lastComponentMouseWasOver;
 					final Atom a1 = b.getAtom(0);
 					final Atom a2 = b.getAtom(1);
@@ -199,7 +200,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 				} 
 				
 				else if (this.lastComponentMouseWasOver
-						.getStructureComponentType() == StructureComponentRegistry.TYPE_RESIDUE)
+						.getStructureComponentType() == ComponentType.RESIDUE)
 				{
 					final Residue r = (Residue) this.lastComponentMouseWasOver;
 					Atom a = r.getAlphaAtom();
@@ -542,25 +543,25 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 		final JoglSceneNode sn = (JoglSceneNode)structureMap.getUData();
 
 		final ChainGeometry defaultChainGeometry = (ChainGeometry) GlGeometryViewer.defaultGeometry
-				.get(StructureComponentRegistry.TYPE_CHAIN);
+				.get(ComponentType.CHAIN);
 		final AtomGeometry defaultAtomGeometry = (AtomGeometry) GlGeometryViewer.defaultGeometry
-				.get(StructureComponentRegistry.TYPE_ATOM);
+				.get(ComponentType.ATOM);
 		final BondGeometry defaultBondGeometry = (BondGeometry) GlGeometryViewer.defaultGeometry
-				.get(StructureComponentRegistry.TYPE_BOND);
+				.get(ComponentType.BOND);
 
 		final ChainStyle defaultChainStyle = (ChainStyle) structureStyles
-				.getDefaultStyle(StructureComponentRegistry.TYPE_CHAIN);
+				.getDefaultStyle(ComponentType.CHAIN);
 		final AtomStyle defaultAtomStyle = (AtomStyle) structureStyles
-				.getDefaultStyle(StructureComponentRegistry.TYPE_ATOM);
+				.getDefaultStyle(ComponentType.ATOM);
 		final BondStyle defaultBondStyle = (BondStyle) structureStyles
-				.getDefaultStyle(StructureComponentRegistry.TYPE_BOND);
+				.getDefaultStyle(ComponentType.BOND);
 
 		str.getStructureMap().getStructureStyles()
 				.removeStructureStylesEventListener(this);
 		str.getStructureMap().getStructureStyles()
 				.addStructureStylesEventListener(this);
 
-		defaultChainGeometry.setRibbonForm(ChainGeometry.RIBBON_SIMPLE_LINE);
+		defaultChainGeometry.setRibbonForm(RibbonForm.RIBBON_SIMPLE_LINE);
 		defaultChainGeometry.setRibbonsAreSmoothed(true);
 
 		// chains

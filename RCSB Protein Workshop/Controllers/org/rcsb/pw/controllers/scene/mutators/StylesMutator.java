@@ -1,6 +1,7 @@
 package org.rcsb.pw.controllers.scene.mutators;
 
-import org.rcsb.mbt.controllers.scene.PickLevel;
+import org.rcsb.mbt.controllers.app.AppBase;
+import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.mbt.glscene.jogl.AtomGeometry;
 import org.rcsb.mbt.glscene.jogl.BondGeometry;
 import org.rcsb.mbt.glscene.jogl.ChainGeometry;
@@ -73,8 +74,8 @@ public class StylesMutator extends Mutator {
 		final StructureMap sm = s.getStructureMap();
 		final StructureStyles ss = sm.getStructureStyles();
 		
-        switch(PickLevel.pickLevel) {
-        case PickLevel.COMPONENTS_ATOMS_BONDS:
+        switch(AppBase.sgetPickController().getPickLevel()) {
+        case ATOMS:
             final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(a);
         	if(renderable != null)
         	{
@@ -101,12 +102,12 @@ public class StylesMutator extends Mutator {
         	}
         	
         	break;
-        case PickLevel.COMPONENTS_RIBBONS:
+        case RIBBONS:
         	// propogate up one level.
         	this.changeStyle(sm.getResidue(a));
         	break;
         default:
-        	(new Exception(PickLevel.pickLevel + " is an invalid style mode.")).printStackTrace();
+        	(new Exception(AppBase.sgetPickController().getPickLevel() + " is an invalid style mode.")).printStackTrace();
         }
     }
 	
@@ -145,8 +146,9 @@ public class StylesMutator extends Mutator {
     	final Structure s = b.getStructure();
 		final StructureMap sm = s.getStructureMap();
 		
-        switch(PickLevel.pickLevel) {
-        case PickLevel.COMPONENTS_ATOMS_BONDS:
+		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        switch(pickLevel) {
+        case ATOMS:
         	/*GlGeometryViewer viewer = Model.getSingleton().getViewer();
             DisplayListRenderable renderable = viewer.getRenderable(b);
         	if(renderable != null) {
@@ -164,31 +166,32 @@ public class StylesMutator extends Mutator {
         	this.changeStyle(b.getAtom(0));
         	this.changeStyle(b.getAtom(1));
         	break;
-        case PickLevel.COMPONENTS_RIBBONS:
+        case RIBBONS:
         	// propogate up one level.
         	this.changeStyle(sm.getResidue(b.getAtom(0)));
         	break;
         default:
-        	(new Exception(PickLevel.pickLevel + " is an invalid style mode.")).printStackTrace();
+        	(new Exception(pickLevel + " is an invalid style mode.")).printStackTrace();
         }     
     }
     
     private void changeStyle(final Residue r)
     {
-        switch(PickLevel.pickLevel)
+		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        switch(pickLevel)
         {
-        case PickLevel.COMPONENTS_ATOMS_BONDS:       	
+        case ATOMS:       	
         	for (Bond b : r.getStructure().getStructureMap().getBonds(r.getAtoms()))
         		this.changeStyle(b);
         	break;
         	
-        case PickLevel.COMPONENTS_RIBBONS:
+        case RIBBONS:
         	// propogate up one level.
         	this.changeStyle(r.getFragment());
         	break;
         	
         default:
-        	(new Exception(PickLevel.pickLevel + " is an invalid style mode.")).printStackTrace();
+        	(new Exception(pickLevel + " is an invalid style mode.")).printStackTrace();
         }
     }
     
@@ -196,20 +199,21 @@ public class StylesMutator extends Mutator {
     	final Structure s = f.getStructure();
 		final StructureMap sm = s.getStructureMap();
 		
-        switch(PickLevel.pickLevel) {
-        case PickLevel.COMPONENTS_ATOMS_BONDS:
+		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        switch(pickLevel) {
+        case ATOMS:
         	for (Residue r : f.getResidues())
             	for (Bond b : sm.getBonds(r.getAtoms()))
             		this.changeStyle(b);
         	break;
         	
-        case PickLevel.COMPONENTS_RIBBONS:
+        case RIBBONS:
         	// propogate up one level.
         	this.changeStyle(f.getChain());
         	break;
         	
         default:
-        	(new Exception(PickLevel.pickLevel + " is an invalid style mode.")).printStackTrace();
+        	(new Exception(pickLevel + " is an invalid style mode.")).printStackTrace();
         }
     }
     
@@ -218,22 +222,23 @@ public class StylesMutator extends Mutator {
     	final Structure s = c.structure;
 		final StructureMap sm = s.getStructureMap();
 		
-        switch(PickLevel.pickLevel)
+		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        switch(pickLevel)
         {
-        case PickLevel.COMPONENTS_ATOMS_BONDS:
+        case ATOMS:
         	for (Residue r : c.getResiduesVec())
             	for (Bond b : sm.getBonds(r.getAtoms()))
             		this.changeStyle(b);
         	break;
         	
-        case PickLevel.COMPONENTS_RIBBONS:
+        case RIBBONS:
         	// propogate to the chains
         	for (Chain mbtChain : c.getMbtChains())
         		this.changeStyle(mbtChain);
         	break;
         	
         default:
-        	(new Exception(PickLevel.pickLevel + " is an invalid style mode.")).printStackTrace();
+        	(new Exception(pickLevel + " is an invalid style mode.")).printStackTrace();
         }
     }
     
@@ -241,13 +246,15 @@ public class StylesMutator extends Mutator {
     	final Structure s = c.getStructure();
 		final StructureMap sm = s.getStructureMap();
 		
-        switch(PickLevel.pickLevel) {
-        case PickLevel.COMPONENTS_ATOMS_BONDS:
+		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        switch(pickLevel)
+        {
+        case ATOMS:
         	for (Fragment f : c.getFragments())
         		this.changeStyle(f);
         	break;
         	
-        case PickLevel.COMPONENTS_RIBBONS:
+        case RIBBONS:
         	// propogate up one level.
             final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(c);
         	if(renderable != null) {
@@ -262,7 +269,7 @@ public class StylesMutator extends Mutator {
         	}
         	break;
         default:
-        	(new Exception(PickLevel.pickLevel + " is an invalid style mode.")).printStackTrace();
+        	(new Exception(pickLevel + " is an invalid style mode.")).printStackTrace();
         }        
     }
     

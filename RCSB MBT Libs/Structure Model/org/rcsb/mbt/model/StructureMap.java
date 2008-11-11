@@ -31,26 +31,6 @@
 //
 //  For further information, please see:  http://mbt.sdsc.edu
 //
-//  History:
-//  $Log: StructureMap.java,v $
-//  Revision 1.1  2007/02/08 02:38:52  jbeaver
-//  version 1.50
-//
-//  Revision 1.3  2007/01/03 19:33:49  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.2  2006/10/04 17:21:06  jbeaver
-//  Lots of changes from surfaces to improved picking
-//
-//  Revision 1.1  2006/09/20 16:50:42  jbeaver
-//  first commit - branched from ProteinWorkshop
-//
-//  Revision 1.1  2006/08/24 17:39:03  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.3  2006/05/16 17:57:02  jbeaver
-//  *** empty log message ***
-//
 //  Revision 1.2  2006/04/14 23:37:34  jbeaver
 //  Update with some (very broken) surface rendering stuff
 //
@@ -299,7 +279,7 @@ package org.rcsb.mbt.model;
 // Core
 import java.util.*;
 
-import org.rcsb.mbt.controllers.app.AppBase;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.*;
 import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
@@ -467,12 +447,20 @@ public class StructureMap
 	protected Vector<Chain> chains = null;     // All Chains in the Stucture.
 	protected Vector<Residue> ligands = null;    // Only Ligand Residues.
 	protected Vector<Bond> bonds = null;      // All Bond objects added to this StructureMap.
+	protected TreeMap<String, Vector<Bond>> calculatedBonds = null;
 	protected Set<Bond> bondUniqueness = null;  // Make sure Bond objects are unique.
 	protected Hashtable<Atom, Vector<Bond>> atomToBonds = null;  // Find all Bonds connected to each Atom.
 	
 	protected UnitCell unitCell = null;
 	protected BiologicUnitTransforms BUTransforms = null;
 	protected NonCrystallographicTransforms NCTransforms = null;
+	
+	public Vector<Bond> getBonds() { return bonds; }
+	public Vector<Chain> getChains() { return chains; }
+	public Vector<Fragment> getFragments() { return fragments; }
+	public Vector<Residue> getResidues() { return residues; }
+	public Vector<Atom> getAtoms() { return atoms; }
+	public Vector<Residue> getLigands() { return ligands; }
 	
 	public BiologicUnitTransforms addBiologicUnitTransforms()
 		{ BUTransforms = new BiologicUnitTransforms(); return BUTransforms; }
@@ -556,7 +544,7 @@ public class StructureMap
 	{
 		// All Atoms in the Stucture.
 		final int atomCount = this.structure.getStructureComponentCount(
-			StructureComponentRegistry.TYPE_ATOM );
+			ComponentType.ATOM );
 		if ( atomCount > 0 ) {
 			this.atoms = new Vector<Atom>( atomCount );
 		} else {
@@ -565,7 +553,7 @@ public class StructureMap
 
 		// All Residues in the Stucture.
 		final int residueCount = this.structure.getStructureComponentCount(
-			StructureComponentRegistry.TYPE_RESIDUE );
+			ComponentType.RESIDUE );
 		if ( residueCount > 0 ) {
 			this.residues = new Vector<Residue>( residueCount );
 		} else {
@@ -578,7 +566,7 @@ public class StructureMap
 
 		// All Bonds in the Structure.
 		final int bondCount = this.structure.getStructureComponentCount(
-			StructureComponentRegistry.TYPE_BOND );
+			ComponentType.BOND );
 		if ( bondCount > 0 ) {
 			this.bonds = new Vector<Bond>( bondCount );
 		} else {
@@ -636,16 +624,16 @@ public class StructureMap
 	protected void processAtomRecords( )
 	{
 		int atomCount = this.structure.getStructureComponentCount(
-			StructureComponentRegistry.TYPE_ATOM );
+			ComponentType.ATOM );
 		
 		for ( int i=0; i<atomCount; i++ )
 		{
 			final Atom atom = (Atom) this.structure.getStructureComponentByIndex(
-				StructureComponentRegistry.TYPE_ATOM, i );
+				ComponentType.ATOM, i );
 
 			String chainKeyId = atom.chain_id + atom.residue_id;
 
-			if (AppBase.isDebug())
+			if (DebugState.isDebug())
 				assert(atom.chain_id.length() > 0);
 						// with new structure loader paradigm, this should never happen
 			
@@ -763,13 +751,13 @@ public class StructureMap
 		int conformationCount = 0;
 
 		conformationCount += this.structure.getStructureComponentCount(
-			StructureComponentRegistry.TYPE_COIL );
+			ComponentType.COIL );
 		conformationCount += this.structure.getStructureComponentCount(
-			StructureComponentRegistry.TYPE_HELIX );
+			ComponentType.HELIX );
 		conformationCount += this.structure.getStructureComponentCount(
-			StructureComponentRegistry.TYPE_STRAND );
+			ComponentType.STRAND );
 		conformationCount += this.structure.getStructureComponentCount(
-			StructureComponentRegistry.TYPE_TURN );
+			ComponentType.TURN );
 
 		return conformationCount;
 	}
@@ -863,7 +851,7 @@ public class StructureMap
 		{
 			final Chain chain = this.chains.elementAt( c );
 			final int residueCount = chain.getResidueCount( );
-			chain.setFragment( 0, residueCount-1, Conformation.TYPE_UNDEFINED );
+			chain.setFragmentRange( 0, residueCount-1, ComponentType.UNDEFINED_CONFORMATION );
 		}
 
 		//
@@ -874,11 +862,11 @@ public class StructureMap
 		Conformation conformation = null;
 
 		final int coilCount = this.structure.getStructureComponentCount(
-			StructureComponentRegistry.TYPE_COIL );
+			ComponentType.COIL );
 		for ( int i=0; i<coilCount; i++ )
 		{
 			final Coil coil = (Coil) this.structure.getStructureComponentByIndex(
-				StructureComponentRegistry.TYPE_COIL, i );
+				ComponentType.COIL, i );
 			conformation = coil;
 
 			String chain_id = StructureMap.defaultChainId;
@@ -908,15 +896,15 @@ public class StructureMap
 				continue;
 			}
 
-			chain.setFragment( rIndex, rIndex+range, StructureComponentRegistry.TYPE_COIL );
+			chain.setFragmentRange( rIndex, rIndex+range, ComponentType.COIL );
 		}
 
 		final int helixCount = this.structure.getStructureComponentCount(
-			StructureComponentRegistry.TYPE_HELIX );
+			ComponentType.HELIX );
 		for ( int i=0; i<helixCount; i++ )
 		{
 			final Helix helix = (Helix) this.structure.getStructureComponentByIndex(
-				StructureComponentRegistry.TYPE_HELIX, i );
+				ComponentType.HELIX, i );
 			conformation = helix;
 
 			String chain_id = StructureMap.defaultChainId;
@@ -946,15 +934,15 @@ public class StructureMap
 				continue;
 			}
 
-			chain.setFragment( rIndex, rIndex+range, StructureComponentRegistry.TYPE_HELIX );
+			chain.setFragmentRange( rIndex, rIndex+range, ComponentType.HELIX );
 		}
 
 		final int strandCount = this.structure.getStructureComponentCount(
-			StructureComponentRegistry.TYPE_STRAND );
+			ComponentType.STRAND );
 		for ( int i=0; i<strandCount; i++ )
 		{
 			final Strand strand = (Strand) this.structure.getStructureComponentByIndex(
-				StructureComponentRegistry.TYPE_STRAND, i );
+				ComponentType.STRAND, i );
 			conformation = strand;
 
 			String chain_id = StructureMap.defaultChainId;
@@ -984,15 +972,15 @@ public class StructureMap
 				continue;
 			}
 
-			chain.setFragment( rIndex, rIndex+range, StructureComponentRegistry.TYPE_STRAND );
+			chain.setFragmentRange( rIndex, rIndex+range, ComponentType.STRAND );
 		}
 
 		final int turnCount = this.structure.getStructureComponentCount(
-			StructureComponentRegistry.TYPE_TURN );
+			ComponentType.TURN );
 		for ( int i=0; i<turnCount; i++ )
 		{
 			final Turn turn = (Turn) this.structure.getStructureComponentByIndex(
-				StructureComponentRegistry.TYPE_TURN, i );
+				ComponentType.TURN, i );
 			conformation = turn;
 
 			String chain_id = StructureMap.defaultChainId;
@@ -1022,7 +1010,7 @@ public class StructureMap
 				continue;
 			}
 
-			chain.setFragment( rIndex, rIndex+range, StructureComponentRegistry.TYPE_TURN );
+			chain.setFragmentRange( rIndex, rIndex+range, ComponentType.TURN );
 		}
 
 		//
@@ -1038,8 +1026,8 @@ public class StructureMap
 			// Skip chains that have no real fragments and <2 residues.
 			if ( (chain.getFragmentCount() <= 1) && (residueCount < 2) )
 			{
-				if ( chain.getFragmentType(0) != Conformation.TYPE_UNDEFINED ) {
-					chain.setFragment( 0, residueCount-1, Conformation.TYPE_UNDEFINED );
+				if ( chain.getFragmentType(0) != ComponentType.UNDEFINED_CONFORMATION ) {
+					chain.setFragmentRange( 0, residueCount-1, ComponentType.UNDEFINED_CONFORMATION );
 				}
 				continue;
 			}
@@ -1059,7 +1047,7 @@ public class StructureMap
 			        (residue.getClassification() != Residue.Classification.NUCLEIC_ACID) )
 				{
 					// Mark ligands/non-polymers as an UNDEFINED fragment.
-					chain.setFragment( r, r, Conformation.TYPE_UNDEFINED );
+					chain.setFragmentRange( r, r, ComponentType.UNDEFINED_CONFORMATION );
 					continue; // This residue needs no further attention.
 				}
 
@@ -1068,9 +1056,9 @@ public class StructureMap
 				{
 					// The residue has a valid alpha atom/index,
 					// but it has no fragment assignment, so assign coil.
-					final String conformationType = residue.getConformationType( );
-					if ( conformationType == Conformation.TYPE_UNDEFINED ) {
-						chain.setFragment( r, r, StructureComponentRegistry.TYPE_COIL );
+					final ComponentType conformationType = residue.getConformationType( );
+					if ( conformationType == ComponentType.UNDEFINED_CONFORMATION ) {
+						chain.setFragmentRange( r, r, ComponentType.COIL );
 					}
 					continue; // This residue needs no further attention.
 				}
@@ -1084,13 +1072,13 @@ public class StructureMap
 						// and fill in the disordered residue gap.
 						final int reasonableAtom = residue.getAtomCount() / 2;
 						residue.setAlphaAtomIndex( reasonableAtom );
-						chain.setFragment( r, r, StructureComponentRegistry.TYPE_COIL );
+						chain.setFragmentRange( r, r, ComponentType.COIL );
 						continue; // This residue needs no further attention.
 					}
 					else
 					{
 						// Leave a gap for the disordered residue.
-						chain.setFragment( r, r, Conformation.TYPE_UNDEFINED );
+						chain.setFragmentRange( r, r, ComponentType.UNDEFINED_CONFORMATION );
 						continue; // This residue needs no further attention.
 					}
 				}
@@ -1103,7 +1091,7 @@ public class StructureMap
 
 			for ( int i=0; i<chain.getFragmentCount(); i++ )
 			{
-				final String fragmentType = chain.getFragmentType( i );
+				final ComponentType fragmentType = chain.getFragmentType( i );
 				final int range0 = chain.getFragmentStartResidue( i );
 				final int range1 = chain.getFragmentEndResidue( i );
 				final int fragLen = range1 - range0;
@@ -1111,15 +1099,15 @@ public class StructureMap
 				if ( fragLen >= 3 ) {
 					continue; // 4 or more residues
 				}
-				if ( fragmentType == Conformation.TYPE_UNDEFINED ) {
+				if ( fragmentType == ComponentType.UNDEFINED_CONFORMATION ) {
 					continue;
 				}
 
 				// Set defined fragments that are "too short" to coil.
-				if ( fragmentType != StructureComponentRegistry.TYPE_COIL )
+				if ( fragmentType != ComponentType.COIL )
 				{
-					chain.setFragment( range0, range1,
-						StructureComponentRegistry.TYPE_COIL );
+					chain.setFragmentRange( range0, range1,
+						ComponentType.COIL );
 				}
 
 				// If we end up with a single-residue coil that is
@@ -1142,7 +1130,7 @@ public class StructureMap
 					final int aI = chain.getFragmentEndResidue( i-1 );
 					final Residue aR = chain.getResidue( aI );
 					final int aId = aR.getResidueId( );
-					final String pT = chain.getFragmentType( i-1 ); // prior type
+					final ComponentType pT = chain.getFragmentType( i-1 ); // prior type
 
 					final Residue bR = chain.getResidue( range0 );
 					final int bId = bR.getResidueId( );
@@ -1153,19 +1141,19 @@ public class StructureMap
 					final int dI = chain.getFragmentStartResidue( i+1 );
 					final Residue dR = chain.getResidue( dI );
 					final int dId = dR.getResidueId( );
-					final String nT = chain.getFragmentType( i+1 ); // next type
+					final ComponentType nT = chain.getFragmentType( i+1 ); // next type
 
 					final int abDiff = bId - aId;
 					final int cdDiff = dId - cId;
 
 					if (
-						( (abDiff>1) || (pT == Conformation.TYPE_UNDEFINED) )
+						( (abDiff>1) || (pT == ComponentType.UNDEFINED_CONFORMATION) )
 						&&
-						( (cdDiff>1) || (nT == Conformation.TYPE_UNDEFINED) )
+						( (cdDiff>1) || (nT == ComponentType.UNDEFINED_CONFORMATION) )
 					)
 					{
-						chain.setFragment( range0, range1,
-							Conformation.TYPE_UNDEFINED );
+						chain.setFragmentRange( range0, range1,
+							ComponentType.UNDEFINED_CONFORMATION );
 					}
 				}
 			}
@@ -1180,19 +1168,19 @@ public class StructureMap
 			if ( fragmentCount <= 0 ) {
 				continue;
 			}
-			String savedType = chain.getFragmentType( 0 );
+			ComponentType savedType = chain.getFragmentType( 0 );
 			final int savedRange[] = new int[2];
 			savedRange[0] = chain.getFragmentStartResidue( 0 );
 			savedRange[1] = chain.getFragmentEndResidue( 0 );
 			for ( int i=1; i<chain.getFragmentCount(); i++ )
 			{
-				final String fragmentType = chain.getFragmentType( i );
+				final ComponentType fragmentType = chain.getFragmentType( i );
 				range[0] = chain.getFragmentStartResidue( i );
 				range[1] = chain.getFragmentEndResidue( i );
 
 				// Can we coalese?
-				if ( (fragmentType == StructureComponentRegistry.TYPE_COIL)
-				&& (savedType == StructureComponentRegistry.TYPE_COIL) )
+				if ( (fragmentType == ComponentType.COIL)
+				&& (savedType == ComponentType.COIL) )
 				{
 					// Are the residue IDs contiguous between fragments?
 					final Residue tailRes = chain.getResidue( savedRange[1] );
@@ -1202,8 +1190,8 @@ public class StructureMap
 					if ( resIdDiff <= 1 )
 					{
 						// Coalese.
-						chain.setFragment( savedRange[0], range[1],
-							StructureComponentRegistry.TYPE_COIL );
+						chain.setFragmentRange( savedRange[0], range[1],
+							ComponentType.COIL );
 						i--; // Since we effectively removed a fragment.
 						savedType = fragmentType;
 						// savedRange[0] = range[0];
@@ -1212,9 +1200,9 @@ public class StructureMap
 					else
 					{
 						// Leave a gap.
-						chain.setFragment( range[0], range[1], StructureComponentRegistry.TYPE_COIL );
+						chain.setFragmentRange( range[0], range[1], ComponentType.COIL );
 						// System.err.println( "StructureMap.loadFragments: chain " + chain.getChainId() + ", residues " + tailRes.getResidueId() + "-GAP-" + headRes.getResidueId() );
-						// chain.setFragment( savedRange[1], savedRange[1], Conformation.TYPE_UNDEFINED );
+						// chain.setFragment( savedRange[1], savedRange[1], ComponentType.UNDEFINED_CONFORMATION );
 						// i++; // Since we effectively added a fragment.
 						savedType = fragmentType;
 						savedRange[0] = range[0];
@@ -1250,7 +1238,7 @@ public class StructureMap
 	protected void processResidueRecords( )
 	{
 		final int residueCount = this.structure.getStructureComponentCount(
-			StructureComponentRegistry.TYPE_RESIDUE );
+			ComponentType.RESIDUE );
 
 		if ( residueCount <= 0 ) {
 			return;
@@ -1265,7 +1253,7 @@ public class StructureMap
 		for ( int r=0; r<residueCount; r++ )
 		{
 			final Residue residue = (Residue) this.structure.getStructureComponentByIndex(
-				StructureComponentRegistry.TYPE_RESIDUE, r );
+				ComponentType.RESIDUE, r );
 
 			this.residues.add( residue );
 			chain.addResidue( residue );
@@ -1282,6 +1270,27 @@ public class StructureMap
 		for ( Residue residue : residues)
 			if ( residue.getClassification() == Residue.Classification.LIGAND )
 				ligands.add( residue );
+	}
+	
+	/**
+	 * This is mostly used for debugging, but also for dumping
+	 * 
+	 * @param compoundCode
+	 * @param bondVector
+	 */
+	public void markCalculatedBonds(String compoundCode, Vector<Bond> bondVector)
+	{
+		if (DebugState.isDebug())
+		{
+			if (calculatedBonds == null)
+				calculatedBonds = new TreeMap<String, Vector<Bond>>();
+			calculatedBonds.put(compoundCode, bondVector);
+		}
+	}
+	
+	public TreeMap<String, Vector<Bond>> getCalculatedBonds()
+	{
+		return calculatedBonds;
 	}
 
 	//
@@ -1346,22 +1355,6 @@ public class StructureMap
 		return this.atoms.size( );
 	}
 
-
-	/**
-	 *  Get a Vector of all Atom objects in the Structure.
-	 *  <P>
-	 *  WARNING: Since the Atom count may be large in complex structures,
-	 *  the returned vector may take a large amount of memory (even though
-	 *  the vector contains only references to the exsting Atom objects).
-	 *  <P>
-	 */
-	public Vector<Atom> getAtoms( )
-	{
-		if ( this.atoms == null ) {
-			return null;
-		}
-		return new Vector<Atom>( this.atoms );
-	}
 
 	/**
 	 *  Get the Atom at the specified index.
@@ -1872,14 +1865,14 @@ public class StructureMap
 		//
 
 		final int bondCount = this.structure.getStructureComponentCount(
-			StructureComponentRegistry.TYPE_BOND );
+			ComponentType.BOND );
 		if ( bondCount > 0 )
 		{
 			// Load bonds from the dataset.
 			for ( int b=0; b<bondCount; b++ )
 			{
 				final Bond bond = (Bond) this.structure.getStructureComponentByIndex(
-					StructureComponentRegistry.TYPE_BOND, b );
+					ComponentType.BOND, b );
 				this.addBond( bond );
 			}
 		}
@@ -2098,15 +2091,7 @@ public class StructureMap
 		if ( this.chains == null ) {
 			return null;
 		}
-		return (Chain) this.chains.elementAt( chainIndex );
-	}
-
-	/**
-	 * Return the chains from the Structure.
-	 */
-	public Vector<Chain> getChains( )
-	{
-		return this.chains;
+		return this.chains.elementAt( chainIndex );
 	}
 
 	/**
@@ -2123,7 +2108,7 @@ public class StructureMap
 		// Do a linear search of the chains vector.
 		for ( int i=0; i<chainCount; i++ )
 		{
-			final Chain chain2 = (Chain) this.chains.elementAt( i );
+			final Chain chain2 = this.chains.elementAt( i );
 			if ( chain == chain2 ) {
 				return i;
 			}
@@ -2163,20 +2148,16 @@ public class StructureMap
 	 * Return the number of StructureComponent objects specified by type.
 	 * <P>
 	 */
-	public int getStructureComponentCount( final String type )
+	public int getStructureComponentCount( final ComponentType type )
 	{
-		if ( type == StructureComponentRegistry.TYPE_ATOM ) {
-			return this.atoms.size( );
-		} else if ( type == StructureComponentRegistry.TYPE_RESIDUE ) {
-			return this.residues.size( );
-		} else if ( type == StructureComponentRegistry.TYPE_FRAGMENT ) {
-			return this.fragments.size( );
-		} else if ( type == StructureComponentRegistry.TYPE_CHAIN ) {
-			return this.chains.size( );
-		} else if ( type == StructureComponentRegistry.TYPE_BOND ) {
-			return this.bonds.size( );
-		} else {
-			return this.structure.getStructureComponentCount( type );
+		switch (type)
+		{
+			case ATOM: return this.atoms.size( );
+			case RESIDUE: return this.residues.size( );
+			case FRAGMENT: return this.fragments.size( );
+			case CHAIN: return this.chains.size( );
+			case BOND: return this.bonds.size( );
+			default: return this.structure.getStructureComponentCount( type );
 		}
 	}
 
@@ -2185,20 +2166,16 @@ public class StructureMap
 	 * Return the StructureComponent object specified by its type and index.
 	 * <P>
 	 */
-	public StructureComponent getStructureComponentByIndex( final String type, final int index )
+	public StructureComponent getStructureComponentByIndex( final ComponentType type, final int index )
 	{
-		if ( type == StructureComponentRegistry.TYPE_ATOM ) {
-			return (Atom) this.atoms.elementAt( index );
-		} else if ( type == StructureComponentRegistry.TYPE_RESIDUE ) {
-			return (Residue) this.residues.elementAt( index );
-		} else if ( type == StructureComponentRegistry.TYPE_FRAGMENT ) {
-			return (Fragment) this.fragments.elementAt( index );
-		} else if ( type == StructureComponentRegistry.TYPE_CHAIN ) {
-			return (Chain) this.chains.elementAt( index );
-		} else if ( type == StructureComponentRegistry.TYPE_BOND ) {
-			return (Bond) this.bonds.elementAt( index );
-		} else {
-			return this.structure.getStructureComponentByIndex( type, index );
+		switch (type)
+		{
+			case ATOM: return this.atoms.elementAt( index );
+			case RESIDUE: return this.residues.elementAt( index );
+			case FRAGMENT: return this.fragments.elementAt( index );
+			case CHAIN: return this.chains.elementAt( index );
+			case BOND: return this.bonds.elementAt( index );
+			default: return this.structure.getStructureComponentByIndex( type, index );
 		}
 	}
 
@@ -2228,35 +2205,36 @@ public class StructureMap
 		}
 
 		final StructureComponent sc = (StructureComponent) object;
-		final String type = sc.getStructureComponentType( );
 		Vector<Object> parents = null;
+		
+		switch(sc.getStructureComponentType( ))
+		{
+			case ATOM:
+				parents = new Vector<Object>( );
+				parents.add( this.getResidue( (Atom) sc ) );
+				break;
 
-		if ( type == StructureComponentRegistry.TYPE_ATOM )
-		{
-			parents = new Vector<Object>( );
-			parents.add( this.getResidue( (Atom) sc ) );
-		}
-		else if ( type == StructureComponentRegistry.TYPE_BOND )
-		{
-			parents = new Vector<Object>( );
-			final Bond bond = (Bond) sc;
-			parents.add( bond.getAtom(0) );
-			parents.add( bond.getAtom(1) );
-		}
-		else if ( type == StructureComponentRegistry.TYPE_RESIDUE )
-		{
-			parents = new Vector<Object>( );
-			parents.add( ((Residue)sc).getFragment() );
-		}
-		else if ( type == StructureComponentRegistry.TYPE_FRAGMENT )
-		{
-			parents = new Vector<Object>( );
-			parents.add( ((Fragment)sc).getChain() );
-		}
-		else if ( type == StructureComponentRegistry.TYPE_CHAIN )
-		{
-			parents = new Vector<Object>( );
-			parents.add( structure );
+			case BOND:
+				parents = new Vector<Object>( );
+				final Bond bond = (Bond) sc;
+				parents.add( bond.getAtom(0) );
+				parents.add( bond.getAtom(1) );
+				break;
+
+			case RESIDUE:
+				parents = new Vector<Object>( );
+				parents.add( ((Residue)sc).getFragment() );
+				break;
+
+			case FRAGMENT:
+				parents = new Vector<Object>( );
+				parents.add( ((Fragment)sc).getChain() );
+				break;
+
+			case CHAIN:
+				parents = new Vector<Object>( );
+				parents.add( structure );
+				break;
 		}
 
 		return parents;
@@ -2284,34 +2262,14 @@ public class StructureMap
 		}
 
 		final StructureComponent sc = (StructureComponent) object;
-		final String type = sc.getStructureComponentType( );
 
-		if ( type == StructureComponentRegistry.TYPE_CHAIN )
+		switch(sc.getStructureComponentType())
 		{
-			return ((Chain) sc).getFragments( );
-		}
-		else if ( type == StructureComponentRegistry.TYPE_FRAGMENT )
-		{
-			return ((Fragment) sc).getResidues( );
-		}
-		else if ( type == StructureComponentRegistry.TYPE_RESIDUE )
-		{
-			return ((Residue) sc).getAtoms( );
-		}
-		else if ( type == StructureComponentRegistry.TYPE_ATOM )
-		{
-			return null;
-		}
-		else if ( type == StructureComponentRegistry.TYPE_BOND )
-		{
-			// Even though physically Atoms are children, they
-			// are not concidered children logically.
-			// Note that Atoms ARE parents to Bonds.
-			return null;
-		}
-		else
-		{
-			return null;
+			case CHAIN:  return ((Chain) sc).getFragments( );
+			case FRAGMENT: return ((Fragment) sc).getResidues( );
+			case RESIDUE: ((Residue) sc).getAtoms( );
+			default:
+				return null;
 		}
 	}
 

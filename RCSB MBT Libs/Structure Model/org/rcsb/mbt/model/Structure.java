@@ -103,6 +103,7 @@
 
 package org.rcsb.mbt.model;
 
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.filters.IStructureComponentFilter;
 import org.rcsb.mbt.model.filters.RelationFilter;
 import org.rcsb.mbt.model.util.Status;
@@ -163,7 +164,7 @@ public abstract class Structure
 	 * Counts components of the specified type that exist in the structure.
 	 * TYPE values are defined in the StructureComponentRegistry class.
 	 */
-	abstract public int getStructureComponentCount( String scType );
+	abstract public int getStructureComponentCount( ComponentType scType );
 
 	/**
 	 * Given a StructureComponentFilter, create and return an iterator
@@ -205,22 +206,21 @@ public abstract class Structure
 	}
 
 	/**
-	 * Get the values for any StructureSomponent subclass by its type-specific
+	 * Get the values for any StructureComponent subclass by its type-specific
 	 * index. For example: Atom, Residue, Conformation, etc.
 	 * <P>
 	 * Note that it is the caller's responsibility to cast the returned
-	 * object to the corresponding StructureComponent sublcass type.
+	 * object to the corresponding StructureComponent subclass type.
 	 * For example, an application might do something like this:
 	 * <P>
 	 * <UL>
 	 * <PRE>
 	 * // First load a structure using the StructureFactory, and then...
 	 * int atom_count =
-	 *   structure.getStructureComponentCount( StructureComponentRegistry.TYPE_ATOM );
-	 * for ( int i=0; i<atom_count; i++ )
+	 *   structure.getStructureComponentCount( ComponentType.ATOM );
+	 * for ( int i = 0; i < atom_count; i++ )
 	 * {
-	 *    Atom atom = (Atom) structure.getStructureComponentByIndex(
-	 *       StructureComponentRegistry.TYPE_ATOM, i );
+	 *    Atom atom = (Atom) structure.getStructureComponentByIndex(ComponentType.ATOM, i );
 	 *
 	 *    System.err.println( "coord = " + atom.coordinate[0] + ", " +
      *      atom.coordinate[1] + ", " + atom.coordinate[2] );
@@ -231,7 +231,7 @@ public abstract class Structure
 	 * </UL>
 	 */
 	abstract public StructureComponent getStructureComponentByIndex(
-		String structureComponentType, int index )
+		ComponentType structureComponentType, int index )
 		throws IndexOutOfBoundsException, IllegalArgumentException;
 
 	/**

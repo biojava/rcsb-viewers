@@ -65,6 +65,8 @@
 
 package org.rcsb.mbt.model;
 
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+
 /**
  *  A class used to store a single relationship description between two
  *  StructureComponent types (much like a relational link between
@@ -86,14 +88,15 @@ public abstract class StructureComponentRelation
 	 * The name of this Relation
 	 */
 	private String name = null;
-	private String subject_type = null;
-	private String object_type = null;
+	private ComponentType subject_type = null;
+	private ComponentType object_type = null;
 
 	/**
 	 * Constructor.
 	 */
-	public StructureComponentRelation( final String name, final String subject_type,
-		final String object_type )
+	public StructureComponentRelation( final String name,
+			final ComponentType subject_type,
+			final ComponentType object_type )
 	{
 		this.name = name;
 		this.subject_type = subject_type;
@@ -112,7 +115,7 @@ public abstract class StructureComponentRelation
 	 * Returns the <I>subject type</I> of this StructureComponentRelation
 	 * object.
 	 */
-	public final String getSubjectType()
+	public final ComponentType getSubjectType()
 	{
 		return this.subject_type;
 	}
@@ -121,7 +124,7 @@ public abstract class StructureComponentRelation
 	 * Returns the <I>object type</I> of this StructureComponentRelation
 	 * object.
 	 */
-	public final String getObjectType()
+	public final ComponentType getObjectType()
 	{
 		return this.object_type;
 	}
@@ -134,8 +137,7 @@ public abstract class StructureComponentRelation
 	 * abstract "isLinked" method.
 	 * <P>
 	 */
-	public final boolean isRelated( final StructureComponent subject,
-		final StructureComponent object )
+	public final boolean isRelated( final StructureComponent subject, final StructureComponent object )
 	{
 		// Are the subject and object related at all?
 		if ( subject.getStructureComponentType() != this.subject_type ) {

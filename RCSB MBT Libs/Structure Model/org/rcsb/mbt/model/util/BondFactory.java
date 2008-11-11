@@ -118,6 +118,7 @@ package org.rcsb.mbt.model.util;
 import java.util.*;
 
 import org.rcsb.mbt.model.*;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.geometry.Algebra;
 
 
@@ -203,7 +204,7 @@ public class BondFactory
 		//
 
 		final int atomCount = structure.getStructureComponentCount(
-			StructureComponentRegistry.TYPE_ATOM );
+			ComponentType.ATOM );
 
 		final Hashtable<Integer,Integer> occupiedCells = new Hashtable<Integer,Integer>( atomCount );
 		final int cellCoord[] = new int[3];
@@ -212,7 +213,7 @@ public class BondFactory
 		for ( int i=0; i<atomCount; i++ )
 		{
 			final Atom atom = (Atom) structure.getStructureComponentByIndex(
-				StructureComponentRegistry.TYPE_ATOM, i );
+				ComponentType.ATOM, i );
 
 			// Compute the 3D cell coordinate in which the atom lives
 			cellCoord[0] = (int)
@@ -239,7 +240,7 @@ public class BondFactory
 		for ( int i=0; i<atomCount; i++ )
 		{
 			final Atom atom = (Atom) structure.getStructureComponentByIndex(
-				StructureComponentRegistry.TYPE_ATOM, i );
+				ComponentType.ATOM, i );
 
 			// Compute the cell coordinate in which the atom lives
 			cellCoord[0] = (int)
@@ -279,7 +280,7 @@ public class BondFactory
 							{
 								final Atom atom2 = (Atom)
 									structure.getStructureComponentByIndex(
-									StructureComponentRegistry.TYPE_ATOM, i2 );
+									ComponentType.ATOM, i2 );
 								// Only add a bond if atoms are close enough
 								if ( BondFactory.distance( atom, atom2 ) <= bondLimit )
 								{
@@ -493,7 +494,7 @@ public class BondFactory
 							continue;
 						}
 
-						final ChemicalComponentBonds.BondType bondType =
+						final ChemicalComponentBonds.BondOrder bondType =
 							ChemicalComponentBonds.bondType( atom0, atom1 );
 
 						switch (bondType)
@@ -516,8 +517,14 @@ public class BondFactory
 			{
 				// The compound is not in the dictionary, so at least
 				// generate bonds for it using the octree / distances.
-				structureMap.addBonds( BondFactory.generateBonds(
-					residue.getAtoms(), BondFactory.covalentBondLimit, true ) );
+				Vector<Bond> bondVector = BondFactory.generateBonds(
+						residue.getAtoms(), BondFactory.covalentBondLimit, true );
+				
+				structureMap.addBonds( bondVector );
+				if (DebugState.isDebug())
+					structureMap.markCalculatedBonds(
+							compoundCode + " (ChainID: " + residue.getAtom(0).chain_id + ")",
+							bondVector);
 			}
 
 		}

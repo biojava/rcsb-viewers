@@ -3,7 +3,7 @@ package org.rcsb.pw.controllers.scene.mutators;
 import java.util.Vector;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.PickLevel;
+import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.mbt.glscene.jogl.DisplayListGeometry;
 import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
@@ -15,8 +15,8 @@ import org.rcsb.mbt.model.ExternChain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
-import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.Style;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
@@ -34,11 +34,13 @@ public class StructureElement_VisibilityMutator extends Mutator {
 	}
 
 	
+	@Override
 	public boolean supportsBatchMode() {
 		return true;
 	}
 	
 	
+	@Override
 	public void doMutationSingle(final Object mutee) {
 		mutees.clear();
 		mutees.add(mutee);
@@ -47,23 +49,25 @@ public class StructureElement_VisibilityMutator extends Mutator {
 	}
 	
 	
+	@Override
 	public void doMutation() {
 		boolean newVisibility = false;
-		switch(this.options.getVisibility()) {
-		case StructureElement_VisibilityOptions.VISIBILITY_INVISIBLE:
+		switch(options.getVisibility())
+		{
+		case INVISIBLE:
 			newVisibility = false;
 			break;
-		case StructureElement_VisibilityOptions.VISIBILITY_VISIBLE:
+		case VISIBLE:
 			newVisibility = true;
 			break;
-		case StructureElement_VisibilityOptions.VISIBILITY_TOGGLE:
+		case TOGGLE:
 			// be consistant - toggle based on the first selection.
 			final Object first = mutees.iterator().next();
 			
 			newVisibility = !this.isComponentVisible(first);
 			break;
 		default:
-			(new Exception("Invalid option: " + PickLevel.pickLevel)).printStackTrace();
+			(new Exception("Invalid option: " + this.options.getVisibility())).printStackTrace();
 		}
 		
 		for (Object next : mutees)
@@ -90,8 +94,10 @@ public class StructureElement_VisibilityMutator extends Mutator {
 	}
 	
 	public boolean isComponentVisible(final Object component) {
-		switch(PickLevel.pickLevel) {
-		case PickLevel.COMPONENTS_ATOMS_BONDS:
+		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        switch(pickLevel)
+        {
+		case ATOMS:
 			if(component instanceof Atom || component instanceof Bond) {
 				final StructureComponent sc = (StructureComponent)component;
 				final StructureStyles ss = sc.structure.getStructureMap().getStructureStyles();
@@ -118,7 +124,7 @@ public class StructureElement_VisibilityMutator extends Mutator {
 				return ss.isVisible(s.getStructureMap().getAtom(0));
 			}
 			//break;
-		case PickLevel.COMPONENTS_RIBBONS:
+		case RIBBONS:
 			if(component instanceof Atom) {
 				final Atom a = (Atom)component;
 				final StructureMap sm = a.structure.getStructureMap();
@@ -174,7 +180,7 @@ public class StructureElement_VisibilityMutator extends Mutator {
 			}
 			//break;
 		default:
-			(new Exception(component.getClass().toString())).printStackTrace();
+            (new Exception("Invalid option: " + pickLevel)).printStackTrace();  
 		}
 		
 		return false;
@@ -195,7 +201,7 @@ public class StructureElement_VisibilityMutator extends Mutator {
 		}
 		
 		// for backbones, make sure this is an amino acid chain...
-		if(sc.getStructureComponentType() == StructureComponentRegistry.TYPE_CHAIN) {
+		if(sc.getStructureComponentType() == ComponentType.CHAIN) {
 			final Chain c = (Chain)sc;
 			if(c.getClassification() != Residue.Classification.AMINO_ACID) {
 				return;
@@ -210,9 +216,9 @@ public class StructureElement_VisibilityMutator extends Mutator {
 		ss.setVisible(sc, newVisibility);
 		
 		if(newVisibility) {
-			final String scType = sc.getStructureComponentType();
+			final ComponentType scType = sc.getStructureComponentType();
 			final DisplayListGeometry geometry =
-				(DisplayListGeometry) AppBase.sgetSceneController().getDefaultGeometry().get( scType );
+				AppBase.sgetSceneController().getDefaultGeometry().get( scType );
 			
 			
 			Style style = ss.getStyle( sc );
@@ -229,9 +235,10 @@ public class StructureElement_VisibilityMutator extends Mutator {
 	
     private void setVisibility(final Atom a, final boolean newVisibility)
     {
-        switch(PickLevel.pickLevel)
+		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        switch(pickLevel)
         {
-        case PickLevel.COMPONENTS_ATOMS_BONDS:
+        case ATOMS:
         	this.setComponentVisibilitySimple(a, newVisibility);
         	
         	final StructureMap sm = a.structure.getStructureMap();
@@ -249,69 +256,34 @@ public class StructureElement_VisibilityMutator extends Mutator {
         	}
         	
             break;
-        case PickLevel.COMPONENTS_RIBBONS:
+        case RIBBONS:
             final Residue r = a.structure.getStructureMap().getResidue(a);
             if(r != null) {
             	this.setVisibility(r, newVisibility);
             }
             break;
         default:
-            (new Exception()).printStackTrace();
-        }
+            (new Exception("Invalid option: " + pickLevel)).printStackTrace();          }
     }
 
     private void setVisibility(final Bond b, final boolean newVisibility) {
-        switch(PickLevel.pickLevel) {
-        case PickLevel.COMPONENTS_ATOMS_BONDS:
+		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        switch(pickLevel)
+        {
+        case ATOMS:
         	// delegate to the atoms...
         	this.setVisibility(b.getAtom(0), newVisibility);
         	this.setVisibility(b.getAtom(1), newVisibility);
-        	
-        	/*this.setComponentVisibilitySimple(b, newVisibility);
-            
-            // set atom visibility based on the surrounding bonds.
-            if(newVisibility) {
-            	this.setComponentVisibilitySimple(b.getAtom(0), newVisibility);
-            	this.setComponentVisibilitySimple(b.getAtom(1), newVisibility);
-            } else {
-	            Vector bonds = sm.getBonds(b.getAtom(0));
-	            int bondsSize = bonds.size();
-	            boolean aBondIsVisible = false;
-	            for(int i = 0; i < bondsSize; i++) {
-	            	Bond b_ = (Bond)bonds.get(i);
-	            	if(viewer.getRenderable(b_) != null) {
-	            		aBondIsVisible = true;
-	            		break;
-	            	}
-	            }
-	            if(!aBondIsVisible) {
-	            	this.setComponentVisibilitySimple(b.getAtom(0), newVisibility);
-	            }
-	            
-	            bonds = sm.getBonds(b.getAtom(1));
-	            bondsSize = bonds.size();
-	            aBondIsVisible = false;
-	            for(int i = 0; i < bondsSize; i++) {
-	            	Bond b_ = (Bond)bonds.get(i);
-	            	if(viewer.getRenderable(b_) != null) {
-	            		aBondIsVisible = true;
-	            		break;
-	            	}
-	            }
-	            if(!aBondIsVisible) {
-	            	this.setComponentVisibilitySimple(b.getAtom(1), newVisibility);
-	            }
-            }*/
             break;
-        case PickLevel.COMPONENTS_RIBBONS:
+            
+        case RIBBONS:
             final Residue r = b.structure.getStructureMap().getResidue(b.getAtom(0));
             if(r != null) {
             	this.setVisibility(r, newVisibility);
             }
             break;
         default:
-            (new Exception()).printStackTrace();
-        }
+            (new Exception("Invalid option: " + pickLevel)).printStackTrace();          }
     }
     
     private void setVisibility(final Residue r, final boolean newVisibility) {
@@ -326,8 +298,10 @@ public class StructureElement_VisibilityMutator extends Mutator {
          *          value: Integer countOccurances
          *      }
          */
-        switch(PickLevel.pickLevel) {
-        case PickLevel.COMPONENTS_ATOMS_BONDS:
+		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        switch(pickLevel)
+        {
+        case ATOMS:
             final Vector<Atom> atoms = r.getAtoms();
             
             for (Atom a : atoms)
@@ -338,35 +312,38 @@ public class StructureElement_VisibilityMutator extends Mutator {
 
             break;
             
-        case PickLevel.COMPONENTS_RIBBONS:
+        case RIBBONS:
             sm.getStructureStyles().setVisible(r, newVisibility);
             break;
             
         default:
-            (new Exception("Invalid option: " + PickLevel.pickLevel)).printStackTrace();
+            (new Exception("Invalid option: " + pickLevel)).printStackTrace();
         }
     }
     
     private void setVisibility(final Chain c, final boolean newVisibility) {
-		switch(PickLevel.pickLevel) {
-        case PickLevel.COMPONENTS_ATOMS_BONDS:
-        case PickLevel.COMPONENTS_RIBBONS:
+		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        switch(pickLevel)
+        {
+        case ATOMS:
+        case RIBBONS:
         	for (Fragment f : c.getFragments())
         		this.setVisibility(f, newVisibility);
             break;
         default:
-            (new Exception("Invalid option: " + PickLevel.pickLevel)).printStackTrace();
+            (new Exception("Invalid option: " + pickLevel)).printStackTrace();
         }
     }
     
     private void setVisibility(final ExternChain c, final boolean newVisibility)
     {
-        switch(PickLevel.pickLevel)
+		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        switch(pickLevel)
         {
-        case PickLevel.COMPONENTS_ATOMS_BONDS: break;
-        case PickLevel.COMPONENTS_RIBBONS: if (!c.isBasicChain()) return;
+        case ATOMS: break;
+        case RIBBONS: if (!c.isBasicChain()) return;
         default:
-            (new Exception("Invalid option: " + PickLevel.pickLevel)).printStackTrace();            
+            (new Exception("Invalid option: " + pickLevel)).printStackTrace();            
         }
         
     	for (Chain mbtChain : c.getMbtChains())
@@ -375,28 +352,32 @@ public class StructureElement_VisibilityMutator extends Mutator {
     
     private void setVisibility(final Fragment f, final boolean newVisibility)
     {       
-        switch(PickLevel.pickLevel) {
-        case PickLevel.COMPONENTS_ATOMS_BONDS:
-        case PickLevel.COMPONENTS_RIBBONS:
+		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        switch(pickLevel)
+        {
+        case ATOMS:
+        case RIBBONS:
         	for (Residue r : f.getResidues())
         		this.setVisibility(r, newVisibility);
             break;
         default:
-            (new Exception("Invalid option: " + PickLevel.pickLevel)).printStackTrace();            
+            (new Exception("Invalid option: " + pickLevel)).printStackTrace();            
         }
     }
     
     private void setVisibility(final Structure s, final boolean newVisibility) {
         final StructureMap sm = s.getStructureMap();
         
-        switch(PickLevel.pickLevel) {
-        case PickLevel.COMPONENTS_ATOMS_BONDS:
-        case PickLevel.COMPONENTS_RIBBONS:
+		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        switch(pickLevel)
+        {
+        case ATOMS:
+        case RIBBONS:
             for (Chain c : sm.getChains())
                 this.setVisibility(c, newVisibility);
             break;
         default:
-            (new Exception("Invalid option: " + PickLevel.pickLevel)).printStackTrace();            
+            (new Exception("Invalid option: " + pickLevel)).printStackTrace();            
         }
     }
 }

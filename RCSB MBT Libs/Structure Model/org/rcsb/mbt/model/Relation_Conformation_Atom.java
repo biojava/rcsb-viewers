@@ -62,6 +62,8 @@
 
 package org.rcsb.mbt.model;
 
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+
 /**
  *  This class represents a relationship between the
  *  Conformation and the Atom StructureComponent class.
@@ -83,7 +85,7 @@ public class Relation_Conformation_Atom
 	public Relation_Conformation_Atom( )
 	{
 		super( "Relation_Conformation_Atom",
-			"org.rcsb.mbt.Conformation", "org.rcsb.mbt.Atom" );
+			ComponentType.RELATION_CONFORMATION_ATOMS, ComponentType.ATOM );
 	}
 
 	/**

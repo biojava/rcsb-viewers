@@ -4,12 +4,11 @@ import java.util.Vector;
 
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 
 public class Surface extends StructureComponent {
 	public Vector atoms;
-	
-	public static final String COMPONENT_TYPE = "Surface";
 	
 	public Surface(final Vector atoms, final Structure structure) {
 		super();
@@ -25,8 +24,8 @@ public class Surface extends StructureComponent {
 	}
 
 	
-	public String getStructureComponentType() {
-		return Surface.COMPONENT_TYPE;
+	public ComponentType getStructureComponentType() {
+		return ComponentType.SURFACE;
 	}
 
 }

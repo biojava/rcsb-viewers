@@ -13,6 +13,7 @@ import javax.swing.WindowConstants;
 
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.doc.DocController;
+import org.rcsb.mbt.controllers.scene.PickController;
 import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.controllers.update.UpdateController;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
@@ -62,6 +63,16 @@ public abstract class DocumentFrameBase extends JFrame
 	{
 		if (sceneController == null) sceneController = AppBase.sgetAppModuleFactory().createSceneController();
 		return sceneController;
+	}
+	
+	/**
+	 * The pick controller determines what level of items are pickable - atoms, residues, chains, etc.
+	 */
+	private PickController pickController = null;
+	public PickController getPickController()
+	{
+		if (pickController == null) pickController = AppBase.sgetAppModuleFactory().createPickController();
+		return pickController;
 	}
 	
 	/**

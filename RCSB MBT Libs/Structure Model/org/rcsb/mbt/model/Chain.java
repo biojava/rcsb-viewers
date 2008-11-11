@@ -40,7 +40,7 @@ package org.rcsb.mbt.model;
 // Core
 import java.util.*;
 
-import org.rcsb.mbt.controllers.app.AppBase;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.util.*;
 
 
@@ -84,7 +84,7 @@ public class Chain
 	 *     the setFragment method to configure ranges.
 	 *  <P>
 	 */ 
-	private RangeMap fragments = null;
+	private RangeMap fragmentRanges = null;
 	private Vector<Fragment> fragmentObjects = null;
 	
 	/**
@@ -114,6 +114,7 @@ public class Chain
 	/**
 	 *  Copy all of the field values from the parameter object into "this".
 	 */
+	@Override
 	public void copy( final StructureComponent structureComponent )
 	{
 		this.setStructure( structureComponent.getStructure() );
@@ -122,6 +123,7 @@ public class Chain
 	/**
 	 *  Clone this object.
 	 */
+	@Override
 	public Object clone( )
 		throws CloneNotSupportedException
 	{
@@ -149,9 +151,10 @@ public class Chain
 	/**
 	 *  This method returns the fully qualified name of this class.
 	 */
-	public String getStructureComponentType( )
+	@Override
+	public ComponentType getStructureComponentType( )
 	{
-		return Chain.className;
+		return ComponentType.CHAIN;
 	}
 
 	//
@@ -196,7 +199,7 @@ public class Chain
 			}
 			
 			/* **/
-			if (AppBase.isDebug())
+			if (DebugState.isDebug())
 			{
 				int numTallies = 0;
 				for (int tally : classTallies)
@@ -260,7 +263,7 @@ public class Chain
 		final int residueCount = this.getResidueCount( );
 		for ( int r=0; r<residueCount; r++ )
 		{
-			final Residue residue = (Residue) this.residues.elementAt( r );
+			final Residue residue = this.residues.elementAt( r );
 			if ( residue != null ) {
 				atomCount += residue.getAtomCount( );
 			}
@@ -301,7 +304,7 @@ public class Chain
 		if ( this.residues == null ) {
 			throw new IndexOutOfBoundsException( "chain has no residues" );
 		} else {
-			return (Residue) this.residues.elementAt( index );
+			return this.residues.elementAt( index );
 		}
 	}
 
@@ -382,16 +385,16 @@ public class Chain
 		this.residues.add( residue );
 
 		// Update the fragments map.
-		if ( this.fragments == null )
+		if ( this.fragmentRanges == null )
 		{
-			this.fragments = new RangeMap( 0, 0, Conformation.TYPE_UNDEFINED );
-			this.fragments.setCollapseOn( false );
+			this.fragmentRanges = new RangeMap( 0, 0, ComponentType.UNDEFINED_CONFORMATION );
+			this.fragmentRanges.setCollapseOn( false );
 			// Don't append the first value othewise we'll have an invalid rangeMax.
-			this.fragments.setValue( 0, residue.getConformationType() );
+			this.fragmentRanges.setValue( 0, residue.getConformationType() );
 		}
 		else
 		{
-			this.fragments.append( residue.getConformationType() );
+			this.fragmentRanges.append( residue.getConformationType() );
 		}
 		this.fragmentObjects = null;  // Invalidate the old fragmentObjects.
 
@@ -412,7 +415,7 @@ public class Chain
 		this.residueToIndexHash = null;
 
 		// Toss the fragments map.
-		this.fragments = null;
+		this.fragmentRanges = null;
 		this.fragmentObjects = null;  // Invalidate the old fragmentObjects.
 
 		// TODO: Should we fire a StructureComponentEvent here?
@@ -426,14 +429,14 @@ public class Chain
 		if ( this.residues == null ) {
 			throw new IndexOutOfBoundsException( "chain has no residues" );
 		}
-		final Residue residue = (Residue) this.residues.elementAt( index );
+		final Residue residue = this.residues.elementAt( index );
 		this.residueToIndexHash.remove( residue );
 		this.residues.remove( index );
 
 		// Remove the corresponding fragment entry.
-		this.fragments.remove( index );
+		this.fragmentRanges.remove( index );
 		if ( this.getResidueCount() == 0 ) {
-			this.fragments = null;
+			this.fragmentRanges = null;
 		}
 		this.fragmentObjects = null;  // Invalidate the old fragmentObjects.
 
@@ -450,11 +453,11 @@ public class Chain
 		if ( this.residues == null ) {
 			throw new IndexOutOfBoundsException( "chain has no residues" );
 		}
-		final Residue residue1 = (Residue) this.residues.elementAt( chainResidueIndex );
+		final Residue residue1 = this.residues.elementAt( chainResidueIndex );
 		if ( chainResidueIndex >= (this.getResidueCount()-1) ) {
 			return false;
 		}
-		final Residue residue2 = (Residue) this.residues.elementAt( chainResidueIndex+1 );
+		final Residue residue2 = this.residues.elementAt( chainResidueIndex+1 );
 
 		final int idDiff = residue2.getResidueId() - residue1.getResidueId();
 
@@ -476,7 +479,7 @@ public class Chain
 	 *  Conformation type.
 	 *  <P>
 	 */ 
-	public void setFragment( final int startResidue, final int endResidue, final String type )
+	public void setFragmentRange( final int startResidue, final int endResidue, final ComponentType type )
 	{
 		if ( this.residues == null ) {
 			throw new IndexOutOfBoundsException( "chain has no residues" );
@@ -498,7 +501,7 @@ public class Chain
 		}
 
 		this.fragmentObjects = null;  // Invalidate the old fragmentObjects.
-		this.fragments.setRange( startResidue, endResidue, type );
+		this.fragmentRanges.setRange( startResidue, endResidue, type );
 
 		// Make sure that we set each underlying residue's conformation
 		// assignment to match the new fragment assignment!
@@ -520,10 +523,10 @@ public class Chain
 		if ( this.residues == null ) {
 			return 0;
 		}
-		if ( this.fragments == null ) {
+		if ( this.fragmentRanges == null ) {
 			return 0;
 		}
-		final int fc = this.fragments.getRangeCount( );
+		final int fc = this.fragmentRanges.getRangeCount( );
 		if ( fc <= 0 ) {
 			return 1;
 		} else {
@@ -535,12 +538,12 @@ public class Chain
 	 *  Get the conformation type currently assigned to the given fragment.
 	 *  <P>
 	 */ 
-	public String getFragmentType( final int fragmentIndex )
+	public ComponentType getFragmentType( final int fragmentIndex )
 	{
-		if ( this.fragments == null ) {
+		if ( this.fragmentRanges == null ) {
 			throw new IndexOutOfBoundsException( "chain has no fragments" );
 		}
-		return (String) this.fragments.getRangeValue( fragmentIndex );
+		return (ComponentType)fragmentRanges.getRangeValue( fragmentIndex );
 	}
 
 	/** 
@@ -549,10 +552,10 @@ public class Chain
 	 */ 
 	public int getFragmentStartResidue( final int fragmentIndex )
 	{
-		if ( this.fragments == null ) {
+		if ( this.fragmentRanges == null ) {
 			throw new IndexOutOfBoundsException( "chain has no fragments" );
 		}
-		return this.fragments.getRangeStart( fragmentIndex );
+		return this.fragmentRanges.getRangeStart( fragmentIndex );
 	}
 
 	/** 
@@ -561,10 +564,10 @@ public class Chain
 	 */ 
 	public int getFragmentEndResidue( final int fragmentIndex )
 	{
-		if ( this.fragments == null ) {
+		if ( this.fragmentRanges == null ) {
 			throw new IndexOutOfBoundsException( "chain has no fragments" );
 		}
-		return this.fragments.getRangeEnd( fragmentIndex );
+		return this.fragmentRanges.getRangeEnd( fragmentIndex );
 	}
 
 	/**
@@ -573,7 +576,7 @@ public class Chain
 	 */ 
 	public void generateFragments( )
 	{
-		if ( this.fragments == null ) {
+		if ( this.fragmentRanges == null ) {
 			return;
 		}
 
@@ -592,8 +595,8 @@ public class Chain
 
 		for ( int i=0; i<fragmentCount; i++ )
 		{
-			final String conformationType = (String) this.fragments.getRangeValue( i );
-			final int[] range = this.fragments.getRange( i );
+			final ComponentType conformationType = (ComponentType)this.fragmentRanges.getRangeValue( i );
+			final int[] range = this.fragmentRanges.getRange( i );
 
 			final Fragment fragment =
 				new Fragment( range[0], range[1], conformationType );
@@ -621,7 +624,7 @@ public class Chain
 		if ( this.fragmentObjects == null ) {
 			this.generateFragments( );
 		}
-		return (Fragment) this.fragmentObjects.elementAt( fragmentIndex );
+		return this.fragmentObjects.elementAt( fragmentIndex );
 	}
 
 	/** 

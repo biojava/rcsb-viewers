@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.util.ChemicalComponentBonds;
-import org.rcsb.mbt.model.util.ChemicalComponentBonds.BondType;
+import org.rcsb.mbt.model.util.ChemicalComponentBonds.BondOrder;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -23,9 +23,9 @@ public class ChemicalComponentBondsTest // implements ITest
 	{
 		Atom[] atoms = new Atom[2];
 		int[] atomIX = new int[2];
-		BondType expected;
+		BondOrder expected;
 		
-		public AtomTestPair(int bondAtoms[], BondType in_expected)
+		public AtomTestPair(int bondAtoms[], BondOrder in_expected)
 		{
 			for (int ix = 0; ix < 2; ix++)
 			{
@@ -99,7 +99,7 @@ public class ChemicalComponentBondsTest // implements ITest
 					case TESTPAIRS:
 						atomTestPairsList.add(new AtomTestPair(
 							new int[] {Integer.parseInt(splitLine[2]), Integer.parseInt(splitLine[3])},
-							ChemicalComponentBonds.BondType.valueByShortName(splitLine[4])));
+							ChemicalComponentBonds.BondOrder.valueByShortName(splitLine[4])));
 						break;
 				}
 			}

@@ -59,6 +59,8 @@ package org.rcsb.mbt.model.attributes;
 
 import java.util.*;
 
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+
 
 /**
  * Style.java<BR>
@@ -76,7 +78,13 @@ public abstract class Style
 	// objects. Then, viewers will listen to the concentrated events that
 	// are re-fired by a StructureStyles.
 	private final Vector listeners = new Vector( );
-
+	
+	public enum StyleProperty
+	{
+		PROPERTY_NONE,
+		PROPERTY_COLOR,
+		PROPERTY_BINDING
+	}
 	// Properties
 	// none.
 
@@ -144,7 +152,7 @@ public abstract class Style
 	 * @return
 	 * @throws
 	 */
-	public abstract boolean isTypeSafe( String scType );
+	public abstract boolean isTypeSafe( ComponentType scType );
 
 
 	/**

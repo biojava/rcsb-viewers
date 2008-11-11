@@ -5,25 +5,24 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.LayoutManager;
-import java.util.Iterator;
 import java.util.Vector;
 
-import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
 public class FullWidthBoxLayout implements LayoutManager {
     private final Dimension preferredSize = new Dimension(-1,-1);
     private final Dimension minimumSize = new Dimension(-1,-1);
-    public static int AXIS_X = 0;
-    public static int AXIS_Y = 1;
     
-    public int axis = -1;
+    public enum LayoutAxis { AXIS_X, AXIS_Y }
     
-    public FullWidthBoxLayout() {
-    	this(FullWidthBoxLayout.AXIS_Y);
+    public LayoutAxis axis = null;
+    
+    public FullWidthBoxLayout() 
+    {
+    	this(LayoutAxis.AXIS_Y);
     }
     
-    public FullWidthBoxLayout(final int axis) {
+    public FullWidthBoxLayout(final LayoutAxis axis) {
     	this.axis = axis;
     }
     
@@ -43,12 +42,12 @@ public class FullWidthBoxLayout implements LayoutManager {
         
         final Insets insets = container.getInsets();
         
-        if(this.axis == FullWidthBoxLayout.AXIS_Y) {
+        if(this.axis == LayoutAxis.AXIS_Y) {
 	        int firstColumnMaxWidth = 0;
 	        
 	        final Component[] firstColumn = container.getComponents();
 	        int curY = insets.top;
-	        final Vector descriptionPanels = new Vector();
+	        final Vector<Component> descriptionPanels = new Vector<Component>();
 	        for(int i = 0; i < firstColumn.length; i++) {
 	        	if(firstColumn[i].isVisible()) {
 		        	if(firstColumn[i] instanceof JSeparator) {
@@ -72,11 +71,9 @@ public class FullWidthBoxLayout implements LayoutManager {
 	        
 	        final int xBuffer = 5;
 	        
-	        final Iterator panelIt = descriptionPanels.iterator();
-	        while(panelIt.hasNext()) {
-	        	final JPanel panel = (JPanel)panelIt.next();
-	        	panel.setBounds(insets.left + firstColumnMaxWidth + xBuffer, insets.top, 170, curY - insets.top);
-	        }
+	        for (Component comp : descriptionPanels)
+	        	comp.setBounds(insets.left + firstColumnMaxWidth + xBuffer,
+	        				   insets.top, 170, curY - insets.top);
 	        
 	        curY += insets.bottom;
 	        
@@ -84,7 +81,7 @@ public class FullWidthBoxLayout implements LayoutManager {
 	        this.preferredSize.width = 0;//parent.getWidth();
 	        this.minimumSize.height = curY;
 	        this.minimumSize.width = 0;
-        } else if(this.axis == FullWidthBoxLayout.AXIS_X) {
+        } else if(this.axis == LayoutAxis.AXIS_X) {
         	final Component[] comps = container.getComponents();
         	int curX = insets.left;
         	final int visualBuffer = 3;

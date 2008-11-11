@@ -6,20 +6,23 @@ import java.util.HashMap;
 public class JournalIndex {
 
 	
+	public enum Source
+	{
+		PEER_REVIEWED,
+		POPULAR_SCIENCE_NONPEER_REVIEWED,
+		NEWS_ARTICLE
+	}
 	
-	public final static int PEER_REVIEWED = 0;
-	public final static int POPULAR_SCIENCE_NONPEER_REVIEWED = 1;
-	public final static int NEWS_ARTICLE = 2;
 	/**
 	 *  What type of journal is this?
 	 */
-	private int type = 0;
+	private Source source = null;
 	private String journalName = "";
 	private String paper_title = "Unknown";
 	
 	// {{ list of available pages }}
 
-	private ArrayList authors = new ArrayList ();
+	private ArrayList<String> authors = new ArrayList<String> ();
 	private HashMap pageRanges = new HashMap ();
 	private String abbreviation = "";
 	private String volume = "";

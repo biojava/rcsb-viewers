@@ -106,7 +106,7 @@ public class BondLabelByType
 	 */
 	public String getBondLabel( final Bond bond )
 	{
-		return bond.getBondType( );
+		return bond.getBondType( ).toString();
 	}
 }
 

@@ -58,6 +58,7 @@ package org.rcsb.mbt.model.attributes;
 
 
 import org.rcsb.mbt.model.*;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 
 /**
@@ -73,13 +74,10 @@ public class BondStyle
 {
 	// Style properties
 	private IBondColor  bondColor  = BondColorRegistry.getDefault( );
-	public static int PROPERTY_COLOR = 1;
 	private IBondForm   bondForm   = BondFormRegistry.getDefault( );
-	public static int PROPERTY_FORM = 2;
 	private IBondLabel  bondLabel  = BondLabelRegistry.getDefault( );
-	public static int PROPERTY_LABEL = 3;
 	private IBondRadius bondRadius = BondRadiusRegistry.getDefault( );
-	public static int PROPERTY_RADIUS = 4;
+
 
 
 	//
@@ -186,9 +184,9 @@ public class BondStyle
 	 * @throws
 	 */
 	
-	public final boolean isTypeSafe( final String scType )
+	public final boolean isTypeSafe( final ComponentType scType )
 	{
-		return (scType == StructureComponentRegistry.TYPE_BOND);
+		return (scType == ComponentType.BOND);
 	}
 
 

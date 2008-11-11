@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.PickLevel;
+import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
@@ -102,15 +102,15 @@ public class PickLevelPanel extends JPanel implements ActionListener, IUpdateLis
 		this.reset();
 	}
 
-	public void actionPerformed(final ActionEvent e) {
-		if(this.atomsBondsButton.isSelected()) {
-			PickLevel.pickLevel = PickLevel.COMPONENTS_ATOMS_BONDS;
-		} else if(this.ribbonsButton.isSelected()) {
-			PickLevel.pickLevel = PickLevel.COMPONENTS_RIBBONS;
-		}
+	public void actionPerformed(final ActionEvent e)
+	{
+		PickLevel pickLevel =
+			(atomsBondsButton.isSelected())? PickLevel.ATOMS :
+			(ribbonsButton.isSelected())? PickLevel.RIBBONS :
+				PickLevel.AUTO;
 		
 		ProteinWorkshop.sgetActiveFrame().getTreeViewer().tree.repaint();
-		ProteinWorkshop.sgetActiveFrame().getStylesOptionsPanel().updatePickLevel(PickLevel.pickLevel);
+		ProteinWorkshop.sgetActiveFrame().getStylesOptionsPanel().updatePickLevel(pickLevel);
 	}
 
 	public void reset()

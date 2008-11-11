@@ -25,6 +25,7 @@ import org.rcsb.mbt.model.ExternChain;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.util.DebugState;
 
 
 /**
@@ -86,7 +87,7 @@ public class FullSequencesViewer extends JScrollPane implements IUpdateListener
 	            {
 	            	String description = null;
 	            	
-	            	if (AppBase.isDebug())
+	            	if (DebugState.isDebug())
 	            		assert (c instanceof ExternChain);
 	            						// curious if we ever get anything else (and why)...
 	            	

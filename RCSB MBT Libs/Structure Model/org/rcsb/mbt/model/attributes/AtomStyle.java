@@ -58,6 +58,7 @@ package org.rcsb.mbt.model.attributes;
 
 
 import org.rcsb.mbt.model.*;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 
 /**
@@ -74,11 +75,8 @@ public class AtomStyle
 {
 	// Style properties
 	private IAtomColor atomColor = AtomColorRegistry.getDefault( );
-	public static int PROPERTY_COLOR = 1;
 	private IAtomRadius atomRadius = AtomRadiusRegistry.getDefault( );
-	public static int PROPERTY_RADIUS = 2;
 	private IAtomLabel atomLabel = AtomLabelRegistry.getDefault( );
-	public static int PROPERTY_LABEL = 3;
 
 
 	//
@@ -147,9 +145,9 @@ public class AtomStyle
 	 * @throws
 	 */
 	
-	public final boolean isTypeSafe( final String scType )
+	public final boolean isTypeSafe( final ComponentType scType )
 	{
-		return (scType == StructureComponentRegistry.TYPE_ATOM);
+		return (scType == ComponentType.ATOM);
 	}
 
 

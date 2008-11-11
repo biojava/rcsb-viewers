@@ -79,6 +79,8 @@
 
 package org.rcsb.mbt.model;
 
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+
 
 /**
  *  Implements a StructureComponent container for Turn conformation
@@ -123,9 +125,9 @@ public class Turn
 	 *  This method returns the fully qualified name of this class.
 	 */
 	
-	public String getStructureComponentType( )
+	public ComponentType getStructureComponentType( )
 	{
-		return Turn.className;
+		return ComponentType.TURN;
 	}
 
 	//

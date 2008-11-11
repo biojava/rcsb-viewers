@@ -63,6 +63,7 @@ package org.rcsb.mbt.model.attributes;
 import java.util.HashMap;
 
 import org.rcsb.mbt.model.*;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 
 
@@ -80,8 +81,7 @@ public class ChainStyle
 {
 	// Style properties
 	private IResidueColor residueColor = ResidueColorRegistry.getDefault( );
-	public static int PROPERTY_COLOR = 1;
-	public static int PROPERTY_BINDING = 2;
+
 	private IResidueLabel residueLabel = ResidueLabelCustom.getSingleton();
 
 	private boolean residueBinding = false;
@@ -147,9 +147,9 @@ public class ChainStyle
 	 * @throws
 	 */
 	
-	public final boolean isTypeSafe( final String scType )
+	public final boolean isTypeSafe( final ComponentType scType )
 	{
-		return (scType == StructureComponentRegistry.TYPE_CHAIN);
+		return (scType == ComponentType.CHAIN);
 	}
 
 
@@ -217,7 +217,7 @@ public class ChainStyle
 			{
 				this.rBinding.remove(r);
 				this.structureStylesEvent.structureComponent=r;
-				this.structureStylesEvent.property=ChainStyle.PROPERTY_BINDING;
+				this.structureStylesEvent.property=StyleProperty.PROPERTY_BINDING;
 				this.fireStructureStylesEvent(this.structureStylesEvent);
 			}
 		}

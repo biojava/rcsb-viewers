@@ -314,7 +314,8 @@ public class Octree {
 		Octree.countChildren++;
 
 		this.children = new Octree[this.maxNumberOfChildren];
-		final Vector[] dataSets = new Vector[this.maxNumberOfChildren]; // Collects data
+		final ArrayList<Vector<OctreeDataItem>> dataSets = new ArrayList<Vector<OctreeDataItem>>(maxNumberOfChildren);
+//		final Vector[] dataSets = new Vector[this.maxNumberOfChildren]; // Collects data
 																// for each
 																// child
 		// float[] mid = new float[ dimension ];
@@ -336,7 +337,7 @@ public class Octree {
 		//
 
 		for (int i = 0; i < this.maxNumberOfChildren; i++) {
-			dataSets[i] = new Vector();
+			dataSets.add(new Vector<OctreeDataItem>());
 		}
 
 		for (int i = 0; i < this.dataItems.length; i++) {
@@ -348,23 +349,23 @@ public class Octree {
 					child |= setFirstBit;
 				}
 			}
-			dataSets[child].add(this.dataItems[i]);
+			dataSets.get(child).add(this.dataItems[i]);
 		}
 
 		OctreeDataItem[] tmpData = null;
 		int dataSize = 0;
-		Iterator dataIterator = null;
+		Iterator<OctreeDataItem> dataIterator = null;
 		int l = 0;
 		int testBit;
 		this.numberOfChildren = 0;
 
 		if (this.dataItems.length > this.leafCutOff) {
 			for (int i = 0; i < this.maxNumberOfChildren; i++) {
-				dataSize = dataSets[i].size();
+				dataSize = dataSets.get(i).size();
 				if (dataSize > 0) {
 					l = 0;
 					tmpData = new OctreeDataItem[dataSize];
-					dataIterator = dataSets[i].iterator();
+					dataIterator = dataSets.get(i).iterator();
 					while (dataIterator.hasNext()) {
 						tmpData[l] = (OctreeDataItem) dataIterator.next();
 						l++;
@@ -412,7 +413,7 @@ public class Octree {
 		}
 
 		this.children = new Octree[this.maxNumberOfChildren];
-		final Vector[] dataSets = new Vector[this.maxNumberOfChildren]; // Collects data
+		final ArrayList<Vector<OctreeDataItem>> dataSets = new ArrayList<Vector<OctreeDataItem>>(this.maxNumberOfChildren); // Collects data
 																// for each
 																// child
 		// float[] mid = new float[ dimension ];
@@ -442,7 +443,7 @@ public class Octree {
 		//
 
 		for (int i = 0; i < this.maxNumberOfChildren; i++) {
-			dataSets[i] = new Vector();
+			dataSets.add(new Vector<OctreeDataItem>());
 		}
 
 		for (int i = 0; i < data.length; i++) {
@@ -454,12 +455,12 @@ public class Octree {
 					child |= setFirstBit;
 				}
 			}
-			dataSets[child].add(data[i]);
+			dataSets.get(child).add(data[i]);
 		}
 
 		OctreeDataItem[] tmpData = null;
 		int dataSize = 0;
-		Iterator dataIterator = null;
+		Iterator<OctreeDataItem> dataIterator = null;
 		int l = 0;
 		int testBit;
 		this.numberOfChildren = 0;
@@ -479,12 +480,13 @@ public class Octree {
 					"Excessive division of the data bounding box");
 		}
 
-		for (int i = 0; i < this.maxNumberOfChildren; i++) {
-			dataSize = dataSets[i].size();
+		for (int i = 0; i < this.maxNumberOfChildren; i++)
+		{
+			dataSize = dataSets.get(i).size();
 			if (dataSize > 0) {
 				l = 0;
 				tmpData = new OctreeDataItem[dataSize];
-				dataIterator = dataSets[i].iterator();
+				dataIterator = dataSets.get(i).iterator();
 				while (dataIterator.hasNext()) {
 					tmpData[l] = (OctreeDataItem) dataIterator.next();
 					l++;
@@ -577,7 +579,7 @@ public class Octree {
 	 * cutOff).
 	 */
 	public Object[] getBonds(final float cutOff) {
-		final Vector bondVector = new Vector();
+		final Vector<Bond> bondVector = new Vector<Bond>();
 		if (this.dataItems != null) {
 			for (int i = 0; i < this.dataItems.length; i++) {
 				this.appendBonds(this.dataItems[i], cutOff, bondVector);
@@ -601,8 +603,8 @@ public class Octree {
 	 * bond that satisfy the distance criterion (i.e. distance less than
 	 * cutOff).
 	 */
-	public Vector getBondsVector(final float cutOff) {
-		final Vector bondVector = new Vector();
+	public Vector<Bond> getBondsVector(final float cutOff) {
+		final Vector<Bond> bondVector = new Vector<Bond>();
 		if (this.dataItems != null) {
 			for (int i = 0; i < this.dataItems.length; i++) {
 				this.appendBonds(this.dataItems[i], cutOff, bondVector);
@@ -624,7 +626,7 @@ public class Octree {
 	 * definition of secondary structures in the Kabsch-Sander algorithm.
 	 */
 	public Object[] getHBonds(final float cutOff) {
-		final Vector bondVector = new Vector();
+		final Vector<Bond> bondVector = new Vector<Bond>();
 		if (this.dataItems != null) {
 			for (int i = 0; i < this.dataItems.length; i++) {
 				this.appendHBonds(this.dataItems[i], cutOff, 2, bondVector);
@@ -646,8 +648,8 @@ public class Octree {
 	 * bonds to correctly select the hydrogen bonds along the backbone in the
 	 * definition of secondary structures in the
 	 */
-	public Vector getHBondsVector(final float cutOff) {
-		final Vector bondVector = new Vector();
+	public Vector<Bond> getHBondsVector(final float cutOff) {
+		final Vector<Bond> bondVector = new Vector<Bond>();
 		if (this.dataItems != null) {
 			for (int i = 0; i < this.dataItems.length; i++) {
 				this.appendHBonds(this.dataItems[i], cutOff, 2, bondVector);
@@ -669,8 +671,8 @@ public class Octree {
 	 * the one for covalent bonds to correctly select the hydrogen bonds along
 	 * the backbone in the definition of secondary structures in the
 	 */
-	public Vector getHBondInfoVector(final double cutOff) {
-		final Vector bondList = new Vector();
+	public Vector<BondInfo> getHBondInfoVector(final double cutOff) {
+		final Vector<BondInfo> bondList = new Vector<BondInfo>();
 		double[] firstCoord = new double[this.dimension];
 		int firstIndex;
 
@@ -693,7 +695,7 @@ public class Octree {
 	 * 
 	 */
 	private void appendHBondInfo(final double[] coords1, final int index1, final double cutOff,
-			final int indexCutOff, final Vector bondList) {
+			final int indexCutOff, final Vector<BondInfo> bondList) {
 		Octree.countAppBondOp++;
 		double distance;
 		int index2;
@@ -734,7 +736,7 @@ public class Octree {
 	 * 
 	 */
 	private void appendBonds(final OctreeDataItem dataItem, final double cutOff,
-			final Vector bondVector) {
+							 final Vector<Bond> bondVector) {
 		Octree.countAppBondOp++;
 		double distance;
 		int index1, index2;
@@ -752,10 +754,15 @@ public class Octree {
 			for (int j = 0; j < this.dataItems.length; j++) {
 				if (this.getDistance(this.dataItems[j].getCoordinate(), coords1) <= cutOff) {
 					index2 = this.dataItems[j].getIndex();
-					if (index1 < index2) {
-						bondVector.add(new Bond(((OctreeAtomItem) dataItem)
+					if (index1 < index2)
+					{
+						Bond newBond = new Bond(((OctreeAtomItem) dataItem)
 								.getAtom(), ((OctreeAtomItem) this.dataItems[j])
-								.getAtom()));
+								.getAtom());
+						if (DebugState.isDebug())
+							newBond.isCalculated = true;
+						
+						bondVector.add(newBond);
 					}
 				}
 			}
@@ -772,7 +779,7 @@ public class Octree {
 	 * 
 	 */
 	private void appendHBonds(final OctreeDataItem dataItem, final double cutOff,
-			final int indexCutOff, final Vector bondVector) {
+			final int indexCutOff, final Vector<Bond> bondVector) {
 		Octree.countAppBondOp++;
 		double distance;
 		int index1, index2;

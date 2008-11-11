@@ -127,12 +127,12 @@ public class RangeMap
 	/**
 	 *  The sorted range tuple objects (ie: int[2]).
 	 */
-	public Vector ranges = new Vector( );
+	public Vector<int[]> ranges = new Vector<int[]>( );
 
 	/**
 	 *  The value objects keyed by range tuple objects (ie: int[2]).
 	 */
-	private final Hashtable values = new Hashtable( );
+	private final Hashtable<int[], Object> values = new Hashtable<int[], Object>( );
 
 	/**
 	 *  The transparency changed.
@@ -154,7 +154,7 @@ public class RangeMap
 	 */
 	public RangeMap( final int min, final int max, final Object defaultObject )
 	{
-		this.reset( min, max, defaultObject );
+		reset( min, max, defaultObject );
 	}
 
 	//
@@ -166,7 +166,7 @@ public class RangeMap
 	 */
 	public int getMin( )
 	{
-		return this.rangeMin;
+		return rangeMin;
 	}
 
 	/**
@@ -174,7 +174,7 @@ public class RangeMap
 	 */
 	public int getMax( )
 	{
-		return this.rangeMax;
+		return rangeMax;
 	}
 
 	/**
@@ -182,7 +182,7 @@ public class RangeMap
 	 */
 	public void setCollapseOn( final boolean state )
 	{
-		this.collapseOn = state;
+		collapseOn = state;
 	}
 
 	/**
@@ -190,7 +190,7 @@ public class RangeMap
 	 */
 	public boolean getCollapseOn( )
 	{
-		return this.collapseOn;
+		return collapseOn;
 	}
 
 
@@ -203,10 +203,10 @@ public class RangeMap
 		if ( start > stop ) {
 			throw new IllegalArgumentException( "stop must be >= start" );
 		}
-		if ( start < this.rangeMin ) {
+		if ( start < rangeMin ) {
 			throw new IllegalArgumentException( "start must be >= min" );
 		}
-		if ( stop > this.rangeMax ) {
+		if ( stop > rangeMax ) {
 			throw new IllegalArgumentException( "stop must be <= max" );
 		}
 		if ( value == null ) {
@@ -227,9 +227,9 @@ public class RangeMap
 	*/
 
 		// Overlay the set of objects spaned by the new range.
-		for ( int i=0; i<this.ranges.size(); i++ )
+		for ( int i = 0; i < ranges.size(); i++ )
 		{
-			final int[] range = (int[]) this.ranges.elementAt( i );
+			final int[] range = (int[]) ranges.elementAt( i );
 
 			if ( newRange[1] < range[0] )
 			{
@@ -267,7 +267,7 @@ public class RangeMap
 				//  |[0]       newRange       [1]|
 				//  ------------------------------
 
-				this.values.put( range, value );
+				values.put( range, value );
 				break;
 			}
 			else if ( (newRange[0] > range[0]) && (newRange[1] < range[1]) )
@@ -284,16 +284,16 @@ public class RangeMap
 				//           |[0]      newRange        [1]|
 				//           ------------------------------
 
-				final Object oldValue = this.values.get( range );
+				final Object oldValue = values.get( range );
 
 				// right piece
 				final int rightSide[] = { newRange[1]+1, range[1] };
-				this.ranges.add( i+1, rightSide );
-				this.values.put( rightSide, oldValue );
+				ranges.add( i+1, rightSide );
+				values.put( rightSide, oldValue );
 
 				// middle piece
-				this.ranges.add( i+1, newRange );
-				this.values.put( newRange, value );
+				ranges.add( i+1, newRange );
+				values.put( newRange, value );
 
 				// left piece (original range and value objects)
 				range[1] = newRange[0]-1;
@@ -315,15 +315,15 @@ public class RangeMap
 				//  ------------------------------------------------|
 
 				// Remove the current range/value
-				this.ranges.remove( i );
-				this.values.remove( range );
+				ranges.remove( i );
+				values.remove( range );
 
 				// Insert the new range (if it hasn't been already)
 				if ( ! haveAddedNewRange )
 				{
 					haveAddedNewRange = true;
-					this.ranges.add( i, newRange );
-					this.values.put( newRange, value );
+					ranges.add( i, newRange );
+					values.put( newRange, value );
 				}
 				else
 				{
@@ -354,8 +354,8 @@ public class RangeMap
 
 				// right piece
 				haveAddedNewRange = true;
-				this.ranges.add( i+1, newRange );
-				this.values.put( newRange, value );
+				ranges.add( i+1, newRange );
+				values.put( newRange, value );
 
 				// Don't process the new piece on the next iteration!
 				i++;
@@ -380,8 +380,8 @@ public class RangeMap
 					// The new piece starts at the begining of the original range,
 					// so we need to insert a new range here.
 					// System.err.println( "JLM DEBUG: add( " + i + ", " + value + ")" );
-					this.ranges.add( i, newRange );
-					this.values.put( newRange, value );
+					ranges.add( i, newRange );
+					values.put( newRange, value );
 				}
 				else
 				{
@@ -400,7 +400,7 @@ public class RangeMap
 		// where adjacent values are equal.
 		// JLM DEBUG: This should probably be custom collapse code
 		// so that we only look at neigboring ranges not all ranges...
-		this.collapse( );
+		collapse( );
 
 	/*
 		//
@@ -444,26 +444,26 @@ public class RangeMap
 	 */
 	public void collapse( )
 	{
-		if ( ! this.collapseOn ) {
+		if ( ! collapseOn ) {
 			return;
 		}
 
-		int size = this.ranges.size();
+		int size = ranges.size();
 		if ( size > 1 )
 		{
-			int prior[] = (int[]) this.ranges.elementAt( 0 );
-			Object priorObj = this.values.get( prior );
+			int prior[] = (int[]) ranges.elementAt( 0 );
+			Object priorObj = values.get( prior );
 			for ( int i=1; i<size; i++ )
 			{
-				final int current[] = (int[]) this.ranges.elementAt( i );
-				final Object currentObj = this.values.get( current );
+				final int current[] = (int[]) ranges.elementAt( i );
+				final Object currentObj = values.get( current );
 
 				if ( currentObj == priorObj )
 				{
 					// Same value, so collapse (extend prior and remove current).
 					prior[1] = current[1];
-					this.ranges.remove( i );
-					this.values.remove( current );
+					ranges.remove( i );
+					values.remove( current );
 					size--;
 					// Since ranges have shifted, we nee to see the "new" i range.
 					i--;
@@ -482,7 +482,7 @@ public class RangeMap
 	 */
 	public void clearRange( final int start, final int stop )
 	{
-		this.setRange( start, stop, this.defaultValue );
+		setRange( start, stop, defaultValue );
 	}
 
 	/**
@@ -490,13 +490,13 @@ public class RangeMap
 	 */
 	public void clearAll( )
 	{
-		this.ranges.clear( );
-		this.values.clear( );
+		ranges.clear( );
+		values.clear( );
 
 		// Add an initial default range and value
-		final int range[] = { this.rangeMin, this.rangeMax };
-		this.ranges.add( range );
-		this.values.put( range, this.defaultValue );
+		final int range[] = { rangeMin, rangeMax };
+		ranges.add( range );
+		values.put( range, defaultValue );
 	}
 
 	/**
@@ -512,11 +512,11 @@ public class RangeMap
 			throw new IllegalArgumentException( "default value was null" );
 		}
 
-		this.rangeMin = min;
-		this.rangeMax = max;
+		rangeMin = min;
+		rangeMax = max;
 		this.defaultValue = defaultValue;
 
-		this.clearAll( );
+		clearAll( );
 	}
 
 	/**
@@ -525,7 +525,7 @@ public class RangeMap
 	 */
 	public void setDefaultValue( final Object newDefault )
 	{
-		if ( newDefault == this.defaultValue ) {
+		if ( newDefault == defaultValue ) {
 			return;
 		}
 		if ( newDefault == null ) {
@@ -533,16 +533,16 @@ public class RangeMap
 		}
 
 		// Replace the current default values with the new default value
-		for ( int i=0; i<this.ranges.size(); i++ )
+		for ( int i=0; i<ranges.size(); i++ )
 		{
-			final int[] range = (int[]) this.ranges.elementAt( i );
-			final Object value = this.values.get( range );
-			if ( value == this.defaultValue ) {
-				this.values.put( range, newDefault );
+			final int[] range = (int[]) ranges.elementAt( i );
+			final Object value = values.get( range );
+			if ( value == defaultValue ) {
+				values.put( range, newDefault );
 			}
 		}
 		// Now set the new defaultValue
-		this.defaultValue = newDefault;
+		defaultValue = newDefault;
 	}
 
 	/**
@@ -550,20 +550,20 @@ public class RangeMap
 	 */
 	private int findRange( final int index )
 	{
-		if ( index < this.rangeMin ) {
-			throw new IllegalArgumentException( "index " + index + " < rangeMin " + this.rangeMin );
+		if ( index < rangeMin ) {
+			throw new IllegalArgumentException( "index " + index + " < rangeMin " + rangeMin );
 		}
-		if ( index > this.rangeMax ) {
-			throw new IllegalArgumentException( "index " + index + " > rangeMax " + this.rangeMax );
+		if ( index > rangeMax ) {
+			throw new IllegalArgumentException( "index " + index + " > rangeMax " + rangeMax );
 		}
 
 		// Do a binary search to find the range in which the index lives
 		int low = 0;
-		int high = this.ranges.size() - 1;
+		int high = ranges.size() - 1;
 		while ( low <= high )
 		{
 			final int mid = (low + high) / 2;
-			final int[] range = (int[]) this.ranges.elementAt( mid );
+			final int[] range = (int[]) ranges.elementAt( mid );
 
 			// If the index is inside this range, return range index.
 			if ( (index >= range[0]) && (index <= range[1]) ) {
@@ -596,7 +596,7 @@ public class RangeMap
 	 */
 	public void setValue( final int index, final Object value )
 	{
-		this.setRange( index, index, value );
+		setRange( index, index, value );
 	}
 
 	/**
@@ -604,19 +604,19 @@ public class RangeMap
 	 */
 	public Object getValue( final int index )
 	{
-		if ( index < this.rangeMin ) {
-			throw new IllegalArgumentException( "index " + index + " < rangeMin " + this.rangeMin );
+		if ( index < rangeMin ) {
+			throw new IllegalArgumentException( "index " + index + " < rangeMin " + rangeMin );
 		}
-		if ( index > this.rangeMax ) {
-			throw new IllegalArgumentException( "index " + index + " > rangeMax " + this.rangeMax );
+		if ( index > rangeMax ) {
+			throw new IllegalArgumentException( "index " + index + " > rangeMax " + rangeMax );
 		}
 
-		final int rangeIndex = this.findRange( index );
-		final int[] range = (int[]) this.ranges.elementAt( rangeIndex );
+		final int rangeIndex = findRange( index );
+		final int[] range = (int[]) ranges.elementAt( rangeIndex );
 
 		// If the index is inside this range, return the associated value.
 		if ( (index >= range[0]) && (index <= range[1]) ) {
-			return this.values.get( range );
+			return values.get( range );
 		}
 
 		return null;
@@ -636,14 +636,14 @@ public class RangeMap
 	 */
 	public Object getContiguousValue( final int start_index, final int end_index )
 	{
-		final int rangeIndex = this.findRange( start_index );
-		final int[] range = (int[]) this.ranges.elementAt( rangeIndex );
+		final int rangeIndex = findRange( start_index );
+		final int[] range = (int[]) ranges.elementAt( rangeIndex );
 		if ( range == null ) {
 			return null;
 		}
 
 		if ( (end_index >= range[0]) && (end_index <= range[1]) ) {
-			return this.values.get( range );
+			return values.get( range );
 		}
 
 		return null;
@@ -654,7 +654,7 @@ public class RangeMap
 	 */
 	public int getRangeCount( )
 	{
-		return this.ranges.size( );
+		return ranges.size( );
 	}
 
 	/**
@@ -662,8 +662,8 @@ public class RangeMap
 	 */
 	public Object getRangeValue( final int rangeIndex )
 	{
-		final int[] range = (int[]) this.ranges.elementAt( rangeIndex );
-		return this.values.get( range );
+		final int[] range = (int[]) ranges.elementAt( rangeIndex );
+		return values.get( range );
 	}
 
 	/**
@@ -674,8 +674,8 @@ public class RangeMap
 		if ( value == null ) {
 			throw new IllegalArgumentException( "null value" );
 		}
-		final int[] range = (int[]) this.ranges.elementAt( rangeIndex );
-		this.values.put( range, value );
+		final int[] range = (int[]) ranges.elementAt( rangeIndex );
+		values.put( range, value );
 	}
 
 	/**
@@ -683,7 +683,7 @@ public class RangeMap
 	 */
 	public int[] getRange( final int rangeIndex )
 	{
-		final int[] range = (int[]) this.ranges.elementAt( rangeIndex );
+		final int[] range = (int[]) ranges.elementAt( rangeIndex );
 		// Copy it so the user can't change our copy out from under us!
 //		int[] result = { range[0], range[1] };
 		return range;
@@ -694,7 +694,7 @@ public class RangeMap
 	 */
 	public int getRangeStart( final int rangeIndex )
 	{
-		final int[] range = (int[]) this.ranges.elementAt( rangeIndex );
+		final int[] range = (int[]) ranges.elementAt( rangeIndex );
 		return range[0];
 	}
 
@@ -703,7 +703,7 @@ public class RangeMap
 	 */
 	public int getRangeEnd( final int rangeIndex )
 	{
-		final int[] range = (int[]) this.ranges.elementAt( rangeIndex );
+		final int[] range = (int[]) ranges.elementAt( rangeIndex );
 		return range[1];
 	}
 
@@ -716,22 +716,22 @@ public class RangeMap
 			throw new IllegalArgumentException( "null value" );
 		}
 
-		this.rangeMax++;
+		rangeMax++;
 
 		// If last range value matches the new value, just extend last range.
 		// This keeps the last/appended range automatically "collapsed".
 
-		final int[] lastRange = (int[]) this.ranges.elementAt( this.ranges.size()-1 );
-		final Object lastValue = this.values.get( lastRange );
+		final int[] lastRange = (int[]) ranges.elementAt( ranges.size()-1 );
+		final Object lastValue = values.get( lastRange );
 		if ( lastValue == value )
 		{
 			lastRange[1] += 1;
 		}
 		else
 		{
-			final int range[] = { this.rangeMax, this.rangeMax };
-			this.ranges.add( range );
-			this.values.put( range, value );
+			final int range[] = { rangeMax, rangeMax };
+			ranges.add( range );
+			values.put( range, value );
 		}
 	}
 
@@ -741,16 +741,16 @@ public class RangeMap
 	 */
 	public void remove( final int index )
 	{
-		if ( (index < this.rangeMin) || (index > this.rangeMax) ) {
+		if ( (index < rangeMin) || (index > rangeMax) ) {
 			throw new IllegalArgumentException( "index out of bounds" );
 		}
 
-		int rangeIndex = this.findRange( index );
-		int[] range = (int[]) this.ranges.elementAt( rangeIndex );
+		int rangeIndex = findRange( index );
+		int[] range = (int[]) ranges.elementAt( rangeIndex );
 		if ( range[0] == range[1] )
 		{
-			this.values.remove( range );
-			this.ranges.remove( rangeIndex );
+			values.remove( range );
+			ranges.remove( rangeIndex );
 		}
 		else
 		{
@@ -759,17 +759,17 @@ public class RangeMap
 		}
 
 		// Simply subtract 1 from the remaining range start/end tuples.
-		final int rangeCount = this.ranges.size( );
+		final int rangeCount = ranges.size( );
 		for ( int r=rangeIndex; r<rangeCount; r++ )
 		{
-			range = (int[]) this.ranges.elementAt( r );
+			range = (int[]) ranges.elementAt( r );
 			range[0] -= 1;
 			range[1] -= 1;
 		}
 
 		// JLM DEBUG: This should probably be custom collapse code
 		// so that we only look at neigboring ranges not all ranges...
-		this.collapse( );
+		collapse( );
 	}
 
 	// public void insert( index, value );

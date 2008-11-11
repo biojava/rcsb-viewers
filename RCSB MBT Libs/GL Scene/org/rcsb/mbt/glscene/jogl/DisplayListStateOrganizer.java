@@ -7,6 +7,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
 import org.rcsb.mbt.model.StructureComponentRegistry;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 import com.sun.opengl.util.GLUT;
 
@@ -80,9 +81,9 @@ public class DisplayListStateOrganizer {
 
 	public synchronized void addArrayLists(final DisplayLists lists) {
 
-		if (lists.structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_FRAGMENT
-				|| lists.structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_CHAIN
-				|| lists.structureComponent.getStructureComponentType() == StructureComponentRegistry.TYPE_RESIDUE) {
+		if (lists.structureComponent.getStructureComponentType() == ComponentType.FRAGMENT
+				|| lists.structureComponent.getStructureComponentType() == ComponentType.CHAIN
+				|| lists.structureComponent.getStructureComponentType() == ComponentType.RESIDUE) {
 			System.err.print("");
 		}
 

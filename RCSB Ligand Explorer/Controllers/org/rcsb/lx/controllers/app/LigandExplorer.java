@@ -109,12 +109,13 @@ import org.rcsb.lx.glscene.jogl.LXSceneNode;
 import org.rcsb.lx.model.LXModel;
 import org.rcsb.lx.ui.LXDocumentFrame;
 import org.rcsb.mbt.controllers.app.ProgressPanelController;
+import org.rcsb.mbt.controllers.scene.PickController;
 import org.rcsb.mbt.controllers.scene.SceneController;
+import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.mbt.controllers.update.UpdateController;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.StructureModel;
-import org.rcsb.mbt.model.util.PickUtils;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
@@ -242,8 +243,6 @@ public class LigandExplorer extends VFAppBase
 			sceneController.setShowAsymmetricUnitOnly(false);
 
 
-		PickUtils.setPickLevel(PickUtils.PICK_RESIDUES);
-		
 		final String structureUrlParam = this.properties.getProperty("structure_url");
 		
 		activeFrame.initialize(true);

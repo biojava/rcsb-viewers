@@ -13,6 +13,7 @@ import java.util.Hashtable;
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.Conformation;
 import org.rcsb.mbt.model.StructureComponentRegistry;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.ResidueColorByFragmentType;
 import org.rcsb.mbt.ui.dialogs.ColorChooserDialog;
 import org.rcsb.pw.ui.DescriptionPanel;
@@ -27,7 +28,8 @@ public class ByFragmentTypePanel extends DescriptionPanel implements MouseListen
 	private static final long serialVersionUID = -71635146298791416L;
 	// parallele arrays
 	private static final String[] labels = {"Turn", "Coil", "Helix", "Strand", "Unknown"};
-	private static final String[] identifiers = {StructureComponentRegistry.TYPE_TURN, StructureComponentRegistry.TYPE_COIL, StructureComponentRegistry.TYPE_HELIX, StructureComponentRegistry.TYPE_STRAND, Conformation.TYPE_UNDEFINED}; 
+	private static final ComponentType[] identifiers =
+		{ComponentType.TURN, ComponentType.COIL, ComponentType.HELIX, ComponentType.STRAND, ComponentType.UNDEFINED_CONFORMATION}; 
 	private static final Point[] boxTopLeftPoints = {new Point(-1,-1),new Point(-1,-1),new Point(-1,-1),new Point(-1,-1),new Point(-1,-1)};
 	
 	private static final Dimension colorBoxDimension = new Dimension(-1,-1);

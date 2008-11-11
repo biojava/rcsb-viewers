@@ -4,8 +4,8 @@ import java.net.URL;
 
 import org.rcsb.mbt.controllers.app.ProgressPanelController;
 import org.rcsb.mbt.controllers.doc.DocController;
+import org.rcsb.mbt.controllers.scene.PickController;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
-import org.rcsb.mbt.model.util.PickUtils;
 import org.rcsb.mbt.model.util.Status;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 import org.rcsb.sv.ui.SVDocumentFrame;
@@ -83,8 +83,6 @@ public class SimpleViewer extends VFAppBase
 										  SimpleViewer.class.getResource("images/icon_128_SV.png"));
 
 		super.initialize(isApplication);
-		
-		PickUtils.setPickLevel(PickUtils.PICK_RESIDUES);
 		
 		activeFrame.initialize(true);
 	

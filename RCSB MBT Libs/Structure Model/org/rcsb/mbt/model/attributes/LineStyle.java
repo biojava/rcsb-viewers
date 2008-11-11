@@ -1,5 +1,7 @@
 package org.rcsb.mbt.model.attributes;
 
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+
 public class LineStyle extends Style {
 	
 	public static final int SOLID = 0;
@@ -11,11 +13,10 @@ public class LineStyle extends Style {
 
 	public LineStyle() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	
-	public boolean isTypeSafe(final String scType) {
+	public boolean isTypeSafe(final ComponentType scType) {
 		return true;
 	}
 

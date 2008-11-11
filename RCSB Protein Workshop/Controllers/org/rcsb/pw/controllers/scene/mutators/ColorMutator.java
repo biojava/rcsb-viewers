@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.util.Vector;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.PickLevel;
+import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
@@ -18,6 +18,7 @@ import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.AtomColorByRgb;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
@@ -95,25 +96,25 @@ public class ColorMutator extends Mutator
 		
 		if(mutee instanceof StructureComponent) {
 			final StructureComponent mutee_ = (StructureComponent)mutee;
-			final String type = mutee_.getStructureComponentType();
+			final ComponentType type = mutee_.getStructureComponentType();
 			
-			if(type == StructureComponentRegistry.TYPE_ATOM) {
+			if(type == ComponentType.ATOM) {
 				final Atom a = (Atom)mutee;
 				final AtomStyle style = (AtomStyle)a.structure.getStructureMap().getStructureStyles().getStyle(a);
 				
 				style.getAtomColor(a, colorFl);
-			} else if(type == StructureComponentRegistry.TYPE_BOND) {
+			} else if(type == ComponentType.BOND) {
 				final Bond b = (Bond)mutee;
 				final BondStyle style = (BondStyle)b.structure.getStructureMap().getStructureStyles().getStyle(b);
 				
 				style.getBondColor(b, colorFl);
-			} else if(type == StructureComponentRegistry.TYPE_FRAGMENT) {
+			} else if(type == ComponentType.FRAGMENT) {
 				final Fragment f = (Fragment)mutee;
 				final Chain c = f.getChain();
 				final ChainStyle style = (ChainStyle)c.structure.getStructureMap().getStructureStyles().getStyle(c);
 				
 				style.getResidueColor(f.getResidue(f.getResidueCount() / 2), colorFl);
-			} else if(type == StructureComponentRegistry.TYPE_RESIDUE) {
+			} else if(type == ComponentType.RESIDUE) {
 				final Residue r = (Residue)mutee;
 				final StructureMap sm = r.structure.getStructureMap();
 				
@@ -121,7 +122,7 @@ public class ColorMutator extends Mutator
 				final ChainStyle style = (ChainStyle)c.structure.getStructureMap().getStructureStyles().getStyle(c);
 				
 				style.getResidueColor(r, colorFl);
-			} else if(type == StructureComponentRegistry.TYPE_CHAIN) {
+			} else if(type == ComponentType.CHAIN) {
 				final Chain c = (Chain)mutee;
 				
 				final ChainStyle style = (ChainStyle)c.structure.getStructureMap().getStructureStyles().getStyle(c);
@@ -165,8 +166,10 @@ public class ColorMutator extends Mutator
         final StructureMap sm = struc.getStructureMap();
         final StructureStyles ss = sm.getStructureStyles();
         
-        switch(PickLevel.pickLevel) {
-        case PickLevel.COMPONENTS_ATOMS_BONDS:
+        PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        switch(pickLevel)
+        {
+        case ATOMS:
         	this.options.getCurrentColor().getColorComponents(ColorMutator.colorFl);
         	
             final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(a);
@@ -183,12 +186,12 @@ public class ColorMutator extends Mutator
             	renderable.style = style;
             }
             break;
-        case PickLevel.COMPONENTS_RIBBONS:
+        case RIBBONS:
             final Residue r = sm.getResidue(a);
             this.changeColor(r.getFragment());
             break;
         default:
-            (new Exception()).printStackTrace();            
+            (new Exception("Invalid option: " + pickLevel)).printStackTrace();            
         }
     }
     
@@ -196,8 +199,10 @@ public class ColorMutator extends Mutator
         final Structure struc = b.structure;
         final StructureMap sm = struc.getStructureMap();
         
-        switch(PickLevel.pickLevel) {
-        case PickLevel.COMPONENTS_ATOMS_BONDS:
+        PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        switch(pickLevel)
+        {
+       case ATOMS:
         	/*this.options.getCurrentColor().getColorComponents(colorFl);
             BondColorByRgb bondColor = new BondColorByRgb(colorFl);
             
@@ -222,13 +227,13 @@ public class ColorMutator extends Mutator
         	this.changeColor(b.getAtom(0));
         	this.changeColor(b.getAtom(1));
             break;
-        case PickLevel.COMPONENTS_RIBBONS:
+        case RIBBONS:
             // even if this is between fragments, just change one of them arbitrarily.
             final Residue r = sm.getResidue(b.getAtom(0));
             this.changeColor(r.getFragment());
             break;
         default:
-            (new Exception()).printStackTrace();
+            (new Exception("Invalid option: " + pickLevel)).printStackTrace();            
         }
     }
     
@@ -237,9 +242,10 @@ public class ColorMutator extends Mutator
         final StructureMap sm = struc.getStructureMap();
         final StructureStyles ss = sm.getStructureStyles();
         
-        switch(PickLevel.pickLevel)
+        PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        switch(pickLevel)
         {
-        case PickLevel.COMPONENTS_ATOMS_BONDS:
+        case ATOMS:
         	Vector<Atom> atoms = r.getAtoms();
             for (Atom a : atoms)
                 this.changeColor(a);
@@ -248,7 +254,7 @@ public class ColorMutator extends Mutator
             	this.changeColor(b);
             break;
             
-        case PickLevel.COMPONENTS_RIBBONS:
+        case RIBBONS:
         	final Chain c = sm.getChain(r.getChainId());
             
             final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(c);
@@ -272,8 +278,8 @@ public class ColorMutator extends Mutator
             break;
             
         default:
-            (new Exception()).printStackTrace();
-        }
+            (new Exception("Invalid option: " + pickLevel)).printStackTrace();            
+       }
     }
     
     private void changeColor(final Fragment f) {
