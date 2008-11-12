@@ -36,9 +36,17 @@ package org.rcsb.mbt.model.util;
 
 
 import java.util.*;
+import java.util.zip.GZIPInputStream;
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.UnknownHostException;
 
 import org.rcsb.mbt.model.*;
+
+import sun.tools.tree.SuperExpression;
 
 
 
@@ -144,6 +152,9 @@ public class ChemicalComponentBonds
 	
 	private enum ItemParts { COMPOUND_CODE, ATOM0, ATOM1, BOND_TYPE }
 					// keys into the split strings.
+	
+	static private final String bondFileUrlPrefix = "http://www.pdb.org/pdb/files/ligand/",
+								bondFileUrlSuffix = ".cif.gz";
 
 	@SuppressWarnings("serial")
 	static private class CompoundMap extends Hashtable<String, BondOrder> {}
@@ -153,7 +164,9 @@ public class ChemicalComponentBonds
 	static private class BondsMap extends Hashtable<String, CompoundMap> {}
 			// compound code -> CompoundMap
 	
-	static private final BondsMap bonds = load( "ChemicalComponentBonds.dat" );
+	static private BondsMap bonds = load( "ChemicalComponentBonds.dat" );
+	
+	static private Set<String> compoundsTriedNotFound = null;
 
 
 	/**
@@ -161,7 +174,7 @@ public class ChemicalComponentBonds
 	 */
 	static private BondsMap load( final String dictionaryFile )
 	{
-		BondsMap bonds = new BondsMap( );
+		BondsMap lclBonds = new BondsMap( );
 
 		//
 		// Read the bond dictionary
@@ -188,53 +201,52 @@ public class ChemicalComponentBonds
 		try
 		{
 			while ( (line = br.readLine()) != null )
-			{
-				// ALA N CA SING
-				// items[0] = compoundName
-				// items[1] = atom 1
-				// items[2] = atom 2
-				// items[3] = bond type
-				
-				final String items[] = line.split( "\t" );
-				if ( (items == null) || (items.length != 4) )
-				{
-					Status.output( Status.LEVEL_WARNING, "ChemicalComponentBonds: Dictionary is corrupt: " + dictionaryFile );
-					return null;
-				}
-	
-				//
-				// Check the bond dictionary for the compound
-				//
-				String compoundKey = items[ItemParts.COMPOUND_CODE.ordinal()];
-				CompoundMap compoundMap = (bonds.containsKey(compoundKey))? bonds.get(compoundKey) : null;
-
-				if (compoundMap == null)
-				{
-					compoundMap = new CompoundMap( );
-					bonds.put( sharedStrings.share(compoundKey), compoundMap );
-				}
-	
-				//
-				// Check the compound for the bond
-				//	
-				String bondKey = items[ItemParts.ATOM0.ordinal()] + ':' + items[ItemParts.ATOM1.ordinal()];
-				if (!compoundMap.containsKey(sharedStrings.share(bondKey)))
-					compoundMap.put( bondKey, BondOrder.valueByShortName(items[ItemParts.BOND_TYPE.ordinal()].substring(0, 4)) );
-								// only the first four characters count
-			}
+				addBondLineToMap(line, sharedStrings, lclBonds);
 		}
 		catch ( final java.io.IOException e )
 		{
-			if (DebugState.isDebug())
-				e.printStackTrace( );
+			Status.output(Status.LEVEL_WARNING, e.getMessage());
 		}
 
 		sharedStrings = null;
 
-		return bonds;
+		return lclBonds;
 	}
 
+	private static void addBondLineToMap(String line, SharedObjects sharedStrings, BondsMap bonds) throws IOException
+	{
+		// ALA N CA SING
+		// items[0] = compoundName
+		// items[1] = atom 1
+		// items[2] = atom 2
+		// items[3] = bond type
+		
+		final String items[] = line.split( "\t" );
+		if ( (items == null) || (items.length != 4) )
+			throw new IOException( "ChemicalComponentBonds: Dictionary is corrupt: ");
 
+		//
+		// Check the bond dictionary for the compound
+		//
+		String compoundKey = items[ItemParts.COMPOUND_CODE.ordinal()];
+		CompoundMap compoundMap = (bonds.containsKey(compoundKey))? bonds.get(compoundKey) : null;
+
+		if (compoundMap == null)
+		{
+			compoundMap = new CompoundMap( );
+			bonds.put( sharedStrings.share(compoundKey), compoundMap );
+		}
+
+		//
+		// Check the compound for the bond
+		//	
+		String bondKey = sharedStrings.share(items[ItemParts.ATOM0.ordinal()] + ':' + items[ItemParts.ATOM1.ordinal()]);
+		if (!compoundMap.containsKey(bondKey))
+			compoundMap.put( bondKey, BondOrder.valueByShortName(items[ItemParts.BOND_TYPE.ordinal()].substring(0, 4)) );
+						// only the first four characters count
+	}
+	
+	
 	/**
 	 *  Try to determine what type of bond might exist between the two atoms
 	 *  using a dictionary of known chemical compounds.
@@ -306,8 +318,96 @@ public class ChemicalComponentBonds
 	 */
 	public static boolean knownCompound( final String compoundCode )
 	{
-		return compoundCode != null && bonds != null &&
-			   bonds.containsKey(compoundCode);
+		if (compoundCode != null && bonds != null)
+		{
+			if (bonds.containsKey(compoundCode)) return true;
+		
+			else
+				return tryAddBondsForCompound(compoundCode);
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * If the bond wasn't found for the compound, try to get it from the pdb site and
+	 * add it.
+	 */
+	private static boolean tryAddBondsForCompound(String compoundCode)
+	{
+		
+		boolean retval = false;
+		try
+		{
+			Status.output(Status.LEVEL_REMARK, "Looking up bond information for the ligand \"" + compoundCode + "\" on pdb.org...");
+			URL bondUrl = new URL(bondFileUrlPrefix + compoundCode + bondFileUrlSuffix);
+			URLConnection urlConnection = bondUrl.openConnection();
+			InputStream inputStream = urlConnection.getInputStream();
+			GZIPInputStream zin = new GZIPInputStream(inputStream);
+			ArrayList<String> bondStrings = parseCifFileForBonds(zin);
+			SharedObjects sharedStrings = new SharedObjects( );
+			for (String bondString : bondStrings)
+				addBondLineToMap(bondString, sharedStrings, bonds);
+			
+			retval = bonds.containsKey(compoundCode);
+			return retval;
+		}
+		
+		catch (MalformedURLException e) {}
+		
+		catch (UnknownHostException e)
+		{
+			Status.output(Status.LEVEL_WARNING, "Internet connection to pdb.org failed...  calculating bonds for Ligand \"" + compoundCode + "\"");
+		}
+		
+		catch (IOException e)
+		{
+			Status.output(Status.LEVEL_WARNING, "Ligand \"" + compoundCode + "\" not found... calculating bonds for Ligand ");			
+		}
+		
+		return retval;
+	}
+	
+
+	public static ArrayList<String> parseCifFileForBonds(InputStream is) throws IOException
+	{
+		BufferedReader in = null;
+		ArrayList<String> out = new ArrayList<String>();
+		
+		InputStreamReader isReader = new InputStreamReader(is);
+		in = new BufferedReader(isReader);
+		
+		boolean isInChemCompBondBlock = false;
+		
+		String line = null;
+		while((line = in.readLine()) != null) {
+			line = line.trim();
+			
+			if(isInChemCompBondBlock) {
+				if(line.equals("#")) {
+					isInChemCompBondBlock = false;
+				} else {
+					String dqline = line.replaceFirst("\"([A-Z0-9]+) ([A-Z0-9]+)\"", "$1=$2");						
+					String[] split = dqline.split("\\s++");
+					if(split == null || split.length != 7) {
+						new Exception("Encountered unexpected data").printStackTrace();
+					} else {
+						for(int i = 0; i < 4; i++) {
+							String s = split[i];
+							if(s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"') {
+								split[i] = s.substring(1,s.length() - 1);
+							}
+						}
+						out.add(split[0] + "\t" + split[1] + "\t" + split[2] + "\t" + split[3]);
+					}
+				}
+			}
+			
+			else if(line.equals("_chem_comp_bond.pdbx_ordinal"))
+				isInChemCompBondBlock = true;
+		}
+		
+		return out;
 	}
 }
 
