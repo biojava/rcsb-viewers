@@ -756,9 +756,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	private boolean needsPick = false;
 
 	private static final double fovy = 45.0;
-
 	private static final double zNear = 1.0; // 1.0, 0.1
-
 	private static final double zFar = 10000.0; // 80.0, 10000.0
 
 	public void requestPick() {
@@ -785,15 +783,13 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 			final SceneController sceneController = AppBase.sgetSceneController();
 
-			if (this.needsPick && !this.isScreenshotRequested) { // needs to
-				// be called
-				// twice in
-				// the case
-				// of a pick
-				// event.
-				this.drawOrPick(gl, this.glu, this.glut, drawable, true, true,
-						true);
-			} else { // draw
+			if (this.needsPick && !this.isScreenshotRequested)
+				this.drawOrPick(gl, this.glu, this.glut, drawable, true, true, true);
+							// needs to be called twice in the case of a pick event. (?)
+
+			
+			else
+			{ // draw
 
 				if (sceneController.isDebugEnabled()
 						&& sceneController.getDebugSettings().isAntialiasingEnabled) {
@@ -806,8 +802,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 					gl.glLoadIdentity();
 
 					for (int jitter = 0; jitter < sceneController.getDebugSettings().JITTER_ARRAY.length; jitter++) {
-						JoglUtils
-								.accPerspective(
+						JoglUtils.accPerspective(
 										gl,
 										this.glu,
 										this.glut,
@@ -832,9 +827,12 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 						gl.glFlush();
 					}
 					gl.glAccum(GL.GL_RETURN, 1);
-				} else {
-					if (this.needsRepaint
-							|| (!this.needsPick && !this.needsRepaint)) {
+				}
+				
+				else
+				{
+					if (this.needsRepaint || (!this.needsPick && !this.needsRepaint))
+					{
 						this.drawOrPick(gl, this.glu, this.glut, drawable,
 								true, true, false);
 						drawable.swapBuffers();
@@ -858,9 +856,10 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	public void drawOrPick(final GL gl, final GLU glu, final GLUT glut,
 			final GLAutoDrawable drawable,
 			final boolean canModifyProjectionMatrix,
-			final boolean canClearModelviewMatrix, final boolean isPick) {
-		if (this.isScreenshotRequested) {
-
+			final boolean canClearModelviewMatrix, final boolean isPick)
+	{
+		if (this.isScreenshotRequested)
+		{
 			final int oldViewportWidth = this.viewportWidth;
 			final int oldViewportHeight = this.viewportHeight;
 			this.reshape(drawable, 0, 0, this.screenshotWidth,
@@ -885,7 +884,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			tr.trPerspective(fovy, 1.0 / this.aspect,
 					zNear, zFar);
 
-			do {
+			do
+			{
 				tr.beginTile(gl);
 
 				gl.glFlush(); // TODO
@@ -908,14 +908,17 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			System.gc();
 			System.gc();
 			System.gc();
-		} else {
+		}
+		
+		else
+		{
 			Point mouseLocationInPanel = null;
-			if (isPick && this.mouseLocationInPanel != null) {
-				mouseLocationInPanel = (Point) this.mouseLocationInPanel
-						.clone();
-			}
+			if (isPick && this.mouseLocationInPanel != null)
+				mouseLocationInPanel = (Point) this.mouseLocationInPanel.clone();
+
 			MouseEvent mousePickEvent = null;
-			if (isPick && this.pickMouseEvent != null) {
+			if (isPick && this.pickMouseEvent != null)
+			{
 				mousePickEvent = new MouseEvent((Component) this.pickMouseEvent
 						.getSource(), this.pickMouseEvent.getID(),
 						this.pickMouseEvent.getWhen(), this.pickMouseEvent
@@ -1145,61 +1148,73 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			if (isPick)
 			{
 				StructureComponent newComponent = null;
+				boolean picked = false;
+				int bufferCheck;
 
 				if (this.rgbaBuffer == null)
 					this.rgbaBuffer = BufferUtil.newByteBuffer(4);
 
-				if (this.alphaBits == 0)
+/* **
+				for (bufferCheck = 0; bufferCheck < 2  && !picked; bufferCheck++)
 				{
-					gl.glReadPixels(x2D, this.viewport[3] - y2D, 1, 1, GL.GL_RGB,
-							GL.GL_UNSIGNED_BYTE, this.rgbaBuffer);
-					this.tempColor.set(this.rgbaBuffer.get(0), this.rgbaBuffer.get(1),
-							this.rgbaBuffer.get(2), (byte) 0);
-				}
+					gl.glReadBuffer(bufferCheck == 0? GL.GL_FRONT : GL.GL_BACK);
+* **/
+					
+					if (this.alphaBits == 0)
+					{
+						gl.glReadPixels(x2D, this.viewport[3] - y2D, 1, 1, GL.GL_RGB,
+								GL.GL_UNSIGNED_BYTE, this.rgbaBuffer);
+						this.tempColor.set(this.rgbaBuffer.get(0), this.rgbaBuffer.get(1),
+								this.rgbaBuffer.get(2), (byte) 0);
+					}
+					
+					else
+					{
+						gl.glReadPixels(x2D, this.viewport[3] - y2D, 1, 1, GL.GL_RGBA,
+								GL.GL_UNSIGNED_BYTE, this.rgbaBuffer);
+						this.tempColor.set(this.rgbaBuffer.get(0), this.rgbaBuffer.get(1),
+								this.rgbaBuffer.get(2), this.rgbaBuffer.get(3));
+					}
+					
+					picked = tempColor.color[0] + tempColor.color[1] + tempColor.color[2] != 0;
+//			}
 				
-				else
+				if (picked)
 				{
-					gl.glReadPixels(x2D, this.viewport[3] - y2D, 1, 1, GL.GL_RGBA,
-							GL.GL_UNSIGNED_BYTE, this.rgbaBuffer);
-					this.tempColor.set(this.rgbaBuffer.get(0), this.rgbaBuffer.get(1),
-							this.rgbaBuffer.get(2), this.rgbaBuffer.get(3));
-				}
-				
-				final DisplayLists.UniqueColorMapValue value = DisplayLists.getDisplayLists(this.tempColor);
-				
-				if (value == null)
-					Status.output(Status.LEVEL_REMARK, " "); // clear the
-					// status
-				else if (value.lists.structureComponent.getStructureComponentType() == ComponentType.FRAGMENT)
-				{
-					final Fragment f = (Fragment) value.lists.structureComponent;
-					final Residue r = f.getResidue(value.index);
-					newComponent = r;
-					this.reportAtComponent(r);
-				}
-				
-				else
-				{
-					newComponent = value.lists.structureComponent;
-					this.reportAtComponent(value.lists.structureComponent);
-				}
+					final DisplayLists.UniqueColorMapValue value = DisplayLists.getDisplayLists(this.tempColor);
+					
+					if (value == null)
+						Status.output(Status.LEVEL_REMARK, " "); // clear the
+						// status
+					else if (value.lists.structureComponent.getStructureComponentType() == ComponentType.FRAGMENT)
+					{
+						final Fragment f = (Fragment) value.lists.structureComponent;
+						final Residue r = f.getResidue(value.index);
+						newComponent = r;
+						this.reportAtComponent(r);
+					}
+					
+					else
+					{
+						newComponent = value.lists.structureComponent;
+						this.reportAtComponent(value.lists.structureComponent);
+					}
+//				}
 
-//				final Structure[] structures = Model.getSingleton().getModel().getModel().getModel().getStructures();
 
-				boolean needsRepaint = false;
 				this.lastComponentMouseWasOver = newComponent;
-
-				if (needsRepaint)
-					this.requestRepaint();
-
 				this.backBufferContainsPickData = true;
+				}
 			}
 		}
 		
 		catch (final Exception e)
 		{
-			e.printStackTrace();
-			System.err.flush();
+			if (DebugState.isDebug())
+			{
+				e.printStackTrace();
+				System.err.flush();
+			}
 		}
 
 /* ** DEBUGGING - Compute and output frames per second

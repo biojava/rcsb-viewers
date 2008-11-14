@@ -302,31 +302,37 @@ public class DisplayLists
 					boolean glPush = false;
 					final Residue r = f.getResidue(i);
 
-					if (ss.isVisible(r)) {
-
-						if (isPickMode) {
-							if (viewer.alphaBits == 0) {
-								gl.glColor3ubv(this.uniqueColors[i].color, 0);
-							} else {
-								gl.glColor4ubv(this.uniqueColors[i].color, 0);
-							}
-						} else
+					if (ss.isVisible(r))
+					{
 						try
 						{
+							if (isPickMode)
+							{
+								if (viewer.alphaBits == 0)
+									gl.glColor3ubv(this.uniqueColors[i].color, 0);
+								
+								else
+									gl.glColor4ubv(this.uniqueColors[i].color, 0);
+							}
+							
+							else
 							{
 								glPush = true;
 								gl.glPushMatrix();
-								this.enactMutableColor(r, gl, glu, glut);
-							}
+								enactMutableColor(r, gl, glu, glut);
+							}					
 
-							if (this.memoryReferencesAreToDisplayLists) {
+							if (memoryReferencesAreToDisplayLists)
 								gl.glCallList(this.videoMemoryReferences[i]);
-							} else {
-								this.indexArrays[i].rewind();
+							
+							else
+							{
+								indexArrays[i].rewind();
 								gl.glDrawRangeElements(GL.GL_TRIANGLE_STRIP, this.ranges[i][0], this.ranges[i][1], this.indexArrays[i].capacity(),
 										GL.GL_UNSIGNED_INT, this.indexArrays[i]);
 							}
 						}
+						
 						catch (Exception e)
 						{
 							if (DebugState.isDebug())
@@ -507,9 +513,7 @@ public class DisplayLists
 
 	public static UniqueColorMapValue getDisplayLists(final Color3b color)
 	{
-		if (color.color[0] + color.color[1] + color.color[2] > 0)
-			return (UniqueColorMapValue) DisplayLists.uniqueColorMap.get(color);
-		return null;
+		return (UniqueColorMapValue) DisplayLists.uniqueColorMap.get(color);
 	}
 
 	public void startDefine(final int index, final GL gl, final GLU glu,

@@ -335,8 +335,12 @@ public class ChemicalComponentBonds
 	 */
 	private static boolean tryAddBondsForCompound(String compoundCode)
 	{
-		
 		boolean retval = false;
+		
+		if (compoundCode.length() < 3 && PeriodicTable.getElement(compoundCode) != null)
+				return retval;
+							// don't look up single elements
+		
 		try
 		{
 			Status.output(Status.LEVEL_REMARK, "Looking up bond information for the ligand \"" + compoundCode + "\" on pdb.org...");

@@ -341,7 +341,7 @@ public class StructureElement_VisibilityMutator extends Mutator {
         switch(pickLevel)
         {
         case ATOMS: break;
-        case RIBBONS: if (!c.isBasicChain()) return;
+        case RIBBONS: if (!c.isBasicChain()) return; break;
         default:
             (new Exception("Invalid option: " + pickLevel)).printStackTrace();            
         }
