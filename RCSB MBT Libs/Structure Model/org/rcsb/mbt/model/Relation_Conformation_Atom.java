@@ -63,6 +63,7 @@
 package org.rcsb.mbt.model;
 
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+import org.rcsb.mbt.model.interim.Conformation;
 
 /**
  *  This class represents a relationship between the

@@ -53,15 +53,6 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 	public LXGlGeometryViewer()
 	{
 		this.do_glFinishInShaders = true;
-		bondGeometry.setShowOrder(false);
-					// This seems odd -
-					// The drawn representation in the original appears to have this unset, yet it
-					// is set in the code.
-					//
-					// I've turned it off, for now, since the bond orders don't appear to be correct
-					// if they're shown.
-					//
-					// 	rickb - 23-May-08
 	}
 
 	/**

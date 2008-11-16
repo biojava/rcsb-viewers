@@ -110,6 +110,7 @@ import java.util.*;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 
+
 /**
  *  Implements a StructureComponent container for secondary structure fragment
  *  information. This consists of Residue range and the secondary structure type.

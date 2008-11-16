@@ -277,14 +277,18 @@ public class FullSequencePanel extends SequencePanelBase
                 
                 buf.setColor(Color.white);
                 int lineY = curY + 1;
-                if (first || ( r.getResidueId() % 10 == 0 && curX > lastCharEndX))
+                if (first || r.getResidueId() % 5 == 0)
                 {
-                	String resId = "";
-                	final Object[] val = sm.getPdbToNdbConverter().getPdbIds(r.getChainId(), new Integer(r.getResidueId()));
-	        		if (val != null)
-	        			resId = (String)val[1];
-	                buf.drawString(resId, curX, curY + (int)letterBounds.getHeight() + rulerWidth);
-	                lastCharEndX = curX + (resId.length() * (int)letterBounds.getWidth() + 1);
+                	if (first || ( r.getResidueId() % 10 == 0 && curX > lastCharEndX))
+                	{
+	                	String resId = "";
+	                	final Object[] val = sm.getPdbToNdbConverter().getPdbIds(r.getChainId(), new Integer(r.getResidueId()));
+		        		if (val != null)
+		        			resId = (String)val[1];
+		                buf.drawString(resId, curX, curY + (int)letterBounds.getHeight() + rulerWidth);
+		                lastCharEndX = curX + (resId.length() * (int)letterBounds.getWidth() + 1);
+                	}
+                	
 	                int tickX = curX + letterCenterX;
 	                buf.drawLine(tickX , lineY, tickX, lineY + rulerWidth);
 	                first = false;

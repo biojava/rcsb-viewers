@@ -11,10 +11,10 @@ import java.awt.geom.Rectangle2D;
 import java.util.Hashtable;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.model.Conformation;
 import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.ResidueColorByFragmentType;
+import org.rcsb.mbt.model.interim.Conformation;
 import org.rcsb.mbt.ui.dialogs.ColorChooserDialog;
 import org.rcsb.pw.ui.DescriptionPanel;
 

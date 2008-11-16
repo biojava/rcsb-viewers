@@ -283,6 +283,11 @@ import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.*;
 import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
+import org.rcsb.mbt.model.interim.Coil;
+import org.rcsb.mbt.model.interim.Conformation;
+import org.rcsb.mbt.model.interim.Helix;
+import org.rcsb.mbt.model.interim.Strand;
+import org.rcsb.mbt.model.interim.Turn;
 import org.rcsb.mbt.model.util.*;
 
 /**

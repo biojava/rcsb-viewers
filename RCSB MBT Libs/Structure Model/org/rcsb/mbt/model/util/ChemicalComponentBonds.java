@@ -38,15 +38,12 @@ package org.rcsb.mbt.model.util;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
 
 import org.rcsb.mbt.model.*;
-
-import sun.tools.tree.SuperExpression;
 
 
 
@@ -348,7 +345,7 @@ public class ChemicalComponentBonds
 			URLConnection urlConnection = bondUrl.openConnection();
 			InputStream inputStream = urlConnection.getInputStream();
 			GZIPInputStream zin = new GZIPInputStream(inputStream);
-			ArrayList<String> bondStrings = parseCifFileForBonds(zin);
+			ArrayList<String> bondStrings = parseCifFileForBonds(zin, null);
 			SharedObjects sharedStrings = new SharedObjects( );
 			for (String bondString : bondStrings)
 				addBondLineToMap(bondString, sharedStrings, bonds);
@@ -373,10 +370,30 @@ public class ChemicalComponentBonds
 	}
 	
 
-	public static ArrayList<String> parseCifFileForBonds(InputStream is) throws IOException
+	/*
+	 * Reads a .cif file for bonds, condenses the bond information into a four-token line,
+	 * and does one of two things with the line:
+	 * 
+	 *   1) if (ps == null), adds it to an array.
+	 *   
+	 *   2) if (ps != null), prints out to ps.
+	 *   
+	 * This gets called from the external process ChemicalComponentBondsCreator to create
+	 * the initial dictionary (which is why it's public.)  It is also called from this class
+	 * in 'tryAddBondsForCompound()'.  Input from this are typically very tiny streams,
+	 * containing the bond info for a single ligand.  OTOH, when called from
+	 * ChemicalComponentBondsCreator, the input stream is huge, hence the need to
+	 * output as it comes in.
+	 * 
+	 * @arg is - input stream to parse.
+	 * @arg ps - output file to write.  Null, if none.
+	 * @return - ArrayList of compressed bond strings to be added to the bonds
+	 *           dictionary.
+	 */
+	public static ArrayList<String> parseCifFileForBonds(InputStream is, PrintWriter pw) throws IOException
 	{
 		BufferedReader in = null;
-		ArrayList<String> out = new ArrayList<String>();
+		ArrayList<String> out = (pw == null)? new ArrayList<String>() : null;
 		
 		InputStreamReader isReader = new InputStreamReader(is);
 		in = new BufferedReader(isReader);
@@ -384,7 +401,11 @@ public class ChemicalComponentBonds
 		boolean isInChemCompBondBlock = false;
 		
 		String line = null;
-		while((line = in.readLine()) != null) {
+		String outStr = null;
+		int lineCount = 0, lineEvery = 20;
+		
+		while((line = in.readLine()) != null)
+		{
 			line = line.trim();
 			
 			if(isInChemCompBondBlock) {
@@ -395,14 +416,23 @@ public class ChemicalComponentBonds
 					String[] split = dqline.split("\\s++");
 					if(split == null || split.length != 7) {
 						new Exception("Encountered unexpected data").printStackTrace();
-					} else {
-						for(int i = 0; i < 4; i++) {
+					} else
+					{
+						for(int i = 0; i < 4; i++)
+						{
 							String s = split[i];
 							if(s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"') {
 								split[i] = s.substring(1,s.length() - 1);
 							}
 						}
-						out.add(split[0] + "\t" + split[1] + "\t" + split[2] + "\t" + split[3]);
+						if (DebugState.isDebug() && ++lineCount % lineEvery == 1)
+							Status.output(Status.LEVEL_REMARK, lineCount + ": " + line);
+						
+						outStr = split[0] + "\t" + split[1] + "\t" + split[2] + "\t" + split[3];
+						if (pw != null)
+							pw.println(outStr);
+						else
+							out.add(outStr);
 					}
 				}
 			}
