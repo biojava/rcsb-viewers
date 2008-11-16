@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html
+ xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta
+     name="generator"
+     content="HTML Tidy, see www.w3.org" />
+    <title>
+      RCSB Viewers Documentation README
+    </title>
+  </head>
+  <body>
+    <h1>
+      README - Documentation on the Documentation
+    </h1>
+    <p>
+      The documentation for the viewers has been lifted out of the build projects for the following reasons:
+    </p>
+    <ul>
+      <li>
+        It's <em>PHP</em> driven to allow breakouts of things like headers, navigation bars, etc.
+      </li>
+      <li>
+        It's comprehensive - all of the documentation for all of the viewers is here.
+      </li>
+      <li>
+        It allows the documentation to easily be copied <em>en-masse</em>, or zipped or otherwised packaged without
+        having to include the source files.
+      </li>
+    </ul>
+    <h2>
+      <em>PHP</em>
+    </h2>
+    <p>
+      <em>PHP</em> is used to allow sectioning up of the documents. Headers, trailers, nav bars, etc. are much more
+      easily implemented as separate entities that only need to be defined once, and are incorporated in the final
+      page.
+    </p>
+    <p>
+      Obviously, we don't want to require the end user to put <em>PHP</em> and an <em>Apache</em> server on his machine
+      (although, more and more, this is becoming the case.)
+    </p>
+    <p>
+      So, we run an Ant script which processes the pages and outputs static HTML pages to the <em>doc-out</em>
+      directory.
+    </p>
+    <p>
+      Development and editing occurs on the <em>doc-in</em> page. If you want to view those pages, directly, you'll
+      need an installation of Apache and PHP (provided by default in Mac installations, BTW), or use eclipse configured
+      with a browser and PHP. <!-- TODO - add more on installation -->
+    </p>
+  </body>
+</html>
+
