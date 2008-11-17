@@ -11,7 +11,8 @@
 <!-- CLEAN -->
 	
   <target name="clean">
-  	<delete dir="./doc" />
+  	<delete dir="./doc/Developer" includeemptydirs="true" />
+		<!-- we don't want to get the '.svn' directory, so we name out dirs, explicitly. -->
   </target>
 	
 <!-- VIEWER FRAMEWORK -->
