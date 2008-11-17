@@ -1,17 +1,8 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>RCSB MBT Lib - Architecture Overview</title>
-<link href="doc.css" rel="stylesheet" type="text/css" />
-</head>
-<body id="ext">
-<div id="title-block">
-<div id="title">RCSB Structure Viewers</div>
-<div class="sub-info">Rick Berger</div>
-<div class="sub-info">Aug, 2008</div>
-</div>
-<div id="main">
+<?php
+  session_start();
+  set_include_path($_SESSION['INCLUDE_PATH']);
+  include_once "resources/snippets/header.php";
+?>
 <h1>Architecture Overview</h1>
 <p>
 The architecture of the <em>RCSB MBT Libs</em> is a blend of two well understood architectures:</p>
@@ -100,12 +91,14 @@ There are a number of these to control subfunctions/systems.  Currently, these a
   <li><em>MutatorController</em> - controls changes to the document.</li>
   </ul>
 </dd>
+<dd>
+More are expected to be added as functionality grows or funcional units are further identified.</dd>
 <dt>GlViewer</dt>
 <dd>The 3d viewer, attached to the <em>DocumentFrame</em>.  Renders the scene.</dd>
 <dt>Other UI</dt>
 <dd>
 Loose definition for various other views/panels/dialogs that are related to the document.</dd>
 </dl>
-</div>
-</body>
-</html>
+<?php
+  include_once "resources/snippets/footer.php";
+?>

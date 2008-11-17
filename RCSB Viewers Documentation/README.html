@@ -46,9 +46,21 @@
       directory.
     </p>
     <p>
-      Development and editing occurs on the <em>doc-in</em> page. If you want to view those pages, directly, you'll
+      Development and editing occurs on the <em>doc-in</em> page. If you want to view those pages, directly, you can
+      do that - you'll
       need an installation of Apache and PHP (provided by default in Mac installations, BTW), or use eclipse configured
-      with a browser and PHP. <!-- TODO - add more on installation -->
+      with a browser and PHP.</p>
+    <p>
+      You also need to make the 'src' directory accessible to the web browser.  An easy way to do that (on unix or mac)
+      is to go to whereever you document root is defined and create a link to the src directory.</p>
+    <p>
+      For browsing the src, you <em>must first</em> visit the 'src/index.php' file - this registers a session and sets
+      session variables that allow the rest of the pages to get the correct include for the various PHP bits.  You'll
+      get lots of errors, if you don't visit this page, first.
+    </p>
+    <p>
+    	Note that all of the links on the pages are relative - this allows the output pages to be placed anywhere (at a
+    	cost disadvantage of ability to reorganize the pages.  Trade-offs...)
     </p>
   </body>
 </html>
