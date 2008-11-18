@@ -148,14 +148,8 @@ public class Bond
 	private Atom atoms[];
 
 	// The order of the bond (how many electron pairs are shared).
+	// (( turn this into an enum??? ))
 	private float order = 0.0f;
-
-/* **/
-			// XXX_DEBUG - comment this out (and the code that sets/accesses it)
-			// for normal deployment (could use a pre-processor, here...)
-	
-	public boolean isCalculated = false;
-/* **/
 
 	//
 	// Constructors

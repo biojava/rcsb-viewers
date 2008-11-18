@@ -60,6 +60,29 @@ import org.xml.sax.helpers.DefaultHandler;
  * (hence the need for the {@linkplain org.rcsb.mbt.model.util.PdbToNdbConverter}, created by the
  * loader and passed off to the {@linkplain org.rcsb.mbt.model.StructureMap} class.</p>
  * 
+ * <p>
+ * Some important mappings:</p>
+ * <h3>Atoms</h3>
+ * <dl>
+ * <dt>group_PDB</dt>
+ * <dd>The PDB Atom record identifier equivalent (ATOM or HETATM)</dd>
+ * 
+ * <dt>label_atom_id</dt>
+ * <dd>The atom NAME</dd>
+ * 
+ * <dt>label_comp_id</dt>
+ * <dd>The atom's residue compound code</dd>
+ * 
+ * <dt>label_asym_id</dt>
+ * <dd>The atom's chain id</dd>
+ * 
+ * <dt>label_seq_id</dt>
+ * <dd>The atom's residue id (can be <em>null</em>)</dd>
+ * 
+ * <dt>auth_seq_id</dt>
+ * <dd>Not recorded - used mainly to track non-protein chain changes.</dd>
+ * 
+ * 
  * @author John Beaver, Jeff Milton
  * @author (revised) rickb
  */
@@ -796,14 +819,13 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    
    class XMLRunnable__group_PDB__End extends XMLRunnable
    {
-		public void run() {
+		public void run()
+		{
 			final String trim = buf.trim();
            
-           if(!trim.equals("ATOM")) {
-           	isCurrentNonProteinChain = true;
-           } else {
-           	isCurrentNonProteinChain = false;
-           }
+			isCurrentNonProteinChain = !trim.equals("ATOM");
+						// in particular HETATM records, but any other type of atom PDB types
+						// (other than ATOM) would fall under the 'non-protein' classification.
            
            curAtom.name = getUnique(trim);
 		}
@@ -844,8 +866,11 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
            
            curAtom.chain_id = chainId;
            
-           if(isCurrentNonProteinChain && !previousNdbChainId.equals(chainId)) {
-           	curGeneratedNdbResidueId = 0;
+           if (isCurrentNonProteinChain && !previousNdbChainId.equals(chainId))
+           {
+           	 curGeneratedNdbResidueId = 0;
+           	 previousPdbResidueId = "";
+           	 				// a new chain has to start a new residue, as well.
            }
            
            previousNdbChainId = chainId;
@@ -858,11 +883,13 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    {
 		public void run() {
 			final String residueId = buf.trim();
-           if(residueId.length() != 0) {
-           	curAtom.residue_id = Integer.parseInt(residueId);
-           } else {
-           	curAtom.residue_id = Integer.MIN_VALUE;    // the previous quick-fix for this situation was, ++this.curResidueId;. But it caused the mbt's bond calculation to fail. 
-           }
+           if (residueId.length() != 0)
+           	 curAtom.residue_id = Integer.parseInt(residueId);
+           
+           else
+           	 curAtom.residue_id = Integer.MIN_VALUE;  
+           			// the previous quick-fix for this situation was, ++this.curResidueId;
+           			// But it caused the mbt's bond calculation to fail. 
 		}
    }
    protected XMLRunnable__label_seq_id__End createXMLRunnable__label_seq_id__End()
@@ -873,9 +900,8 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
 		public void run() {
 			final String trim = buf.trim();
            
-           if(isCurrentNonProteinChain && !previousPdbResidueId.equals(trim)) {
-           	curGeneratedNdbResidueId++;
-           }
+           if (isCurrentNonProteinChain && !previousPdbResidueId.equals(trim))
+           	 curGeneratedNdbResidueId++;
            
            previousPdbResidueId = trim;
 		}
@@ -949,14 +975,12 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    {
 		public void run() {
        	// ignore all but the first model, for now.
-       	if(currentModelNumber != 1 && currentModelNumber != -1) {
+       	if(currentModelNumber != 1 && currentModelNumber != -1)
        		return;
-       	}
        	
-           if(curAtom.residue_id == Integer.MIN_VALUE) {
-           	curAtom.residue_id = curGeneratedNdbResidueId;
-           }
-           
+           if (curAtom.residue_id == Integer.MIN_VALUE)
+           	  curAtom.residue_id = curGeneratedNdbResidueId;
+ 
            atomVector.add(curAtom);
 		}
    }

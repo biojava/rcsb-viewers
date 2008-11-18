@@ -759,8 +759,6 @@ public class Octree {
 						Bond newBond = new Bond(((OctreeAtomItem) dataItem)
 								.getAtom(), ((OctreeAtomItem) this.dataItems[j])
 								.getAtom());
-						if (DebugState.isDebug())
-							newBond.isCalculated = true;
 						
 						bondVector.add(newBond);
 					}

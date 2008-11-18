@@ -307,7 +307,7 @@ import org.rcsb.mbt.model.util.*;
  *  more spacially/biologically meaningful representations and displays.</p>
  *  <IMG style="text-align:center">SRC="doc-files/StructureMap.jpg"/>
  *  <p>
- *  The class provides a number of different "entry points" to traverse
+ *  The class provides a number of different access venues to traverse
  *  the underlying Structure data. The one an application should choose
  *  depends mostly on what the application wishes to accomplish. For
  *  example, while a basic sequence viewer might simply walk the raw list
@@ -654,6 +654,7 @@ public class StructureMap
 				this.chainById.put( atom.chain_id, chain );
 			}
 
+			assert(chain != null);
 			chainKeyId = atom.chain_id + atom.residue_id;
 			
 			Residue residue = this.residueByChainKeyId.get( chainKeyId );
@@ -661,14 +662,13 @@ public class StructureMap
 			{
 				residue = new Residue( );
 				residue.setStructure( this.structure );
-				residue.addAtom( atom );
 
 				chain.addResidue( residue );
 				this.residueByChainKeyId.put( chainKeyId, residue );
 			}
 			
-			else
-				residue.addAtom( atom );
+			assert(residue != null);
+			residue.addAtom( atom );
 
 			// Need to add the chain to our master list LAST
 			// so that it has a valid chain id (that needs a residue and an atom)!

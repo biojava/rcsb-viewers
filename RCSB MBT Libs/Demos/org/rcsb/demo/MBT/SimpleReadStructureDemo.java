@@ -33,6 +33,7 @@ package org.rcsb.demo.MBT;
 import org.rcsb.demo.utils.Output;
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
+import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.mbt.structLoader.*;
 
 import java.io.File;
@@ -438,6 +439,7 @@ public class SimpleReadStructureDemo
 	protected void outputResidueInfo(Vector<Residue> residues, Chain chain, Structure struct)
 	{
 		output.lineOut("Residues: " + residues.size());
+		PdbToNdbConverter conv = struct.getStructureMap().getPdbToNdbConverter();
 
 		if (!doResidues) return;
 		
@@ -446,8 +448,8 @@ public class SimpleReadStructureDemo
 		output.indent();
 		for (Residue residue : residues)
 		{	
-			output.lineOut("Res - Id: " + residue.getResidueId() + ", " +
-						   "CC: " + residue.getCompoundCode() + ", " +
+			output.lineOut("Res - Id: " + residue.getResidueId() + "/" + conv.getResidueNdbId(residue, "(NONE)") + ", " +
+						   "CmpCd: " + residue.getCompoundCode() + ", " +
 						   "HPhob: " + residue.getHydrophobicity() + ", " +
 						   "NAtoms: " + residue.getAtomCount() + " (" +
 	    				   "C_ID: " + ((residue.getChainId() == chain.getChainId())? "OK" : "BAD") + ")");

@@ -275,10 +275,15 @@ public class ChemicalComponentBonds
 		if (bonds.containsKey(atom0.compound))
 		{
 			final CompoundMap compoundMap = bonds.get( atom0.compound );
+			
+			String atomName0 = atom0.name.replace(" ", "");
+			String atomName1 = atom1.name.replace(" ", "");
+								// spaces have been removed in the keys...
+								// (see 4hhb for example...)
 		
 			for (int ix = 0; ix < 2; ix++)
 			{
-				String bondKey = (ix == 0)? atom0.name + ":" + atom1.name : atom1.name + ":" + atom0.name;
+				String bondKey = (ix == 0)? atomName0 + ":" + atomName1 : atomName1 + ":" + atomName0;
 							// try natural, then reverse atom orders
 				
 				if (compoundMap.containsKey(bondKey))
@@ -402,7 +407,7 @@ public class ChemicalComponentBonds
 		
 		String line = null;
 		String outStr = null;
-		int lineCount = 0, lineEvery = 20;
+		int lineCount = 0, lineEvery = 1000;
 		
 		while((line = in.readLine()) != null)
 		{
@@ -412,7 +417,7 @@ public class ChemicalComponentBonds
 				if(line.equals("#")) {
 					isInChemCompBondBlock = false;
 				} else {
-					String dqline = line.replaceFirst("\"([A-Z0-9]+) ([A-Z0-9]+)\"", "$1=$2");						
+					String dqline = line.replaceFirst("\"([A-Z0-9]+) ([A-Z0-9]+)\"", "$1$2");						
 					String[] split = dqline.split("\\s++");
 					if(split == null || split.length != 7) {
 						new Exception("Encountered unexpected data").printStackTrace();

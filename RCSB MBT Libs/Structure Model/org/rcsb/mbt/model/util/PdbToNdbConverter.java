@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.rcsb.mbt.model.Residue;
+
 
 
 /**
@@ -160,5 +162,11 @@ public class PdbToNdbConverter {
         }
         
         return (String)((Object[])residueIds.values().iterator().next())[0];
+    }
+    
+    public String getResidueNdbId(final Residue residue, String notFoundValue)
+    {
+    	Object ndbIds[] = getNdbIds(residue.getChainId(), Integer.toString(residue.getResidueId()));    	
+    	return ndbIds!= null && ndbIds[1] != null? ndbIds[1].toString() : notFoundValue;
     }
 }
