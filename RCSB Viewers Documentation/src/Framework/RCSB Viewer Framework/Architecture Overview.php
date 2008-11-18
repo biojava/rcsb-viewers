@@ -1,9 +1,8 @@
 <?php
   session_start();
   set_include_path($_SESSION['INCLUDE_PATH']);
-  include_once "resources/snippets/header.php";
+  include_once "resources/snippets/prefix.php";
 ?>
-<h1>Architecture Overview</h1>
 <p>
 The architecture of the <em>RCSB MBT Libs</em> is a blend of two well understood architectures:</p>
 <ul>
@@ -100,5 +99,5 @@ More are expected to be added as functionality grows or funcional units are furt
 Loose definition for various other views/panels/dialogs that are related to the document.</dd>
 </dl>
 <?php
-  include_once "resources/snippets/footer.php";
+  include_once "resources/snippets/suffix.php";
 ?>

@@ -1,18 +1,8 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>RCSB MBT Lib - Install and Build</title>
-<link href="doc.css" rel="stylesheet" type="text/css" />
-</head>
-<body id="ext">
-<div id="title-block">
-<div id="title">RCSB Structure Viewers</div>
-<div class="sub-info">Rick Berger</div>
-<div class="sub-info">Aug, 2008</div>
-</div>
-<div id="main">
-<h1>Installing</h1>
+<?php
+  session_start();
+  set_include_path($_SESSION['INCLUDE_PATH']);
+  include_once "resources/snippets/prefix.php";
+?>
 <p>
 We are currently using <em>Eclipse</em> for our build environment.  Other environments may work,
 but since Eclipse is universally available and free, we highly recommend your using it.</p>
@@ -168,7 +158,6 @@ to the '../../3rd Party Libs/jogl/jnilibs' directory.</dd>
 (Expect this to get reorganized, in the future.)</dd>
 <dd>
 At this point, you should be able to debug or run the TestRun scripts.</dd>
-</dl>
-</div>
-</body>
-</html>
+<?php
+  include_once "resources/snippets/suffix.php";
+?>
