@@ -143,7 +143,7 @@ public class BondFactory
 	/**
 	 * Cut-off distance limit for peptide bond formation.
 	 */
-	private static float peptideBondLimit    = 2.3f;
+	private static float peptideBondLimit    = 3.0f;
 
 	/**
 	 *  Return a vector of Bond objects extracted from a Structure
