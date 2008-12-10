@@ -2,21 +2,27 @@ package org.rcsb.mbt.model.geometry;
 
 import java.util.regex.Pattern;
 
-import org.rcsb.mbt.glscene.geometry.Matrix3f;
-import org.rcsb.mbt.glscene.geometry.Vector3f;
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Point3d;
+import javax.vecmath.Vector3f;
 import org.rcsb.mbt.model.UnitCell;
 
 /**
  * Isolation issue -
  * 
  * The original version of this (renamed as GLTransformationMatrix) uses FloatBuffer objects obtained from
- * GL to store and operate on the matrices - perhaps a good thing for performance, but it destroys the ability
+ * GL to store and operate on the matrices - doing so destroys the ability
  * to isolate the model, because the loaders use this to generate and store biological unit and non-crystallographic
  * transformations.
  * 
  * This version is a reimplementation that uses a simple array of floats.  These are almost always stored in
  * lists - note GLTransformationList has a utility to return a list of FloatBuffer objects for use in
  * gl rendering.
+ * 
+ * TODO: re-implement this as a subclass of Matrix3x and remove redundant functionality.
+ *       Revert the array implementation to a Vector3x/Point3x implementation.
+ *       All of the vertices and points should be carried consistently.
+ *       24-Nov-08 - rickb
  * 
  * @see org.rcsb.mbt.glscene.jogl.GLTransformationMatrix
  * @see org.rcsb.mbt.glscene.jogl.GLTransformationList
@@ -44,9 +50,9 @@ public class ModelTransformationMatrix {
 			this.values[9] = (matrix.m12);
 			this.values[10] = (matrix.m22);
 			this.values[11] = (0);
-			this.values[12] = (vector.coordinates[0]);
-			this.values[13] = (vector.coordinates[1]);
-			this.values[14] = (vector.coordinates[2]);
+			this.values[12] = (vector.x);
+			this.values[13] = (vector.y);
+			this.values[14] = (vector.z);
 			this.values[15] = (1);
 		}
 	}
@@ -60,6 +66,16 @@ public class ModelTransformationMatrix {
 		result[2] = this.values[2] * point[0] + this.values[6] * point[1] + this.values[10] * point[2] + this.values[14];
 	}
 	
+	/**
+	 * This function will change the contents of result, but will not change point.
+	 */
+	public void transformPoint(final Point3d point, Point3d result)
+	{
+		result.x = this.values[0] * point.x + this.values[4] * point.y + this.values[8] * point.z + this.values[12];
+		result.y = this.values[1] * point.x + this.values[5] * point.y + this.values[9] * point.z + this.values[13];
+		result.z = this.values[2] * point.x + this.values[6] * point.y + this.values[10] * point.z + this.values[14];
+	}
+
 	/**
 	 * The provided rotation matrix is:
 	 * m00 m01 m02

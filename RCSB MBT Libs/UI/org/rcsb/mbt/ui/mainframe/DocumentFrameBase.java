@@ -1,24 +1,17 @@
 package org.rcsb.mbt.ui.mainframe;
 
 import java.awt.Dimension;
-import java.awt.GraphicsConfiguration;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.net.URL;
 
 import javax.swing.JFrame;
-import javax.swing.JProgressBar;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
-
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.doc.DocController;
-import org.rcsb.mbt.controllers.scene.PickController;
 import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.controllers.update.UpdateController;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.StructureModel;
-import org.rcsb.mbt.model.util.Status;
 
 
 /**
@@ -63,16 +56,6 @@ public abstract class DocumentFrameBase extends JFrame
 	{
 		if (sceneController == null) sceneController = AppBase.sgetAppModuleFactory().createSceneController();
 		return sceneController;
-	}
-	
-	/**
-	 * The pick controller determines what level of items are pickable - atoms, residues, chains, etc.
-	 */
-	private PickController pickController = null;
-	public PickController getPickController()
-	{
-		if (pickController == null) pickController = AppBase.sgetAppModuleFactory().createPickController();
-		return pickController;
 	}
 	
 	/**

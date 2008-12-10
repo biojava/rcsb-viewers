@@ -22,7 +22,7 @@ import javax.swing.border.*;
 
 import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
 import org.rcsb.lx.ui.LXDocumentFrame;
-import org.rcsb.mbt.model.geometry.Algebra;
+import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.util.*;
 
 
@@ -168,7 +168,7 @@ public class AngleDialog extends JDialog implements IPickInfoReceiver
 			
 				AngleDialog.this.setVisible(false);
 
-				Status.output(Status.LEVEL_REMARK, "Angle: " + LXGlGeometryViewer.getDistString(Algebra.angle(AngleDialog.this.point1, AngleDialog.this.point2, AngleDialog.this.point3)));
+				Status.output(Status.LEVEL_REMARK, "Angle: " + LXGlGeometryViewer.getDistString(ArrayLinearAlgebra.angle(AngleDialog.this.point1, AngleDialog.this.point2, AngleDialog.this.point3)));
 
 				dispose();
 			}

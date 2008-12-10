@@ -59,6 +59,7 @@ public class ComprehensiveStructureTest implements FileFilter
 		
 		SimpleReadStructureDump rdr = new SimpleReadStructureDump();
 		rdr.doDump(inputFile.getAbsolutePath(), ps);
+		
 		ps.close();
 		
 		Assert.assertTrue(ioDirs.compareOutputToExpected(inputFile.getName()));

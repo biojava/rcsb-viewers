@@ -20,7 +20,7 @@ import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms.BiologicalUnitGenerationMapByChain;
-import org.rcsb.mbt.model.geometry.Algebra;
+import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
 import org.rcsb.mbt.model.util.DebugState;
@@ -313,7 +313,7 @@ public class SceneController implements GvPickEventListener, IUpdateListener
 		if (forceRecalculation || viewer.bounds == null)
 			viewer.bounds = getSceneBounds();
 
-		final double maxStructureLength = Algebra.distance(viewer.bounds[0],
+		final double maxStructureLength = ArrayLinearAlgebra.distance(viewer.bounds[0],
 				viewer.bounds[1]);
 
 		final double[] center = {

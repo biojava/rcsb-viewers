@@ -2,7 +2,7 @@ package org.rcsb.pw.controllers.scene.mutators.options;
 
 import java.awt.Color;
 
-import org.rcsb.mbt.glscene.geometry.Point3d;
+import javax.vecmath.Point3d;
 import org.rcsb.mbt.model.attributes.LineStyle;
 
 

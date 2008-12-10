@@ -10,6 +10,7 @@ import java.util.Vector;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
+import javax.vecmath.Point3d;
 
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.glscene.surfaces.Surface;
@@ -628,11 +629,12 @@ public class JoglSceneNode
 				try {
 					gl.glPushMatrix();
 
-					for (int i = 0; i < line.getFirstPoint().vector.length; i++) {
-						this.tempMidpoint[i] = (line
-								.getFirstPoint().vector[i] + line
-								.getSecondPoint().vector[i]) / 2;
-					}
+					double firstPointArray[] = new double[3], secondPointArray[] = new double[3];
+					line.getFirstPoint().get(firstPointArray);
+					line.getSecondPoint().get(secondPointArray);
+					for (int i = 0; i < 3; i++)
+						this.tempMidpoint[i] = (firstPointArray[i] + secondPointArray[i]) / 2;
+
 					gl.glTranslated(this.tempMidpoint[0] + .5f,
 							this.tempMidpoint[1] - .5f,
 							this.tempMidpoint[2] + .5f);

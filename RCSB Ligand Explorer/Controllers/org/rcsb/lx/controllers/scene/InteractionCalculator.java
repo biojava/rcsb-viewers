@@ -20,7 +20,7 @@ import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
-import org.rcsb.mbt.model.geometry.Algebra;
+import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 
 /*
  * Calculates the interactions between the ligand and the protein.
@@ -84,7 +84,7 @@ public class InteractionCalculator
 							&& (atom_j.element.equals("N") || atom_j.element
 									.equals("O"))) {
 
-						distance = Algebra.distance(atom_i.coordinate,
+						distance = ArrayLinearAlgebra.distance(atom_i.coordinate,
 								atom_j.coordinate);
 
 						if (distance <= hbondupper && distance >= hbondlower) {
@@ -107,7 +107,7 @@ public class InteractionCalculator
 
 					if (atom_i.element.equals("C")
 							&& atom_j.element.equals("C")) {
-						distance = Algebra.distance(atom_i.coordinate,
+						distance = ArrayLinearAlgebra.distance(atom_i.coordinate,
 								atom_j.coordinate);
 						if (distance <= hydroupper && distance >= hydrolower) {
 							interactionType = InteractionConstants.hydrophobicType;
@@ -136,7 +136,7 @@ public class InteractionCalculator
 							&& !((atom_i.element.equals("N") || atom_i.element
 									.equals("O")) && (atom_j.element
 									.equals("N") || atom_j.element.equals("O")))) {
-						distance = Algebra.distance(atom_i.coordinate,
+						distance = ArrayLinearAlgebra.distance(atom_i.coordinate,
 								atom_j.coordinate);
 						if (distance <= otherupper && distance >= otherlower) {
 							interactionType = InteractionConstants.otherType;
@@ -191,7 +191,7 @@ public class InteractionCalculator
 							Atom hohAtom = hohResidue.getAtom(0);
 										// water residue only contains a single 'O'
 							
-							distance = Algebra.distance(hohAtom.coordinate,
+							distance = ArrayLinearAlgebra.distance(hohAtom.coordinate,
 														ligAtom.coordinate);
 							if (distance < upperBound && distance > lowerBound)
 							{
@@ -268,7 +268,7 @@ public class InteractionCalculator
 		{
 			for (int k = 0; k < proAtoms.size(); k++) {
 				final Atom atom_k = proAtoms.get(k);
-				distance = Algebra.distance(atom_j.coordinate,
+				distance = ArrayLinearAlgebra.distance(atom_j.coordinate,
 						atom_k.coordinate);
 				distString = LXGlGeometryViewer.getDistString(distance);
 				final Residue res = structureMap.getResidue(atom_k);
@@ -327,7 +327,7 @@ public class InteractionCalculator
 						&& (atomResidueM != atomResidueN) &&
 							(atomResidueM.getChainId().equals(currentLigandResidues[0].getChainId()) ||
 							 atomResidueN.getChainId().equals(currentLigandResidues[0].getChainId()))) {
-					distance = Algebra.distance(atom_m.coordinate,
+					distance = ArrayLinearAlgebra.distance(atom_m.coordinate,
 							atom_n.coordinate);
 					distString = LXGlGeometryViewer.getDistString(distance);
 

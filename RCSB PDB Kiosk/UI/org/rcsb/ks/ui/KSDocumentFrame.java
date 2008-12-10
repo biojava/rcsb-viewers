@@ -18,14 +18,11 @@ import java.net.URL;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.rcsb.ks.controllers.doc.KSDocController;
 import org.rcsb.ks.glscene.jogl.KSGlGeometryViewer;
-import org.rcsb.mbt.controllers.scene.PickController;
 import org.rcsb.mbt.controllers.scene.SceneState;
-import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.model.Structure;

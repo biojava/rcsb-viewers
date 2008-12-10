@@ -148,7 +148,6 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.model.Atom;
@@ -167,7 +166,7 @@ import org.rcsb.mbt.model.attributes.StructureStylesEvent;
 import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
-import org.rcsb.pw.controllers.scene.mutators.Mutator;
+import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 
 
 /**
@@ -327,10 +326,9 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 				boolean isBackboneMode = false;
 				final boolean disableVisibilityCheck = false;
 
-				PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
-				switch (pickLevel)
+				switch (MutatorBase.getActivationType())
 				{
-				case ATOMS:
+				case ATOMS_AND_BONDS:
 					isAtomMode = true;
 					break;
 				default:
@@ -568,7 +566,7 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 				return;
 			}
 
-			final Mutator curMut = ProteinWorkshop.sgetSceneController().getMutatorEnum().getCurrentMutator();
+			final MutatorBase curMut = ProteinWorkshop.sgetSceneController().getMutatorEnum().getCurrentMutator();
 
 			if (userObject instanceof Structure)
 			{

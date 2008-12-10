@@ -2,24 +2,22 @@
 <classpath>
 	<classpathentry excluding="org/rcsb/mbt/model/WaterChain.java|org/rcsb/mbt/model/MiscellaneousMoleculeChain.java" kind="src" path="Structure Model"/>
 	<classpathentry excluding="edu/sdsc/mbt/ui/views/SequenceViewer.java|edu/sdsc/mbt/ui/views/SequenceViewerPanel.java|org/rcsb/mbt/ui/views/SequenceViewer.java|org/rcsb/mbt/ui/views/SequenceViewerPanel.java" kind="src" path="UI"/>
-	<classpathentry excluding="org/rcsb/mbt/glscene/jogl/GLTransformationMatrix.java" kind="src" path="GL Scene"/>
+	<classpathentry excluding="org/rcsb/mbt/glscene/jogl/GLTransformationMatrix.java|org/rcsb/mbt/glscene/geometry/Matrixd.java|org/rcsb/mbt/glscene/geometry/MaxDimMatrixd.java|org/rcsb/mbt/glscene/geometry/MaxDimVectord.java|org/rcsb/mbt/glscene/geometry/Pointd.java|org/rcsb/mbt/glscene/geometry/Vectord.java" kind="src" path="GL Scene"/>
 	<classpathentry kind="src" path="Controllers"/>
 	<classpathentry kind="src" path="Structure Loader"/>
 	<classpathentry kind="src" path="UnitTests"/>
 	<classpathentry kind="src" path="Demos"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/3rd Party Libs/jogl/gluegen-rt.jar">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="3rd Party Libs/jogl/jnilibs"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/3rd Party Libs/jogl/jogl.jar">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="3rd Party Libs/jogl/jnilibs"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="con" path="org.testng.TESTNG_CONTAINER"/>
-	<classpathentry kind="lib" path="/3rd Party Libs/jai/jai_codec.jar"/>
-	<classpathentry kind="lib" path="/3rd Party Libs/jai/jai_core.jar"/>
+	<classpathentry kind="lib" path="/3rd Party Libs/JOGL-1.1.1/gluegen-rt.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="3rd Party Libs/jogl/jnilibs"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/3rd Party Libs/JOGL-1.1.1/jogl.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="3rd Party Libs/jogl/jnilibs"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

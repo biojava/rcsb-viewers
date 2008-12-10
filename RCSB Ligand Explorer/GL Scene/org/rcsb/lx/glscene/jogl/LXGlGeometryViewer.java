@@ -38,7 +38,7 @@ import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.attributes.LineStyle;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
-import org.rcsb.mbt.model.geometry.Algebra;
+import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.vf.glscene.jogl.VFGlGeometryViewer;
 
@@ -311,7 +311,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 			 * System.err.flush(); }
 			 */
 
-			Algebra.normalizeVector(viewDirection);
+			ArrayLinearAlgebra.normalizeVector(viewDirection);
 			/*
 			 * if (Double.isNaN(viewDirection[0]) ||
 			 * Double.isNaN(viewDirection[1]) || Double.isNaN(viewDirection[2])) {
@@ -320,13 +320,13 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 
 			// Construct the viewRight vector (ie: viewDirection x viewUp).
 			final double viewRight[] = { 1.0f, 0.0f, 0.0f };
-			Algebra.crossProduct(viewDirection, sn.viewUp, viewRight);
+			ArrayLinearAlgebra.crossProduct(viewDirection, sn.viewUp, viewRight);
 			/*
 			 * if (Double.isNaN(viewRight[0]) || Double.isNaN(viewRight[1]) ||
 			 * Double.isNaN(viewRight[2])) { System.err.flush(); }
 			 */
 
-			Algebra.normalizeVector(viewRight);
+			ArrayLinearAlgebra.normalizeVector(viewRight);
 
 			/*
 			 * if (Double.isNaN(viewRight[0]) || Double.isNaN(viewRight[1]) ||
@@ -347,7 +347,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 
 			// Transform the virtual sphere axis's coordinate system
 			final double vsAxis[] = { rotDelta[1], rotDelta[2], rotDelta[3] };
-			Algebra.matrixRotate(viewMatrix, vsAxis);
+			ArrayLinearAlgebra.matrixRotate(viewMatrix, vsAxis);
 			rotDelta[1] = vsAxis[0];
 			rotDelta[2] = vsAxis[1];
 			rotDelta[3] = vsAxis[2];
@@ -363,7 +363,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 			sn.viewEye[0] -= sn.rotationCenter[0];
 			sn.viewEye[1] -= sn.rotationCenter[1];
 			sn.viewEye[2] -= sn.rotationCenter[2];
-			Algebra.angleAxisRotate(rotDelta, sn.viewEye);
+			ArrayLinearAlgebra.angleAxisRotate(rotDelta, sn.viewEye);
 			// Translate back.
 			sn.viewEye[0] += sn.rotationCenter[0];
 			sn.viewEye[1] += sn.rotationCenter[1];
@@ -379,7 +379,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 			sn.viewCenter[0] -= sn.rotationCenter[0];
 			sn.viewCenter[1] -= sn.rotationCenter[1];
 			sn.viewCenter[2] -= sn.rotationCenter[2];
-			Algebra.angleAxisRotate(rotDelta, sn.viewCenter);
+			ArrayLinearAlgebra.angleAxisRotate(rotDelta, sn.viewCenter);
 			// Translate back.
 			sn.viewCenter[0] += sn.rotationCenter[0];
 			sn.viewCenter[1] += sn.rotationCenter[1];
@@ -393,14 +393,14 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 			// Compute the new viewUp.
 			// (note that we do not translate to the rotation center first
 			// because viewUp is a direction vector not an absolute vector!)
-			Algebra.angleAxisRotate(rotDelta, sn.viewUp);
+			ArrayLinearAlgebra.angleAxisRotate(rotDelta, sn.viewUp);
 
 			/*
 			 * for(int i = 0; i < viewUp.length; i++) {
 			 * if(Double.isNaN(viewUp[i])) { System.err.flush(); } }
 			 */
 
-			Algebra.normalizeVector(sn.viewUp);
+			ArrayLinearAlgebra.normalizeVector(sn.viewUp);
 
 			/*
 			 * for(int i = 0; i < viewUp.length; i++) {
@@ -423,7 +423,7 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 			// before
 			// normalize!
 
-			Algebra.normalizeVector(v3d);
+			ArrayLinearAlgebra.normalizeVector(v3d);
 
 			// Compute a deltaZ that provides a nice motion speed,
 			// then multiply the direction vector by deltaZ.
@@ -466,11 +466,11 @@ public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateLis
 			// length
 			// before
 			// norm!
-			Algebra.normalizeVector(v3d2);
+			ArrayLinearAlgebra.normalizeVector(v3d2);
 
 			// Compute left-right direction vector (v3d2 x viewUp).
-			Algebra.crossProduct(v3d2, sn.viewUp, v3d);
-			Algebra.normalizeVector(v3d);
+			ArrayLinearAlgebra.crossProduct(v3d2, sn.viewUp, v3d);
+			ArrayLinearAlgebra.normalizeVector(v3d);
 
 			// Compute a deltaX and deltaY that provide a nice motion speed,
 			// then multiply the direction vector by the deltas.

@@ -1,6 +1,7 @@
 package org.rcsb.pw.controllers.scene.mutators;
 
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
+import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 
 
 /**
@@ -23,9 +24,9 @@ public class MutatorEnum
 		RECENTER_MUTATOR(new ReCenterMutator()),
 		SELECTION_MUTATOR(new SelectionMutator());
 		  
-		private final Mutator mutator;
+		private final MutatorBase mutator;
 		
-		Id(Mutator mutator)
+		Id(MutatorBase mutator)
 		{
 			this.mutator = mutator;
 		}
@@ -49,7 +50,7 @@ public class MutatorEnum
     	ProteinWorkshop.sgetActiveFrame().getMutatorBasePanel().updateOptionsPanel();
     }
     
-    public Mutator getCurrentMutator() {
+    public MutatorBase getCurrentMutator() {
     	return this.currentMutatorId.mutator;
     }
     

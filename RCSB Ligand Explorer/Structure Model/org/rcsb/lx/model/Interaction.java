@@ -1,7 +1,7 @@
 package org.rcsb.lx.model;
 
 import org.rcsb.lx.model.LXStructureComponentRegistry.LXComponentType;
-import org.rcsb.mbt.glscene.geometry.Point3d;
+import javax.vecmath.Point3d;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.LineSegment;
 import org.rcsb.mbt.model.StructureComponent;

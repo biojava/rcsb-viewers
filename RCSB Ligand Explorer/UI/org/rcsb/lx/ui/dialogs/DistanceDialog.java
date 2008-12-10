@@ -10,7 +10,7 @@ import javax.swing.border.*;
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
 import org.rcsb.lx.ui.LXDocumentFrame;
-import org.rcsb.mbt.model.geometry.Algebra;
+import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.util.*;
 
 
@@ -113,7 +113,7 @@ public class DistanceDialog extends JDialog implements IPickInfoReceiver {
 				public void actionPerformed(final ActionEvent ae)
 				{
 					setVisible(false);					
-					Status.output(Status.LEVEL_REMARK, "Distance: " + LXGlGeometryViewer.getDistString(Algebra.distance(DistanceDialog.this.point1, DistanceDialog.this.point2)));
+					Status.output(Status.LEVEL_REMARK, "Distance: " + LXGlGeometryViewer.getDistString(ArrayLinearAlgebra.distance(DistanceDialog.this.point1, DistanceDialog.this.point2)));
 					dispose();
 				}
 			});

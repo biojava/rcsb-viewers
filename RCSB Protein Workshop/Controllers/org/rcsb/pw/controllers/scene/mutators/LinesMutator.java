@@ -20,15 +20,16 @@ import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.LineStyle;
-import org.rcsb.mbt.model.geometry.Algebra;
+import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.options.LinesOptions;
+import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 
 
 
 
-public class LinesMutator extends Mutator
+public class LinesMutator extends MutatorBase
 {
 	private LinesOptions options = null;
 	public Vector<LineSegment> lines = new Vector<LineSegment>();
@@ -86,7 +87,8 @@ public class LinesMutator extends Mutator
 		final LineGeometry geometry = new LineGeometry();
 		final LineStyle style = new LineStyle();
 		style.lineStyle = this.options.getLineStyle();
-		style.label = Algebra.distance(line.getFirstPoint().vector, line.getSecondPoint().vector) + "";
+		style.label = Double.toString(line.getFirstPoint().distance(line.getSecondPoint()));
+		
 		// 5 characters max
 		style.label = style.label.substring(0, style.label.length() >= 5 ? 5 : style.label.length());
 		

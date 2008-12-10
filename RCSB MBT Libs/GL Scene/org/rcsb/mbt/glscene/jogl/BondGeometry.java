@@ -66,8 +66,14 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUquadric;
 
+import javax.vecmath.AxisAngle4d;
+import javax.vecmath.Matrix3d;
+import javax.vecmath.Quat4d;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3d;
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.attributes.*;
+import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 
 import com.sun.opengl.util.GLUT;
 
@@ -272,6 +278,8 @@ public class BondGeometry
 			atom1.coordinate[1] - atom0.coordinate[1],
 			atom1.coordinate[2] - atom0.coordinate[2]
 		};
+		
+		// normalize the vector.
 		final float directionLength = (float)Math.sqrt(
 			direction[0] * direction[0] +
 			direction[1] * direction[1] +
@@ -290,7 +298,8 @@ public class BondGeometry
 		// which is "acos( v1 DOT v2 / |v1| * |v2| )" which simplifies to:
 		final double pi = Math.PI;//3.1415926535f;
 		final double r2d = 180.0f / pi;  // radians to degrees conversion factor
-		final double rotAngle = r2d * Math.acos( direction[1] );
+		final double rotAngleRadians = Math.acos( direction[1] );
+		final double rotAngleDegrees = r2d * rotAngleRadians;
 
 		// When we draw the bond order representation, we need
 		// to compute different segment locations to get the
@@ -307,6 +316,12 @@ public class BondGeometry
 		double segmentDistance0 = 0.0f;
 		double segmentDistance1 = 0.0f;
 		double atomRadius1 = 0.0;
+		
+		double preRotYcos = 1.0, preRotYsin = 0.0;
+					// sin/cos vectors to pre-rotate double bonds around the Y axis prior to pointing,
+					// to align with third plane-defining atom.
+		
+		boolean doPreRot = false;
 		
 		if ( this.showOrder )
 		{
@@ -333,14 +348,14 @@ public class BondGeometry
 		}
 
 		// Get bond length and radius
-        double bondRadius = bondStyle.getBondRadius( bond );
+        double bondRadius = atomRadius1 / 2.0; // XXX bondStyle.getBondRadius( bond );
 		double bondScale = bondRadius / 2.0f;
 		final double bondSplitLen = bondDistance / 2.0f;
 
 		// Figure out what to do with the bond order
 		int nBondParts = 1; // By default, we only draw one bond copy.
 		float bondOrder = bond.getOrder( );
-		if ( this.showOrder )
+		if ( showOrder )
 		{
 			nBondParts = Math.round( bondOrder );
 			if ( nBondParts <= 0 )
@@ -358,32 +373,104 @@ public class BondGeometry
 		// nBondParts == 1 and we'll only go through the outer loop once.
 		int partialIX = (showOrder && bondOrder - (float)nBondParts + 0.1 > 0.5)? nBondParts++ : -1;
 		
-		double stance[] = new double[nBondParts];
+		float stance[] = new float[nBondParts];
 		if (nBondParts > 1)
 		{
 			bondRadius /= (nBondParts);
 			bondScale /= (nBondParts);
 			
-			double offset = atomRadius1 - bondRadius;
+			double offset = bondRadius;
+			Atom participantAtom0 = null, centerAtom = null, participantAtom1 = null,
+			     candidateAtom = null;;
 			
-			stance[0] = -offset;
+			//
+			// beg get pre-rotation angle
+			// find outlier atom
+			//
+			for (int ixAtom = 0; ixAtom < 2 && participantAtom1 == null; ixAtom++)
+			{
+				participantAtom0 = ixAtom == 0? atom0 : atom1;
+				centerAtom = ixAtom == 0? atom1 : atom0;
+				
+				Vector<Bond> checkBonds = structureMap.getBonds(centerAtom);
+				
+				if (checkBonds.size() > 1)		// (if 1, it's this bond and we don't care.)
+					for (Bond checkBond : checkBonds)
+					{
+						for (int nxAtom = 0; nxAtom < 2; nxAtom++)
+						{
+							Atom checkAtom = checkBond.getAtom(nxAtom);
+							if (checkAtom != participantAtom0 && checkAtom != centerAtom)
+							{				
+								if (checkAtom.element.charAt(0) == 'C')
+								{
+									participantAtom1 = checkAtom;
+									break;
+								}
+								
+								else
+									candidateAtom = checkAtom;
+							}
+						}
+					}
+			}
+			
+			if (participantAtom1 == null)
+				participantAtom1 = candidateAtom;
+							// ( which may be null )
+			
+			//
+			// end get other bond
+			// beg get angle
+			//
+			
+			assert(participantAtom1 != null);
+						// this shouldn't happen, but it seems to...
+			
+			if (participantAtom1 != null)
+			{			
+				double[] xlatedThirdAtomPoint =
+					new double[] { participantAtom1.coordinate[0] - participantAtom0.coordinate[0], 
+								   participantAtom1.coordinate[1] - participantAtom0.coordinate[1],
+								   participantAtom1.coordinate[2] - participantAtom0.coordinate[2] };
+			
+				
+				double rotator[] = new double[] { -rotAngleRadians, rotation[0], rotation[1], rotation[2]};			
+				ArrayLinearAlgebra.angleAxisRotate(rotator, xlatedThirdAtomPoint);
+							// apply the reverse rotation to the third atom point, so that it is in reference
+							// to the y-aligned initial bond vector
+				
+				double xzLen = Math.sqrt(xlatedThirdAtomPoint[0] * xlatedThirdAtomPoint[0] +
+										 xlatedThirdAtomPoint[2] * xlatedThirdAtomPoint[2]);
+							// the pre-rotation is only about the y axis, so we need to get the values for the xz plane, only
+				
+				preRotYcos = xlatedThirdAtomPoint[0] / xzLen;
+				preRotYsin = xlatedThirdAtomPoint[2] / xzLen;
+							// sin-cos fully define the rotation angle (see below)
+				
+				doPreRot = true;
+			}
+			
+			stance[0] = (float)-offset;
+			
 			if (nBondParts == 3)
 				stance[1] = 0.0f;
 			
-			stance[nBondParts - 1] = offset;
-				// stance array determines where each bond part gets drawn
+			stance[nBondParts - 1] = (float)offset;
+				// stance array determines the offset where each bond part gets drawn
 		}
 		
 		else
-			stance[0] = 0.0;
+			stance[0] = 0.0f;
 		
 		for ( int bondPartIX = 0; bondPartIX < nBondParts; bondPartIX++ )
+				// Draw the bond parts (1 - 3 [ +1 if fractional bond ])
 		{
-			// Draw the two split bond segments (top and bottom).
-			for ( int s=0; s < 2; s++ )
+			for ( int s = 0; s < 2; s++ )
+				// Draw the two split bond segments (top and bottom).
 			{
 				final DisplayLists currentList = cylinderList.copy();
-				currentList.isLeftSideOfBond = s == 0 ? true : false;
+				currentList.isLeftSideOfBond = s == 0;;
 
 				if (  form == Geometry.FORM_POINTS || form == Geometry.FORM_LINES )
 				{
@@ -412,23 +499,30 @@ public class BondGeometry
 						atom0.coordinate[2] + direction[2] * segmentDistance1;
 				}
 				currentList.translation = new float[] {(float)locations[s][0], (float)locations[s][1], (float)locations[s][2]};
-				currentList.rotation = new float[] {(float)rotAngle, (float)rotation[0], (float)rotation[1], (float)rotation[2]};
+				currentList.rotation = new float[] {(float)rotAngleDegrees, (float)rotation[0], (float)rotation[1], (float)rotation[2]};
 
-				if ( this.showOrder )
+				if ( nBondParts > 1 )
 				{
-					currentList.translation[2] += stance[bondPartIX];
+					if (doPreRot)
+					{
+						currentList.doPreRot = doPreRot;
+						currentList.preRotYcos = preRotYcos;
+						currentList.preRotYsin = preRotYsin;
+						currentList.preTranslateX = stance[bondPartIX];
+					}
 
 					// If last copy and odd bond order (ie: 0.5 partial order)
 					// make the geometry "broken" by shrinking the two pieces
 					// of the split geometry vertically to leave gaps.
-					if ( bondPartIX == partialIX ) {
-						currentList.scale = new float[] {1f, bondSegmentFraction, 1f};
-					}
+					if ( bondPartIX == partialIX )
+						currentList.scale = new float[] {1.f, bondSegmentFraction, 1.f};
 				}
 
-				if(currentList.scale == null) {
+				if(currentList.scale == null)
 					currentList.scale = new float[] {(float)bondScale, (float)bondSplitLen, (float)bondScale};
-				} else {
+				
+				else
+				{
 					currentList.scale[0] *= bondScale;
 					currentList.scale[1] *= bondSplitLen;
 					currentList.scale[2] *= bondScale;

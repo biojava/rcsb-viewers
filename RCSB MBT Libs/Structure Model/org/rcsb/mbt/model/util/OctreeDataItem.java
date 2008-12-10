@@ -62,7 +62,6 @@
 
 package org.rcsb.mbt.model.util;
 
-
 /**
  * OctreeDataItem interface.
  *

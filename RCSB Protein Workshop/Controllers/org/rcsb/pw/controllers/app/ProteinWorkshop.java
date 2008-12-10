@@ -8,9 +8,7 @@ import javax.swing.SwingUtilities;
 
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.app.ProgressPanelController;
-import org.rcsb.mbt.controllers.scene.PickController;
 import org.rcsb.mbt.controllers.scene.SceneController;
-import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.util.Status;
@@ -19,6 +17,7 @@ import org.rcsb.pw.controllers.scene.PWSceneController;
 import org.rcsb.pw.glscene.jogl.PWGlGeometryViewer;
 import org.rcsb.pw.ui.PWDocumentFrame;
 import org.rcsb.vf.controllers.app.VFAppBase;
+import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
 
 /**
@@ -92,6 +91,8 @@ public class ProteinWorkshop extends VFAppBase
 		activeFrame.initialize(true);
 
 		final StructureModel model = sgetModel();
+		
+		MutatorBase.setActivationType(MutatorBase.ActivationType.ATOMS_AND_BONDS);
 
 		if (structureUrlParam != null)
 			((VFDocumentFrameBase)activeFrame).loadURL(structureUrlParam);

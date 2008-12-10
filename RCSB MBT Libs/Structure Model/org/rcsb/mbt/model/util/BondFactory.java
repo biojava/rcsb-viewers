@@ -117,9 +117,10 @@ package org.rcsb.mbt.model.util;
 
 import java.util.*;
 
+import javax.vecmath.Vector3d;
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
-import org.rcsb.mbt.model.geometry.Algebra;
+import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 
 
 /**
@@ -267,8 +268,7 @@ public class BondFactory
 							((cellCoord[0]+x)*cellCount[1]+(cellCoord[1]+y)) * cellCount[2] + (cellCoord[2]+z);
 
 						// Try to fetch the neighbor
-						final Integer neighborAtom = (Integer)
-							occupiedCells.get( new Integer( cellIndex ) );
+						final Integer neighborAtom = occupiedCells.get( new Integer( cellIndex ) );
 
 						// Is there an occupied neighbor cell?
 						if ( neighborAtom != null )
@@ -316,14 +316,14 @@ public class BondFactory
 
 			for( int i=0; i<atomCount; i++ )
 			{
-				final Atom atom = (Atom) atoms.elementAt( i );
+				final Atom atom = atoms.elementAt( i );
 				octreeAtomItems[i] = new OctreeAtomItem( atom, i );
 			}
 
 			// TODO: The Octree code needs to handle cases that are causing
 			// out of memory conditions and stack overflows.
 			final float[] margin = new float[] { 0.0f, 0.0f, 0.0f };
-			final Octree octree = new Octree( margin.length, octreeAtomItems, margin );
+			final Octree octree = new Octree( 3, octreeAtomItems, margin );
 			octree.build( );
 
 			// Generate a vector of Bond objects.
@@ -354,7 +354,7 @@ public class BondFactory
 		final int bondCount = result.size( );
 		for ( int b=bondCount-1; b>=0; b-- )
 		{
-			final Bond bond = (Bond) result.elementAt( b );
+			final Bond bond = result.elementAt( b );
 			final Atom atom0 = bond.getAtom( 0 );
 			final Atom atom1 = bond.getAtom( 1 );
 
@@ -445,7 +445,7 @@ public class BondFactory
 						final Atom headAtom = nextResidue.getPolymerHeadAtom( );
 						if ( (tailAtom != null) && (headAtom != null) )
 						{
-							final double distance = Algebra.distance(tailAtom.coordinate, headAtom.coordinate);
+							final double distance = ArrayLinearAlgebra.distance(tailAtom.coordinate, headAtom.coordinate);
 							if (distance < 5) { // ensure that the maximum bond
 								// length is less than 5
 								// angstroms. Handles cases when
@@ -562,7 +562,7 @@ public class BondFactory
 	 */
 	public static double distance( final Atom atomA, final Atom atomB )
 	{
-		return Algebra.distance( atomA.coordinate, atomB.coordinate );
+		return ArrayLinearAlgebra.distance(atomA.coordinate, atomB.coordinate );
 	}
 }
 

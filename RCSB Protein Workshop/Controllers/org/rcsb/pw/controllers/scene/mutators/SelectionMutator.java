@@ -10,9 +10,10 @@ import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.StructureStyles;
+import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 
 
-public class SelectionMutator extends Mutator {
+public class SelectionMutator extends MutatorBase {
 //	SelectionOptions options = null;
 	
 	public SelectionMutator() {

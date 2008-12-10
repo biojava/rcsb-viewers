@@ -137,6 +137,38 @@ public class SimpleReadStructureDemo
 	 */
 	public void doDump(String fileName, PrintStream out) throws IOException
 	{
+		IFileStructureLoader loader = loadStructure(fileName, out);
+		
+		output.lineOut("Structure Loaded");
+		Set<String> nprids = loader.getNonProteinChainIds();
+		output.lineOut("Non Protein Chain ID Count: " + nprids.size());
+		if (nprids.size() > 0)
+		{
+			output.indent();
+			output.lineOut("IDs:");
+			output.indent();
+			for (String id : nprids)
+				output.lineOut(id);
+			output.outdent();
+			output.outdent();
+			output.lineOut("");
+		}
+		
+		reportChains(struct);
+		reportBonds(struct);		
+		reportTransforms(loader, struct);
+	}
+	
+	/**
+	 * load structure from a filename and setup the output print stream.
+	 * 
+	 * @param fileName - the filename to load.  Can be system disk file or URL
+	 * @param out - the output stream to write to.
+	 * @return - and IFileStructureLoad object
+	 * @throws IOException
+	 */
+	protected IFileStructureLoader loadStructure(final String fileName, PrintStream out) throws IOException
+	{
 		File file = new File(fileName);
 		
 		if (file == null || !file.exists())
@@ -176,24 +208,7 @@ public class SimpleReadStructureDemo
 
 		output = new Output(out);
 		
-		output.lineOut("Structure Loaded");
-		Set<String> nprids = loader.getNonProteinChainIds();
-		output.lineOut("Non Protein Chain ID Count: " + nprids.size());
-		if (nprids.size() > 0)
-		{
-			output.indent();
-			output.lineOut("IDs:");
-			output.indent();
-			for (String id : nprids)
-				output.lineOut(id);
-			output.outdent();
-			output.outdent();
-			output.lineOut("");
-		}
-		
-		reportChains(struct);
-		reportBonds(struct);		
-		reportTransforms(loader, struct);
+		return loader;
 	}
 	
 	/**

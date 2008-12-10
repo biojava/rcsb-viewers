@@ -10,7 +10,6 @@ import javax.swing.JPanel;
 
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.MutatorEnum;
-import org.rcsb.pw.ui.PickLevelPanel;
 import org.rcsb.pw.ui.tree.TreeViewer;
 
 
@@ -30,7 +29,7 @@ public class MutatorBasePanel extends JPanel
     private MutatorPanel mutatorPanel = null;
     public TreeViewer tree = null;
     
-    private PickLevelPanel pickLevelPanel = null;
+    private MutatorActivationPanel pickLevelPanel = null;
     
     private JPanel currentPanel = null;
     
@@ -114,7 +113,7 @@ public class MutatorBasePanel extends JPanel
         this.reCenterPanel = new ReCenterOptionsPanel();
         this.linesPanel = new LinesOptionsPanel();
 //        this.selectionPanel = new SelectionOptionsPanel();
-        this.pickLevelPanel = new PickLevelPanel();
+        this.pickLevelPanel = new MutatorActivationPanel();
         
         super.add(this.mutatorPanel);
         super.add(this.pickLevelPanel);

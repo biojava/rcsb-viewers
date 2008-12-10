@@ -18,11 +18,12 @@ import org.rcsb.mbt.model.attributes.AtomLabelNone;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.IAtomLabel;
 import org.rcsb.pw.controllers.scene.mutators.options.LabelsOptions;
+import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 
 
 
 
-public class LabelsMutator extends Mutator {
+public class LabelsMutator extends MutatorBase {
 	LabelsOptions options = null;
 	
 	public LabelsMutator() {

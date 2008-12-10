@@ -1,7 +1,5 @@
 package org.rcsb.pw.controllers.scene.mutators;
 
-import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.mbt.glscene.jogl.AtomGeometry;
 import org.rcsb.mbt.glscene.jogl.BondGeometry;
 import org.rcsb.mbt.glscene.jogl.ChainGeometry;
@@ -20,8 +18,9 @@ import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.pw.controllers.scene.mutators.options.StylesOptions;
+import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 
-public class StylesMutator extends Mutator {
+public class StylesMutator extends MutatorBase {
 	private StylesOptions options = null; 
 	
 	public StylesMutator() {
@@ -74,8 +73,8 @@ public class StylesMutator extends Mutator {
 		final StructureMap sm = s.getStructureMap();
 		final StructureStyles ss = sm.getStructureStyles();
 		
-        switch(AppBase.sgetPickController().getPickLevel()) {
-        case ATOMS:
+        switch(getActivationType()) {
+        case ATOMS_AND_BONDS:
             final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(a);
         	if(renderable != null)
         	{
@@ -107,7 +106,7 @@ public class StylesMutator extends Mutator {
         	this.changeStyle(sm.getResidue(a));
         	break;
         default:
-        	(new Exception(AppBase.sgetPickController().getPickLevel() + " is an invalid style mode.")).printStackTrace();
+        	(new Exception(getActivationType() + " is an invalid style mode.")).printStackTrace();
         }
     }
 	
@@ -146,9 +145,9 @@ public class StylesMutator extends Mutator {
     	final Structure s = b.getStructure();
 		final StructureMap sm = s.getStructureMap();
 		
-		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+		ActivationType pickLevel = getActivationType();
         switch(pickLevel) {
-        case ATOMS:
+        case ATOMS_AND_BONDS:
         	/*GlGeometryViewer viewer = Model.getSingleton().getViewer();
             DisplayListRenderable renderable = viewer.getRenderable(b);
         	if(renderable != null) {
@@ -177,10 +176,10 @@ public class StylesMutator extends Mutator {
     
     private void changeStyle(final Residue r)
     {
-		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+		ActivationType pickLevel = getActivationType();
         switch(pickLevel)
         {
-        case ATOMS:       	
+        case ATOMS_AND_BONDS:       	
         	for (Bond b : r.getStructure().getStructureMap().getBonds(r.getAtoms()))
         		this.changeStyle(b);
         	break;
@@ -199,9 +198,9 @@ public class StylesMutator extends Mutator {
     	final Structure s = f.getStructure();
 		final StructureMap sm = s.getStructureMap();
 		
-		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+		ActivationType pickLevel = getActivationType();
         switch(pickLevel) {
-        case ATOMS:
+        case ATOMS_AND_BONDS:
         	for (Residue r : f.getResidues())
             	for (Bond b : sm.getBonds(r.getAtoms()))
             		this.changeStyle(b);
@@ -222,10 +221,10 @@ public class StylesMutator extends Mutator {
     	final Structure s = c.structure;
 		final StructureMap sm = s.getStructureMap();
 		
-		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+		ActivationType pickLevel = getActivationType();
         switch(pickLevel)
         {
-        case ATOMS:
+        case ATOMS_AND_BONDS:
         	for (Residue r : c.getResiduesVec())
             	for (Bond b : sm.getBonds(r.getAtoms()))
             		this.changeStyle(b);
@@ -246,10 +245,10 @@ public class StylesMutator extends Mutator {
     	final Structure s = c.getStructure();
 		final StructureMap sm = s.getStructureMap();
 		
-		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+		ActivationType pickLevel = getActivationType();
         switch(pickLevel)
         {
-        case ATOMS:
+        case ATOMS_AND_BONDS:
         	for (Fragment f : c.getFragments())
         		this.changeStyle(f);
         	break;

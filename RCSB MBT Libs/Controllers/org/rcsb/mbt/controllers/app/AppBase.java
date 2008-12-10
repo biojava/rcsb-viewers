@@ -6,7 +6,6 @@ import java.net.URL;
 import java.util.Properties;
 
 import org.rcsb.mbt.controllers.doc.DocController;
-import org.rcsb.mbt.controllers.scene.PickController;
 import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.controllers.update.UpdateController;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
@@ -83,7 +82,6 @@ public abstract class AppBase
 		public DocController createDocController() { return new DocController(); }
 		public UpdateController createUpdateController() { return new UpdateController(); }
 		public SceneController createSceneController() { return new SceneController(); }
-		public PickController createPickController() { return new PickController(); }
 		public StructureModel createModel() { return new StructureModel(); }
 		public GlGeometryViewer createGlGeometryViewer() { return new GlGeometryViewer(); }
 		public JoglSceneNode createSceneNode() { return new JoglSceneNode(); }
@@ -114,7 +112,6 @@ public abstract class AppBase
 	public static SceneController sgetSceneController() { return sgetActiveFrame().getSceneController(); }
 	public static GlGeometryViewer sgetGlGeometryViewer() { return sgetActiveFrame().getGlGeometryViewer(); }
 	public static StructureModel sgetModel() { return sgetActiveFrame().getModel(); }
-	public static PickController sgetPickController() { return sgetActiveFrame().getPickController(); }
 	public DocumentFrameBase getActiveFrame() { return activeFrame; }
 
 	

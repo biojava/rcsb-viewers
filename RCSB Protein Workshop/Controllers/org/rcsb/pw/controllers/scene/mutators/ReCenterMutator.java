@@ -10,10 +10,11 @@ import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.pw.controllers.scene.mutators.options.ReCenterOptions;
+import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 
 
 
-public class ReCenterMutator extends Mutator
+public class ReCenterMutator extends MutatorBase
 {
 	private ReCenterOptions options = null; 
 	

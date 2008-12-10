@@ -346,7 +346,7 @@ public class PdbStructureLoader
 		Vector<String> pdbChainIds = new Vector<String>();
 		Vector<String> pdbResidueIds = new Vector<String>();
 		Vector<String> ndbChainIds = new Vector<String>();
-		Vector<Object> ndbResidueIds = new Vector<Object>();
+		Vector<Integer> ndbResidueIds = new Vector<Integer>();
 		String previousResidueIdRaw = "";	// the untouched residue id.
 		int previousResidueIdInt = Integer.MIN_VALUE;	// the residue id which was assigned to the Atom.residue_id field
 		int previousResidueIdIntSimple = Integer.MIN_VALUE;	// the simple int conversion of the file's residue id, minus any letters.  

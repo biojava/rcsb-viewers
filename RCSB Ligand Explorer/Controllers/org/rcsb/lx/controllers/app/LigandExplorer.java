@@ -97,10 +97,7 @@ package org.rcsb.lx.controllers.app;
 // CORE JAVA
 
 import java.awt.image.BufferedImage;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-
-import javax.swing.SwingUtilities;
 
 import org.rcsb.lx.controllers.scene.LXSceneController;
 import org.rcsb.lx.controllers.update.LXUpdateController;
@@ -108,10 +105,7 @@ import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
 import org.rcsb.lx.glscene.jogl.LXSceneNode;
 import org.rcsb.lx.model.LXModel;
 import org.rcsb.lx.ui.LXDocumentFrame;
-import org.rcsb.mbt.controllers.app.ProgressPanelController;
-import org.rcsb.mbt.controllers.scene.PickController;
 import org.rcsb.mbt.controllers.scene.SceneController;
-import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.mbt.controllers.update.UpdateController;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;

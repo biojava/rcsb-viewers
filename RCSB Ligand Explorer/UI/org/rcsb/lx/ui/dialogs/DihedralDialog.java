@@ -10,7 +10,7 @@ import javax.swing.border.*;
 
 import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
 import org.rcsb.lx.ui.LXDocumentFrame;
-import org.rcsb.mbt.model.geometry.Algebra;
+import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.util.*;
 
 // MBT
@@ -168,7 +168,7 @@ public class DihedralDialog extends JDialog implements IPickInfoReceiver {
 			
 				setVisible(false);
 
-				Status.output(Status.LEVEL_REMARK, "Dihedral Angle: " + LXGlGeometryViewer.getDistString(Algebra.dihedralAngle(DihedralDialog.this.point1, DihedralDialog.this.point2, DihedralDialog.this.point3, DihedralDialog.this.point4)));
+				Status.output(Status.LEVEL_REMARK, "Dihedral Angle: " + LXGlGeometryViewer.getDistString(ArrayLinearAlgebra.dihedralAngle(DihedralDialog.this.point1, DihedralDialog.this.point2, DihedralDialog.this.point3, DihedralDialog.this.point4)));
 
 				dispose();
 			}

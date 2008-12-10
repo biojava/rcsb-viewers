@@ -109,7 +109,7 @@ package org.rcsb.mbt.model;
 
 
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
-import org.rcsb.mbt.model.geometry.Algebra;
+import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 
 
 /**
@@ -342,12 +342,12 @@ public class Bond
 			return 0.0f;
 		}
 
-		return Algebra.distance( this.atoms[0].coordinate, this.atoms[1].coordinate );
+		return ArrayLinearAlgebra.distance( this.atoms[0].coordinate, this.atoms[1].coordinate );
 	}
 
 	public static final double getDistance( final Atom atom0, final Atom atom1 )
 	{
-		return Algebra.distance( atom0.coordinate, atom1.coordinate );
+		return ArrayLinearAlgebra.distance( atom0.coordinate, atom1.coordinate );
 	}
 
 	/**

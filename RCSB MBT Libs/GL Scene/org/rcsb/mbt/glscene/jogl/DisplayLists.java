@@ -87,7 +87,11 @@ public class DisplayLists
 	public float[] rotation = null; // rotate the object by this amount.
 
 	public float[] scale = null; // scale the drawn object by this amount.
-
+	
+	public boolean doPreRot = false;
+	public double preTranslateX;  // pre-transform by this amount (required by multiple order bonds)
+	public double preRotYcos = 1.0, preRotYsin = 0.0;
+	
 	public int mutableColorType = -1; // the type of color which is modified
 										// by this.colors.
 	// public int vertexSize = -1;
@@ -275,6 +279,30 @@ public class DisplayLists
 				gl.glRotatef(this.rotation[0], this.rotation[1], this.rotation[2],
 						this.rotation[3]);
 			}
+
+			if (doPreRot)   // (for multiple order bonds)
+			{
+/* **/
+				gl.glMultMatrixd(new double[]  {
+				           preRotYcos, 0.0, preRotYsin,  0.0,
+			 			   0.0, 	   1.0, 	0.0,	 0.0,
+			 			   -preRotYsin, 0.0, preRotYcos, 0.0,
+			 			   0.0, 	    0.0,    0.0,     1.0}, 0);
+						// do pre-rotation.  The pre-rotation is about the 'y' axis.
+						//
+						// We have to specify a fully qualified rotation matrice for this rotation, otherwise,
+						// we can get 'opposite' rotations on one half of the sphere due to the rotation angle
+						// being only partially defined by the cosine in the x-z plane.  Sin and Cos fully
+					// describe the rotation.
+/* **/
+
+				if (preTranslateX != 0.0)
+					gl.glTranslated(preTranslateX, 0.0, 0.0);
+						// second, do pretranslation if defined.  Translation is along the x axis,
+						// plus or minus some delta
+			}
+
+			
 			if (this.scale != null) {
 				// Radius
 				gl.glScalef(this.scale[0], this.scale[1], this.scale[2]);

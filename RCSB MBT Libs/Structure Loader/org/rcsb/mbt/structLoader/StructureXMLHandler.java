@@ -7,8 +7,8 @@ import java.util.Stack;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import org.rcsb.mbt.glscene.geometry.Matrix3f;
-import org.rcsb.mbt.glscene.geometry.Vector3f;
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Vector3f;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.Atom;
@@ -74,14 +74,19 @@ import org.xml.sax.helpers.DefaultHandler;
  * <dd>The atom's residue compound code</dd>
  * 
  * <dt>label_asym_id</dt>
- * <dd>The atom's chain id</dd>
+ * <dd>The atom's NDB chain id</dd>
  * 
  * <dt>label_seq_id</dt>
- * <dd>The atom's residue id (can be <em>null</em>)</dd>
+ * <dd>The atom's NDB residue id (can be empty) (Integer)</dd>
  * 
  * <dt>auth_seq_id</dt>
- * <dd>Not recorded - used mainly to track non-protein chain changes.</dd>
+ * <dd>The atom's PDB residue id (also tracks non-protein chain changes.)</dd>
  * 
+ * <dt>pdb_strand_id</dt>
+ * <dd>The atom's PDB id (only recorded for strands [secondary structures])
+ * 
+ * <p>
+ * Note that what is stored in the atom is <em>NDB</em> ids.  PDB ids are looked up as needed.</p>
  * 
  * @author John Beaver, Jeff Milton
  * @author (revised) rickb
@@ -774,7 +779,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    {
 		public void run() {
 			final String trim = buf.trim();			
-			currentTranslationVector.coordinates[0] = Float.parseFloat(trim);
+			currentTranslationVector.x = Float.parseFloat(trim);
 		}
    }
    protected XMLRunnable__vector1__End createXMLRunnable__vector1__End() { return new XMLRunnable__vector1__End(); }
@@ -783,7 +788,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    {
 		public void run() {
 			final String trim = buf.trim();			
-			currentTranslationVector.coordinates[1] = Float.parseFloat(trim);
+			currentTranslationVector.y = Float.parseFloat(trim);
 		}
    }
    protected XMLRunnable__vector2__End createXMLRunnable__vector2__End() { return new XMLRunnable__vector2__End(); }
@@ -792,7 +797,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    {
 		public void run() {
 			final String trim = buf.trim();			
-			currentTranslationVector.coordinates[2] = Float.parseFloat(trim);
+			currentTranslationVector.z = Float.parseFloat(trim);
 		}
    }
    protected XMLRunnable__vector3__End createXMLRunnable__vector3__End() { return new XMLRunnable__vector3__End(); }
@@ -861,7 +866,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
            
            final String chainId = getUnique(trim);
            
-           if (isCurrentNonProteinChain)
+           if (isCurrentNonProteinChain && !nonProteinChainIds.contains(chainId))
            	  nonProteinChainIds.add(chainId);
            
            curAtom.chain_id = chainId;

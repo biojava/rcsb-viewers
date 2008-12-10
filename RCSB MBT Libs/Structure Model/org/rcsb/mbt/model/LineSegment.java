@@ -1,6 +1,6 @@
 package org.rcsb.mbt.model;
 
-import org.rcsb.mbt.glscene.geometry.Point3d;
+import javax.vecmath.Point3d;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 /**

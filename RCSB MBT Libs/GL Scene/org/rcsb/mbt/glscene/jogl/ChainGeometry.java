@@ -59,10 +59,10 @@ package org.rcsb.mbt.glscene.jogl;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
-import org.rcsb.mbt.glscene.StructureViewerImpl.CrossSectionStyle;
-import org.rcsb.mbt.glscene.StructureViewerImpl.SsGeometry;
-import org.rcsb.mbt.glscene.StructureViewerImpl.CrossSectionStyle.CrossSectionType;
-import org.rcsb.mbt.glscene.StructureViewerImpl.SsGeometry.ConformationShape;
+import org.rcsb.mbt.glscene.SecondaryStructureBuilder.CrossSectionStyle;
+import org.rcsb.mbt.glscene.SecondaryStructureBuilder.SsGeometry;
+import org.rcsb.mbt.glscene.SecondaryStructureBuilder.CrossSectionStyle.CrossSectionType;
+import org.rcsb.mbt.glscene.SecondaryStructureBuilder.SsGeometry.ConformationShape;
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.attributes.*;
 

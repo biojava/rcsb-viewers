@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.Vector;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
@@ -28,11 +27,12 @@ import org.rcsb.mbt.model.attributes.ResidueColorByRgb;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.options.ColorOptions;
+import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 
 
 
 
-public class ColorMutator extends Mutator
+public class ColorMutator extends MutatorBase
 {
 	private ColorOptions options = null; 
 	
@@ -166,10 +166,10 @@ public class ColorMutator extends Mutator
         final StructureMap sm = struc.getStructureMap();
         final StructureStyles ss = sm.getStructureStyles();
         
-        PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        ActivationType pickLevel = MutatorBase.getActivationType();
         switch(pickLevel)
         {
-        case ATOMS:
+        case ATOMS_AND_BONDS:
         	this.options.getCurrentColor().getColorComponents(ColorMutator.colorFl);
         	
             final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(a);
@@ -199,10 +199,10 @@ public class ColorMutator extends Mutator
         final Structure struc = b.structure;
         final StructureMap sm = struc.getStructureMap();
         
-        PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        ActivationType pickLevel = MutatorBase.getActivationType();
         switch(pickLevel)
         {
-       case ATOMS:
+       case ATOMS_AND_BONDS:
         	/*this.options.getCurrentColor().getColorComponents(colorFl);
             BondColorByRgb bondColor = new BondColorByRgb(colorFl);
             
@@ -242,10 +242,10 @@ public class ColorMutator extends Mutator
         final StructureMap sm = struc.getStructureMap();
         final StructureStyles ss = sm.getStructureStyles();
         
-        PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
+        ActivationType pickLevel = MutatorBase.getActivationType();
         switch(pickLevel)
         {
-        case ATOMS:
+        case ATOMS_AND_BONDS:
         	Vector<Atom> atoms = r.getAtoms();
             for (Atom a : atoms)
                 this.changeColor(a);

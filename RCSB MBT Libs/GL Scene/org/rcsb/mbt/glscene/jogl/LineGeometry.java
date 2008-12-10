@@ -4,7 +4,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.glscene.geometry.Point3d;
+import javax.vecmath.Point3d;
 import org.rcsb.mbt.model.LineSegment;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.attributes.LineStyle;
@@ -67,8 +67,8 @@ public class LineGeometry extends DisplayListGeometry {
 		
 		gl.glPointSize(7.0f);
 		gl.glBegin(GL.GL_LINES);
-		gl.glVertex3d(firstPoint.vector[0],firstPoint.vector[1],firstPoint.vector[2]);
-		gl.glVertex3d(secondPoint.vector[0],secondPoint.vector[1],secondPoint.vector[2]);
+		gl.glVertex3d(firstPoint.x,firstPoint.y,firstPoint.z);
+		gl.glVertex3d(secondPoint.x,secondPoint.y,secondPoint.z);
 //		gl.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, Constants.white, 0);
 		gl.glEnd();
 		gl.glPointSize(1.0f);

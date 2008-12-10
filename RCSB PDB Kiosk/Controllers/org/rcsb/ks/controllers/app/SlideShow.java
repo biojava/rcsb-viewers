@@ -21,7 +21,6 @@ import org.rcsb.ks.model.AnnotatedAtom;
 import org.rcsb.ks.model.EntityDescriptor;
 import org.rcsb.ks.model.KSStructureInfo;
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
 import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Atom;
@@ -39,6 +38,7 @@ import org.rcsb.mbt.model.attributes.IResidueColor;
 import org.rcsb.mbt.model.attributes.ResidueColorByRgb;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.util.DebugState;
+import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 
 /*
  * Set up a thread to run a slide show.  Collects all the filenames from a directory
@@ -525,10 +525,10 @@ public class SlideShow extends Thread
 		StructureMap sm = struc.getStructureMap();
 		StructureStyles ss = sm.getStructureStyles();
 
-		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
-		switch (pickLevel)
+		MutatorBase.ActivationType activeMutatorType = MutatorBase.getActivationType();
+		switch (activeMutatorType)
 		{
-		case ATOMS:
+		case ATOMS_AND_BONDS:
 			Vector<Atom> atoms = r.getAtoms();
 
 			for (Atom a : atoms)
@@ -579,10 +579,10 @@ public class SlideShow extends Thread
 		StructureStyles ss = sm.getStructureStyles();
 		JoglSceneNode sn = (JoglSceneNode)sm.getUData();
 
-		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
-		switch (pickLevel)
+		MutatorBase.ActivationType activeMutatorType = MutatorBase.getActivationType();
+		switch (activeMutatorType)
 		{
-		case ATOMS:
+		case ATOMS_AND_BONDS:
 			// this.options.getCurrentColor().getColorComponents(colorFl);
 
 			DisplayListRenderable renderable = sn.getRenderable(a);
@@ -607,7 +607,7 @@ public class SlideShow extends Thread
 			break;
 			
 		default:
-            (new Exception("Invalid option: " + pickLevel)).printStackTrace();            
+            (new Exception("Invalid option: " + activeMutatorType)).printStackTrace();            
 		}
 	}
 
@@ -616,10 +616,10 @@ public class SlideShow extends Thread
 		Structure struc = b.structure;
 		StructureMap sm = struc.getStructureMap();
 
-		PickLevel pickLevel = AppBase.sgetPickController().getPickLevel();
-		switch (pickLevel)
+		MutatorBase.ActivationType activeMutatorType = MutatorBase.getActivationType();
+		switch (activeMutatorType)
 		{
-		case ATOMS:
+		case ATOMS_AND_BONDS:
 			// delegate to atoms...
 			this.changeColor(b.getAtom(0), _color);
 			this.changeColor(b.getAtom(1), _color);
@@ -633,7 +633,7 @@ public class SlideShow extends Thread
 			break;
 			
 		default:
-            (new Exception("Invalid option: " + pickLevel)).printStackTrace();            
+            (new Exception("Invalid option: " + activeMutatorType)).printStackTrace();            
 		}
 	}
 

@@ -2,23 +2,17 @@ package org.rcsb.sv.controllers.app;
 
 import java.net.URL;
 
-import org.rcsb.mbt.controllers.app.ProgressPanelController;
-import org.rcsb.mbt.controllers.doc.DocController;
-import org.rcsb.mbt.controllers.scene.PickController;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
-import org.rcsb.mbt.model.util.Status;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 import org.rcsb.sv.ui.SVDocumentFrame;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.glscene.jogl.VFGlGeometryViewer;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
 
-
-
 /**
+ * Viewer without a frame or any UI other than the menu.
  * 
  * @author rickb
- *
  */
 public class SimpleViewer extends VFAppBase
 {

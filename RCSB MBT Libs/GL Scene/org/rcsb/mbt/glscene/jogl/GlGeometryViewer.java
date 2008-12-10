@@ -95,7 +95,7 @@ import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
 import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
-import org.rcsb.mbt.model.geometry.Algebra;
+import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.util.DebugState;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.mbt.model.util.Status;
@@ -350,7 +350,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 		final double newViewDirection[] = { center[0] - eye[0],
 				center[1] - eye[1], center[2] - eye[2] };
-		Algebra.normalizeVector(newViewDirection);
+		ArrayLinearAlgebra.normalizeVector(newViewDirection);
 
 		// Use Graham-Schmidt orthogonalization: e3 = e2 - e1 * ( e2 DOT e1 )
 		// to produce a newViewUp vector that is orthonormal to the
@@ -364,13 +364,13 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		// so it is safe to re-orthogonalize since the orthogonal vector
 		// component will be the zero vector and you will be left with the
 		// original input vector.
-		Algebra.normalizeVector(this.viewUp);
-		final double dot = Algebra.dotProduct(this.viewUp, newViewDirection);
+		ArrayLinearAlgebra.normalizeVector(this.viewUp);
+		final double dot = ArrayLinearAlgebra.dotProduct(this.viewUp, newViewDirection);
 		final double newViewUp[] = {
 				this.viewUp[0] - newViewDirection[0] * dot,
 				this.viewUp[1] - newViewDirection[1] * dot,
 				this.viewUp[2] - newViewDirection[2] * dot };
-		Algebra.normalizeVector(newViewUp);
+		ArrayLinearAlgebra.normalizeVector(newViewUp);
 
 		// Set the new eye location.
 		this.viewEye[0] = eye[0];
@@ -451,7 +451,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 		final double newViewDirection[] = { center[0] - eye[0],
 				center[1] - eye[1], center[2] - eye[2] };
-		Algebra.normalizeVector(newViewDirection);
+		ArrayLinearAlgebra.normalizeVector(newViewDirection);
 
 		// Use Graham-Schmidt orthogonalization: e3 = e2 - e1 * ( e2 DOT e1 )
 		// to produce a newViewUp vector that is orthonormal to the
@@ -465,13 +465,13 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		// so it is safe to re-orthogonalize since the orthogonal vector
 		// component will be the zero vector and you will be left with the
 		// original input vector.
-		Algebra.normalizeVector(this.viewUp);
-		final double dot = Algebra.dotProduct(this.viewUp, newViewDirection);
+		ArrayLinearAlgebra.normalizeVector(this.viewUp);
+		final double dot = ArrayLinearAlgebra.dotProduct(this.viewUp, newViewDirection);
 		final double newViewUp[] = {
 				this.viewUp[0] - newViewDirection[0] * dot,
 				this.viewUp[1] - newViewDirection[1] * dot,
 				this.viewUp[2] - newViewDirection[2] * dot };
-		Algebra.normalizeVector(newViewUp);
+		ArrayLinearAlgebra.normalizeVector(newViewUp);
 
 		// Set the new eye location.
 		this.viewEye[0] = eye[0];
@@ -635,7 +635,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	{
 		this.drawable = drawable;
 
-		drawable.setGL(new DebugGL(drawable.getGL()));
+		if (DebugState.isDebug())
+			drawable.setGL(new DebugGL(drawable.getGL()));
 
 //		 drawable.setGL(new TraceGL(drawable.getGL(), debugOut));
 
@@ -821,8 +822,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 						this.drawOrPick(gl, this.glu, this.glut, drawable,
 								false, false, false);
 						// gl.glFlush();
-						gl
-								.glAccum(GL.GL_ACCUM, 1f / sceneController
+						gl.glAccum(GL.GL_ACCUM, 1f / sceneController
 										.getDebugSettings().JITTER_ARRAY.length);
 						gl.glFlush();
 					}
@@ -1574,7 +1574,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				 * System.err.flush(); }
 				 */
 	
-				Algebra.normalizeVector(viewDirection);
+				ArrayLinearAlgebra.normalizeVector(viewDirection);
 				/*
 				 * if (Double.isNaN(viewDirection[0]) ||
 				 * Double.isNaN(viewDirection[1]) || Double.isNaN(viewDirection[2])) {
@@ -1583,13 +1583,13 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	
 				// Construct the viewRight vector (ie: viewDirection x viewUp).
 				final double viewRight[] = { 1.0f, 0.0f, 0.0f };
-				Algebra.crossProduct(viewDirection, this.viewUp, viewRight);
+				ArrayLinearAlgebra.crossProduct(viewDirection, this.viewUp, viewRight);
 				/*
 				 * if (Double.isNaN(viewRight[0]) || Double.isNaN(viewRight[1]) ||
 				 * Double.isNaN(viewRight[2])) { System.err.flush(); }
 				 */
 	
-				Algebra.normalizeVector(viewRight);
+				ArrayLinearAlgebra.normalizeVector(viewRight);
 	
 				/*
 				 * if (Double.isNaN(viewRight[0]) || Double.isNaN(viewRight[1]) ||
@@ -1610,7 +1610,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	
 				// Transform the virtual sphere axis's coordinate system
 				final double vsAxis[] = { rotDelta[1], rotDelta[2], rotDelta[3] };
-				Algebra.matrixRotate(viewMatrix, vsAxis);
+				ArrayLinearAlgebra.matrixRotate(viewMatrix, vsAxis);
 				rotDelta[1] = vsAxis[0];
 				rotDelta[2] = vsAxis[1];
 				rotDelta[3] = vsAxis[2];
@@ -1626,7 +1626,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				this.viewEye[0] -= this.rotationCenter[0];
 				this.viewEye[1] -= this.rotationCenter[1];
 				this.viewEye[2] -= this.rotationCenter[2];
-				Algebra.angleAxisRotate(rotDelta, this.viewEye);
+				ArrayLinearAlgebra.angleAxisRotate(rotDelta, this.viewEye);
 				// Translate back.
 				this.viewEye[0] += this.rotationCenter[0];
 				this.viewEye[1] += this.rotationCenter[1];
@@ -1642,7 +1642,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				this.viewCenter[0] -= this.rotationCenter[0];
 				this.viewCenter[1] -= this.rotationCenter[1];
 				this.viewCenter[2] -= this.rotationCenter[2];
-				Algebra.angleAxisRotate(rotDelta, this.viewCenter);
+				ArrayLinearAlgebra.angleAxisRotate(rotDelta, this.viewCenter);
 				// Translate back.
 				this.viewCenter[0] += this.rotationCenter[0];
 				this.viewCenter[1] += this.rotationCenter[1];
@@ -1656,14 +1656,14 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				// Compute the new viewUp.
 				// (note that we do not translate to the rotation center first
 				// because viewUp is a direction vector not an absolute vector!)
-				Algebra.angleAxisRotate(rotDelta, this.viewUp);
+				ArrayLinearAlgebra.angleAxisRotate(rotDelta, this.viewUp);
 	
 				/*
 				 * for(int i = 0; i < viewUp.length; i++) {
 				 * if(Double.isNaN(viewUp[i])) { System.err.flush(); } }
 				 */
 	
-				Algebra.normalizeVector(this.viewUp);
+				ArrayLinearAlgebra.normalizeVector(this.viewUp);
 	
 				/*
 				 * for(int i = 0; i < viewUp.length; i++) {
@@ -1681,7 +1681,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				v3d[1] = this.viewCenter[1] - this.viewEye[1];
 				v3d[2] = this.viewCenter[2] - this.viewEye[2];
 	
-				Algebra.normalizeVector(v3d);
+				ArrayLinearAlgebra.normalizeVector(v3d);
 	
 				// Compute a deltaZ that provides a nice motion speed,
 				// then multiply the direction vector by deltaZ.
@@ -1720,11 +1720,11 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				v3d2[0] = this.viewCenter[0] - this.viewEye[0];
 				v3d2[1] = this.viewCenter[1] - this.viewEye[1];
 				v3d2[2] = this.viewCenter[2] - this.viewEye[2];
-				Algebra.normalizeVector(v3d2);
+				ArrayLinearAlgebra.normalizeVector(v3d2);
 	
 				// Compute left-right direction vector (v3d2 x viewUp).
-				Algebra.crossProduct(v3d2, this.viewUp, v3d);
-				Algebra.normalizeVector(v3d);
+				ArrayLinearAlgebra.crossProduct(v3d2, this.viewUp, v3d);
+				ArrayLinearAlgebra.normalizeVector(v3d);
 	
 				// Compute a deltaX and deltaY that provide a nice motion speed,
 				// then multiply the direction vector by the deltas.

@@ -65,7 +65,6 @@
 
 package org.rcsb.mbt.model.util;
 
-
 import org.rcsb.mbt.model.*;
 
 

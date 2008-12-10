@@ -3,10 +3,8 @@ package org.rcsb.pw.controllers.scene;
 import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.glscene.jogl.GvPickEvent;
 import org.rcsb.mbt.model.StructureComponent;
-import org.rcsb.pw.controllers.app.ProteinWorkshop;
-import org.rcsb.pw.controllers.scene.mutators.Mutator;
 import org.rcsb.pw.controllers.scene.mutators.MutatorEnum;
-
+import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 
 public class PWSceneController extends SceneController
 {
@@ -20,7 +18,7 @@ public class PWSceneController extends SceneController
 	{
 		final StructureComponent sc = pickEvent.structureComponent;
 
-		Mutator mut = mutatorEnum.getCurrentMutator();
+		MutatorBase mut = mutatorEnum.getCurrentMutator();
 		
 		// Do the selection.
 		mut.setShiftDown(pickEvent.mouseEvent.isShiftDown());

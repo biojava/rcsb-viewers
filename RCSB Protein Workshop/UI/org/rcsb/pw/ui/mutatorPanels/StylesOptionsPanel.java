@@ -12,7 +12,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.PickController.PickLevel;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.glscene.jogl.ChainGeometry;
@@ -24,6 +23,7 @@ import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.MutatorEnum;
 import org.rcsb.pw.controllers.scene.mutators.options.StylesOptions;
 import org.rcsb.pw.ui.FullWidthBoxLayout;
+import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 
 
 
@@ -178,15 +178,15 @@ public class StylesOptionsPanel extends JPanel implements IUpdateListener
     }
 
     // mode corresponds to the index in AVAILABLE_MODE_LABELS.
-    public void updatePickLevel(final PickLevel pickLevel) {
+    public void updateMutatorActivation(final MutatorBase.ActivationType activationType) {
 //    	this.atomFormComboDescriptor.setVisible(false);
     	this.atomRadiusComboDescriptor.setVisible(false);
     	this.bondOrderComboDescriptor.setVisible(false);
     	this.ribbonFormComboDescriptor.setVisible(false);
     	this.areRibbonsSmoothedBox.setVisible(false);
     	
-    	switch(pickLevel) {
-    	case ATOMS:	// atoms and bonds
+    	switch(activationType) {
+    	case ATOMS_AND_BONDS:	// atoms and bonds
     		this.bondOrderComboDescriptor.setVisible(true);
 //    		this.atomFormComboDescriptor.setVisible(true);
     		this.atomRadiusComboDescriptor.setVisible(true);
@@ -196,7 +196,7 @@ public class StylesOptionsPanel extends JPanel implements IUpdateListener
         	this.areRibbonsSmoothedBox.setVisible(true);
     		break;
     	default:
-    		(new Exception(pickLevel + " is an invalid pick level")).printStackTrace();
+    		(new Exception(activationType + " is an invalid pick level")).printStackTrace();
     	}
     	
     	super.revalidate();
@@ -267,7 +267,7 @@ public class StylesOptionsPanel extends JPanel implements IUpdateListener
     	this.ribbonFormStyles.setSelectedIndex(1);
     	
     	// enact the default mode
-    	this.updatePickLevel(PickLevel.ATOMS);
+    	this.updateMutatorActivation(MutatorBase.ActivationType.ATOMS_AND_BONDS);
     }
 
 	/* (non-Javadoc)

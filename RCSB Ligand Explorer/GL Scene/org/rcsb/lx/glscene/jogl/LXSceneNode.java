@@ -21,7 +21,7 @@ import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.ChainStyle;
-import org.rcsb.mbt.model.geometry.Algebra;
+import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.util.DebugState;
 
 import com.sun.opengl.util.GLUT;
@@ -198,7 +198,7 @@ public class LXSceneNode extends JoglSceneNode
 
 		final double newViewDirection[] = { center[0] - eye[0],
 				center[1] - eye[1], center[2] - eye[2] };
-		Algebra.normalizeVector(newViewDirection);
+		ArrayLinearAlgebra.normalizeVector(newViewDirection);
 
 		// Use Graham-Schmidt orthogonalization: e3 = e2 - e1 * ( e2 DOT e1 )
 		// to produce a newViewUp vector that is orthonormal to the
@@ -212,13 +212,13 @@ public class LXSceneNode extends JoglSceneNode
 		// so it is safe to re-orthogonalize since the orthogonal vector
 		// component will be the zero vector and you will be left with the
 		// original input vector.
-		Algebra.normalizeVector(this.viewUp);
-		final double dot = Algebra.dotProduct(this.viewUp, newViewDirection);
+		ArrayLinearAlgebra.normalizeVector(this.viewUp);
+		final double dot = ArrayLinearAlgebra.dotProduct(this.viewUp, newViewDirection);
 		final double newViewUp[] = {
 				this.viewUp[0] - newViewDirection[0] * dot,
 				this.viewUp[1] - newViewDirection[1] * dot,
 				this.viewUp[2] - newViewDirection[2] * dot };
-		Algebra.normalizeVector(newViewUp);
+		ArrayLinearAlgebra.normalizeVector(newViewUp);
 
 		// Set the new eye location.
 		this.viewEye[0] = eye[0];
@@ -299,7 +299,7 @@ public class LXSceneNode extends JoglSceneNode
 
 		final double newViewDirection[] = { center[0] - eye[0],
 				center[1] - eye[1], center[2] - eye[2] };
-		Algebra.normalizeVector(newViewDirection);
+		ArrayLinearAlgebra.normalizeVector(newViewDirection);
 
 		// Use Graham-Schmidt orthogonalization: e3 = e2 - e1 * ( e2 DOT e1 )
 		// to produce a newViewUp vector that is orthonormal to the
@@ -313,13 +313,13 @@ public class LXSceneNode extends JoglSceneNode
 		// so it is safe to re-orthogonalize since the orthogonal vector
 		// component will be the zero vector and you will be left with the
 		// original input vector.
-		Algebra.normalizeVector(this.viewUp);
-		final double dot = Algebra.dotProduct(this.viewUp, newViewDirection);
+		ArrayLinearAlgebra.normalizeVector(this.viewUp);
+		final double dot = ArrayLinearAlgebra.dotProduct(this.viewUp, newViewDirection);
 		final double newViewUp[] = {
 				this.viewUp[0] - newViewDirection[0] * dot,
 				this.viewUp[1] - newViewDirection[1] * dot,
 				this.viewUp[2] - newViewDirection[2] * dot };
-		Algebra.normalizeVector(newViewUp);
+		ArrayLinearAlgebra.normalizeVector(newViewUp);
 
 		// Set the new eye location.
 		this.viewEye[0] = eye[0];
