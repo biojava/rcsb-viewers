@@ -9,11 +9,39 @@
       notes, below.
     </li>
     <li>
+      Ids stored in the model are <em>Ndb</em> ids, not Pdb.  Pdb ids are looked up.
+    </li>
+    <li>
       One problem is the conversion methods are quite hard to use - they return a two-element array of
       objects which have to be tested for existence and cast.  I'm currently working on providing
       simplified versions.
     </li>
   </ul>
+  
+  <p>
+  <em>Ndb</em> ids primarily come from .cif/.xml files, Pdb ids from .pdb files.  The identification schemes
+  are quite different.</p>
+  
+  <p>
+  Thus, the requirement to map from one to the other.  The <span class="classname">PdbToNdbConverter</span>
+  performs this conversion.</p>
+  
+  <ul>
+    <li>
+      On loading XML files, the chain and residue ids are extracted in both Ndb and Pdb namespaces.
+    </li>
+    <li>
+      On loading PDB files, the Ndb ids are set to their corresponding Pdb ids, thus the mapping is essentially 1:1.
+    </li>
+  </ul>
+  
+  <p>
+  The loaders create
+  the <span class="classname">PdbToNdbConverter</span> as the last step from the lists of
+  names extracted.  It is handed off to the <span class="classname">StructureMap</span>, which then
+  uses it throughout the rest of the application.
+  <p>
+  Non-protein chains present their own issues - 
   
   <p>
   From John Beaver (edited):</p>
