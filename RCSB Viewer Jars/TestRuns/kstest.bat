@@ -1,1 +1,2 @@
-java -D"java.library.path=../3rdParty/%NUMBITS%/jnilibs" -jar ../RCSBKiosk/RCSB-Kiosk.jar 
+call setargs.bat
+java %PATHARGS% -jar ../RCSBKiosk/RCSB-Kiosk.jar -show_asymmetric_unit_only
