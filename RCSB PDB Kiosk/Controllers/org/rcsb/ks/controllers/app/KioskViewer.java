@@ -74,6 +74,7 @@ import org.rcsb.mbt.controllers.doc.DocController;
 import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.structLoader.StructureXMLHandler;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
+import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 
 
 /**
@@ -134,6 +135,7 @@ public class KioskViewer extends AppBase
 	private void initialize()
 	{
 		appModuleFactory = new KSAppModuleFactory();
+		MutatorBase.setActivationType(MutatorBase.ActivationType.RIBBONS);
 		activeFrame = appModuleFactory.createDocFrame("PDB Kiosk (Powered by the MBT)", null);
 		((KSDocumentFrame)activeFrame).initialize(true, true);
 	}

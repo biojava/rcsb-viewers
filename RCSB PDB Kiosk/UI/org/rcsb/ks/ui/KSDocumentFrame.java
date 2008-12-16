@@ -159,10 +159,19 @@ public class KSDocumentFrame extends DocumentFrameBase implements IUpdateListene
 				structurePanel = new StructurePanel();
 				structurePanel.setDoubleBuffered(true);
 				container.add(structurePanel);
-//				pack();
+				pack();
 
 				setSize(size);
-				gDevice.setFullScreenWindow(KSDocumentFrame.this);
+				if (System.getProperty("os.name").equals("Mac OS X"))
+					gDevice.setFullScreenWindow(KSDocumentFrame.this);
+				
+				else
+				{
+					setLocation(0, 0);
+					setSize(size.width, size.height);
+				}
+				
+				
 
 				setResizable( false );
 				setVisible(true);

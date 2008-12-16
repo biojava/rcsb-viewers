@@ -74,13 +74,16 @@ public class SlideShow extends Thread
 		return threadSuspended;
 	}
 
-	private void loadList() {
+	private void loadList()
+	{
+		String fileDirectory = null;
+		
 		try {
 			File pdbPropertiesFile = new File("pdbscreensaver.properties");
 			FileInputStream pdbPropertiesInputstream = new FileInputStream(
 					pdbPropertiesFile);
 			pdbProperties.load(pdbPropertiesInputstream);
-			String fileDirectory = pdbProperties.getProperty("pdbFiles");
+			fileDirectory = pdbProperties.getProperty("pdbFiles");
 			setPDBFileDirectory(fileDirectory);
 
 			// {{}}
@@ -110,8 +113,13 @@ public class SlideShow extends Thread
 				}
 			}
 			startPreemptiveListLoadingThread();
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception e)
+		{
+			System.err.println(
+				fileDirectory == null? "Can't open file \"pdbscreensaver.properties\"." : 
+									   "Problems with file directory: " + fileDirectory);
+			System.err.println("Current Directory: " + System.getProperty("user.dir"));
+			System.exit(1);
 		}
 	}
 
