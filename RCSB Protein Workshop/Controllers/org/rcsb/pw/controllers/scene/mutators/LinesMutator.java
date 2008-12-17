@@ -4,9 +4,6 @@ import java.awt.Color;
 import java.util.Vector;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
-import org.rcsb.mbt.glscene.jogl.LineGeometry;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -25,6 +22,9 @@ import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.options.LinesOptions;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
+import org.rcsb.vf.glscene.jogl.DisplayListRenderable;
+import org.rcsb.vf.glscene.jogl.JoglSceneNode;
+import org.rcsb.vf.glscene.jogl.LineGeometry;
 
 
 

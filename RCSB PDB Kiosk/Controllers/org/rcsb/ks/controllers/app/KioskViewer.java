@@ -69,12 +69,12 @@ import org.rcsb.ks.controllers.doc.KSDocController;
 import org.rcsb.ks.controllers.doc.KSStructureXMLHandler;
 import org.rcsb.ks.glscene.jogl.KSGlGeometryViewer;
 import org.rcsb.ks.ui.KSDocumentFrame;
-import org.rcsb.mbt.controllers.app.AppBase;
+import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.mbt.controllers.doc.DocController;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.structLoader.StructureXMLHandler;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
+import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 
 
 /**
@@ -85,9 +85,9 @@ import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
  * @copyright SDSC
  * @see
  */
-public class KioskViewer extends AppBase
+public class KioskViewer extends VFAppBase
 {
-	public class KSAppModuleFactory extends AppBase.AppModuleFactory
+	public class KSAppModuleFactory extends VFAppBase.VFAppModuleFactory
 	{
 
 		/* (non-Javadoc)

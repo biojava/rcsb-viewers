@@ -5,13 +5,13 @@ import javax.media.opengl.glu.GLU;
 
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.model.Interaction;
-import org.rcsb.mbt.glscene.jogl.Constants;
-import org.rcsb.mbt.glscene.jogl.DisplayListGeometry;
-import org.rcsb.mbt.glscene.jogl.DisplayLists;
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.attributes.LineStyle;
 import org.rcsb.mbt.model.attributes.Style;
+import org.rcsb.vf.glscene.jogl.Constants;
+import org.rcsb.vf.glscene.jogl.DisplayListGeometry;
+import org.rcsb.vf.glscene.jogl.DisplayLists;
+import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 
 import com.sun.opengl.util.GLUT;
 

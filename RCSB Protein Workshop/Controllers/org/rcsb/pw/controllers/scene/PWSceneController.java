@@ -1,10 +1,10 @@
 package org.rcsb.pw.controllers.scene;
 
-import org.rcsb.mbt.controllers.scene.SceneController;
-import org.rcsb.mbt.glscene.jogl.GvPickEvent;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.pw.controllers.scene.mutators.MutatorEnum;
+import org.rcsb.vf.controllers.scene.SceneController;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
+import org.rcsb.vf.glscene.jogl.GvPickEvent;
 
 public class PWSceneController extends SceneController
 {

@@ -92,12 +92,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.net.URL;
 
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.doc.DocController;
-import org.rcsb.mbt.controllers.scene.SceneController;
+import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 import org.rcsb.vf.controllers.doc.VFDocController;
-import org.rcsb.vf.glscene.jogl.VFGlGeometryViewer;
+import org.rcsb.vf.controllers.scene.SceneController;
+import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
+import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
 
 
@@ -120,6 +123,12 @@ public abstract class VFAppBase extends AppBase
 {
 	public abstract class VFAppModuleFactory extends AppBase.AppModuleFactory
 	{
+		@Override
+		public Object createStructureMapUserData() { return createSceneNode(); }
+		public GlGeometryViewer createGlGeometryViewer() { return new GlGeometryViewer(); }
+		public JoglSceneNode createSceneNode() { return new JoglSceneNode(); }
+		public SceneController createSceneController() { return new SceneController(); }
+
 		/* (non-Javadoc)
 		 * @see org.rcsb.mbt.appController.AppBase.AppModuleFactory#createDocController()
 		 */
@@ -130,9 +139,14 @@ public abstract class VFAppBase extends AppBase
 	public static final String PERFORMANCE_WARNING_KEY = "Performance Warning";
 	
 	public static VFAppBase getApp() { return (VFAppBase)AppBase.getApp(); }
-	public static VFDocumentFrameBase sgetActiveFrame() { return (VFDocumentFrameBase)AppBase.getApp().getActiveFrame(); }
+	public static VFDocumentFrameBase sgetActiveFrame() { return VFAppBase.getApp().getActiveFrame(); }
 	public static VFDocController sgetDocController() { return sgetActiveFrame().getDocController(); }
-	public static VFGlGeometryViewer sgetGlGeometryViewer() { return sgetActiveFrame().getGlGeometryViewer(); }
+	public static GlGeometryViewer sgetGlGeometryViewer() { return sgetActiveFrame().getGlGeometryViewer(); }
+	public static SceneController sgetSceneController() { return sgetActiveFrame().getSceneController(); }
+	
+	public static VFAppModuleFactory sgetAppModuleFactory() { return (VFAppModuleFactory)AppBase.sgetAppModuleFactory(); }
+
+	public VFDocumentFrameBase getActiveFrame() { return (VFDocumentFrameBase)super.getActiveFrame(); }
 	
 	/**
 	 * Constructor - parses args and registers a panel(?)
@@ -168,8 +182,6 @@ public abstract class VFAppBase extends AppBase
 					properties.setProperty("output_format", args[++i]);
 				} else if (args[i].equals("-unit_id")) {
 					properties.setProperty("unit_id", args[++i]);
-				} else if (args[i].equals("-treat_models_as_subunits")) {
-					properties.setProperty("treat_models_as_subunits", "true");
 				} else if (args[i].equals("-log_folder")) {
 					properties.setProperty("log_folder", args[++i]);
 				} else if (args[i].equals("-disable_global_transforms")) {

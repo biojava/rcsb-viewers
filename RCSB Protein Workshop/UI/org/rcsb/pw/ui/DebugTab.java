@@ -10,10 +10,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.model.Structure;
+import org.rcsb.vf.controllers.app.VFAppBase;
+import org.rcsb.vf.controllers.scene.SceneController;
 
 
 public class DebugTab extends JPanel implements IUpdateListener
@@ -32,7 +33,7 @@ public class DebugTab extends JPanel implements IUpdateListener
 		super();
 		super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
-		SceneController sceneController = AppBase.sgetSceneController();
+		SceneController sceneController = VFAppBase.sgetSceneController();
 		this.planeField = new JTextField(sceneController.getDebugSettings().blurPlane + "");
 		this.factorField = new JTextField(sceneController.getDebugSettings().blurFactor + "");
 		
@@ -42,7 +43,7 @@ public class DebugTab extends JPanel implements IUpdateListener
 		public void actionPerformed(final ActionEvent e)
 		{
 			final JCheckBox source = (JCheckBox)e.getSource();
-			SceneController sceneController = AppBase.sgetSceneController();
+			SceneController sceneController = VFAppBase.sgetSceneController();
 			if(source.isSelected())
 			{
 				sceneController.getDebugSettings().isAntialiasingEnabled = true;
@@ -53,7 +54,7 @@ public class DebugTab extends JPanel implements IUpdateListener
 			else
 				sceneController.getDebugSettings().isAntialiasingEnabled = false;
 
-			AppBase.sgetGlGeometryViewer().requestRepaint();
+			VFAppBase.sgetGlGeometryViewer().requestRepaint();
 		}
 			
 		});

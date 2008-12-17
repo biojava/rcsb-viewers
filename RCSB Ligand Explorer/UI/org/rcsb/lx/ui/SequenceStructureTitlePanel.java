@@ -8,8 +8,8 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
-import org.rcsb.mbt.glscene.jogl.SequencePanelBase;
 import org.rcsb.mbt.model.Structure;
+import org.rcsb.vf.glscene.jogl.SequencePanelBase;
 
 
 @SuppressWarnings("serial")

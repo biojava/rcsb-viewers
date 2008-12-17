@@ -22,15 +22,15 @@ import javax.swing.SwingUtilities;
 
 import org.rcsb.ks.controllers.doc.KSDocController;
 import org.rcsb.ks.glscene.jogl.KSGlGeometryViewer;
-import org.rcsb.mbt.controllers.scene.SceneState;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.model.Structure;
-import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
+import org.rcsb.vf.ui.VFDocumentFrameBase;
+import org.rcsb.vf.controllers.scene.SceneState;
 
 
 @SuppressWarnings("serial")
-public class KSDocumentFrame extends DocumentFrameBase implements IUpdateListener, KeyEventDispatcher
+public class KSDocumentFrame extends VFDocumentFrameBase implements IUpdateListener, KeyEventDispatcher
 {
 	@Override
 	public KSGlGeometryViewer getGlGeometryViewer() { return (KSGlGeometryViewer)super.getGlGeometryViewer(); }

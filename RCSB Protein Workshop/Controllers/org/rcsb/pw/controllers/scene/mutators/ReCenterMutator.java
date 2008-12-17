@@ -1,6 +1,6 @@
 package org.rcsb.pw.controllers.scene.mutators;
 
-import org.rcsb.mbt.controllers.app.AppBase;
+import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -59,7 +59,7 @@ public class ReCenterMutator extends MutatorBase
 	}	
 	
 	private void changeCenter(final Atom a) {
-    	AppBase.sgetGlGeometryViewer().lookAt(a.coordinate);
+    	VFAppBase.sgetGlGeometryViewer().lookAt(a.coordinate);
     }
     
     private void changeCenter(final Bond b) {

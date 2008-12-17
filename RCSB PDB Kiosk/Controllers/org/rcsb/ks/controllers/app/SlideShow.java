@@ -14,15 +14,11 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Vector;
 
-import org.rcsb.mbt.controllers.scene.SceneState;
-import org.rcsb.mbt.controllers.scene.ViewMovementThread;
 import org.rcsb.ks.glscene.jogl.KSGlGeometryViewer;
 import org.rcsb.ks.model.AnnotatedAtom;
 import org.rcsb.ks.model.EntityDescriptor;
 import org.rcsb.ks.model.KSStructureInfo;
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -38,7 +34,11 @@ import org.rcsb.mbt.model.attributes.IResidueColor;
 import org.rcsb.mbt.model.attributes.ResidueColorByRgb;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.util.DebugState;
+import org.rcsb.vf.controllers.scene.SceneState;
+import org.rcsb.vf.controllers.scene.ViewMovementThread;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
+import org.rcsb.vf.glscene.jogl.DisplayListRenderable;
+import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 
 /*
  * Set up a thread to run a slide show.  Collects all the filenames from a directory

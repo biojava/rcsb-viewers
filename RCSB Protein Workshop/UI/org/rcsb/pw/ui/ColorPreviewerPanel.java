@@ -20,6 +20,7 @@ import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.ColorMutator;
 import org.rcsb.pw.controllers.scene.mutators.MutatorEnum;
 import org.rcsb.pw.controllers.scene.mutators.options.ColorOptions;
+import org.rcsb.vf.controllers.app.VFAppBase;
 
 
 
@@ -92,7 +93,7 @@ public class ColorPreviewerPanel extends JPanel implements IUpdateListener
         public void actionPerformed(final ActionEvent e) {
         	// cause the next mutation to instead change the color of this panel.
         	// note that every attempt is made to disable this functionaliy if the user implicity cancels it, such as by clicking something else.
-        	AppBase.sgetSceneController().setColorSelectorSampleModeEnabled(true);
+        	VFAppBase.sgetSceneController().setColorSelectorSampleModeEnabled(true);
             
             Status.output(Status.LEVEL_REMARK, "Choose an atom, bond, or chain in the 3d viewer or tree to sample its color.");
         }

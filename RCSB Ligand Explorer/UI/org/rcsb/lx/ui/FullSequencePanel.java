@@ -21,10 +21,6 @@ import java.util.regex.Pattern;
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
 import org.rcsb.lx.glscene.jogl.ResidueFontInfo;
-import org.rcsb.mbt.glscene.jogl.AtomGeometry;
-import org.rcsb.mbt.glscene.jogl.BondGeometry;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
-import org.rcsb.mbt.glscene.jogl.SequencePanelBase;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.ExternChain;
 import org.rcsb.mbt.model.Residue;
@@ -38,6 +34,10 @@ import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.util.AminoAcidInfo;
 import org.rcsb.mbt.model.util.Status;
+import org.rcsb.vf.glscene.jogl.AtomGeometry;
+import org.rcsb.vf.glscene.jogl.BondGeometry;
+import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
+import org.rcsb.vf.glscene.jogl.SequencePanelBase;
 
 
 /**

@@ -3,10 +3,7 @@ package org.rcsb.pw.controllers.scene.mutators;
 import java.awt.Color;
 import java.util.Vector;
 
-import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.SceneController;
-import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
+import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -27,7 +24,10 @@ import org.rcsb.mbt.model.attributes.ResidueColorByRgb;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.options.ColorOptions;
+import org.rcsb.vf.controllers.scene.SceneController;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
+import org.rcsb.vf.glscene.jogl.DisplayListRenderable;
+import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 
 
 
@@ -60,7 +60,7 @@ public class ColorMutator extends MutatorBase
 	@Override
 	public void doMutation()
 	{
-		SceneController sceneController = AppBase.sgetSceneController();
+		SceneController sceneController = VFAppBase.sgetSceneController();
 		if(sceneController.isColorSelectorSampleModeEnabled() && mutees.size() > 0) {
 			final Object mutee = mutees.iterator().next();
 			

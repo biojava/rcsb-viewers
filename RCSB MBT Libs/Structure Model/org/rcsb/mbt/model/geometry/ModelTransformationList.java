@@ -10,7 +10,7 @@ import java.util.ArrayList;
  *
  * Note this is the model version, not the GL version.
  * 
- * @see org.rcsb.mbt.glscene.jogl.GLTransformationList
+ * @see org.rcsb.vf.glscene.jogl.GLTransformationList
  * @see org.rcsb.mbt.model.geometry.ModelTranformationMatrix
  * 
  * @author rickb

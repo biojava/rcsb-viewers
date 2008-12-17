@@ -37,20 +37,20 @@ import org.rcsb.lx.ui.dialogs.AngleDialog;
 import org.rcsb.lx.ui.dialogs.DihedralDialog;
 import org.rcsb.lx.ui.dialogs.DistanceDialog;
 import org.rcsb.lx.ui.dialogs.IPickInfoReceiver;
-import org.rcsb.mbt.controllers.app.AppBase;
+import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
-import org.rcsb.mbt.glscene.jogl.Constants;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.util.Status;
+import org.rcsb.mbt.ui.FileLocs;
 import org.rcsb.mbt.ui.mainframe.UIBuilder;
 import org.rcsb.mbt.ui.views.StructureComponentInspector;
 import org.rcsb.vf.controllers.app.BBBrowserLauncher;
-import org.rcsb.vf.controllers.app.VFAppBase;
+import org.rcsb.vf.glscene.jogl.Constants;
+import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
 
 
@@ -145,7 +145,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 			super.run();
 			// define the base level UI items
 
-			if (!AppBase.backgroundScreenshotOnly)
+			if (!VFAppBase.backgroundScreenshotOnly)
 			{	
 
 				final JMenuItem fileSaveContactsItem = new JMenuItem("Save Interactions...");
@@ -281,8 +281,8 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 							{
 								String pdbId = (String) pdbIdList
 										.getSelectedItem();
-								String url = Constants.pdbFileBase + pdbId
-										+ Constants.pdbFileExtension;
+								String url = FileLocs.pdbFileBase + pdbId
+										+ FileLocs.pdbFileExtension;
 								VFAppBase.sgetDocController().loadStructure(url, pdbId);
 
 /* **
@@ -361,7 +361,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 			// Reset the view to look at the center of the data.
 			getSceneController().resetView(false);
 
-			if (!AppBase.backgroundScreenshotOnly)
+			if (!VFAppBase.backgroundScreenshotOnly)
 			{
 				if (getModel().hasStructures())
 					setTitle(getModel().getStructures().get(0).getStructureMap().getPdbId());
@@ -535,7 +535,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 				Vector<Chain> ligandList = sidebar.getLigandList();
 				if (ligandList != null && !ligandList.isEmpty())
 				{
-					getModel().setInitialLigand((String)AppBase.getApp().properties.get("ligand"));
+					getModel().setInitialLigand((String)VFAppBase.getApp().properties.get("ligand"));
 					sidebar.selectInitialLigand();
 					LigandExplorer.sgetGlGeometryViewer().requestRedrawInitialLigand();
 				}

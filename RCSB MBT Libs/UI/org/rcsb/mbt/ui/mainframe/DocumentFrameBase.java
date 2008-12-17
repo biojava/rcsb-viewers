@@ -8,9 +8,7 @@ import java.net.URL;
 import javax.swing.JFrame;
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.doc.DocController;
-import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.controllers.update.UpdateController;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.StructureModel;
 
 
@@ -49,16 +47,6 @@ public abstract class DocumentFrameBase extends JFrame
 	}
 	
 	/**
-	 * The scene controller has all the machinery to manipulate the scene.
-	 */
-	private SceneController sceneController = null;
-	public SceneController getSceneController()
-	{
-		if (sceneController == null) sceneController = AppBase.sgetAppModuleFactory().createSceneController();
-		return sceneController;
-	}
-	
-	/**
 	 * This is the molecule model.  Contains all of the structures.
 	 */
 	private StructureModel model = null;
@@ -66,13 +54,6 @@ public abstract class DocumentFrameBase extends JFrame
 	{
 		if (model == null) model = AppBase.sgetAppModuleFactory().createModel();
 		return model;
-	}
-	
-	private GlGeometryViewer _glGeometryViewer = null;
-	public GlGeometryViewer getGlGeometryViewer()
-	{
-		if (_glGeometryViewer == null) _glGeometryViewer = AppBase.sgetAppModuleFactory().createGlGeometryViewer();
-		return _glGeometryViewer;
 	}
 
 	private UpdateController _updateController = null;
@@ -99,7 +80,5 @@ public abstract class DocumentFrameBase extends JFrame
 	public void initialize(boolean showFrame)
 	{
 		_showFrame = showFrame;
-		AppBase.sgetGlGeometryViewer();
-						// force the geometryviewer creation
 	}
 }

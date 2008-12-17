@@ -4,8 +4,8 @@ import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.glscene.jogl.LXSceneNode;
 import org.rcsb.lx.model.LXModel;
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.SceneState;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
+import org.rcsb.vf.controllers.scene.SceneState;
+import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 

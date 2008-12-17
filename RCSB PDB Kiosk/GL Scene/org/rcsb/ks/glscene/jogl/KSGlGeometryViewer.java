@@ -2,7 +2,7 @@ package org.rcsb.ks.glscene.jogl;
 
 import javax.media.opengl.GLAutoDrawable;
 
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
+import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 
 public class KSGlGeometryViewer extends GlGeometryViewer
 {	

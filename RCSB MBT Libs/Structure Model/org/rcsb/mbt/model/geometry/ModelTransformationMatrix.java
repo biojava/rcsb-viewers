@@ -25,7 +25,7 @@ import org.rcsb.mbt.model.UnitCell;
  *       24-Nov-08 - rickb
  * 
  * @see org.rcsb.mbt.glscene.jogl.GLTransformationMatrix
- * @see org.rcsb.mbt.glscene.jogl.GLTransformationList
+ * @see org.rcsb.vf.glscene.jogl.GLTransformationList
  * @see org.rcsb.mbt.model.geometry.ModelTransformationList
  * 
  * @author rickb

@@ -16,10 +16,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
-import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.scene.SceneController;
+import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.util.Status;
@@ -32,6 +30,8 @@ import org.rcsb.pw.ui.mutatorPanels.LinesOptionsPanel;
 import org.rcsb.pw.ui.mutatorPanels.MutatorBasePanel;
 import org.rcsb.pw.ui.mutatorPanels.StylesOptionsPanel;
 import org.rcsb.pw.ui.tree.TreeViewer;
+import org.rcsb.vf.controllers.scene.SceneController;
+import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
 
 
@@ -180,7 +180,7 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 			//
 			// Enable picking
 			//
-			SceneController sceneController = AppBase.sgetSceneController();
+			SceneController sceneController = VFAppBase.sgetSceneController();
 			glViewer.addPickEventListener(sceneController);
 
 			// Reset the view to look at the center of the data.
@@ -188,7 +188,7 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 
 			if (!ProteinWorkshop.backgroundScreenshotOnly)
 			{
-				StructureModel model = AppBase.sgetModel();
+				StructureModel model = VFAppBase.sgetModel();
 				if (model.hasStructures())
 					setTitle(model.getStructures().get(0).getStructureMap().getPdbId());
 			}

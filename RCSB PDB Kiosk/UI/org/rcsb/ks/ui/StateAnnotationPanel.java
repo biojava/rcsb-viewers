@@ -6,7 +6,7 @@ import java.awt.Graphics;
 
 import javax.swing.JPanel;
 
-import org.rcsb.mbt.controllers.scene.SceneState;
+import org.rcsb.vf.controllers.scene.SceneState;
 
 /*
  * This is the panel on the right.

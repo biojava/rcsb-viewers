@@ -22,11 +22,11 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.rcsb.mbt.controllers.app.AppBase;
+import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.mbt.controllers.doc.DocController;
-import org.rcsb.mbt.controllers.scene.SceneState;
 import org.rcsb.mbt.model.util.Status;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
+import org.rcsb.vf.controllers.scene.SceneState;
 
 
 
@@ -70,7 +70,7 @@ public class StatePanel extends JPanel implements LayoutManager, ActionListener,
 		this.writeButton.addActionListener(this);
 		
 		// cause any selected list items to become deselected when the mouse enters something else...
-		AppBase.sgetGlGeometryViewer().glCanvas.addMouseListener(this);
+		VFAppBase.sgetGlGeometryViewer().glCanvas.addMouseListener(this);
 		ProteinWorkshop.sgetActiveFrame().getTreeViewer().tree.addMouseListener(this);
 	}
 
@@ -141,7 +141,7 @@ public class StatePanel extends JPanel implements LayoutManager, ActionListener,
 	public void actionPerformed(final ActionEvent e) {
 		final Object source = e.getSource();
 		
-		DocController docController = AppBase.sgetDocController();
+		DocController docController = VFAppBase.sgetDocController();
 		
 		if(source == this.captureCurrentViewerStateButton) {
 			final SceneState state = new SceneState();
@@ -185,7 +185,7 @@ public class StatePanel extends JPanel implements LayoutManager, ActionListener,
 			}
 		}
 		
-		AppBase.sgetGlGeometryViewer().requestRepaint();
+		VFAppBase.sgetGlGeometryViewer().requestRepaint();
 	}
 
 	public void valueChanged(final ListSelectionEvent e) {

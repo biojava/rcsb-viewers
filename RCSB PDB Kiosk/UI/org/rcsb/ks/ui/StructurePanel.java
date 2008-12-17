@@ -7,8 +7,8 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-import org.rcsb.mbt.controllers.scene.SceneState;
 import org.rcsb.mbt.model.Structure;
+import org.rcsb.vf.controllers.scene.SceneState;
 
 
 @SuppressWarnings("serial")

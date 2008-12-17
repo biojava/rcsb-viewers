@@ -18,7 +18,6 @@ import javax.swing.JTextField;
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.LineSegment;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.attributes.LineStyle;
@@ -27,6 +26,8 @@ import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.MutatorEnum;
 import org.rcsb.pw.ui.CommonDialogs;
 import org.rcsb.pw.ui.FullWidthBoxLayout;
+import org.rcsb.vf.controllers.app.VFAppBase;
+import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 
 
 
@@ -234,7 +235,7 @@ public class LinesOptionsPanel extends JPanel implements IUpdateListener, Action
 			if(struc != null) {
 				((JoglSceneNode)struc.getStructureMap().getUData()).regenerateGlobalList();
 			}
-			AppBase.sgetGlGeometryViewer().requestRepaint();
+			VFAppBase.sgetGlGeometryViewer().requestRepaint();
 		} else if(arg0.getSource() == this.showDistancesCheck) {
 			mutEnum.getLinesMutator().getOptions().setDisplayDistance(this.showDistancesCheck.isSelected());
 		}

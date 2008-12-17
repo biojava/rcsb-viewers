@@ -6,21 +6,40 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
+
+import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.doc.LoadThread;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
+import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.controllers.doc.VFDocController;
-import org.rcsb.vf.glscene.jogl.VFGlGeometryViewer;
+import org.rcsb.vf.controllers.scene.SceneController;
+import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 
 public abstract class VFDocumentFrameBase extends DocumentFrameBase
 {
 	private static final long serialVersionUID = 1761606139608488229L;
 
 	@Override
-	public VFGlGeometryViewer getGlGeometryViewer() { return (VFGlGeometryViewer)super.getGlGeometryViewer(); }
-	@Override
 	public VFDocController getDocController() { return (VFDocController)super.getDocController(); }
 
+	
+	private GlGeometryViewer _glGeometryViewer = null;
+	public GlGeometryViewer getGlGeometryViewer()
+	{
+		if (_glGeometryViewer == null) _glGeometryViewer = VFAppBase.sgetAppModuleFactory().createGlGeometryViewer();
+		return _glGeometryViewer;
+	}
 
+	/**
+	 * The scene controller has all the machinery to manipulate the scene.
+	 */
+	private SceneController sceneController = null;
+	public SceneController getSceneController()
+	{
+		if (sceneController == null) sceneController = VFAppBase.sgetAppModuleFactory().createSceneController();
+		return sceneController;
+	}
+	
 	public VFDocumentFrameBase(String title, URL iconURL)
 	{
 		super(title, iconURL);
@@ -70,5 +89,13 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 	{
 		LoadThread loader = new LoadThread(url);
 		loader.run();
+	}
+	
+	@Override
+	public void initialize(boolean showFrame)
+	{
+		super.initialize(showFrame);
+		VFAppBase.sgetGlGeometryViewer();
+		// force the geometryviewer creation
 	}
 }

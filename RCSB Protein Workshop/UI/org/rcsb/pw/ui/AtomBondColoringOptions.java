@@ -14,8 +14,6 @@ import javax.swing.JRadioButton;
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
-import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.StructureModel;
@@ -31,6 +29,8 @@ import org.rcsb.mbt.model.attributes.IAtomColor;
 import org.rcsb.mbt.model.attributes.IBondColor;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
+import org.rcsb.vf.glscene.jogl.DisplayListRenderable;
+import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 
 
 public class AtomBondColoringOptions extends JPanel implements IUpdateListener, ActionListener

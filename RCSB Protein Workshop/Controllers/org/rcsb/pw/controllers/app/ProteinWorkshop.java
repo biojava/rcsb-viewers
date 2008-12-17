@@ -1,23 +1,17 @@
 package org.rcsb.pw.controllers.app;
 
 
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 
-import javax.swing.SwingUtilities;
-
-import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.app.ProgressPanelController;
-import org.rcsb.mbt.controllers.scene.SceneController;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.StructureModel;
-import org.rcsb.mbt.model.util.Status;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 import org.rcsb.pw.controllers.scene.PWSceneController;
 import org.rcsb.pw.glscene.jogl.PWGlGeometryViewer;
 import org.rcsb.pw.ui.PWDocumentFrame;
 import org.rcsb.vf.controllers.app.VFAppBase;
+import org.rcsb.vf.controllers.scene.SceneController;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
+import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
 
 /**
@@ -34,19 +28,19 @@ public class ProteinWorkshop extends VFAppBase
 	public class PWAppModuleFactory extends VFAppBase.VFAppModuleFactory
 	{
 		/* (non-Javadoc)
-		 * @see edu.sdsc.mbt.app_controller.JAppBase.AppModuleFactory#createSceneController()
+		 * @see edu.sdsc.mbt.app_controller.JVFAppBase.AppModuleFactory#createSceneController()
 		 */
 		@Override
 		public SceneController createSceneController() { return new PWSceneController(); }
 
 		/* (non-Javadoc)
-		 * @see edu.sdsc.mbt.app_controller.JAppBase.AppModuleFactory#createDocFrame(java.lang.String)
+		 * @see edu.sdsc.mbt.app_controller.JVFAppBase.AppModuleFactory#createDocFrame(java.lang.String)
 		 */
 		@Override
 		public DocumentFrameBase createDocFrame(String name, URL iconUrl) {return new PWDocumentFrame(name, iconUrl); }
 
 		/* (non-Javadoc)
-		 * @see edu.sdsc.mbt.app_controller.JAppBase.AppModuleFactory#createGlGeometryViewer()
+		 * @see edu.sdsc.mbt.app_controller.JVFAppBase.AppModuleFactory#createGlGeometryViewer()
 		 */
 		@Override
 		public GlGeometryViewer createGlGeometryViewer() {return new PWGlGeometryViewer(); }
@@ -58,7 +52,7 @@ public class ProteinWorkshop extends VFAppBase
 	@Override
 	public PWDocumentFrame getActiveFrame() { return (PWDocumentFrame)activeFrame; }
 	public static PWDocumentFrame sgetActiveFrame() { return getApp().getActiveFrame(); }
-	public static PWSceneController sgetSceneController() { return (PWSceneController)AppBase.sgetSceneController(); }
+	public static PWSceneController sgetSceneController() { return (PWSceneController)VFAppBase.sgetSceneController(); }
 	public static PWGlGeometryViewer sgetGlGeometryViewer() { return sgetActiveFrame().getGlGeometryViewer(); }
 
 	public ProteinWorkshop(final String args[])

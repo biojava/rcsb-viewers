@@ -8,7 +8,6 @@ import java.util.Vector;
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -19,6 +18,8 @@ import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.StructureStyles;
+import org.rcsb.vf.controllers.app.VFAppBase;
+import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 
 
 // class which all mutators extend
@@ -69,7 +70,7 @@ public abstract class MutatorBase implements IUpdateListener
 	{
 		boolean isMuteeOnNow = false;
 		
-		if(AppBase.sgetSceneController().isBatchMode()) {
+		if(VFAppBase.sgetSceneController().isBatchMode()) {
 			if(this.supportsBatchMode()) {
 				if(mutees.contains(mutee)) {
 					mutees.remove(mutee);
@@ -102,7 +103,7 @@ public abstract class MutatorBase implements IUpdateListener
 			for (Structure struc : AppBase.sgetModel().getStructures())
 				((JoglSceneNode)struc.getStructureMap().getUData()).regenerateGlobalList();
 			
-			AppBase.sgetGlGeometryViewer().requestRepaint();
+			VFAppBase.sgetGlGeometryViewer().requestRepaint();
 		}
 		
 //		if(mutee instanceof StructureComponent) {

@@ -126,14 +126,12 @@ package org.rcsb.mbt.model.util;
 import java.util.Vector;
 import java.util.ListIterator;
 
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
-
 
 
 /**
@@ -164,13 +162,6 @@ public class DerivedInformation
 	private char[] ssFlags = null;
 
 	private int[][] chains = null;
-
-	/**
-	 * Creates a DerivedInformation object from a structure object.
-	 */
-	public DerivedInformation(final Structure structure) {
-		this.structureMap = new StructureMap(structure, new JoglSceneNode(), null, null);
-	}
 
 	/**
 	 * Creates a DerivedInformation object from a structure and a StructureMap

@@ -15,16 +15,7 @@ import org.rcsb.lx.model.Interaction;
 import org.rcsb.lx.model.InteractionConstants;
 import org.rcsb.lx.model.LXModel;
 import org.rcsb.lx.ui.dialogs.IPickInfoReceiver;
-import org.rcsb.mbt.controllers.scene.ViewMovementThread;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
-import org.rcsb.mbt.glscene.jogl.AtomGeometry;
-import org.rcsb.mbt.glscene.jogl.BondGeometry;
-import org.rcsb.mbt.glscene.jogl.ChainGeometry;
-import org.rcsb.mbt.glscene.jogl.Constants;
-import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
-import org.rcsb.mbt.glscene.jogl.ChainGeometry.RibbonForm;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -40,10 +31,18 @@ import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
-import org.rcsb.vf.glscene.jogl.VFGlGeometryViewer;
+import org.rcsb.vf.controllers.scene.ViewMovementThread;
+import org.rcsb.vf.glscene.jogl.AtomGeometry;
+import org.rcsb.vf.glscene.jogl.BondGeometry;
+import org.rcsb.vf.glscene.jogl.ChainGeometry;
+import org.rcsb.vf.glscene.jogl.Constants;
+import org.rcsb.vf.glscene.jogl.DisplayListRenderable;
+import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
+import org.rcsb.vf.glscene.jogl.JoglSceneNode;
+import org.rcsb.vf.glscene.jogl.ChainGeometry.RibbonForm;
 
 
-public class LXGlGeometryViewer extends VFGlGeometryViewer implements IUpdateListener
+public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListener
 {
 	private static final long serialVersionUID = -2533795368689609713L;
 

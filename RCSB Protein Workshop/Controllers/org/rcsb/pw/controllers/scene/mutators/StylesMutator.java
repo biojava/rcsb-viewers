@@ -1,11 +1,5 @@
 package org.rcsb.pw.controllers.scene.mutators;
 
-import org.rcsb.mbt.glscene.jogl.AtomGeometry;
-import org.rcsb.mbt.glscene.jogl.BondGeometry;
-import org.rcsb.mbt.glscene.jogl.ChainGeometry;
-import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
-import org.rcsb.mbt.glscene.jogl.Geometry;
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -19,6 +13,12 @@ import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.pw.controllers.scene.mutators.options.StylesOptions;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
+import org.rcsb.vf.glscene.jogl.AtomGeometry;
+import org.rcsb.vf.glscene.jogl.BondGeometry;
+import org.rcsb.vf.glscene.jogl.ChainGeometry;
+import org.rcsb.vf.glscene.jogl.DisplayListRenderable;
+import org.rcsb.vf.glscene.jogl.Geometry;
+import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 
 public class StylesMutator extends MutatorBase {
 	private StylesOptions options = null; 

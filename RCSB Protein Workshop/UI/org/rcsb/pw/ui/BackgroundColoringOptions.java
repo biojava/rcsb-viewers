@@ -14,9 +14,10 @@ import javax.swing.event.ChangeListener;
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.ui.dialogs.ColorChooserDialog;
+import org.rcsb.vf.controllers.app.VFAppBase;
+import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 
 
 
@@ -58,7 +59,7 @@ public class BackgroundColoringOptions extends JPanel implements IUpdateListener
 
     public void reset()
     {
-    	AppBase.sgetSceneController().resetView(false);
+    	VFAppBase.sgetSceneController().resetView(false);
     }
     
 //    private int getFogRange() {
@@ -95,7 +96,7 @@ public class BackgroundColoringOptions extends JPanel implements IUpdateListener
 class ChangeBackgroundColorListener implements ActionListener {
 
     public void actionPerformed(final ActionEvent e) {
-        final GlGeometryViewer glViewer = AppBase.sgetGlGeometryViewer();
+        final GlGeometryViewer glViewer = VFAppBase.sgetGlGeometryViewer();
         
         final float[] colorFl = new float[] {0,0,0,0};
         glViewer.getBackgroundColor(colorFl);

@@ -1,11 +1,20 @@
 package org.rcsb.vf.controllers.doc;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+
+import javax.swing.SwingUtilities;
+
+import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.doc.DocController;
-import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
+import org.rcsb.mbt.model.util.Status;
+import org.rcsb.mbt.ui.dialogs.ImageFileManager;
 import org.rcsb.vf.controllers.app.VFAppBase;
+import org.rcsb.vf.controllers.scene.SceneController;
+import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 
 
 public class VFDocController extends DocController
@@ -133,4 +142,108 @@ public class VFDocController extends DocController
 		}
 		return structures;
 	}
+	
+///////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Beg Image Save implementation
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////
+		
+		private final class ImageSaverThread extends Thread
+		{
+			private static final int DURATION_BETWEEN_SCREENSHOT_CHECKS_IN_MILLISECONDS = 1000;
+
+			private class SaverRunnable implements Runnable {
+				private int width;
+				private int height;
+				private File file;
+				private ImageFileManager manager;
+				
+				public SaverRunnable(int width, int height, File file, ImageFileManager manager) {
+					this.width = width;
+					this.height = height;
+					this.file = file;
+					this.manager = manager;
+				}
+				
+				public void run() {
+					final GlGeometryViewer viewer = VFAppBase.sgetGlGeometryViewer();
+					viewer.requestScreenShot(width, height);
+
+					Thread t = new Thread() {
+
+						@Override
+						public void run() {
+//							 check for the screenshot regularly until it appears or the
+							// timeout expires.
+							BufferedImage screenshot = null;
+							while (screenshot == null && !viewer.hasScreenshotFailed()) {
+								try {
+									Thread
+											.sleep(ImageSaverThread.DURATION_BETWEEN_SCREENSHOT_CHECKS_IN_MILLISECONDS);
+								} catch (final InterruptedException e) {
+								}
+
+								screenshot = viewer.getScreenshot();
+							}
+
+							if (screenshot != null) {
+								manager.save(screenshot, file);
+								viewer.clearScreenshot();
+								Status.output(Status.LEVEL_REMARK, "Image saved.");
+							} else {
+								Status.output(Status.LEVEL_REMARK, "Error saving the image.");
+							}
+						}
+						
+					};
+					
+					t.start();
+				}
+			}
+			
+			@Override
+			public void run() 
+			{
+				final GlGeometryViewer viewer = VFAppBase.sgetGlGeometryViewer();
+
+				int width = viewer.getWidth();
+				int height = viewer.getHeight();
+
+				// Ask the user for file name, image file format, and image size.
+				final ImageFileManager imageFileManager = new ImageFileManager(
+						AppBase.sgetActiveFrame());
+				final File file = imageFileManager.save(width, height);
+				if (file == null)
+				{
+					return; // User canceled the save.
+				}
+				width = imageFileManager.getSaveWidth();
+				height = imageFileManager.getSaveHeight();
+
+				SaverRunnable run = new SaverRunnable(width, height, file, imageFileManager);
+				SwingUtilities.invokeLater(run);
+			}
+		}
+		
+		/**
+		 * Save the image (to where???)
+		 */
+		public void saveImage() {
+//			Runnable runnable = new Runnable() {
+//				public void run() {
+					final ImageSaverThread screenshotWaiter = new ImageSaverThread();
+					// wait until the image is obtained or the timeout occurs
+					screenshotWaiter.start();
+//				}
+//			};
+//			
+//			SwingUtilities.invokeLater(runnable);
+		}
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// End Image Save Implementation
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
 }

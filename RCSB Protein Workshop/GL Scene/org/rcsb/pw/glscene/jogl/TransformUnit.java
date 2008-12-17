@@ -1,10 +1,10 @@
 package org.rcsb.pw.glscene.jogl;
 
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
+import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 
 
 /**

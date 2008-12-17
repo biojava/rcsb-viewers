@@ -18,7 +18,6 @@ import org.rcsb.lx.controllers.update.LXUpdateEvent;
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
-import org.rcsb.mbt.glscene.jogl.SequencePanelBase;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.ExternChain;
@@ -26,6 +25,7 @@ import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.util.DebugState;
+import org.rcsb.vf.glscene.jogl.SequencePanelBase;
 
 
 /**

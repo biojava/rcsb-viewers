@@ -12,9 +12,6 @@ import javax.swing.JRadioButton;
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
-import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Structure;
@@ -28,6 +25,10 @@ import org.rcsb.mbt.model.attributes.ResidueColorByResidueIndex;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.pw.ui.DescriptionPanel;
 import org.rcsb.pw.ui.FullWidthBoxLayout;
+import org.rcsb.vf.controllers.app.VFAppBase;
+import org.rcsb.vf.glscene.jogl.DisplayListRenderable;
+import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
+import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 
 
 
@@ -144,8 +145,8 @@ public class BackboneColoringOptions extends JPanel implements IUpdateListener, 
 				(new Exception()).printStackTrace();
 			}
 			
-			final StructureModel model = AppBase.sgetModel();
-			GlGeometryViewer glViewer = AppBase.sgetGlGeometryViewer();
+			final StructureModel model = VFAppBase.sgetModel();
+			GlGeometryViewer glViewer = VFAppBase.sgetGlGeometryViewer();
 			if(model.hasStructures())
 			{
 				for(Structure s : model.getStructures())

@@ -14,7 +14,6 @@ import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
 import org.rcsb.lx.glscene.jogl.LXSceneNode;
 import org.rcsb.lx.model.LXModel;
 import org.rcsb.lx.ui.LXDocumentFrame;
-import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.StructureModel;
@@ -22,6 +21,7 @@ import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.attributes.StructureStyles;
+import org.rcsb.vf.controllers.scene.SceneController;
 
 
 public class LXSceneController extends SceneController

@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -16,8 +17,8 @@ import javax.swing.filechooser.FileFilter;
 
 import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.doc.LoadThread;
-import org.rcsb.mbt.glscene.jogl.Constants;
 import org.rcsb.mbt.model.util.Status;
+import org.rcsb.mbt.ui.FileLocs;
 
 /**
  * This is a swing runnable - it is invoked to build the ActiveFrame UI at the appropriate
@@ -37,6 +38,7 @@ public class UIBuilder implements Runnable
 	protected JMenuBar menuBar;
 	protected JMenu fileMenu;		
 	protected StatusPanel statusPanel = null;
+	protected JComponent preFileExitSeparator = null;
 	
 	public void run()
 	{
@@ -116,7 +118,7 @@ public class UIBuilder implements Runnable
 							{
 								if (pdbId.length() == 4)
 								{
-									final String url = Constants.pdbFileBase + pdbId + Constants.pdbFileExtension;
+									final String url = FileLocs.pdbFileBase + pdbId + FileLocs.pdbFileExtension;
 									LoadThread loadIt = new LoadThread(url, pdbId);										
 									loadIt.start();
 								}
@@ -159,18 +161,6 @@ public class UIBuilder implements Runnable
 					}
 
 				});
-				
-				final JMenuItem saveImageItem = new JMenuItem("Save Image...");					
-				/**
-				 * Save Image Item Listener
-				 */
-				saveImageItem.addActionListener(
-					new ActionListener()
-						{
-						public void actionPerformed(ActionEvent arg0) {
-							AppBase.sgetDocController().saveImage();
-						}
-					});
 
 				exitItem.addActionListener(
 					new ActionListener()
@@ -190,8 +180,8 @@ public class UIBuilder implements Runnable
 				fileMenu.add(openFileItem);
 				fileMenu.add(openUrlItem);
 				fileMenu.add(openPdbIdItem);
-				fileMenu.add(saveImageItem);
-				fileMenu.add(new JSeparator());
+				preFileExitSeparator = new JSeparator();
+				fileMenu.add(preFileExitSeparator);
 				fileMenu.add(exitItem);
 				menuBar.add(fileMenu);
 
@@ -205,6 +195,28 @@ public class UIBuilder implements Runnable
 				AppBase.sgetActiveFrame().getContentPane().add(BorderLayout.SOUTH, statusPanel);
 			}
 		}
+	}
+	
+	/**
+	 * Insert a menu item before the specified item.  Helps keep the menu list ordered
+	 * reasonably.
+	 * 
+	 * @param menu
+	 * @param beforeItem
+	 * @param insertItem
+	 */
+	protected void insertMenuItemBefore(JMenu menu, JComponent beforeItem, JMenuItem insertItem)
+	{
+		if (beforeItem == null)
+			menu.add(insertItem);
+		
+		else
+			for (int ix = 0; ix < menu.getItemCount(); ix++)
+				if (menu.getItem(ix) == beforeItem)
+				{
+					menu.insert(insertItem, ix);
+					break;
+				}				
 	}
 }
 

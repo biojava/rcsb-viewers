@@ -2,10 +2,7 @@ package org.rcsb.pw.controllers.scene.mutators;
 
 import java.util.Vector;
 
-import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.glscene.jogl.DisplayListGeometry;
-import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
+import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -20,6 +17,9 @@ import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.Style;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
+import org.rcsb.vf.glscene.jogl.DisplayListGeometry;
+import org.rcsb.vf.glscene.jogl.DisplayListRenderable;
+import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 
 
 
@@ -217,7 +217,7 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
 		if(newVisibility) {
 			final ComponentType scType = sc.getStructureComponentType();
 			final DisplayListGeometry geometry =
-				AppBase.sgetSceneController().getDefaultGeometry().get( scType );
+				VFAppBase.sgetSceneController().getDefaultGeometry().get( scType );
 			
 			
 			Style style = ss.getStyle( sc );

@@ -2,11 +2,10 @@ package org.rcsb.sv.controllers.app;
 
 import java.net.URL;
 
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 import org.rcsb.sv.ui.SVDocumentFrame;
 import org.rcsb.vf.controllers.app.VFAppBase;
-import org.rcsb.vf.glscene.jogl.VFGlGeometryViewer;
+import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
 
 /**
@@ -26,7 +25,7 @@ public class SimpleViewer extends VFAppBase
 		 * @see edu.sdsc.mbt.app_controller.JAppBase.AppModuleFactory#createGlGeometryViewer()
 		 */
 		@Override
-		public GlGeometryViewer createGlGeometryViewer() { return new VFGlGeometryViewer(); }
+		public GlGeometryViewer createGlGeometryViewer() { return new GlGeometryViewer(); }
 
 		/* (non-Javadoc)
 		 * @see edu.sdsc.mbt.app_controller.JAppBase.AppModuleFactory#createDocFrame()

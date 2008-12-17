@@ -3,7 +3,7 @@ package org.rcsb.lx.controllers.scene;
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.glscene.jogl.LXSceneNode;
 import org.rcsb.lx.model.LXModel;
-import org.rcsb.mbt.controllers.scene.ViewMovementThread;
+import org.rcsb.vf.controllers.scene.ViewMovementThread;
 
 public class LXViewMovementThread extends ViewMovementThread
 {

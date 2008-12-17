@@ -166,6 +166,7 @@ import org.rcsb.mbt.model.attributes.StructureStylesEvent;
 import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
+import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 
 
@@ -574,7 +575,7 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 				curMut.setConsiderSelectedFlag(true);
 				curMut.setSelected(treeSelectionEvent.isAddedPath(i));
 
-				if (AppBase.sgetSceneController().areSelectionsEnabled()) {
+				if (VFAppBase.sgetSceneController().areSelectionsEnabled()) {
 					if (curMut.supportsBatchMode()) {
 						curMut.toggleMutee(userObject);
 					} else {
@@ -592,7 +593,7 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 				curMut.setSelected(treeSelectionEvent.isAddedPath(i));
 				curMut.setCtrlDown(this.latestClickEvent.isControlDown());
 				curMut.setShiftDown(this.latestClickEvent.isShiftDown());
-				if (AppBase.sgetSceneController().areSelectionsEnabled()) {
+				if (VFAppBase.sgetSceneController().areSelectionsEnabled()) {
 					if (curMut.supportsBatchMode()) {
 						curMut.toggleMutee(structureComponent);
 					} else {

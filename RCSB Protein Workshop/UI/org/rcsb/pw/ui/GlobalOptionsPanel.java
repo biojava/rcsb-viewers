@@ -8,7 +8,8 @@ import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 
 import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
+import org.rcsb.vf.controllers.app.VFAppBase;
+import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 
 
 public class GlobalOptionsPanel extends JPanel
@@ -49,8 +50,8 @@ public class GlobalOptionsPanel extends JPanel
         {
             public void actionPerformed(final ActionEvent e)
             {
-                AppBase.sgetUpdateController().resetEverything();
-                AppBase.sgetGlGeometryViewer().requestRepaint();
+                VFAppBase.sgetUpdateController().resetEverything();
+                VFAppBase.sgetGlGeometryViewer().requestRepaint();
             }
             
         });
@@ -73,7 +74,7 @@ public class GlobalOptionsPanel extends JPanel
     private final class SaveImageListener implements ActionListener {
     	
 		public void actionPerformed(final ActionEvent e) {
-			AppBase.sgetDocController().saveImage();
+			VFAppBase.sgetDocController().saveImage();
 		}
 	}
     
@@ -99,7 +100,7 @@ public class GlobalOptionsPanel extends JPanel
 							super.sleep(ScreenshotWaiterThread.DURATION_BETWEEN_SCREENSHOT_CHECKS_IN_MILLISECONDS);
 						} catch (final InterruptedException e) {}
 						
-						GlGeometryViewer glViewer = AppBase.sgetGlGeometryViewer();
+						GlGeometryViewer glViewer = VFAppBase.sgetGlGeometryViewer();
 						
 						if (glViewer != null && !glViewer.hasScreenshotFailed())
 							finished = true;
@@ -111,7 +112,7 @@ public class GlobalOptionsPanel extends JPanel
 			@Override
 			public void run()
 			{
-				GlGeometryViewer glViewer = AppBase.sgetGlGeometryViewer();
+				GlGeometryViewer glViewer = VFAppBase.sgetGlGeometryViewer();
 				glViewer.requestScreenShot(glViewer.getWidth(), glViewer.getHeight());
 				
 				final Thread screenshotWaiter = new ScreenshotWaiterThread();

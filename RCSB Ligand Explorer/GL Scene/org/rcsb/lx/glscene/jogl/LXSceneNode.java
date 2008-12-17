@@ -9,11 +9,7 @@ import javax.media.opengl.glu.GLU;
 
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.model.Interaction;
-import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.glscene.jogl.Constants;
-import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
+import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Fragment;
 import org.rcsb.mbt.model.Residue;
@@ -23,6 +19,10 @@ import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.util.DebugState;
+import org.rcsb.vf.glscene.jogl.Constants;
+import org.rcsb.vf.glscene.jogl.DisplayListRenderable;
+import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
+import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 
 import com.sun.opengl.util.GLUT;
 
@@ -401,7 +401,7 @@ public class LXSceneNode extends JoglSceneNode
 	 * I'm not sure why I have to do this - it's virtually identical to the base implementation,
 	 * with the exception that the base implementation is sensitized to BiologicUnit transformations.
 	 * 
-	 * I can turn those off with 'Appbase.setDisableGlobalTransformations(true)', which almost works,
+	 * I can turn those off with 'VFAppBase.setDisableGlobalTransformations(true)', which almost works,
 	 * but the colors don't come out right.
 	 * 
 	 * So, this seems to be as close as I can get it.  Not good, because there is a considerable amount
@@ -410,7 +410,7 @@ public class LXSceneNode extends JoglSceneNode
 	 * happening if I try to use the base version.
 	 * 
 	 * BIG NOTE: The atom radius scaling for protein atoms that appear during calculations is this
-	 * odd bit of code down in {@linkplain org.rcsb.mbt.glscene.jogl.AtomGeometry} that is sensitized
+	 * odd bit of code down in {@linkplain org.rcsb.vf.glscene.jogl.AtomGeometry} that is sensitized
 	 * specifically for LX.  It's pretty Mickey Mouse.  The real way to do this, I think, is to
 	 * create and register an AtomStyle for protein atoms, and switch it in when drawing those.
 	 * 
@@ -425,7 +425,7 @@ public class LXSceneNode extends JoglSceneNode
 		try {
 			gl.glPushMatrix();
 
-			final GlGeometryViewer glViewer = AppBase.sgetGlGeometryViewer();
+			final GlGeometryViewer glViewer = VFAppBase.sgetGlGeometryViewer();
 
 			if (nc_transform != null)
 			{
@@ -606,7 +606,7 @@ public class LXSceneNode extends JoglSceneNode
 	}
 
 	/**
-	 * @see org.rcsb.mbt.glscene.jogl.JoglSceneNode#drawTypeLabels(javax.media.opengl.GL, java.lang.Object, java.lang.Integer)
+	 * @see org.rcsb.vf.glscene.jogl.JoglSceneNode#drawTypeLabels(javax.media.opengl.GL, java.lang.Object, java.lang.Integer)
 	 */
 	@Override
 	protected void drawTypeLabels(GL gl, Object key, Integer label)

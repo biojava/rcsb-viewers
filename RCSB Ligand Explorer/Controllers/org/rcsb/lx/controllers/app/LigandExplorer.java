@@ -105,13 +105,13 @@ import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
 import org.rcsb.lx.glscene.jogl.LXSceneNode;
 import org.rcsb.lx.model.LXModel;
 import org.rcsb.lx.ui.LXDocumentFrame;
-import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.controllers.update.UpdateController;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 import org.rcsb.vf.controllers.app.VFAppBase;
+import org.rcsb.vf.controllers.scene.SceneController;
+import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
+import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
 
 
@@ -228,7 +228,7 @@ public class LigandExplorer extends VFAppBase
 		super.initialize(true);
 		
 		final String showAsymmetricUnitOnly = this.properties.getProperty("show_asymmetric_unit_only");
-		SceneController sceneController = activeFrame.getSceneController();
+		SceneController sceneController = ((LXDocumentFrame)activeFrame).getSceneController();
 		if (showAsymmetricUnitOnly != null && showAsymmetricUnitOnly.equals("true"))
 			sceneController.setShowAsymmetricUnitOnly(true);
 		

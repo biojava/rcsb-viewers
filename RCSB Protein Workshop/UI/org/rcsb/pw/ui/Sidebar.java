@@ -6,7 +6,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.rcsb.mbt.controllers.app.AppBase;
+import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.pw.ui.mutatorPanels.MutatorBasePanel;
 
 
@@ -39,7 +39,7 @@ public class Sidebar extends JPanel implements ChangeListener
         this.tools = new GlobalOptionsPanel();
         this.coloring = new ColoringOptions();
         this.credits = new CreditsPanel();
-        if(AppBase.sgetSceneController().isDebugEnabled()) {
+        if(VFAppBase.sgetSceneController().isDebugEnabled()) {
         	this.debug = new DebugTab();
         }
         
@@ -48,7 +48,7 @@ public class Sidebar extends JPanel implements ChangeListener
         this.tabs.addTab("Shortcuts", this.coloring);
         this.tabs.addTab("Options", this.tools);
         this.tabs.addTab("Help and Credits", this.credits);
-        if(AppBase.sgetSceneController().isDebugEnabled()) {
+        if(VFAppBase.sgetSceneController().isDebugEnabled()) {
         	this.tabs.addTab("Debug", this.debug);
         }
         //this.tabs.addTab("Debug", Debug.getPanel());
@@ -61,6 +61,6 @@ public class Sidebar extends JPanel implements ChangeListener
 
 	public void stateChanged(final ChangeEvent e) {
         // user has implicitly disabled this mode if it was enabled.
-		AppBase.sgetSceneController().setColorSelectorSampleModeEnabled(false);
+		VFAppBase.sgetSceneController().setColorSelectorSampleModeEnabled(false);
 	}
 }

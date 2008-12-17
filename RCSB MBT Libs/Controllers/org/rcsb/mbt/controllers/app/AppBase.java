@@ -6,10 +6,7 @@ import java.net.URL;
 import java.util.Properties;
 
 import org.rcsb.mbt.controllers.doc.DocController;
-import org.rcsb.mbt.controllers.scene.SceneController;
 import org.rcsb.mbt.controllers.update.UpdateController;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.util.DebugState;
 import org.rcsb.mbt.structLoader.StructureXMLHandler;
@@ -81,11 +78,9 @@ public abstract class AppBase
 		public abstract DocumentFrameBase createDocFrame(final String name, URL iconUrl);
 		public DocController createDocController() { return new DocController(); }
 		public UpdateController createUpdateController() { return new UpdateController(); }
-		public SceneController createSceneController() { return new SceneController(); }
 		public StructureModel createModel() { return new StructureModel(); }
-		public GlGeometryViewer createGlGeometryViewer() { return new GlGeometryViewer(); }
-		public JoglSceneNode createSceneNode() { return new JoglSceneNode(); }
 		public StructureXMLHandler createStructureXMLHandler(String dataset) { return new StructureXMLHandler(dataset); }
+		public Object createStructureMapUserData() { return null; }
 
 	}
 
@@ -109,8 +104,6 @@ public abstract class AppBase
 	public static DocumentFrameBase sgetActiveFrame() { return _theJApp.activeFrame; }
 	public static UpdateController sgetUpdateController() { return sgetActiveFrame().getUpdateController(); }
 	public static DocController sgetDocController() { return sgetActiveFrame().getDocController(); }
-	public static SceneController sgetSceneController() { return sgetActiveFrame().getSceneController(); }
-	public static GlGeometryViewer sgetGlGeometryViewer() { return sgetActiveFrame().getGlGeometryViewer(); }
 	public static StructureModel sgetModel() { return sgetActiveFrame().getModel(); }
 	public DocumentFrameBase getActiveFrame() { return activeFrame; }
 
@@ -172,6 +165,8 @@ public abstract class AppBase
 			{
 				if (args[i].equals("-debug"))
 					DebugState.setDebugState(true);
+				else if (args[i].equals("-treat_models_as_subunits"))
+					properties.setProperty("treat_models_as_subunits", "true");
 			}
 		
 		_theJApp = this;

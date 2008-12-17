@@ -8,10 +8,6 @@ import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
 import org.rcsb.lx.glscene.jogl.LXSceneNode;
 import org.rcsb.lx.model.InteractionConstants;
-import org.rcsb.mbt.glscene.jogl.AtomGeometry;
-import org.rcsb.mbt.glscene.jogl.BondGeometry;
-import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
-import org.rcsb.mbt.glscene.jogl.GlGeometryViewer;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
@@ -21,6 +17,10 @@ import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
+import org.rcsb.vf.glscene.jogl.AtomGeometry;
+import org.rcsb.vf.glscene.jogl.BondGeometry;
+import org.rcsb.vf.glscene.jogl.DisplayListRenderable;
+import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 
 /*
  * Calculates the interactions between the ligand and the protein.

@@ -2,9 +2,6 @@ package org.rcsb.pw.controllers.scene.mutators;
 
 import java.util.Vector;
 
-import org.rcsb.mbt.glscene.jogl.CustomAtomLabel;
-import org.rcsb.mbt.glscene.jogl.DisplayListRenderable;
-import org.rcsb.mbt.glscene.jogl.JoglSceneNode;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -19,6 +16,9 @@ import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.IAtomLabel;
 import org.rcsb.pw.controllers.scene.mutators.options.LabelsOptions;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
+import org.rcsb.vf.glscene.jogl.CustomAtomLabel;
+import org.rcsb.vf.glscene.jogl.DisplayListRenderable;
+import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 
 
 

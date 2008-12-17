@@ -7,9 +7,9 @@ import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
-import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.controllers.update.IUpdateListener;
 import org.rcsb.mbt.controllers.update.UpdateEvent;
+import org.rcsb.vf.controllers.app.VFAppBase;
 
 
 public class MiscellaneousConvenienceOptionsPanel extends JPanel implements IUpdateListener
@@ -33,12 +33,12 @@ public class MiscellaneousConvenienceOptionsPanel extends JPanel implements IUpd
         this.autoRotateBox.addActionListener(new ActionListener() {
 
 			public void actionPerformed(final ActionEvent e) {
-				AppBase.sgetSceneController().setAutoRotateEnabled(((JCheckBox)e.getSource()).isSelected());
+				VFAppBase.sgetSceneController().setAutoRotateEnabled(((JCheckBox)e.getSource()).isSelected());
 			}
         	
         });
         
-        AppBase.sgetUpdateController().registerListener(this);
+        VFAppBase.sgetUpdateController().registerListener(this);
 	}
 	
 	public void reset() {
