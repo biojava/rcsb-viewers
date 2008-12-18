@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
 Main-Class: org.rcsb.pw.controllers.app.ProteinWorkshop
-Class-Path: ../RCSBSupport/RCSB-ViewerFramework.jar ../RCSBSupport/RCSB-MBT-Controllers.jar ../RCSBSupport/RCSB-MBT-GLScene.jar ../RCSBSupport/RCSB-MBT-StructureModel.jar ../RCSBSupport/RCSB-MBT-StructureLoader.jar ../RCSBSupport/RCSB-MBT-UI.jar ../3rdParty/jai_codec.jar ../3rdParty/jai_core.jar ../3rdParty/gluegen-rt.jar ../3rdParty/jogl.jar ../3rdParty/vecmath.jar
+Class-Path: ../RCSBSupport/RCSB-MBT.jar ../RCSBSupport/RCSB-UIAppFramework.jar ../RCSBSupport/RCSB-ViewerFramework.jar ../3rdParty/jai_codec.jar ../3rdParty/jai_core.jar ../3rdParty/gluegen-rt.jar ../3rdParty/jogl.jar ../3rdParty/vecmath.jar

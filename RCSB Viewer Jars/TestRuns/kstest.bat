@@ -1,2 +1,3 @@
 call setargs.bat
-java %PATHARGS% -jar ../RCSBKiosk/RCSB-Kiosk.jar -show_asymmetric_unit_only
+rem call debugargs.bat
+java %DEBUGARGS% %PATHARGS% -jar ../RCSBKiosk/RCSB-Kiosk.jar -show_asymmetric_unit_only
