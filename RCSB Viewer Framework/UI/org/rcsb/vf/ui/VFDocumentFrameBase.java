@@ -7,9 +7,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
-import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.doc.LoadThread;
-import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
+import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.uiApp.controllers.doc.LoadThread;
+import org.rcsb.uiApp.ui.mainframe.DocumentFrameBase;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.controllers.doc.VFDocController;
 import org.rcsb.vf.controllers.scene.SceneController;

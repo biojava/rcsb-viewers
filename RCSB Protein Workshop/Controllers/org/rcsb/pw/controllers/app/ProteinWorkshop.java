@@ -4,10 +4,10 @@ package org.rcsb.pw.controllers.app;
 import java.net.URL;
 
 import org.rcsb.mbt.model.StructureModel;
-import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 import org.rcsb.pw.controllers.scene.PWSceneController;
 import org.rcsb.pw.glscene.jogl.PWGlGeometryViewer;
 import org.rcsb.pw.ui.PWDocumentFrame;
+import org.rcsb.uiApp.ui.mainframe.DocumentFrameBase;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.controllers.scene.SceneController;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;

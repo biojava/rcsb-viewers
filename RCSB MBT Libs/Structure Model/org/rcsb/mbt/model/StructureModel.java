@@ -102,30 +102,18 @@ package org.rcsb.mbt.model;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.update.UpdateController;
-import org.rcsb.mbt.controllers.update.UpdateEvent;
-
 
 /**
  *  This class implements the top-level container for one or more
  *  Structures.
  *  
- *  When a Structure object is added or removed from a StructureDocument,
- *  each registered Viewer will automatically receive a StructureDocumentEvent
- *  telling the Viewer that a given Structure was added (or removed as the case
- *  may be). It is then the responsibility of the Viewer to use the
- *  Structure object reference to display a suitable visual representation
- *  (often this entails getting the StructureMap and then the StructureStyles
- *  object in order to display a representation using the defined colors
- *  and other visual display properties).
  *  <P>
  *  <center>
  *  <img src="doc-files/StructureDocument.jpg" border=0></a>
  *  </center>
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.controllers.update.UpdateEvent
+ *  @see	org.rcsb.uiApp.controllers.update.UpdateEvent
  *  @see	org.rcsb.mbt.model.attributes.StructureStyles
  *  @see	org.rcsb.mbt.model.StructureMap
  *  @see	org.rcsb.mbt.model.Structure
@@ -142,7 +130,7 @@ public class StructureModel
 	@SuppressWarnings("serial")
 	public class StructureList extends ArrayList<Structure>{};
 	
-	private StructureList structures = new StructureList();
+	protected StructureList structures = new StructureList();
 	public synchronized StructureList getStructures() { return structures; }
 	
 	/**
@@ -165,24 +153,14 @@ public class StructureModel
 		}
 
 		this.structures.add( structure );
-
-		UpdateController update = AppBase.sgetUpdateController();
-		update.fireUpdateViewEvent(UpdateEvent.Action.STRUCTURE_ADDED, structure);
 	}
 	
 	public synchronized void setStructures(Structure[] structure_array)
 	{
 		if (structure_array != null)
 		{
-			UpdateController update = AppBase.sgetUpdateController();
-			
 			for (Structure struc : structure_array)
-			{
 			   this.structures.add(struc);
-			   update.fireUpdateViewEvent(UpdateEvent.Action.STRUCTURE_ADDED, struc);
-			}
-			
-			update.fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE);
 		}
 	}
 
@@ -200,9 +178,6 @@ public class StructureModel
 			throw new IllegalArgumentException( "structure not found" );
 		}
 		
-		UpdateController update = AppBase.sgetUpdateController();
-		update.fireUpdateViewEvent(UpdateEvent.Action.STRUCTURE_REMOVED, structure);
-
 		this.structures.remove( structure );
 	}
 

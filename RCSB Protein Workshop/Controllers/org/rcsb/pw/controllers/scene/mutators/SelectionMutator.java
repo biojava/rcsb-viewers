@@ -1,6 +1,5 @@
 package org.rcsb.pw.controllers.scene.mutators;
 
-import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -10,6 +9,7 @@ import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.StructureStyles;
+import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 
 

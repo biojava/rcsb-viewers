@@ -1,7 +1,7 @@
 package org.rcsb.pw.ui;
 
-import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.ui.dialogs.ColorChooserDialog;
+import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.uiApp.ui.dialogs.ColorChooserDialog;
 
 
 public class CommonDialogs {

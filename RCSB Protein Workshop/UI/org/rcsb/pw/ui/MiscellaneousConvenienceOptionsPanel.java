@@ -7,8 +7,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
-import org.rcsb.mbt.controllers.update.IUpdateListener;
-import org.rcsb.mbt.controllers.update.UpdateEvent;
+import org.rcsb.uiApp.controllers.update.IUpdateListener;
+import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.vf.controllers.app.VFAppBase;
 
 

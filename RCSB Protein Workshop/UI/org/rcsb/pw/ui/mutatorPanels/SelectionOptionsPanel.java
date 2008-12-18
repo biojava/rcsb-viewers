@@ -7,10 +7,10 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.update.IUpdateListener;
-import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.pw.ui.FullWidthBoxLayout;
+import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.uiApp.controllers.update.IUpdateListener;
+import org.rcsb.uiApp.controllers.update.UpdateEvent;
 
 
 public class SelectionOptionsPanel extends JPanel implements IUpdateListener, ActionListener

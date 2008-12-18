@@ -5,9 +5,11 @@ import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
+import org.rcsb.mbt.model.util.IResidueNameModifier;
+import org.rcsb.uiApp.model.UIAppStructureModel;
 
 
-public class LXModel extends StructureModel
+public class LXModel extends UIAppStructureModel implements IResidueNameModifier
 {
 	private String initialLigand = null;	
 	private final InteractionMap interactionMap = new InteractionMap();
@@ -113,9 +115,6 @@ public class LXModel extends StructureModel
 		this.contactMap = contactMap;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.sdsc.mbt.Model#getModifiedResidueName(edu.sdsc.mbt.Residue)
-	 */
 	@Override
 	public String getModifiedResidueName(Residue residue)
 	{

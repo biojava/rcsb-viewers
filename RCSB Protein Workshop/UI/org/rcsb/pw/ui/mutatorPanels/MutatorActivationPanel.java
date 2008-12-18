@@ -13,10 +13,10 @@ import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.update.IUpdateListener;
-import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
+import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.uiApp.controllers.update.IUpdateListener;
+import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 
 

@@ -15,5 +15,6 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="3rd Party Libs/jogl/jnilibs"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/RCSB UIApp Framework"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

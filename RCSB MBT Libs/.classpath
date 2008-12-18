@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="org/rcsb/mbt/model/WaterChain.java|org/rcsb/mbt/model/MiscellaneousMoleculeChain.java" kind="src" path="Structure Model"/>
-	<classpathentry excluding="edu/sdsc/mbt/ui/views/SequenceViewer.java|edu/sdsc/mbt/ui/views/SequenceViewerPanel.java|org/rcsb/mbt/ui/views/SequenceViewer.java|org/rcsb/mbt/ui/views/SequenceViewerPanel.java" kind="src" path="UI"/>
-	<classpathentry excluding="org/rcsb/mbt/glscene/jogl/GLTransformationMatrix.java|org/rcsb/mbt/glscene/geometry/Matrixd.java|org/rcsb/mbt/glscene/geometry/MaxDimMatrixd.java|org/rcsb/mbt/glscene/geometry/MaxDimVectord.java|org/rcsb/mbt/glscene/geometry/Pointd.java|org/rcsb/mbt/glscene/geometry/Vectord.java" kind="src" path="GL Scene"/>
-	<classpathentry kind="src" path="Controllers"/>
 	<classpathentry kind="src" path="Structure Loader"/>
 	<classpathentry kind="src" path="UnitTests"/>
 	<classpathentry kind="src" path="Demos"/>

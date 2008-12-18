@@ -2,8 +2,8 @@ package org.rcsb.sv.controllers.app;
 
 import java.net.URL;
 
-import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 import org.rcsb.sv.ui.SVDocumentFrame;
+import org.rcsb.uiApp.ui.mainframe.DocumentFrameBase;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
@@ -44,14 +44,7 @@ public class SimpleViewer extends VFAppBase
 	@Override
 	public SVDocumentFrame getActiveFrame() { return (SVDocumentFrame)super.getActiveFrame(); }
 	public static SVDocumentFrame sgetActiveFrame() { return getApp().getActiveFrame(); }
-	
-	/**
-	 * Temporary hack - tell the subsystem what the current app is.
-	 * 
-	 * @return
-	 */
-	@Override
-	public boolean isSimpleViewer() { return true; }
+
 	
 	/**
 	 * Constructor

@@ -22,8 +22,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.rcsb.uiApp.controllers.doc.DocController;
 import org.rcsb.vf.controllers.app.VFAppBase;
-import org.rcsb.mbt.controllers.doc.DocController;
 import org.rcsb.mbt.model.util.Status;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.vf.controllers.scene.SceneState;

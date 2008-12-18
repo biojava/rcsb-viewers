@@ -7,7 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 
-import org.rcsb.mbt.controllers.app.AppBase;
+import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 

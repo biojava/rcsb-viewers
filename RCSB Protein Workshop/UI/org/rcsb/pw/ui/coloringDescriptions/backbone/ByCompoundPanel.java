@@ -11,10 +11,10 @@ import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.attributes.ResidueColorByResidueCompound;
-import org.rcsb.mbt.ui.dialogs.ColorChooserDialog;
 import org.rcsb.pw.ui.DescriptionPanel;
+import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.uiApp.ui.dialogs.ColorChooserDialog;
 
 
 

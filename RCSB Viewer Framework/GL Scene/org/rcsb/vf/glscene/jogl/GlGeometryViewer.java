@@ -72,9 +72,6 @@ import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
 import javax.swing.JPanel;
 
-import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.update.IUpdateListener;
-import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -94,8 +91,12 @@ import org.rcsb.mbt.model.attributes.StructureStylesEvent;
 import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.util.DebugState;
+import org.rcsb.mbt.model.util.ExternReferences;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.mbt.model.util.Status;
+import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.uiApp.controllers.update.IUpdateListener;
+import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.controllers.scene.SceneController;
 import org.rcsb.vf.glscene.jogl.ChainGeometry.RibbonForm;
@@ -1114,7 +1115,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			// This is necessary for the simple viewer and protein workshop viewers' manipulation.
 			// -- not the ligand explorer (which handles it differently, somehow.)
 			//
-			if (!AppBase.getApp().isLigandExplorer())
+			if (!ExternReferences.isLigandExplorer())
 				glu.gluLookAt(this.viewEye[0], this.viewEye[1], this.viewEye[2],
 					this.viewCenter[0], this.viewCenter[1], this.viewCenter[2],
 					this.viewUp[0], this.viewUp[1], this.viewUp[2]);
@@ -2121,7 +2122,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		 * So, this would be better controlled by an invocation flag but, since it's a prescribed
 		 * interface, we have to rely on the application hack.
 		 */
-		if (!AppBase.getApp().isLigandExplorer())
+		if (!ExternReferences.isLigandExplorer())
 		{
 			AppBase.sgetModel().clear();
 			this.requestRepaint();

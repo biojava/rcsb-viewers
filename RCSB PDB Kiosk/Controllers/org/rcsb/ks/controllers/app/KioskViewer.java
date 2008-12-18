@@ -69,10 +69,10 @@ import org.rcsb.ks.controllers.doc.KSDocController;
 import org.rcsb.ks.controllers.doc.KSStructureXMLHandler;
 import org.rcsb.ks.glscene.jogl.KSGlGeometryViewer;
 import org.rcsb.ks.ui.KSDocumentFrame;
+import org.rcsb.uiApp.controllers.doc.DocController;
+import org.rcsb.uiApp.ui.mainframe.DocumentFrameBase;
 import org.rcsb.vf.controllers.app.VFAppBase;
-import org.rcsb.mbt.controllers.doc.DocController;
 import org.rcsb.mbt.structLoader.StructureXMLHandler;
-import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 

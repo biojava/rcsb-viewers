@@ -15,17 +15,17 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.update.IUpdateListener;
-import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.model.LineSegment;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.attributes.LineStyle;
-import org.rcsb.mbt.ui.dialogs.ColorChooserDialog;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.MutatorEnum;
 import org.rcsb.pw.ui.CommonDialogs;
 import org.rcsb.pw.ui.FullWidthBoxLayout;
+import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.uiApp.controllers.update.IUpdateListener;
+import org.rcsb.uiApp.controllers.update.UpdateEvent;
+import org.rcsb.uiApp.ui.dialogs.ColorChooserDialog;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 

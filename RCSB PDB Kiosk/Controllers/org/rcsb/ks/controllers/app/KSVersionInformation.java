@@ -1,6 +1,6 @@
 package org.rcsb.ks.controllers.app;
 
-import org.rcsb.mbt.controllers.app.VersionInformation;
+import org.rcsb.uiApp.controllers.app.VersionInformation;
 
 public class KSVersionInformation extends VersionInformation
 {

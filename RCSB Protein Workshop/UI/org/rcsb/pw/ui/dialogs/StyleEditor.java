@@ -107,10 +107,10 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.*;
+import org.rcsb.uiApp.controllers.app.AppBase;
 
 /**
  *  This class implements a GUI for editing StructureStyle styles

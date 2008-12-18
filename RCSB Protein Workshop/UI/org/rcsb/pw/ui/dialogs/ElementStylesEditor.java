@@ -86,11 +86,11 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.attributes.*;
 import org.rcsb.mbt.model.util.*;
-import org.rcsb.mbt.ui.dialogs.ColorChooserDialog;
+import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.uiApp.ui.dialogs.ColorChooserDialog;
 
 
 /**

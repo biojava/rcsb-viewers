@@ -94,9 +94,9 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.net.URL;
 
-import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.doc.DocController;
-import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
+import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.uiApp.controllers.doc.DocController;
+import org.rcsb.uiApp.ui.mainframe.DocumentFrameBase;
 import org.rcsb.vf.controllers.doc.VFDocController;
 import org.rcsb.vf.controllers.scene.SceneController;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;

@@ -73,10 +73,10 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.attributes.*;
-import org.rcsb.mbt.ui.dialogs.InterpolatedColorMapEditor;
+import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.uiApp.ui.dialogs.InterpolatedColorMapEditor;
 
 // MBT
 
@@ -101,7 +101,7 @@ import org.rcsb.mbt.ui.dialogs.InterpolatedColorMapEditor;
  *
  *  @author	David R. Nadeau / UCSD
  *  @see	org.rcsb.mbt.model.attributes.InterpolatedColorMap
- *  @see	org.rcsb.mbt.ui.dialogs.InterpolatedColorMapEditor
+ *  @see	org.rcsb.uiApp.ui.dialogs.InterpolatedColorMapEditor
  */
 public class ColorMapDialog
 	extends JDialog

@@ -1,6 +1,6 @@
 package org.rcsb.lx.controllers.app;
 
-import org.rcsb.mbt.controllers.app.VersionInformation;
+import org.rcsb.uiApp.controllers.app.VersionInformation;
 
 public class LXVersionInformation extends VersionInformation
 {

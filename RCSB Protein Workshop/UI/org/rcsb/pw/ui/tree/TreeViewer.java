@@ -147,9 +147,6 @@ import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.update.IUpdateListener;
-import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -166,6 +163,9 @@ import org.rcsb.mbt.model.attributes.StructureStylesEvent;
 import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
+import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.uiApp.controllers.update.IUpdateListener;
+import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 
@@ -175,8 +175,8 @@ import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
  * <P>
  * 
  * @author John L. Moreland
- * @see org.rcsb.mbt.controllers.update.IUpdateListener
- * @see org.rcsb.mbt.controllers.update.UpdateEvent
+ * @see org.rcsb.uiApp.controllers.update.IUpdateListener
+ * @see org.rcsb.uiApp.controllers.update.UpdateEvent
  */
 public class TreeViewer extends JPanel implements IUpdateListener,
 		TreeSelectionListener, IStructureStylesEventListener, MouseListener

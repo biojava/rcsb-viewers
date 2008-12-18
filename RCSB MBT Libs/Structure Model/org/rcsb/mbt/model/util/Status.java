@@ -165,7 +165,7 @@ public class Status
 	
 	private static String lastMessage = "";
 	public static String getLastMessage() { return lastMessage; }
-
+	
 	/**
 	 * A Vector of human-readable level names corresponding to level numbers.
 	 */

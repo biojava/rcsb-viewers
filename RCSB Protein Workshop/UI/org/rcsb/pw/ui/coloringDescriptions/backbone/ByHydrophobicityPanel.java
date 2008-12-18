@@ -6,11 +6,11 @@ import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 
-import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.attributes.InterpolatedColorMap;
 import org.rcsb.mbt.model.attributes.ResidueColorByHydrophobicity;
 import org.rcsb.pw.ui.DescriptionPanel;
 import org.rcsb.pw.ui.dialogs.ColorMapDialog;
+import org.rcsb.uiApp.controllers.app.AppBase;
 
 
 

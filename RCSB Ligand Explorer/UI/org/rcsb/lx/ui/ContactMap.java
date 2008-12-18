@@ -16,9 +16,9 @@ import javax.swing.ScrollPaneConstants;
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.controllers.update.LXUpdateEvent;
 import org.rcsb.lx.model.LXModel;
-import org.rcsb.mbt.controllers.update.IUpdateListener;
-import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.model.Structure;
+import org.rcsb.uiApp.controllers.update.IUpdateListener;
+import org.rcsb.uiApp.controllers.update.UpdateEvent;
 
 
 

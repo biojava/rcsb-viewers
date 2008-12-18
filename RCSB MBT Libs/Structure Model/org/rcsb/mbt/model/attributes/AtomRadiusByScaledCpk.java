@@ -81,14 +81,16 @@
 package org.rcsb.mbt.model.attributes;
 
 
-import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.attributes.ElementStyles;
 import org.rcsb.mbt.model.attributes.IAtomRadius;
 import org.rcsb.mbt.model.util.AminoAcidInfo;
 import org.rcsb.mbt.model.util.Element;
+import org.rcsb.mbt.model.util.ExternReferences;
 import org.rcsb.mbt.model.util.PeriodicTable;
+import org.rcsb.mbt.model.util.Status;
+
 
 
 
@@ -150,7 +152,7 @@ public class AtomRadiusByScaledCpk
 		 * 
 		 * rickb - 23-May-08
 		 */
-		if (AppBase.getApp().isLigandExplorer())
+		if (ExternReferences.isLigandExplorer())
 		{
 			final boolean isAminoAcid =
 				atom.getStructure().getStructureMap().getResidue(atom).getClassification() == Residue.Classification.AMINO_ACID;

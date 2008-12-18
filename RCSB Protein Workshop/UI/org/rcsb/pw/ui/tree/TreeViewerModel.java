@@ -77,7 +77,6 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Fragment;
@@ -88,13 +87,14 @@ import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+import org.rcsb.uiApp.controllers.app.AppBase;
 
 /**
  *  This class impements a custom TreeModel for the TreeViewer class.
  *  <P>
  *  @author	John L. Moreland
- *  @see	org.rcsb.mbt.controllers.update.IUpdateListener
- *  @see	org.rcsb.mbt.controllers.update.UpdateEvent
+ *  @see	org.rcsb.uiApp.controllers.update.IUpdateListener
+ *  @see	org.rcsb.uiApp.controllers.update.UpdateEvent
  */
 public class TreeViewerModel
 	implements TreeModel

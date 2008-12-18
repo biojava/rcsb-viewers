@@ -5,13 +5,13 @@ import java.io.File;
 
 import javax.swing.SwingUtilities;
 
-import org.rcsb.mbt.controllers.app.AppBase;
-import org.rcsb.mbt.controllers.doc.DocController;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
 import org.rcsb.mbt.model.util.Status;
-import org.rcsb.mbt.ui.dialogs.ImageFileManager;
+import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.uiApp.controllers.doc.DocController;
+import org.rcsb.uiApp.ui.dialogs.ImageFileManager;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.controllers.scene.SceneController;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;

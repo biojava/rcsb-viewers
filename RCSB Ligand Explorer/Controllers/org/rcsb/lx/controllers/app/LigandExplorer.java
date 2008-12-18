@@ -105,9 +105,10 @@ import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
 import org.rcsb.lx.glscene.jogl.LXSceneNode;
 import org.rcsb.lx.model.LXModel;
 import org.rcsb.lx.ui.LXDocumentFrame;
-import org.rcsb.mbt.controllers.update.UpdateController;
 import org.rcsb.mbt.model.StructureModel;
-import org.rcsb.mbt.ui.mainframe.DocumentFrameBase;
+import org.rcsb.mbt.model.util.ExternReferences;
+import org.rcsb.uiApp.controllers.update.UpdateController;
+import org.rcsb.uiApp.ui.mainframe.DocumentFrameBase;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.controllers.scene.SceneController;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
@@ -161,7 +162,10 @@ public class LigandExplorer extends VFAppBase
 		@Override
 		public StructureModel createModel()
 		{
-			return new LXModel();
+			LXModel model = new LXModel();
+			ExternReferences.registerResidueNameModifier(model);
+							// make sure this is registered as soon as it is created.
+			return model;
 		}
 
 
@@ -201,14 +205,6 @@ public class LigandExplorer extends VFAppBase
 	public String toString() { return "SDSC Ligand Explorer"; }
 	
 	/**
-	 * Temporary hack - indicate to the subsystems the app.
-	 * 
-	 * @return
-	 */
-	@Override
-	public boolean isLigandExplorer() { return true; }
-
-	/**
 	 * Constructor
 	 * 
 	 * @param args - argument list from the main() caller.
@@ -216,6 +212,7 @@ public class LigandExplorer extends VFAppBase
 	public LigandExplorer(final String[] args)
 	{
 		super(args);
+		ExternReferences.setIsLigandExplorer();
 	}
 
 	@Override

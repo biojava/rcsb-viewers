@@ -74,7 +74,7 @@ import org.rcsb.mbt.model.Atom;
  *  <P>
  *  @author	John L. Moreland
  *  @see	org.rcsb.mbt.model.StructureModel
- *  @see	org.rcsb.mbt.controllers.update.IUpdateListener
+ *  @see	org.rcsb.uiApp.controllers.update.IUpdateListener
  */
 public interface IAtomColor
 {

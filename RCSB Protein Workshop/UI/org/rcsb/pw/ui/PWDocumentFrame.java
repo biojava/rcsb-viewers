@@ -16,12 +16,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
+import org.rcsb.uiApp.controllers.update.UpdateEvent;
+import org.rcsb.uiApp.ui.mainframe.UIBuilder;
 import org.rcsb.vf.controllers.app.VFAppBase;
-import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.util.Status;
-import org.rcsb.mbt.ui.mainframe.UIBuilder;
 import org.rcsb.pw.controllers.app.PWVersionInformation;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.PWSceneController;

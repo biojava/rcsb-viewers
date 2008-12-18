@@ -5,7 +5,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JMenuItem;
 
-import org.rcsb.mbt.ui.mainframe.UIBuilder;
+import org.rcsb.uiApp.ui.mainframe.UIBuilder;
 import org.rcsb.vf.controllers.app.VFAppBase;
 
 public class VFUIBuilder extends UIBuilder

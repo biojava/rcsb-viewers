@@ -68,7 +68,7 @@ package org.rcsb.mbt.model.attributes;
  *  <P>
  *  @author	John L. Moreland
  *  @see	org.rcsb.mbt.model.StructureModel
- *  @see	org.rcsb.mbt.controllers.update.IUpdateListener
+ *  @see	org.rcsb.uiApp.controllers.update.IUpdateListener
  */
 public interface IColorMap
 {

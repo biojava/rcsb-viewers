@@ -2,9 +2,9 @@ package org.rcsb.lx.controllers.update;
 
 import org.rcsb.lx.controllers.app.LXVersionInformation;
 import org.rcsb.lx.controllers.app.LigandExplorer;
-import org.rcsb.mbt.controllers.update.UpdateController;
-import org.rcsb.mbt.controllers.update.UpdateEvent;
 import org.rcsb.mbt.model.Structure;
+import org.rcsb.uiApp.controllers.update.UpdateController;
+import org.rcsb.uiApp.controllers.update.UpdateEvent;
 
 
 /**

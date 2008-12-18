@@ -3,12 +3,12 @@ package org.rcsb.vf.glscene.jogl;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
-import org.rcsb.mbt.controllers.app.AppBase;
 import javax.vecmath.Point3d;
 import org.rcsb.mbt.model.LineSegment;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.attributes.LineStyle;
 import org.rcsb.mbt.model.attributes.Style;
+import org.rcsb.uiApp.controllers.app.AppBase;
 
 
 import com.sun.opengl.util.GLUT;

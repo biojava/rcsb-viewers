@@ -123,7 +123,6 @@ package org.rcsb.mbt.model;
 
 import java.util.*;
 
-import org.rcsb.mbt.controllers.app.AppBase;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.util.*;
 
@@ -666,7 +665,7 @@ public class Residue
 	@Override
 	public String toString()
 	{
-		return AppBase.sgetModel().getModifiedResidueName(this);
+		return ExternReferences.getModifiedResidueName(this);
 	}
 
 }
