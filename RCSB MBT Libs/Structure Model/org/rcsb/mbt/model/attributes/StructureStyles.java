@@ -1,193 +1,48 @@
-//  $Id: StructureStyles.java,v 1.1 2007/02/08 02:38:51 jbeaver Exp $
-//
-//  Copyright 2000-2004 The Regents of the University of California.
-//  All Rights Reserved.
-//
-//  Permission to use, copy, modify and distribute any part of this
-//  Molecular Biology Toolkit (MBT)
-//  for educational, research and non-profit purposes, without fee, and without
-//  a written agreement is hereby granted, provided that the above copyright
-//  notice, this paragraph and the following three paragraphs appear in all
-//  copies.
-//
-//  Those desiring to incorporate this MBT into commercial products
-//  or use for commercial purposes should contact the Technology Transfer &
-//  Intellectual Property Services, University of California, San Diego, 9500
-//  Gilman Drive, Mail Code 0910, La Jolla, CA 92093-0910, Ph: (858) 534-5815,
-//  FAX: (858) 534-7345, E-MAIL:invent@ucsd.edu.
-//
-//  IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR
-//  DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING
-//  LOST PROFITS, ARISING OUT OF THE USE OF THIS MBT, EVEN IF THE
-//  UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-//  THE MBT PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND THE
-//  UNIVERSITY OF CALIFORNIA HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
-//  UPDATES, ENHANCEMENTS, OR MODIFICATIONS. THE UNIVERSITY OF CALIFORNIA MAKES
-//  NO REPRESENTATIONS AND EXTENDS NO WARRANTIES OF ANY KIND, EITHER IMPLIED OR
-//  EXPRESS, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-//  MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, OR THAT THE USE OF THE
-//  MBT WILL NOT INFRINGE ANY PATENT, TRADEMARK OR OTHER RIGHTS.
-//
-//  For further information, please see:  http://mbt.sdsc.edu
-//
-//  History:
-//  $Log: StructureStyles.java,v $
-//  Revision 1.1  2007/02/08 02:38:51  jbeaver
-//  version 1.50
-//
-//  Revision 1.1  2006/09/20 16:50:42  jbeaver
-//  first commit - branched from ProteinWorkshop
-//
-//  Revision 1.1  2006/08/24 17:39:02  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.2  2006/05/26 15:28:47  jbeaver
-//  removed errors in source
-//
-//  Revision 1.1  2006/03/09 00:18:55  jbeaver
-//  Initial commit
-//
-//  Revision 1.38  2005/11/08 20:58:33  moreland
-//  Switched style code to new StructureStyles API.
-//
-//  Revision 1.37  2004/08/16 16:33:27  moreland
-//  Added getBondVisibility(Bond) utility method.
-//  Now allow color array to be 3 or 4 elements long (allows for alpha values).
-//
-//  Revision 1.36  2004/06/23 23:08:30  moreland
-//  When atomVisibility is null, just return from setAtomSelection.
-//
-//  Revision 1.35  2004/06/23 22:53:51  moreland
-//  Greatly simplified and optimized showVisibleAtomBonds implementation.
-//  Added "setAtomVisibility" method variant that takes an Atom as an argument.
-//
-//  Revision 1.34  2004/06/23 01:09:14  moreland
-//  Changed default atomCount cut-off for showing all Atoms from 100 to 20.
-//
-//  Revision 1.33  2004/06/18 17:55:39  moreland
-//  All uses of InterpolatedColorMap are now non-static.
-//
-//  Revision 1.32  2004/06/07 16:28:57  moreland
-//  Added "getChainSelection( Chain )" method.
-//
-//  Revision 1.31  2004/06/07 16:26:17  moreland
-//  Added "setChainSelection( Chain, boolean )" utility method.
-//
-//  Revision 1.30  2004/05/20 22:00:42  moreland
-//  Make all atoms for "small" molecules visible.
-//
-//  Revision 1.29  2004/05/13 17:35:55  moreland
-//  Improved handling of zero length chain and fragment record conditions.
-//
-//  Revision 1.28  2004/05/11 23:01:39  moreland
-//  Added the atomIndex variant of the setAtomColor method.
-//
-//  Revision 1.27  2004/05/10 17:59:57  moreland
-//  Added support for alternate location identifier (atom occupancy < 1.0).
-//
-//  Revision 1.26  2004/05/05 17:22:44  moreland
-//  Added set/getSkipWater methods to effect showLigandAtoms behavior for "HOH".
-//
-//  Revision 1.25  2004/04/09 00:12:54  moreland
-//  Updated copyright to new UCSD wording.
-//
-//  Revision 1.24  2004/02/04 21:41:02  moreland
-//  Added setResidueSelection utility method that takes a Residue object argument.
-//
-//  Revision 1.23  2004/01/30 22:47:58  moreland
-//  Added more detail descriptions for the class block comment.
-//
-//  Revision 1.22  2004/01/30 21:24:00  moreland
-//  Added new diagrams.
-//
-//  Revision 1.21  2004/01/29 17:53:42  moreland
-//  Updated copyright and class comment block.
-//
-//  Revision 1.20  2004/01/21 16:06:29  moreland
-//  Disabled FragmentForm code while support infrastructure is developed.
-//
-//  Revision 1.19  2004/01/21 16:03:29  moreland
-//  Temporarily removed bulk style code (oops, it slipped in with another update).
-//
-//  Revision 1.18  2004/01/15 17:14:42  moreland
-//  Removed debug print statement.
-//
-//  Revision 1.17  2003/12/22 03:28:41  moreland
-//  Added renderingQuality attributes and get/set methods.
-//  Optimized the "selection sensitive" set methods to use RangeMap ranges.
-//
-//  Revision 1.16  2003/12/20 01:24:55  moreland
-//  Added fragmentVisibility and fragmentStyle RangeMaps.
-//  Added showFragments method and a call to it at initialization time.
-//  Added methods atomsAreSelected, bondsAreSelected, residuesAreSelected,
-//  and fragmentsAreSelected.
-//  Fixed bug in getFragmentSelection which was using the wrong indexes.
-//  Added selection-aware utility methods for setting attibutes: setBondColor,
-//  setAtomVisibility, setBondVisibility, setFragmentVisibility, setAtomColor,
-//  setAtomLabel, setAtomRadius, and setResidueColor.
-//  Added basic setFragmentVisibility, getFragmentVisibility, and
-//  setChainVisibility methods.
-//  Added getStructureSelection method.
-//  Added showFragments method.
-//
-//  Revision 1.15  2003/12/16 21:43:14  moreland
-//  Added atom label support.
-//
-//  Revision 1.14  2003/12/12 21:12:24  moreland
-//  Added "update color" methods.
-//
-//  Revision 1.13  2003/12/09 21:21:42  moreland
-//  Now throws an IllegalArgumentException if the StructureMap argument to the
-//  constructor is null.
-//
-//  Revision 1.12  2003/12/08 21:32:18  moreland
-//  Made some minor formatting changes.
-//
-//  Revision 1.11  2003/11/22 00:15:06  moreland
-//  Fixed logic in getChainSelection method which was generally returning true.
-//
-//  Revision 1.10  2003/11/20 22:34:32  moreland
-//  Added Fragment selection code (needs to be tested).
-//
-//  Revision 1.9  2003/09/18 20:35:20  moreland
-//  The setResidueSelection selects the bonds that are part of each residue.
-//
-//  Revision 1.8  2003/07/17 23:31:08  moreland
-//  Added showVisibleAtomBonds method.
-//
-//  Revision 1.7  2003/07/17 19:44:43  moreland
-//  Fleshed out and cleaned up Bond color and form style handling.
-//  Generally improved all event propagation code.
-//
-//  Revision 1.6  2003/07/15 21:44:55  moreland
-//  Partial implementation of Bond style code.
-//
-//  Revision 1.5  2003/04/30 17:58:41  moreland
-//  Added showNucleicAcidAtoms method.
-//
-//  Revision 1.4  2003/04/23 23:31:52  moreland
-//  Constructor now initializes all of the style RangeMaps.
-//  Constructor now uses utility methods to set default content visibility.
-//  Added "showChains" and "showLigandAtoms" utility methods.
-//  Implemented selection methods and event handling for same.
-//  Added Atom color and radius set and get methods.
-//  Added Residue color set and get methods.
-//  Added fireStructureStylesEvent method.
-//
-//  Revision 1.3  2003/04/03 22:49:12  moreland
-//  Added residueVisibility RangeMap.
-//
-//  Revision 1.2  2003/03/19 22:57:41  moreland
-//  Added preliminary support for residue selection.
-//
-//  Revision 1.1  2003/02/27 21:06:34  moreland
-//  Began adding classes for viewable "Styles" (colors, sizes, forms, etc).
-//
-//  Revision 1.0  2003/02/18 18:06:54  moreland
-//  First version.
-//
-
+/*
+ * BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence. This should
+ * be distributed with the code. If you do not have a copy,
+ * see:
+ *
+ * http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors. These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ * http://www.biojava.org/
+ *
+ * This code was contributed from the Molecular Biology Toolkit
+ * (MBT) project at the University of California San Diego.
+ *
+ * Please reference J.L. Moreland, A.Gramada, O.V. Buzko, Qing
+ * Zhang and P.E. Bourne 2005 The Molecular Biology Toolkit (MBT):
+ * A Modular Platform for Developing Molecular Visualization
+ * Applications. BMC Bioinformatics, 6:21.
+ *
+ * The MBT project was funded as part of the National Institutes
+ * of Health PPG grant number 1-P01-GM63208 and its National
+ * Institute of General Medical Sciences (NIGMS) division. Ongoing
+ * development for the MBT project is managed by the RCSB
+ * Protein Data Bank(http://www.pdb.org) and supported by funds
+ * from the National Science Foundation (NSF), the National
+ * Institute of General Medical Sciences (NIGMS), the Office of
+ * Science, Department of Energy (DOE), the National Library of
+ * Medicine (NLM), the National Cancer Institute (NCI), the
+ * National Center for Research Resources (NCRR), the National
+ * Institute of Biomedical Imaging and Bioengineering (NIBIB),
+ * the National Institute of Neurological Disorders and Stroke
+ * (NINDS), and the National Institute of Diabetes and Digestive
+ * and Kidney Diseases (NIDDK).
+ *
+ * Created on 2007/02/08
+ *
+ */ 
 package org.rcsb.mbt.model.attributes;
 
 // MBT

@@ -1,133 +1,48 @@
-//  $Id: TreeViewer.java,v 1.1 2007/02/08 02:38:52 jbeaver Exp $
-//
-//  Copyright 2000-2004 The Regents of the University of California.
-//  All Rights Reserved.
-//
-//  Permission to use, copy, modify and distribute any part of this
-//  Molecular Biology Toolkit (MBT)
-//  for educational, research and non-profit purposes, without fee, and without
-//  a written agreement is hereby granted, provided that the above copyright
-//  notice, this paragraph and the following three paragraphs appear in all
-//  copies.
-//
-//  Those desiring to incorporate this MBT into commercial products
-//  or use for commercial purposes should contact the Technology Transfer &
-//  Intellectual Property Services, University of California, San Diego, 9500
-//  Gilman Drive, Mail Code 0910, La Jolla, CA 92093-0910, Ph: (858) 534-5815,
-//  FAX: (858) 534-7345, E-MAIL:invent@ucsd.edu.
-//
-//  IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR
-//  DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING
-//  LOST PROFITS, ARISING OUT OF THE USE OF THIS MBT, EVEN IF THE
-//  UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-//  THE MBT PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND THE
-//  UNIVERSITY OF CALIFORNIA HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
-//  UPDATES, ENHANCEMENTS, OR MODIFICATIONS. THE UNIVERSITY OF CALIFORNIA MAKES
-//  NO REPRESENTATIONS AND EXTENDS NO WARRANTIES OF ANY KIND, EITHER IMPLIED OR
-//  EXPRESS, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-//  MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, OR THAT THE USE OF THE
-//  MBT WILL NOT INFRINGE ANY PATENT, TRADEMARK OR OTHER RIGHTS.
-//
-//  For further information, please see:  http://mbt.sdsc.edu
-//
-//  History:
-//  $Log: TreeViewer.java,v $
-//  Revision 1.1  2007/02/08 02:38:52  jbeaver
-//  version 1.50
-//
-//  Revision 1.3  2007/01/03 19:33:49  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.2  2006/10/04 17:21:06  jbeaver
-//  Lots of changes from surfaces to improved picking
-//
-//  Revision 1.1  2006/09/20 16:50:43  jbeaver
-//  first commit - branched from ProteinWorkshop
-//
-//  Revision 1.2  2006/09/02 18:52:28  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/08/24 17:39:03  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/03/09 00:18:55  jbeaver
-//  Initial commit
-//
-//  Revision 1.1  2005/10/06 17:07:53  jbeaver
-//  Initial commit
-//
-//  Revision 1.1  2005/06/23 08:25:02  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.19  2004/05/13 17:34:25  moreland
-//  Now tries to use StructureInfo data (if available) for Structure label.
-//
-//  Revision 1.18  2004/05/10 18:02:49  moreland
-//  Invisible atoms are now "grayed out" but are still selectable.
-//
-//  Revision 1.17  2004/04/09 00:06:11  moreland
-//  Updated copyright to new UCSD wording.
-//
-//  Revision 1.16  2004/01/29 18:16:03  moreland
-//  Updated copyright and class block comment.
-//
-//  Revision 1.15  2004/01/15 23:19:37  moreland
-//  Added document icon.
-//
-//  Revision 1.14  2004/01/15 23:02:33  moreland
-//  Added Structure icon.
-//
-//  Revision 1.13  2003/11/24 17:32:38  moreland
-//  Removed debug print statements.
-//
-//  Revision 1.12  2003/11/22 00:14:01  moreland
-//  Wrapped some long lines.
-//
-//  Revision 1.11  2003/07/15 22:11:32  moreland
-//  Partial implementation after StructureStyle event updates.
-//
-//  Revision 1.10  2003/05/23 00:10:00  moreland
-//  Rewrote TreeViewer to use TreeViewerModel custom TreeModel in order to reduce
-//  memory usage and increase performance.
-//
-//  Revision 1.9  2003/05/16 23:28:42  moreland
-//  Commented out the "scroll the viewable path into view" feature because it was anoying!
-//
-//  Revision 1.8  2003/05/15 19:49:03  moreland
-//  Wrote initial structureRemoved method code.
-//
-//  Revision 1.7  2003/05/14 16:25:59  moreland
-//  Added structureRemoved method support.
-//
-//  Revision 1.6  2003/05/14 01:16:43  moreland
-//  Added StructureStylesEventListener support.
-//  Improved and enabled custom cell renderer code.
-//  Added preliminary picking support.
-//  Added preliminary selection support.
-//
-//  Revision 1.5  2003/04/23 23:47:00  moreland
-//  Updated code to use the new object-based hierarchical StructureMap implementation.
-//
-//  Revision 1.4  2002/12/16 06:50:36  moreland
-//  Began implementing picking/selection handling code.
-//  Began implementing cell renderer code to enable custom JTree icons.
-//
-//  Revision 1.3  2002/11/14 18:49:56  moreland
-//  Corrected "see" document reference.
-//
-//  Revision 1.2  2002/11/14 18:21:31  moreland
-//  Began implementation of the basic TreeViewer.
-//  Changed to match Viewer change from class to interface.
-//  Added new event callback methods to implement Viewer interface.
-//  Changed old "MbtController" references to new "StructureDocument" class.
-//
-//  Revision 1.1.1.1  2002/07/16 18:00:21  moreland
-//  Imported sources
-//
-//  Revision 1.0  2002/06/10 23:38:39  moreland
-//
-
+/*
+ * BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence. This should
+ * be distributed with the code. If you do not have a copy,
+ * see:
+ *
+ * http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors. These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ * http://www.biojava.org/
+ *
+ * This code was contributed from the Molecular Biology Toolkit
+ * (MBT) project at the University of California San Diego.
+ *
+ * Please reference J.L. Moreland, A.Gramada, O.V. Buzko, Qing
+ * Zhang and P.E. Bourne 2005 The Molecular Biology Toolkit (MBT):
+ * A Modular Platform for Developing Molecular Visualization
+ * Applications. BMC Bioinformatics, 6:21.
+ *
+ * The MBT project was funded as part of the National Institutes
+ * of Health PPG grant number 1-P01-GM63208 and its National
+ * Institute of General Medical Sciences (NIGMS) division. Ongoing
+ * development for the MBT project is managed by the RCSB
+ * Protein Data Bank(http://www.pdb.org) and supported by funds
+ * from the National Science Foundation (NSF), the National
+ * Institute of General Medical Sciences (NIGMS), the Office of
+ * Science, Department of Energy (DOE), the National Library of
+ * Medicine (NLM), the National Cancer Institute (NCI), the
+ * National Center for Research Resources (NCRR), the National
+ * Institute of Biomedical Imaging and Bioengineering (NIBIB),
+ * the National Institute of Neurological Disorders and Stroke
+ * (NINDS), and the National Institute of Diabetes and Digestive
+ * and Kidney Diseases (NIDDK).
+ *
+ * Created on 2007/02/08
+ *
+ */ 
 package org.rcsb.pw.ui.tree;
 
 // MBT

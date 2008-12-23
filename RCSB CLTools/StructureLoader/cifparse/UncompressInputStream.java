@@ -1,63 +1,48 @@
-// $Id: UncompressInputStream.java,v 1.1 2007/02/08 02:38:52 jbeaver Exp $
-//
-// This file is part of the HTTPClient package
-// Copyright (C) 1996-2001 Ronald Tschal?r
-//
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2 of the License, or (at your option) any later version.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free
-// Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-// MA 02111-1307, USA
-//
-// For questions, suggestions, bug-reports, enhancement-requests etc.
-// I may be contacted at:
-//
-// ronald@innovation.ch
-//
-// The HTTPClient's home page is located at:
-//
-// http://www.innovation.ch/java/HTTPClient/
-//
-// This version has been modified from the original 0.3-3 version by the
-// Unidata Program Center (support@unidata.ucar.edu) to make the constructor
-// public and to fix a couple of bugs.
-//
-// The PDB version has been modified to clean up the formatting, to add
-// CVS header and history lines, and to change the package statement.
-//
-// History:
-//  $Log: UncompressInputStream.java,v $
-//  Revision 1.1  2007/02/08 02:38:52  jbeaver
-//  version 1.50
-//
-//  Revision 1.1  2006/09/20 16:50:42  jbeaver
-//  first commit - branched from ProteinWorkshop
-//
-//  Revision 1.2  2006/09/02 18:52:28  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/08/24 17:39:03  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/03/09 00:18:55  jbeaver
-//  Initial commit
-//
-//  Revision 1.1  2004/02/10 21:28:47  moreland
-//  Added support for UNIX compress format.
-//
-//  Revision 1.0  2004/02/10 17:23:33  moreland
-//
-
-
+/*
+ * BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence. This should
+ * be distributed with the code. If you do not have a copy,
+ * see:
+ *
+ * http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors. These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ * http://www.biojava.org/
+ *
+ * This code was contributed from the Molecular Biology Toolkit
+ * (MBT) project at the University of California San Diego.
+ *
+ * Please reference J.L. Moreland, A.Gramada, O.V. Buzko, Qing
+ * Zhang and P.E. Bourne 2005 The Molecular Biology Toolkit (MBT):
+ * A Modular Platform for Developing Molecular Visualization
+ * Applications. BMC Bioinformatics, 6:21.
+ *
+ * The MBT project was funded as part of the National Institutes
+ * of Health PPG grant number 1-P01-GM63208 and its National
+ * Institute of General Medical Sciences (NIGMS) division. Ongoing
+ * development for the MBT project is managed by the RCSB
+ * Protein Data Bank(http://www.pdb.org) and supported by funds
+ * from the National Science Foundation (NSF), the National
+ * Institute of General Medical Sciences (NIGMS), the Office of
+ * Science, Department of Energy (DOE), the National Library of
+ * Medicine (NLM), the National Cancer Institute (NCI), the
+ * National Center for Research Resources (NCRR), the National
+ * Institute of Biomedical Imaging and Bioengineering (NIBIB),
+ * the National Institute of Neurological Disorders and Stroke
+ * (NINDS), and the National Institute of Diabetes and Digestive
+ * and Kidney Diseases (NIDDK).
+ *
+ * Created on 2007/02/08
+ *
+ */ 
 package org.rcsb.mbt.structLoader.openmms.cifparse;
 
 

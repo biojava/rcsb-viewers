@@ -1,155 +1,48 @@
-//  $Id: CifStructureLoader.java,v 1.1 2007/02/08 02:38:52 jbeaver Exp $
-//
-//  Copyright 2000-2004 The Regents of the University of California.
-//  All Rights Reserved.
-//
-//  Permission to use, copy, modify and distribute any part of this
-//  Molecular Biology Toolkit (MBT)
-//  for educational, research and non-profit purposes, without fee, and without
-//  a written agreement is hereby granted, provided that the above copyright
-//  notice, this paragraph and the following three paragraphs appear in all
-//  copies.
-//
-//  Those desiring to incorporate this MBT into commercial products
-//  or use for commercial purposes should contact the Technology Transfer &
-//  Intellectual Property Services, University of California, San Diego, 9500
-//  Gilman Drive, Mail Code 0910, La Jolla, CA 92093-0910, Ph: (858) 534-5815,
-//  FAX: (858) 534-7345, E-MAIL:invent@ucsd.edu.
-//
-//  IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR
-//  DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING
-//  LOST PROFITS, ARISING OUT OF THE USE OF THIS MBT, EVEN IF THE
-//  UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-//  THE MBT PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND THE
-//  UNIVERSITY OF CALIFORNIA HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
-//  UPDATES, ENHANCEMENTS, OR MODIFICATIONS. THE UNIVERSITY OF CALIFORNIA MAKES
-//  NO REPRESENTATIONS AND EXTENDS NO WARRANTIES OF ANY KIND, EITHER IMPLIED OR
-//  EXPRESS, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-//  MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, OR THAT THE USE OF THE
-//  MBT WILL NOT INFRINGE ANY PATENT, TRADEMARK OR OTHER RIGHTS.
-//
-//  For further information, please see:  http://mbt.sdsc.edu
-//
-//  History:
-//  $Log: CifStructureLoader.java,v $
-//  Revision 1.1  2007/02/08 02:38:52  jbeaver
-//  version 1.50
-//
-//  Revision 1.1  2006/09/20 16:50:43  jbeaver
-//  first commit - branched from ProteinWorkshop
-//
-//  Revision 1.2  2006/09/02 18:52:28  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/08/24 17:39:03  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/03/09 00:18:55  jbeaver
-//  Initial commit
-//
-//  Revision 1.28  2005/11/08 20:58:16  moreland
-//  Switched style code to new StructureStyles API.
-//
-//  Revision 1.27  2005/06/17 21:45:41  moreland
-//  PDB-derived mmCIF files that set _struct_asym.pdbx_blank_PDB_chainid_flag
-//  now cause a subsitution of "_" for all asym_id field values (as per RCSB).
-//
-//  Revision 1.26  2004/11/08 22:58:22  moreland
-//  if useLabelFields then use "label_atom_id" for name else use "auth_atom_id".
-//
-//  Revision 1.25  2004/10/22 23:29:05  moreland
-//  Clear single_items hash after populating StructureInfo.
-//  Toss MbtBuilder when we're  finished parsing.
-//
-//  Revision 1.24  2004/08/30 17:58:32  moreland
-//  Improved exception handling and error messages.
-//
-//  Revision 1.23  2004/08/16 16:30:19  moreland
-//  Now uses SharedObjects class to reduce memory usage.
-//
-//  Revision 1.22  2004/07/01 23:51:09  moreland
-//  Added "UseLabelFields" support for old/PDB chain/residue/conformation mapping.
-//
-//  Revision 1.21  2004/06/16 22:04:43  moreland
-//  Reduced memory use in CifStructureLoader by filtering loops in MbtBuilder.
-//
-//  Revision 1.20  2004/05/12 23:49:29  moreland
-//  Added support to populate the StructureInfo meta-data object.
-//
-//  Revision 1.19  2004/05/10 17:57:24  moreland
-//  Added support for alternate location identifier (atom occupancy < 1.0).
-//
-//  Revision 1.18  2004/04/15 20:14:59  moreland
-//  Use "_atom_site.label_seq_id", but fall back to "_atom_site.auth_seq_id".
-//
-//  Revision 1.17  2004/04/09 00:06:40  moreland
-//  Updated copyright to new UCSD wording.
-//
-//  Revision 1.16  2004/03/25 18:28:18  moreland
-//  Replaced "_atom_site.auth_seq_id" with "_atom_site.label_seq_id" as per PDB staff instructions.
-//  Replaced "_struct_conf.beg_auth_seq_id" with "_struct_conf.beg_label_seq_id" as per PDB staff instructions.
-//  Replaced "_struct_conf.end_auth_seq_id" with "_struct_conf.end_label_seq_id" as per PDB staff instructions.
-//  Replaced "_struct_sheet_range.beg_auth_seq_id" with "_struct_sheet_range.beg_label_seq_id" as per PDB staff instructions.
-//  Replaced "_struct_sheet_range.end_auth_seq_id" with "_struct_sheet_range.end_label_seq_id" as per PDB staff instructions.
-//
-//  Revision 1.15  2004/02/10 21:29:44  moreland
-//  Added support for UNIX compress format.
-//
-//  Revision 1.14  2004/01/29 17:23:33  moreland
-//  Updated copyright and class block comments.
-//
-//  Revision 1.13  2004/01/08 22:12:59  moreland
-//  Improved exception handling for bad data.
-//  Added "verify" method to StructureFactory to check StructureComponent integrity.
-//
-//  Revision 1.12  2003/12/16 22:24:33  moreland
-//  Added exception handling for out of memory errors.
-//  Added code to strip all atoms but those from the first model.
-//
-//  Revision 1.11  2003/12/09 21:22:09  moreland
-//  Commented out debug print statement.
-//
-//  Revision 1.10  2003/11/10 22:27:16  moreland
-//  Better handles Exception(s) when the mmCIF dictionary can't be found or parsed.
-//
-//  Revision 1.9  2003/09/18 23:02:18  moreland
-//  The load methods now call Status.output instead of System.err for error conditions.
-//
-//  Revision 1.8  2003/05/14 01:07:38  moreland
-//  Removed unused CIF_TYPE conversion clutter.
-//
-//  Revision 1.7  2003/04/30 17:56:25  moreland
-//  Added Atom serial number field support.
-//
-//  Revision 1.6  2003/04/23 18:05:58  moreland
-//  The mmCIF records are now marshalled into StructureComponent records and
-//  cached for fast retrieval in a hashtable (SC types) of vectors (SC records).
-//
-//  Revision 1.5  2003/04/03 18:20:25  moreland
-//  Changed Atom field "type" to "element" due to naming and meaning conflict.
-//
-//  Revision 1.4  2003/01/22 18:39:13  moreland
-//  If the residue is not a number, set the field to -1.
-//
-//  Revision 1.3  2002/12/30 21:53:24  moreland
-//  Changed to extract Strand conformation information from _struct_sheet_range
-//  records (instead of _struct_conf records).
-//
-//  Revision 1.2  2002/12/16 06:32:20  moreland
-//  Changed code to support differentiation of Conformation into Coil, Helix,
-//  Strand, and Turn sub-class types (at Eliot Clingman's suggestion).
-//
-//  Revision 1.1  2002/10/24 18:00:50  moreland
-//  Added support to use the StructureComponentRegistry class.
-//
-//  Revision 1.1.1.1  2002/07/16 18:00:19  moreland
-//  Imported sources
-//
-//  Revision 1.0  2002/06/10 23:38:39  moreland
-//
-
-
+/*
+ * BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence. This should
+ * be distributed with the code. If you do not have a copy,
+ * see:
+ *
+ * http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors. These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ * http://www.biojava.org/
+ *
+ * This code was contributed from the Molecular Biology Toolkit
+ * (MBT) project at the University of California San Diego.
+ *
+ * Please reference J.L. Moreland, A.Gramada, O.V. Buzko, Qing
+ * Zhang and P.E. Bourne 2005 The Molecular Biology Toolkit (MBT):
+ * A Modular Platform for Developing Molecular Visualization
+ * Applications. BMC Bioinformatics, 6:21.
+ *
+ * The MBT project was funded as part of the National Institutes
+ * of Health PPG grant number 1-P01-GM63208 and its National
+ * Institute of General Medical Sciences (NIGMS) division. Ongoing
+ * development for the MBT project is managed by the RCSB
+ * Protein Data Bank(http://www.pdb.org) and supported by funds
+ * from the National Science Foundation (NSF), the National
+ * Institute of General Medical Sciences (NIGMS), the Office of
+ * Science, Department of Energy (DOE), the National Library of
+ * Medicine (NLM), the National Cancer Institute (NCI), the
+ * National Center for Research Resources (NCRR), the National
+ * Institute of Biomedical Imaging and Bioengineering (NIBIB),
+ * the National Institute of Neurological Disorders and Stroke
+ * (NINDS), and the National Institute of Diabetes and Digestive
+ * and Kidney Diseases (NIDDK).
+ *
+ * Created on 2007/02/08
+ *
+ */ 
 package org.rcsb.mbt.structLoader;
 
 

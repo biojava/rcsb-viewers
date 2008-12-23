@@ -1,113 +1,48 @@
-//  $Id: SsGeometry.java,v 1.1 2007/02/08 02:38:52 jbeaver Exp $
-//
-//  Copyright (c) 2000-2002  San Diego Supercomputer Center (SDSC),
-//  a facility operated jointly by the University of California,
-//  San Diego (UCSD) and General Atomics, San Diego, California, USA.
-//
-//  Users and possessors of this source code are hereby granted a
-//  nonexclusive, royalty-free copyright and design patent license to
-//  use this code in individual software.  License is not granted for
-//  commercial resale, in whole or in part, without prior written
-//  permission from SDSC.  This source is provided "AS IS" without express
-//  or implied warranty of any kind.
-//
-//  For further information, please see:  http://mbt.sdsc.edu
-//
-//  History:
-//  $Log: SsGeometry.java,v $
-//  Revision 1.1  2007/02/08 02:38:52  jbeaver
-//  version 1.50
-//
-//  Revision 1.1  2006/09/20 16:50:43  jbeaver
-//  first commit - branched from ProteinWorkshop
-//
-//  Revision 1.1  2006/08/24 17:39:03  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.5  2006/07/18 21:06:38  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.4  2006/05/16 17:57:02  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.3  2006/04/14 23:37:34  jbeaver
-//  Update with some (very broken) surface rendering stuff
-//
-//  Revision 1.2  2006/03/27 19:11:56  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/03/09 00:18:55  jbeaver
-//  Initial commit
-//
-//  Revision 1.20  2005/11/08 20:58:34  moreland
-//  Switched style code to new StructureStyles API.
-//
-//  Revision 1.19  2005/09/21 17:36:03  agramada
-//  Reenabled a piece of logic that deals with special sequences of ss elements.
-//  For whatever reasons it was commented out in a previous version.
-//
-//  Revision 1.18  2005/06/28 23:52:43  agramada
-//  Added code to handle special cases related to gaps in structural data.
-//  Also, some preliminary enhancements in anticipation of the new cylinder
-//  style for helices.
-//
-//  Revision 1.17  2005/05/24 22:39:30  agramada
-//  Added code to fix the problem of long coils appearing in the data gap regions.
-//
-//  Revision 1.15  2005/01/21 23:07:41  agramada
-//  Added a couple of variants for the drawSs method which allow a finer customization
-//  of the ribbon styles. Also, experimental code for using the new style ribbons is
-//  present in this version without being effectively useful at this time though.
-//
-//  Revision 1.14  2004/07/02 16:38:58  agramada
-//  Included logic to detect and remove long segments that were drawn when
-//  gaps in data were encountered. This solution only works at this point with
-//  secondary structures generated via the DerivedInformation class since in this
-//  case a "NONE" conformation type is associated with gaps and can be easily
-//  detected. A solution for the case when secondary structures come from the
-//  file needs to be added.
-//
-//  Revision 1.13  2004/05/24 21:26:10  agramada
-//  Added calls to the setQuality method in building Helix and Strands in the
-//  drawSs method. Appearantly they were missing.
-//
-//  Revision 1.10  2004/01/21 22:03:06  agramada
-//  Removed a lot of code no longer used. Improved color updating methods.
-//  Added code to throw exceptions when too short fragments are encountered.
-//
-//  Revision 1.7  2003/12/08 22:39:12  agramada
-//  Extensive changes especially in the drawSs method to conform with how
-//  fragments are defined in the StructureMap (i.e. no residue sharing).
-//  Also, moved to a more uniform approach to color updating/highlighting.
-//
-//  Revision 1.6  2003/11/24 17:34:10  moreland
-//  Commented out debug print statements.
-//
-//  Revision 1.5  2003/10/01 23:30:20  agramada
-//  Updated the import statements to reflect new location of the DerivedInformation class.
-//
-//  Revision 1.4  2003/08/01 16:26:25  agramada
-//  Added a quality parameter and its set and get methods in the GeometryEntity
-//  class. Also, added stuff to handle thie new parameter in the PsGeometry and
-//  SsGeometry classes.
-//
-//  Revision 1.3  2003/07/17 17:58:50  agramada
-//  Fix a boundary array index issue in the highlightClosestResidue method.
-//  Also, as a temporar solution, added the drawBackboneTrace method, which
-//  draw all Ss elements with a line style.
-//
-//  Revision 1.2  2003/06/25 21:22:59  agramada
-//  Added methods to set coordinates from an array of float[] components,
-//
-//  Revision 1.1  2003/06/24 22:19:46  agramada
-//  Reorganized the geometry package. Old classes removed, new classes added.
-//
-//
-
-//***********************************************************************************
-// Package
-//***********************************************************************************
-//
+/*
+ * BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence. This should
+ * be distributed with the code. If you do not have a copy,
+ * see:
+ *
+ * http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors. These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ * http://www.biojava.org/
+ *
+ * This code was contributed from the Molecular Biology Toolkit
+ * (MBT) project at the University of California San Diego.
+ *
+ * Please reference J.L. Moreland, A.Gramada, O.V. Buzko, Qing
+ * Zhang and P.E. Bourne 2005 The Molecular Biology Toolkit (MBT):
+ * A Modular Platform for Developing Molecular Visualization
+ * Applications. BMC Bioinformatics, 6:21.
+ *
+ * The MBT project was funded as part of the National Institutes
+ * of Health PPG grant number 1-P01-GM63208 and its National
+ * Institute of General Medical Sciences (NIGMS) division. Ongoing
+ * development for the MBT project is managed by the RCSB
+ * Protein Data Bank(http://www.pdb.org) and supported by funds
+ * from the National Science Foundation (NSF), the National
+ * Institute of General Medical Sciences (NIGMS), the Office of
+ * Science, Department of Energy (DOE), the National Library of
+ * Medicine (NLM), the National Cancer Institute (NCI), the
+ * National Center for Research Resources (NCRR), the National
+ * Institute of Biomedical Imaging and Bioengineering (NIBIB),
+ * the National Institute of Neurological Disorders and Stroke
+ * (NINDS), and the National Institute of Diabetes and Digestive
+ * and Kidney Diseases (NIDDK).
+ *
+ * Created on 2007/02/08
+ *
+ */ 
 package org.rcsb.vf.glscene.SecondaryStructureBuilder;
 
 //***********************************************************************************

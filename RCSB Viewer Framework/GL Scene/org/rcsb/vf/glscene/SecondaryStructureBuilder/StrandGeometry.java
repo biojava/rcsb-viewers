@@ -1,105 +1,48 @@
-//  $Id: StrandGeometry.java,v 1.1 2007/02/08 02:38:52 jbeaver Exp $
-//
-//  Copyright 2000-2004 The Regents of the University of California.
-//  All Rights Reserved.
-//
-//  Permission to use, copy, modify and distribute any part of this
-//  Molecular Biology Toolkit (MBT)
-//  for educational, research and non-profit purposes, without fee, and without
-//  a written agreement is hereby granted, provided that the above copyright
-//  notice, this paragraph and the following three paragraphs appear in all
-//  copies.
-//
-//  Those desiring to incorporate this MBT into commercial products
-//  or use for commercial purposes should contact the Technology Transfer &
-//  Intellectual Property Services, University of California, San Diego, 9500
-//  Gilman Drive, Mail Code 0910, La Jolla, CA 92093-0910, Ph: (858) 534-5815,
-//  FAX: (858) 534-7345, E-MAIL:invent@ucsd.edu.
-//
-//  IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR
-//  DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING
-//  LOST PROFITS, ARISING OUT OF THE USE OF THIS MBT, EVEN IF THE
-//  UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-//  THE MBT PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND THE
-//  UNIVERSITY OF CALIFORNIA HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
-//  UPDATES, ENHANCEMENTS, OR MODIFICATIONS. THE UNIVERSITY OF CALIFORNIA MAKES
-//  NO REPRESENTATIONS AND EXTENDS NO WARRANTIES OF ANY KIND, EITHER IMPLIED OR
-//  EXPRESS, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-//  MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, OR THAT THE USE OF THE
-//  MBT WILL NOT INFRINGE ANY PATENT, TRADEMARK OR OTHER RIGHTS.
-//
-//  For further information, please see:  http://mbt.sdsc.edu
-//
-//  History:
-//  $Log: StrandGeometry.java,v $
-//  Revision 1.1  2007/02/08 02:38:52  jbeaver
-//  version 1.50
-//
-//  Revision 1.1  2006/09/20 16:50:43  jbeaver
-//  first commit - branched from ProteinWorkshop
-//
-//  Revision 1.2  2006/09/02 18:52:28  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/08/24 17:39:03  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/03/09 00:18:55  jbeaver
-//  Initial commit
-//
-//  Revision 1.12  2004/06/25 23:27:43  agramada
-//  Removed a "rounded" variable which was hiding the global variable.
-//
-//  Revision 1.11  2004/05/24 21:45:27  agramada
-//  Fixed a deficiency that prevented the possibility of passing an arbitrarily
-//  shaped cross section. This is a temporary solution until a more comprehensive
-//  mechanism for cross section styling is put in place.
-//
-//  Revision 1.10  2004/04/09 00:04:29  moreland
-//  Updated copyright to new UCSD wording.
-//
-//  Revision 1.9  2004/01/29 18:05:33  agramada
-//  Removed General Atomics from copyright
-//
-//  Revision 1.8  2004/01/21 21:55:09  agramada
-//  Removed experimental code that is no longer usefull.
-//
-//  Revision 1.7  2003/12/09 00:15:19  agramada
-//  Removed references to the ColorTable class.
-//
-//  Revision 1.6  2003/12/08 22:42:21  agramada
-//  A number of changes in the way coloring/highlighting is handled. Moved
-//  towards a uniform approach.
-//
-//  Revision 1.5  2003/08/01 16:22:56  agramada
-//  A new round of improvements. Most of them related to the addition of a
-//  quality parameter and it's handling methods to set the quality of the
-//  rendering.
-//
-//  Revision 1.4  2003/07/17 17:54:49  agramada
-//  Added code to allow the use of the line style.
-//
-//  Revision 1.3  2003/07/14 20:17:40  agramada
-//  Set the detach capability on the returned BranchGroup.
-//
-//  Revision 1.2  2003/07/08 17:40:53  agramada
-//  Modified the code so that when the geometry is calculated, the corresponding
-//  BranchGroup object is stored in the branch field of that geometry entity.
-//
-//  Revision 1.1  2003/06/24 22:19:46  agramada
-//  Reorganized the geometry package. Old classes removed, new classes added.
-//
-//  Revision 1.1  2003/01/10 00:28:59  agramada
-//  Initial checkin of geometry generation package.
-//
-//  Revision 1.0  2002/06/10 23:38:39  agramada
-//
-
-//***********************************************************************************
-// Package
-//***********************************************************************************
-//
+/*
+ * BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence. This should
+ * be distributed with the code. If you do not have a copy,
+ * see:
+ *
+ * http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors. These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ * http://www.biojava.org/
+ *
+ * This code was contributed from the Molecular Biology Toolkit
+ * (MBT) project at the University of California San Diego.
+ *
+ * Please reference J.L. Moreland, A.Gramada, O.V. Buzko, Qing
+ * Zhang and P.E. Bourne 2005 The Molecular Biology Toolkit (MBT):
+ * A Modular Platform for Developing Molecular Visualization
+ * Applications. BMC Bioinformatics, 6:21.
+ *
+ * The MBT project was funded as part of the National Institutes
+ * of Health PPG grant number 1-P01-GM63208 and its National
+ * Institute of General Medical Sciences (NIGMS) division. Ongoing
+ * development for the MBT project is managed by the RCSB
+ * Protein Data Bank(http://www.pdb.org) and supported by funds
+ * from the National Science Foundation (NSF), the National
+ * Institute of General Medical Sciences (NIGMS), the Office of
+ * Science, Department of Energy (DOE), the National Library of
+ * Medicine (NLM), the National Cancer Institute (NCI), the
+ * National Center for Research Resources (NCRR), the National
+ * Institute of Biomedical Imaging and Bioengineering (NIBIB),
+ * the National Institute of Neurological Disorders and Stroke
+ * (NINDS), and the National Institute of Diabetes and Digestive
+ * and Kidney Diseases (NIDDK).
+ *
+ * Created on 2007/02/08
+ *
+ */ 
 package org.rcsb.vf.glscene.SecondaryStructureBuilder;
 
 import java.awt.Color;

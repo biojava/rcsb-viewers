@@ -1,126 +1,48 @@
-//  $Id: DerivedInformation.java,v 1.1 2007/02/08 02:38:52 jbeaver Exp $
-//
-//  Copyright 2000-2004 The Regents of the University of California.
-//  All Rights Reserved.
-//
-//  Permission to use, copy, modify and distribute any part of this
-//  Molecular Biology Toolkit (MBT)
-//  for educational, research and non-profit purposes, without fee, and without
-//  a written agreement is hereby granted, provided that the above copyright
-//  notice, this paragraph and the following three paragraphs appear in all
-//  copies.
-//
-//  Those desiring to incorporate this MBT into commercial products
-//  or use for commercial purposes should contact the Technology Transfer &
-//  Intellectual Property Services, University of California, San Diego, 9500
-//  Gilman Drive, Mail Code 0910, La Jolla, CA 92093-0910, Ph: (858) 534-5815,
-//  FAX: (858) 534-7345, E-MAIL:invent@ucsd.edu.
-//
-//  IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR
-//  DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING
-//  LOST PROFITS, ARISING OUT OF THE USE OF THIS MBT, EVEN IF THE
-//  UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-//  THE MBT PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND THE
-//  UNIVERSITY OF CALIFORNIA HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
-//  UPDATES, ENHANCEMENTS, OR MODIFICATIONS. THE UNIVERSITY OF CALIFORNIA MAKES
-//  NO REPRESENTATIONS AND EXTENDS NO WARRANTIES OF ANY KIND, EITHER IMPLIED OR
-//  EXPRESS, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-//  MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, OR THAT THE USE OF THE
-//  MBT WILL NOT INFRINGE ANY PATENT, TRADEMARK OR OTHER RIGHTS.
-//
-//  For further information, please see:  http://mbt.sdsc.edu
-//
-//  History:
-//  $Log: DerivedInformation.java,v $
-//  Revision 1.1  2007/02/08 02:38:52  jbeaver
-//  version 1.50
-//
-//  Revision 1.1  2006/09/20 16:50:43  jbeaver
-//  first commit - branched from ProteinWorkshop
-//
-//  Revision 1.1  2006/08/24 17:39:03  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.3  2006/07/18 21:06:38  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.2  2006/05/16 17:57:02  jbeaver
-//  *** empty log message ***
-//
-//  Revision 1.1  2006/03/09 00:18:55  jbeaver
-//  Initial commit
-//
-//  Revision 1.16  2005/07/11 21:57:29  agramada
-//  A slight increase in the cutoff distance used to detect unresolved (data gaps)
-//  portions of chains (from 5.0A to 5.1A). This was motivated by some examples.
-//
-//  Revision 1.15  2005/06/28 23:57:28  agramada
-//  Various bugs related to the handling of end of chain ss and gaps in the data are
-//  addressed in this version.
-//
-//  Revision 1.13  2005/05/24 22:37:56  agramada
-//  Added code to solve problems of fragments at end of chain or near data
-//  gaps were not properly detected. Also, the NONE fragments are no longer
-//  listed since they confuse the RangeMap.
-//
-//  Revision 1.12  2004/07/01 18:28:28  agramada
-//  Modified code to handle the case when a residue contains more than one
-//  atom of a kind (multiple occupancy cases). The code assumes however that
-//  the first atom of a kind in a given residue is the one that should be used
-//  for energy calculations.
-//
-//  Revision 1.10  2004/04/09 00:15:20  moreland
-//  Updated copyright to new UCSD wording.
-//
-//  Revision 1.9  2004/01/29 17:14:50  agramada
-//  Removed General Atomics from copyright
-//
-//  Revision 1.8  2004/01/28 18:03:49  agramada
-//  Fixed some javadoc comments. Removed commented out code.
-//
-//  Revision 1.7  2004/01/16 19:11:55  agramada
-//  Added code that checks the length of the vector containing the fragments
-//  before retrieving the first element to initiate iteration loops in the
-//  getFragments and getDisjointFragments methods.
-//
-//  Revision 1.6  2004/01/14 19:27:14  agramada
-//  Modified to catch the ExcessiveDivisionException thrown by the octree build
-//  method. Commented public methods.
-//
-//  Revision 1.5  2003/12/15 21:28:05  moreland
-//  Commented out more debug print statements.
-//
-//  Revision 1.4  2003/12/15 21:25:20  moreland
-//  Commented out debug print statements.
-//
-//  Revision 1.3  2003/12/08 21:33:47  moreland
-//  Commented out debug print statements.
-//
-//  Revision 1.2  2003/10/07 23:22:17  agramada
-//  Inserted a method call in getDisjointFragments method.
-//
-//  Revision 1.1  2003/10/01 21:13:15  agramada
-//  Class moved from the geometry util package to this generatl util package.
-//  Method added to set the fragments rangeMap in the StructureMap class.
-//
-//  Revision 1.6  2003/06/24 22:19:46  agramada
-//  Reorganized the geometry package. Old classes removed, new classes added.
-//
-//  Revision 1.5  2003/05/12 22:03:49  agramada
-//  A number of bugs were fixed. A new "NONE" fragment type was introduced to
-//  account for gaps in the data which (aritficially) break the chains. This
-//  gaps may be replaced in the future by a toolkit wide defined special type
-//  of fragment.
-//
-//  Revision 1.4  2003/04/30 21:51:30  agramada
-//  Added a switch in getFragments to return false when no aa chain is present
-//  in the structure. Also, commented out some debug messages.
-//
-//  Revision 1.3  2003/04/30 20:17:44  agramada
-//  Added the "History" lines needed to generate the log inside the source file.
-//
-
+/*
+ * BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence. This should
+ * be distributed with the code. If you do not have a copy,
+ * see:
+ *
+ * http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors. These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ * http://www.biojava.org/
+ *
+ * This code was contributed from the Molecular Biology Toolkit
+ * (MBT) project at the University of California San Diego.
+ *
+ * Please reference J.L. Moreland, A.Gramada, O.V. Buzko, Qing
+ * Zhang and P.E. Bourne 2005 The Molecular Biology Toolkit (MBT):
+ * A Modular Platform for Developing Molecular Visualization
+ * Applications. BMC Bioinformatics, 6:21.
+ *
+ * The MBT project was funded as part of the National Institutes
+ * of Health PPG grant number 1-P01-GM63208 and its National
+ * Institute of General Medical Sciences (NIGMS) division. Ongoing
+ * development for the MBT project is managed by the RCSB
+ * Protein Data Bank(http://www.pdb.org) and supported by funds
+ * from the National Science Foundation (NSF), the National
+ * Institute of General Medical Sciences (NIGMS), the Office of
+ * Science, Department of Energy (DOE), the National Library of
+ * Medicine (NLM), the National Cancer Institute (NCI), the
+ * National Center for Research Resources (NCRR), the National
+ * Institute of Biomedical Imaging and Bioengineering (NIBIB),
+ * the National Institute of Neurological Disorders and Stroke
+ * (NINDS), and the National Institute of Diabetes and Digestive
+ * and Kidney Diseases (NIDDK).
+ *
+ * Created on 2007/02/08
+ *
+ */ 
 package org.rcsb.mbt.model.util;
 
 import java.util.Vector;

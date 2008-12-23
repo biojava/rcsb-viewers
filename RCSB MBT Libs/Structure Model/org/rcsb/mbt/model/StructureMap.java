@@ -1,276 +1,48 @@
-//  $Id: StructureMap.java,v 1.1 2007/02/08 02:38:52 jbeaver Exp $
-//
-//  Copyright 2000-2004 The Regents of the University of California.
-//  All Rights Reserved.
-//
-//  Permission to use, copy, modify and distribute any part of this
-//  Molecular Biology Toolkit (MBT)
-//  for educational, research and non-profit purposes, without fee, and without
-//  a written agreement is hereby granted, provided that the above copyright
-//  notice, this paragraph and the following three paragraphs appear in all
-//  copies.
-//
-//  Those desiring to incorporate this MBT into commercial products
-//  or use for commercial purposes should contact the Technology Transfer &
-//  Intellectual Property Services, University of California, San Diego, 9500
-//  Gilman Drive, Mail Code 0910, La Jolla, CA 92093-0910, Ph: (858) 534-5815,
-//  FAX: (858) 534-7345, E-MAIL:invent@ucsd.edu.
-//
-//  IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR
-//  DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING
-//  LOST PROFITS, ARISING OUT OF THE USE OF THIS MBT, EVEN IF THE
-//  UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-//  THE MBT PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND THE
-//  UNIVERSITY OF CALIFORNIA HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
-//  UPDATES, ENHANCEMENTS, OR MODIFICATIONS. THE UNIVERSITY OF CALIFORNIA MAKES
-//  NO REPRESENTATIONS AND EXTENDS NO WARRANTIES OF ANY KIND, EITHER IMPLIED OR
-//  EXPRESS, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-//  MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, OR THAT THE USE OF THE
-//  MBT WILL NOT INFRINGE ANY PATENT, TRADEMARK OR OTHER RIGHTS.
-//
-//  For further information, please see:  http://mbt.sdsc.edu
-//
-//  Revision 1.2  2006/04/14 23:37:34  jbeaver
-//  Update with some (very broken) surface rendering stuff
-//
-//  Revision 1.1  2006/03/09 00:18:55  jbeaver
-//  Initial commit
-//
-//  Revision 1.61  2005/11/08 20:58:12  moreland
-//  Switched style code to new StructureStyles API.
-//
-//  Revision 1.60  2005/06/21 19:48:43  moreland
-//  If we end up with a single-residue coil that is surrounded by residue
-//  numbering gaps or UNDEFINED fragments, then set the fragment to UNDEFINED
-//  because it's orphaned and can't be rendered.
-//
-//  Revision 1.59  2005/06/17 21:45:36  moreland
-//  PDB-derived mmCIF files that set _struct_asym.pdbx_blank_PDB_chainid_flag
-//  now cause a subsitution of "_" for all asym_id field values (as per RCSB).
-//
-//  Revision 1.58  2005/04/25 22:13:11  moreland
-//  Improved heuristics for handling fragment assignments of polymers having no CA
-//  and for non-polymers.
-//
-//  Revision 1.57  2005/04/21 23:04:34  moreland
-//  Modified the loadFrgments method to replace "short" fragments with coil.
-//
-//  Revision 1.56  2005/03/15 02:28:23  moreland
-//  Added getResidue method variant that takes chain id and residue id arguments.
-//
-//  Revision 1.55  2005/01/31 17:01:53  moreland
-//  Renamed "enum" variable in preparation for evntual jdk1.5 migration.
-//
-//  Revision 1.54  2004/10/27 20:03:30  moreland
-//  Corrected javadoc SEE references.
-//
-//  Revision 1.53  2004/08/19 19:43:33  moreland
-//  Added getStructureComponentCount method.
-//  Added getStructureComponentByIndex method.
-//
-//  Revision 1.52  2004/07/01 20:04:40  moreland
-//  Added thrown exceptions to "addBond" method for null arguments.
-//
-//  Revision 1.51  2004/06/23 00:48:51  moreland
-//  When residues have no atoms, we can't do a binary search using chainId,
-//  so break and do a linear search. Mostly needed for pure sequence data.
-//
-//  Revision 1.50  2004/06/23 00:40:53  moreland
-//  Added "getAtoms" method which returns a Vector CLONE of Atom references.
-//  Fixed a bug in the "loadFragments" method which left out many coil segments.
-//
-//  Revision 1.49  2004/06/01 16:01:43  moreland
-//  If fragments can't be derived for some reason, then try generating coils.
-//  If no bonds are generated using the dictionary, then fall back to distances.
-//
-//  Revision 1.48  2004/05/13 17:32:22  moreland
-//  Re-ordered intialization code to make it more organized and readable.
-//  Added support to load "additional" Bond objects from the data.
-//
-//  Revision 1.47  2004/05/05 19:12:41  moreland
-//  Changed default values for generateBondsByDistance and fillDisorderedGaps.
-//  Made sure that non-amino/nucleic acids are marked as UNDEFINED fragments.
-//
-//  Revision 1.46  2004/05/04 19:54:01  moreland
-//  Simplified and optimized loadFragments method and added disorder support.
-//
-//  Revision 1.45  2004/05/03 17:36:50  moreland
-//  Added get/setGenerateBondsByDistance methods to control generateBonds behavior.
-//  The loadFragments method now handles disordered residues (no "CA" atom).
-//
-//  Revision 1.44  2004/04/29 23:07:51  moreland
-//  In loadFragments, if chain_id is empty, substitute defaultChainId ("_").
-//  Reverted to distance-based bond generation until ChemComp dictionary is fixed.
-//
-//  Revision 1.43  2004/04/15 20:43:14  moreland
-//  Changed to new UCSD copyright statement.
-//  Optimized getBondIndex, addBond and removeBond methods.
-//  Added BondFactory.improveCovalentBonds call to generateBonds method.
-//
-//  Revision 1.42  2004/02/12 17:55:27  moreland
-//  Corrected typo in loadFragments method which was preventing coil growth.
-//
-//  Revision 1.41  2004/02/05 18:36:35  moreland
-//  Now computes distances using the Algebra class methods.
-//
-//  Revision 1.40  2004/01/30 22:47:56  moreland
-//  Added more detail descriptions for the class block comment.
-//
-//  Revision 1.39  2004/01/30 21:23:56  moreland
-//  Added new diagrams.
-//
-//  Revision 1.38  2004/01/29 17:08:16  moreland
-//  Updated copyright and class block comments.
-//
-//  Revision 1.37  2004/01/17 00:45:34  moreland
-//  After loading conformations, coalesce contiguous runs of coil fragments.
-//
-//  Revision 1.36  2004/01/16 23:04:21  moreland
-//  Added code to warn-about/skip reversed conformation records.
-//  Added code to warn-about/skip oversized conformation records.
-//
-//  Revision 1.35  2004/01/16 18:13:24  moreland
-//  Corrected index bug when single-residue fragments were replaced with coil.
-//
-//  Revision 1.34  2004/01/15 17:13:11  moreland
-//  Removed debug print statement.
-//
-//  Revision 1.33  2004/01/15 00:52:37  moreland
-//  Moved code that requests that each chain regenerate Fragment objects
-//  to generateFragments method to make loaded and derived methods consistent.
-//
-//  Revision 1.32  2003/12/20 01:03:44  moreland
-//  Cleaned up formatting a bit.
-//
-//  Revision 1.31  2003/12/09 21:19:50  moreland
-//  Now throws an IllegalArgumentException if the Structure argument to the contructor is null.
-//
-//  Revision 1.30  2003/11/20 21:33:52  moreland
-//  Added code to fill a new fragments Vector.
-//  Added getFragmentCount, getFragment, and getFragmentIndex access methods.
-//
-//  Revision 1.29  2003/10/23 22:05:38  moreland
-//  Changed initialize and print method from public to protected methods.
-//
-//  Revision 1.28  2003/10/17 18:19:56  moreland
-//  Fixed a javadoc comment.
-//
-//  Revision 1.27  2003/10/06 23:12:44  moreland
-//  Cleaned up code to generate Fragments in StructureMap so that Fragments are set
-//  as complete ranges (instead of individual residues - which didn't work well).
-//
-//  Revision 1.26  2003/10/01 21:19:24  agramada
-//  Added code to create fragments according to the output from the Kabsch-Sander
-//  algorithm.
-//
-//  Revision 1.25  2003/09/16 17:18:22  moreland
-//  Added code to enable secondary structure generation from data VS derivation.
-//
-//  Revision 1.24  2003/09/11 19:41:41  moreland
-//  Added a getChain method variant that takes a chainId argument.
-//
-//  Revision 1.23  2003/07/17 23:14:45  moreland
-//  The getBonds(atomVector) now returns a Vector of UNIQUE Bond objects.
-//
-//  Revision 1.22  2003/07/17 22:54:39  moreland
-//  Fixed trivial bug in getBondIndex method which always returned a -1 index value. Oops!
-//
-//  Revision 1.21  2003/07/11 23:06:26  moreland
-//  Covalent Bonds are now generated and added at construction time.
-//  Added bonds are kept sorted by both Atom's numbers for retrieval performance.
-//  Two "getBonds" methods return a Bond Vector given one or multiple Atom objects.
-//
-//  Revision 1.20  2003/04/30 17:53:31  moreland
-//  Added addChain method to add chains in sorted order.
-//  The getAtomIndex method now does a binary search.
-//  The getResidueIndex method now does a binary search.
-//
-//  Revision 1.19  2003/04/24 17:14:34  moreland
-//  Enabled the processConformations to call resetFragments for each chain.
-//
-//  Revision 1.18  2003/04/23 17:56:04  moreland
-//  Completely rewrote this class from scratch to use an direct object hierarchy
-//  rather than a index/table based model. The excentricities of data and relations
-//  were too problematic to maintain a complex cross-referencing index based model.
-//
-//  Revision 1.17  2003/04/03 18:18:51  moreland
-//  Changed Atom field "type" to "element" due to naming and meaning conflict.
-//  Changed ATOM_MAP_ and TYPES[] fields from public to protected,
-//  and removed the "getAtomMapFlags" method.
-//
-//  Revision 1.16  2003/03/14 21:08:18  moreland
-//  Divided state initialization code into separate methods in prepration to
-//  eventually add computated secondary structure code.
-//  Also added support for extracting ligands.
-//
-//  Revision 1.15  2003/03/10 23:25:54  moreland
-//  Moved "chain classification" comment to appear after the overview diagrams.
-//
-//  Revision 1.14  2003/03/10 22:52:08  moreland
-//  Changed getLeadingCaAtomIndex and getTrailingCaAtomIndex method names
-//  to getLeadingAlphaIndex and getTrailingAlphaIndex in order to reflect
-//  support for C-Alpha (amino acid) and P-alpha (nucleic acid) chain
-//  primary backbone atoms.
-//  The "residues" array's "C-alpha" index is now just the "alpha" index.
-//  The "residues" array is now fully intialized with -1 values.
-//  Added the "ligands" array to support mapping of ligands (het groups).
-//  Added methods to return ligandCount and ligand index values.
-//  When a residue has one atom (eg: O=water), the end index is now set properly.
-//
-//  Revision 1.13  2003/03/07 20:25:19  moreland
-//  Added support to provide an atom coordinate average.
-//
-//  Revision 1.12  2003/02/21 21:55:30  moreland
-//  Added bounding box computation for a Structure's atom coordinates.
-//  Added start_atom and end_atom elements to "chains" array.
-//  Added methods to get atom start/stop indexes for a residue or a chain.
-//  Added support for generating a bond list.
-//
-//  Revision 1.11  2003/02/07 17:33:29  moreland
-//  Fixed inter-chain fragment split bug.
-//
-//  Revision 1.10  2003/02/03 22:49:51  moreland
-//  Added support for Status message output.
-//
-//  Revision 1.9  2003/01/22 18:18:57  moreland
-//  Commented out debug call to printTables method.
-//
-//  Revision 1.8  2003/01/17 22:16:29  moreland
-//  Corrected getTrailingAlphaAtomIndex and getLeadingAlphaAtomIndex method
-//  index calculations.
-//
-//  Revision 1.7  2003/01/17 02:28:01  moreland
-//  Fixed the "chains" and "fragments" index calculations in the constructor.
-//  Still need to re-test the operation of the other methods in the class...
-//
-//  Revision 1.6  2003/01/07 19:35:45  moreland
-//  Changed assignment algorithm for conformation records to use the residues
-//  table for finding gaps instead of atomMap flags.
-//
-//  Revision 1.5  2002/12/20 22:27:53  moreland
-//  Fixed bug in computing end atom index for gap fragments.
-//
-//  Revision 1.4  2002/12/19 21:12:25  moreland
-//  Oops. Fixed a cut and paste error when calling getType method during
-//  the Conformation pass.
-//
-//  Revision 1.3  2002/12/17 19:19:14  moreland
-//  Added public and protected overview diagrams.
-//
-//  Revision 1.2  2002/12/16 18:28:10  moreland
-//  Updated getLeadingAlphaIndex and getTrailingAlphaIndex methods (still need testing!)
-//
-//  Revision 1.1  2002/12/16 06:31:06  moreland
-//  Added new class to enable vital derived data to be built from Structure objects.
-//  This class, in fact, forms the basis for many new/upcomming StructureDocument
-//  and Viewer features and capabilities.
-//
-//  Revision 1.0  2002/11/14 18:47:33  moreland
-//  Corrected "see" document reference.
-//
-
-
+/*
+ * BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence. This should
+ * be distributed with the code. If you do not have a copy,
+ * see:
+ *
+ * http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors. These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ * http://www.biojava.org/
+ *
+ * This code was contributed from the Molecular Biology Toolkit
+ * (MBT) project at the University of California San Diego.
+ *
+ * Please reference J.L. Moreland, A.Gramada, O.V. Buzko, Qing
+ * Zhang and P.E. Bourne 2005 The Molecular Biology Toolkit (MBT):
+ * A Modular Platform for Developing Molecular Visualization
+ * Applications. BMC Bioinformatics, 6:21.
+ *
+ * The MBT project was funded as part of the National Institutes
+ * of Health PPG grant number 1-P01-GM63208 and its National
+ * Institute of General Medical Sciences (NIGMS) division. Ongoing
+ * development for the MBT project is managed by the RCSB
+ * Protein Data Bank(http://www.pdb.org) and supported by funds
+ * from the National Science Foundation (NSF), the National
+ * Institute of General Medical Sciences (NIGMS), the Office of
+ * Science, Department of Energy (DOE), the National Library of
+ * Medicine (NLM), the National Cancer Institute (NCI), the
+ * National Center for Research Resources (NCRR), the National
+ * Institute of Biomedical Imaging and Bioengineering (NIBIB),
+ * the National Institute of Neurological Disorders and Stroke
+ * (NINDS), and the National Institute of Diabetes and Digestive
+ * and Kidney Diseases (NIDDK).
+ *
+ * Created on 2007/02/08
+ *
+ */ 
 package org.rcsb.mbt.model;
 
 
