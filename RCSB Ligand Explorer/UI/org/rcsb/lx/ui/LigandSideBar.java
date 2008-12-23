@@ -484,6 +484,8 @@ public class LigandSideBar extends JPanel
 						public void valueChanged(TreeSelectionEvent e)
 						{
 							applyButton.doClick();
+							LigandExplorer.sgetGlGeometryViewer().ligandView(
+								LigandExplorer.sgetModel().getStructures().get(0));
 						}				
 					});
 				

@@ -210,13 +210,8 @@ public class LXSceneController extends SceneController
 		interactionsCalculator.calculateInteractions(structure, hbondflag, hydroflag, otherflag,
 				hbondupper, hbondlower, hydroupper, hydrolower, otherupper,
 				otherlower, displayDisLabel, interactionsOut);
-
-		// Center the view at the ligand
-		// Status.progress(0.95f, "Centering the view at the ligand" +
-		// inLigName+"...Please wait");
-		if (!saveInteractionsToFile) {
-			LigandExplorer.sgetGlGeometryViewer().ligandView(structure);
-		}
+		
+//		LigandExplorer.sgetGlGeometryViewer().requestRepaint();
 
 		if (interactionsOut != null) {
 			interactionsOut.close();

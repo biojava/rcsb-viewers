@@ -76,6 +76,7 @@ import org.rcsb.mbt.model.attributes.StructureStylesEvent;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
+import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.vf.controllers.scene.ViewMovementThread;
 import org.rcsb.vf.glscene.jogl.AtomGeometry;
 import org.rcsb.vf.glscene.jogl.BondGeometry;
@@ -686,12 +687,29 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		super.clearStructure();
 	}
 	
-	public void handleModelChangedEvent(LXUpdateEvent evt)
+	@Override
+	public void handleUpdateEvent(UpdateEvent evt)
 	{
+		boolean transitory = (evt instanceof LXUpdateEvent)?
+			transitory = ((LXUpdateEvent)evt).transitory : false;
+		
 		switch(evt.action)
 		{
 		case CLEAR_ALL:
-			clearStructure(evt.transitory);
+			clearStructure(transitory);
+			break;
+			
+		case EXTENDED:
+			switch(((LXUpdateEvent)evt).lxAction)
+			{
+				case INTERACTIONS_CHANGED:
+					requestRepaint();
+					break;
+					
+				default:
+					super.handleUpdateEvent(evt);
+					break;
+			}
 			break;
 
 		default:
