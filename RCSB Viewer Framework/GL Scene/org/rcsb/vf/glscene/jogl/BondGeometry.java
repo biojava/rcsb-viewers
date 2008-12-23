@@ -334,7 +334,7 @@ public class BondGeometry
 		}
 
 		// Get bond length and radius
-        double bondRadius = atomRadius1 / 2.0; // XXX bondStyle.getBondRadius( bond );
+        double bondRadius = bondStyle.getBondRadius( bond );
 		double bondScale = bondRadius / 2.0f;
 		final double bondSplitLen = bondDistance / 2.0f;
 
