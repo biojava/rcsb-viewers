@@ -60,7 +60,13 @@ import java.util.Locale;
 
 /**
  * Embeds the legal statement found in 'LegalStatementHeader' in java source files.
- * If a statement already exists, removes that and replaces with this.
+ * If a statement already exists, removes that and replaces with this.  If a creation date
+ * is found, it tries to preserve it.  Otherwise, the creation date is the date the header
+ * was added.
+ * 
+ * Can be run anytime to pick up newly submitted source, change the legal statement wording,
+ * etc.  See the '@args' item in the main to get arguments.  Is expected to run from the
+ * project root.
  * 
  * @author rickb
  *
