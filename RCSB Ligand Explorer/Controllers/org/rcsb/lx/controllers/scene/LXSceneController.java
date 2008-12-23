@@ -211,8 +211,6 @@ public class LXSceneController extends SceneController
 				hbondupper, hbondlower, hydroupper, hydrolower, otherupper,
 				otherlower, displayDisLabel, interactionsOut);
 		
-//		LigandExplorer.sgetGlGeometryViewer().requestRepaint();
-
 		if (interactionsOut != null) {
 			interactionsOut.close();
 		}
