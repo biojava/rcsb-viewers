@@ -370,6 +370,13 @@ public class EmbedLegalStatement
 			}
 	}
 	
+	/**
+	 * The directory acceptance filter.  Note it is sensitive to traversal levels.
+	 * '.svn' directories never pass.
+	 * 
+	 * @author rickb
+	 *
+	 */
 	static class DirAcceptFilter implements FileFilter
 	{
 		public boolean accept(File pathname)
@@ -378,23 +385,23 @@ public class EmbedLegalStatement
 			{
 				switch(dirAction.getLevel())
 				{
-				case 0:
+				case 0:		// level zero is the top-level directories listed in dirNames, above.
 					for (String dir : dirNames)
 						if (pathname.getName().equals(dir))
 							return true;
 					break;
 					
-				case 1:
+				case 1:		// level one can have a 'bin' or 'doc*' path - ignore
 					if (!(pathname.getName().equals("bin") || pathname.getName().startsWith("doc")))
 						return true;
 					break;
 					
-				default:
+				default:	// all other levels return true if directory
 					return true;
 				}
 			}
 			
-			return false;
+			return false;	// not a directory or directory is '.svn' directory
 		}
 	}
 	
