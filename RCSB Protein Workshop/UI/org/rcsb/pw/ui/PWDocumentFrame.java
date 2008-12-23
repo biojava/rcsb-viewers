@@ -62,7 +62,6 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
-import org.rcsb.uiApp.ui.mainframe.UIBuilder;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Structure;
@@ -78,6 +77,7 @@ import org.rcsb.pw.ui.tree.TreeViewer;
 import org.rcsb.vf.controllers.scene.SceneController;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
+import org.rcsb.vf.ui.VFUIBuilder;
 
 
 public class PWDocumentFrame extends VFDocumentFrameBase 
@@ -128,7 +128,7 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 		}
 	}
 	
-	class ProteinWorkshopUIBuilder extends UIBuilder
+	class ProteinWorkshopUIBuilder extends VFUIBuilder
 	{
 		@Override
 		public void run()

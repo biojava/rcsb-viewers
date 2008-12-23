@@ -74,8 +74,8 @@ public class VFUIBuilder extends UIBuilder
 				}
 			});
 
-		insertMenuItemBefore(fileMenu, preFileExitSeparator, saveImageItem);
-		fileMenu.add(saveImageItem);
+		insertMenuItemBefore(fileMenu, fileMenuPreSeparatorIX, saveImageItem);
+//		fileMenu.add(saveImageItem);
 						// doesn't work - we need to insert before the separator...
 	}
 }

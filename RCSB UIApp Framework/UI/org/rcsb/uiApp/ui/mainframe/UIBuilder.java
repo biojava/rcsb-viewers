@@ -83,7 +83,7 @@ public class UIBuilder implements Runnable
 	protected JMenuBar menuBar;
 	protected JMenu fileMenu;		
 	protected StatusPanel statusPanel = null;
-	protected JComponent preFileExitSeparator = null;
+	protected int fileMenuPreSeparatorIX;
 	
 	public void run()
 	{
@@ -225,8 +225,8 @@ public class UIBuilder implements Runnable
 				fileMenu.add(openFileItem);
 				fileMenu.add(openUrlItem);
 				fileMenu.add(openPdbIdItem);
-				preFileExitSeparator = new JSeparator();
-				fileMenu.add(preFileExitSeparator);
+				fileMenuPreSeparatorIX = fileMenu.getItemCount();
+				fileMenu.addSeparator();
 				fileMenu.add(exitItem);
 				menuBar.add(fileMenu);
 
@@ -250,18 +250,13 @@ public class UIBuilder implements Runnable
 	 * @param beforeItem
 	 * @param insertItem
 	 */
-	protected void insertMenuItemBefore(JMenu menu, JComponent beforeItem, JMenuItem insertItem)
+	protected void insertMenuItemBefore(JMenu menu, int afterItemIX, JMenuItem insertItem)
 	{
-		if (beforeItem == null)
+		if (afterItemIX == -1)
 			menu.add(insertItem);
 		
 		else
-			for (int ix = 0; ix < menu.getItemCount(); ix++)
-				if (menu.getItem(ix) == beforeItem)
-				{
-					menu.insert(insertItem, ix);
-					break;
-				}				
+			menu.insert(insertItem, afterItemIX);
 	}
 }
 

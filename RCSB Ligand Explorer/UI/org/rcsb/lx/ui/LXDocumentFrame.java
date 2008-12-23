@@ -82,21 +82,20 @@ import org.rcsb.lx.ui.dialogs.AngleDialog;
 import org.rcsb.lx.ui.dialogs.DihedralDialog;
 import org.rcsb.lx.ui.dialogs.DistanceDialog;
 import org.rcsb.lx.ui.dialogs.IPickInfoReceiver;
+import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.uiApp.ui.FileLocs;
-import org.rcsb.uiApp.ui.mainframe.UIBuilder;
 import org.rcsb.uiApp.ui.views.StructureComponentInspector;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.mbt.model.Chain;
-import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.util.Status;
 import org.rcsb.vf.controllers.app.BBBrowserLauncher;
-import org.rcsb.vf.glscene.jogl.Constants;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
+import org.rcsb.vf.ui.VFUIBuilder;
 
 
 
@@ -113,7 +112,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 	@Override
 	public LXSceneController getSceneController() { return (LXSceneController)super.getSceneController(); }
 	
-	class LigandExplorerUIBuilder extends UIBuilder
+	class LigandExplorerUIBuilder extends VFUIBuilder
 	{
 		/**
 		 * Receive notification if a display dialog is destroyed.
@@ -190,7 +189,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 			super.run();
 			// define the base level UI items
 
-			if (!VFAppBase.backgroundScreenshotOnly)
+			if (!AppBase.backgroundScreenshotOnly)
 			{	
 
 				final JMenuItem fileSaveContactsItem = new JMenuItem("Save Interactions...");
@@ -406,7 +405,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 			// Reset the view to look at the center of the data.
 			getSceneController().resetView(false);
 
-			if (!VFAppBase.backgroundScreenshotOnly)
+			if (!AppBase.backgroundScreenshotOnly)
 			{
 				if (getModel().hasStructures())
 					setTitle(getModel().getStructures().get(0).getStructureMap().getPdbId());
