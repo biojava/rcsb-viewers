@@ -850,10 +850,10 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 
 		String dist = null;
 		try {
-			dist = distString.substring(0, index + 4);
+			dist = distString.substring(0, index + 3);
 		} catch (final Exception ex) {
 			// only one digit after the decimal to begin with
-			dist = distString.substring(0, index + 3);
+			dist = distString.substring(0, index + 2);
 		}
 		return dist;
 	}
