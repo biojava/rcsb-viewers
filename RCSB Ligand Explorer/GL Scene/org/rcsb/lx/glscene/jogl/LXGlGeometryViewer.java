@@ -784,6 +784,8 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		minX = minY = minZ = Double.MAX_VALUE;
 
 		for (Residue residue : curLigandResidues)
+		{
+			if (residue == null) continue;
 			for (Atom atom_j : residue.getAtoms())
 			{
 				maxX = Math.max(atom_j.coordinate[0], maxX);
@@ -794,6 +796,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 				minY = Math.min(atom_j.coordinate[1], minY);
 				minZ = Math.min(atom_j.coordinate[2], minZ);
 			}
+		}
 
 		return new double[][] { { minX, minY, minZ }, { maxX, maxY, maxZ } };
 	}

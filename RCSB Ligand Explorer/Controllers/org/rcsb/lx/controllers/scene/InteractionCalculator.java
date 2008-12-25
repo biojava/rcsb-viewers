@@ -86,7 +86,8 @@ public class InteractionCalculator
 		final StructureMap structureMap = structure.getStructureMap();
 		Vector<Atom> ligandAtoms = new Vector<Atom>();
 		for (Residue residue : currentLigandResidues)
-			ligandAtoms.addAll(residue.getAtoms());
+			if (residue != null)
+				ligandAtoms.addAll(residue.getAtoms());
 		
 		final Vector<Atom> proteinAtoms = new Vector<Atom>();
 
