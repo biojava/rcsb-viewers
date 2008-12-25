@@ -47,8 +47,10 @@ package org.rcsb.mbt.structLoader;
 
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -59,10 +61,10 @@ import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
-import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.UnitCell;
 import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
+import org.rcsb.mbt.model.util.Status;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -162,13 +164,20 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
     protected Vector<String> pdbResidueIds = new Vector<String>();
     protected Vector<Integer> ndbResidueIds = null;
     
+    class PdbBioIdSet
+    {
+    	String chainIds[], expressionIds[];
+    	PdbBioIdSet(String chainIds[], String expressionIds[]) { this.chainIds = chainIds; this.expressionIds = expressionIds; }
+    }
+    Map<String, PdbBioIdSet> pdbStructAssemblyMap = new TreeMap<String, PdbBioIdSet>();
+    
     /**
      * Parsing flags - some of the end element operations are controlled by these
      * @author rickb
      *
      */
     protected enum eIsParsing { NONE, CONVERSIONS, CELL, ATOM_SITES, DATABASE_PDB_MATRIX, NON_POLY_CONVERSIONS, STRUCT_BIOLGEN,
-    						    NON_CRYSTALLOGRAPHIC_OPERATIONS, LEGACY_BIOLOGIC_UNIT_OPERATIONS }
+    						    STRUCT_ASSEMBLY, NON_CRYSTALLOGRAPHIC_OPERATIONS, LEGACY_BIOLOGIC_UNIT_OPERATIONS }
     private Stack<eIsParsing> isParsingStack = new Stack<eIsParsing>();
     
     /**
@@ -229,7 +238,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
     
     protected boolean pdbStrandIdEncountered = false;
     protected boolean ndbSeqNumEncountered = false;
-    protected boolean pdbSeqNumEncountered = false;   
+    protected boolean pdbSeqNumEncountered = false;
 
     protected static final String xmlPrefix = "PDBx:";
     
@@ -273,12 +282,20 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
         endElementNonCrystallographicRunnables.put(xmlPrefix + "pdbx_struct_legacy_oper_list", createXMLRunnable__pdbx_struct_legacy_oper_list__End());
         //
         // END Legacy Biologic Unit
-        // BEG BiolGen
+        // BEG BiolGen (prior new way to specify biological unit)
         //
         startElementRunnables.put(xmlPrefix + "struct_biol_gen", createXMLRunnable__struct_biol_gen__Start());
         //
         // END BiolGen
-        //   
+        // BEG Struct Assembly Gen (new new way to specify biological unit symmetry operations)
+        //
+        startElementRunnables.put(xmlPrefix + "pdbx_struct_oper_listCategory", createXMLRunnable__pdbx_struct_oper_listCategory__Start());
+        startElementRunnables.put(xmlPrefix + "pdbx_struct_assembly_gen", createXMLRunnable__pdbx_struct_assembly_gen__Start());
+        startElementRunnables.put(xmlPrefix + "pdbx_struct_oper_list", createXMLRunnable__pdbx_struct_oper_list__Start());
+        //
+        // END Struct Assembly Gen
+        //
+        
         endElementNonCrystallographicRunnables.put(xmlPrefix + "code", createXMLRunnable__code__End());
         
         //
@@ -512,6 +529,41 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
 		        		}
 		        	}
 		        	break;
+		        	
+		        case STRUCT_ASSEMBLY:
+		        	if (qName.endsWith("name"))
+		        		curStructBiolGen.symmetryShorthand = buf.trim();
+		        	
+		        	else if (qName.endsWith("symmetry_operation"))
+		        		curStructBiolGen.setFullSymmetryOperation(buf.trim());
+		        	
+		        	else if (qName.endsWith("pdbx_struct_oper_list"))
+		        					// seems these could be contained more efficiently and
+		        					// the matrices concatenated...
+		        					//
+		        					// 25-Dec-08 -- rickb
+		        	{
+		        		PdbBioIdSet idSet =  pdbStructAssemblyMap.get(initialBioId == null? "1" : initialBioId);
+		        		if (idSet != null)
+		        		{
+		        			ModelTransformationMatrix newStructBiolGen;
+			        		for (String chainId : idSet.chainIds)
+			        			for (String expressionId : idSet.expressionIds)
+			        			{
+			        				newStructBiolGen = new ModelTransformationMatrix(curStructBiolGen);
+			        				newStructBiolGen.ndbChainId = chainId;
+			        				newStructBiolGen.id = expressionId;
+			        				structBiolGens.add(newStructBiolGen);
+			        			}	
+			        		
+			        		curStructBiolGen = null;
+		        		}
+		        	}
+		        	
+		        	else if (qName.endsWith("pdbx_struct_oper_listCategory"))
+		        		clearParsingFlag(eIsParsing.STRUCT_ASSEMBLY);
+		        	
+		        	break;
 		        
 		        case CELL:
 		        	if(qName.endsWith("length_a")) 
@@ -725,7 +777,49 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    }
    protected XMLRunnable__struct_biol_gen__Start createXMLRunnable__struct_biol_gen__Start()
    { return new XMLRunnable__struct_biol_gen__Start(); }
+   
+   protected class XMLRunnable__pdbx_struct_oper_listCategory__Start extends XMLRunnable
+   {
+	   public void run()
+	   {	   
+		   setParsingFlag(eIsParsing.STRUCT_ASSEMBLY);	   
+	   }	   
+   }
+   protected XMLRunnable__pdbx_struct_oper_listCategory__Start createXMLRunnable__pdbx_struct_oper_listCategory__Start()
+   {  return new XMLRunnable__pdbx_struct_oper_listCategory__Start(); }
+   
+   protected class XMLRunnable__pdbx_struct_assembly_gen__Start extends XMLRunnable
+   {
+	   public void run() {
+		   if (!structBiolGens.isEmpty())
+		   {
+			   structBiolGens.clear();
+			   Status.output(Status.LEVEL_REMARK, "'pdbx_struct_assembly_gen' superceding deprecated 'struct_biol_gen' key.");
+			   startElementRunnables.remove(xmlPrefix + "struct_biol_gen");
+			   					// don't allow struct_biol_gen's to be processed.
+		   }			   
+		   	   
+		   pdbStructAssemblyMap.put(attrs.getValue("assembly_id"),
+				   					new PdbBioIdSet(attrs.getValue("asym_id_list").trim().split(","),
+				   							        attrs.getValue("oper_expression").trim().split(",")));
+										// save the split out ids
+	   }
+   }
 
+   protected XMLRunnable__pdbx_struct_assembly_gen__Start createXMLRunnable__pdbx_struct_assembly_gen__Start()
+   { return new XMLRunnable__pdbx_struct_assembly_gen__Start(); }
+   
+   protected class XMLRunnable__pdbx_struct_oper_list__Start extends XMLRunnable
+   {
+	   public void run()
+	   {
+		   curStructBiolGen = new ModelTransformationMatrix();
+		   curStructBiolGen.id = attrs.getValue("id");		   
+	   }
+   }
+   protected XMLRunnable__pdbx_struct_oper_list__Start createXMLRunnable__pdbx_struct_oper_list__Start()
+   { return new XMLRunnable__pdbx_struct_oper_list__Start(); }
+  
    protected class XMLRunnable__code__End extends XMLRunnable
    {
 		public void run() {
@@ -742,6 +836,17 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__matrix11_End extends XMLRunnable       
    {
 		public void run() {
+			if (getCurrentParsingFlag() == eIsParsing.STRUCT_ASSEMBLY) return;
+						// We can get matrix and vector specifications in the struct_oper_list of the struct assembly
+						// specification (new biological unit definition).  We don't use them, and we don't want them
+						// to affect a current rotation matrix specification.  So, we block them out, this way.
+						//
+						// anyway, reading these matrix and vector specifications should be done in a more agnostic way,
+						// just accumulating a temporary matrix or vector and then copying/assigning it to the encapsulating
+						// XML tag at that tag end.  (currently, these appear to be used only for ncs_oper tags?)
+						//
+						// 2008-Dec-25 -- rickb
+			
 			final String trim = buf.trim();			
 			currentRotationMatrix.m00 = Float.parseFloat(trim);
 		}
@@ -751,6 +856,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__matrix12_End extends XMLRunnable       
    {
 		public void run() {
+			if (getCurrentParsingFlag() == eIsParsing.STRUCT_ASSEMBLY) return;
 			final String trim = buf.trim();			
 			currentRotationMatrix.m01 = Float.parseFloat(trim);
 		}
@@ -760,6 +866,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__matrix13_End extends XMLRunnable       
    {
 		public void run() {
+			if (getCurrentParsingFlag() == eIsParsing.STRUCT_ASSEMBLY) return;
 			final String trim = buf.trim();			
 			currentRotationMatrix.m02 = Float.parseFloat(trim);
 		}
@@ -769,6 +876,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__matrix21_End extends XMLRunnable       
    {
 		public void run() {
+			if (getCurrentParsingFlag() == eIsParsing.STRUCT_ASSEMBLY) return;
 			final String trim = buf.trim();			
 			currentRotationMatrix.m10 = Float.parseFloat(trim);
 		}
@@ -778,6 +886,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__matrix22_End extends XMLRunnable       
    {
 		public void run() {
+			if (getCurrentParsingFlag() == eIsParsing.STRUCT_ASSEMBLY) return;
 			final String trim = buf.trim();			
 			currentRotationMatrix.m11 = Float.parseFloat(trim);
 		}
@@ -787,6 +896,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__matrix23_End extends XMLRunnable       
    {
 		public void run() {
+			if (getCurrentParsingFlag() == eIsParsing.STRUCT_ASSEMBLY) return;
 			final String trim = buf.trim();			
 			currentRotationMatrix.m12 = Float.parseFloat(trim);
 		}
@@ -796,6 +906,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__matrix31_End extends XMLRunnable       
    {
 		public void run() {
+			if (getCurrentParsingFlag() == eIsParsing.STRUCT_ASSEMBLY) return;
 			final String trim = buf.trim();			
 			currentRotationMatrix.m20 = Float.parseFloat(trim);
 		}
@@ -805,6 +916,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__matrix32_End extends XMLRunnable       
    {
 		public void run() {
+			if (getCurrentParsingFlag() == eIsParsing.STRUCT_ASSEMBLY) return;
 			final String trim = buf.trim();			
 			currentRotationMatrix.m21 = Float.parseFloat(trim);
 		}
@@ -814,6 +926,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__matrix33_End extends XMLRunnable       
    {
 		public void run() {
+			if (getCurrentParsingFlag() == eIsParsing.STRUCT_ASSEMBLY) return;
 			final String trim = buf.trim();			
 			currentRotationMatrix.m22 = Float.parseFloat(trim);
 		}
@@ -823,6 +936,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__vector1__End extends XMLRunnable
    {
 		public void run() {
+			if (getCurrentParsingFlag() == eIsParsing.STRUCT_ASSEMBLY) return;
 			final String trim = buf.trim();			
 			currentTranslationVector.x = Float.parseFloat(trim);
 		}
@@ -832,6 +946,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__vector2__End extends XMLRunnable
    {
 		public void run() {
+			if (getCurrentParsingFlag() == eIsParsing.STRUCT_ASSEMBLY) return;
 			final String trim = buf.trim();			
 			currentTranslationVector.y = Float.parseFloat(trim);
 		}
@@ -841,6 +956,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__vector3__End extends XMLRunnable
    {
 		public void run() {
+			if (getCurrentParsingFlag() == eIsParsing.STRUCT_ASSEMBLY) return;
 			final String trim = buf.trim();			
 			currentTranslationVector.z = Float.parseFloat(trim);
 		}

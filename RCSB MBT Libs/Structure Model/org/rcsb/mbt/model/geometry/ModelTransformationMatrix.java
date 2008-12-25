@@ -103,6 +103,32 @@ public class ModelTransformationMatrix {
 	}
 	
 	/**
+	 * Default Constructor
+	 */
+	public ModelTransformationMatrix()
+	{
+		init();
+	}
+	
+	/**
+	 * Copy Constructor
+	 * 
+	 * @param src
+	 */
+	public ModelTransformationMatrix(final ModelTransformationMatrix src)
+	{
+		init();
+		for (int ix = 0; ix < 16; ix++)
+			values[ix] = src.values[ix];
+		
+		this.id = src.id;
+		this.cell = src.cell;
+		this.ndbChainId = src.ndbChainId;
+		this.symmetryShorthand = src.symmetryShorthand;
+		this.code = src.code;
+	}
+	
+	/**
 	 * This function will change the contents of result, but will not change point.
 	 */
 	public void transformPoint(final double[] point, final double[] result) {
