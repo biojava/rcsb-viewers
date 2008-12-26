@@ -155,7 +155,14 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
     public void setInitialBiologicalUnitId(final String id) { initialBioId = id; }
     
     // used temporarily to store the current atom before putting it into atomVector.
-    protected Atom curAtom = null;
+    protected class XAtom extends Atom
+    {
+    	boolean isNonProteinChainAtom = false;
+    	String auth_seq_id;
+    	String label_asym_id, label_seq_id;
+    }
+    
+    protected XAtom curAtom = null, prevAtom = null;
     protected Vector<Atom> atomVector = new Vector<Atom>();
     // used temporarily to store the information needed by the ResidueIdConverter constructor.
     // parallel arrays.
@@ -176,7 +183,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
      * @author rickb
      *
      */
-    protected enum eIsParsing { NONE, CONVERSIONS, CELL, ATOM_SITES, DATABASE_PDB_MATRIX, NON_POLY_CONVERSIONS, STRUCT_BIOLGEN,
+    protected enum eIsParsing { NONE, CONVERSIONS, CELL, ATOM_SITES, ATOM_SITE, DATABASE_PDB_MATRIX, NON_POLY_CONVERSIONS, STRUCT_BIOLGEN,
     						    STRUCT_ASSEMBLY, NON_CRYSTALLOGRAPHIC_OPERATIONS, LEGACY_BIOLOGIC_UNIT_OPERATIONS }
     private Stack<eIsParsing> isParsingStack = new Stack<eIsParsing>();
     
@@ -249,7 +256,8 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
      * (see Ligand Explorer for example)
      * @return
      */
-    protected Atom createAtom() { return new Atom(); }
+    protected XAtom createXAtom() { return new XAtom(); }
+    protected Atom createFinalAtom(Atom src) { return new Atom(src); }
     ///
     /// end type overrides
     
@@ -475,9 +483,6 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
     }
     
     private Set<String> nonProteinChainIds = new TreeSet<String>();
-    private boolean isCurrentNonProteinChain = false;
-    private String previousPdbResidueId = null;
-    private String previousNdbChainId = null;
     private int curGeneratedNdbResidueId = -1;
     private int currentModelNumber = -1;
     
@@ -489,19 +494,13 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
         
 		try
 		{
-	    	if(this.curAtom != null)
-	    	{
-	    		final XMLRunnable runnable = endElementAtomRunnables.get(qName);
-	        	if(runnable != null) {
-	    	        runnable.run();
-	        	}
-	        }
-	    	
-	    	else 
-	    	{
 	    		XMLRunnable runnable = null;
 	    		switch(getCurrentParsingFlag())
 		    	{
+	    		case ATOM_SITE:
+		    		runnable = endElementAtomRunnables.get(qName);
+		    		break;
+	    			
 		    	case CONVERSIONS:
 		        	runnable = endElementPolyConversionsRunnables.get(qName);
 		        	break;
@@ -595,7 +594,6 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
 	        	runnable.run();
 	    	}
 	    	
-		}
 		
 		catch(final Exception e)
 		{
@@ -967,7 +965,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    {
 		public void run()
 		{           
-           curAtom = null;    // flags the end of the atoms.
+		   prevAtom = curAtom = null;
 		}
    }
    protected XMLRunnable__atom_siteCategory__End createXMLRunnable__atom_siteCategory__End()
@@ -989,11 +987,11 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
 		{
 			final String trim = buf.trim();
            
-			isCurrentNonProteinChain = !trim.equals("ATOM");
+			curAtom.isNonProteinChainAtom = !trim.equals("ATOM");
 						// in particular HETATM records, but any other type of atom PDB types
 						// (other than ATOM) would fall under the 'non-protein' classification.
            
-           curAtom.name = getUnique(trim);
+           curAtom.name = getUnique(trim); // (??) -- this must be a fallback "make sure something is there" op
 		}
    }
    protected XMLRunnable__group_PDB__End createXMLRunnable__group_PDB__End() { return new XMLRunnable__group_PDB__End(); }
@@ -1012,9 +1010,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__label_comp_id__End extends XMLRunnable
    {
 		public void run() {
-			final String trim = buf.trim();
-           
-			curAtom.compound = getUnique(trim);
+			curAtom.compound = getUnique(buf.trim());
 		}
    }
    protected XMLRunnable__label_comp_id__End createXMLRunnable__label_comp_id__End()
@@ -1023,23 +1019,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__label_asym_id__End extends XMLRunnable
    {
 		public void run() {
-			final String trim = buf.trim();
-           
-           final String chainId = getUnique(trim);
-           
-           if (isCurrentNonProteinChain && !nonProteinChainIds.contains(chainId))
-           	  nonProteinChainIds.add(chainId);
-           
-           curAtom.chain_id = chainId;
-           
-           if (isCurrentNonProteinChain && !previousNdbChainId.equals(chainId))
-           {
-           	 curGeneratedNdbResidueId = 0;
-           	 previousPdbResidueId = "";
-           	 				// a new chain has to start a new residue, as well.
-           }
-           
-           previousNdbChainId = chainId;
+			curAtom.label_asym_id = buf.trim();
 		}
    }
    protected XMLRunnable__label_asym_id__End createXMLRunnable__label_asym_id__End()
@@ -1048,14 +1028,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__label_seq_id__End extends XMLRunnable
    {
 		public void run() {
-			final String residueId = buf.trim();
-           if (residueId.length() != 0)
-           	 curAtom.residue_id = Integer.parseInt(residueId);
-           
-           else
-           	 curAtom.residue_id = Integer.MIN_VALUE;  
-           			// the previous quick-fix for this situation was, ++this.curResidueId;
-           			// But it caused the mbt's bond calculation to fail. 
+			curAtom.label_seq_id = buf.trim();
 		}
    }
    protected XMLRunnable__label_seq_id__End createXMLRunnable__label_seq_id__End()
@@ -1064,12 +1037,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    protected class XMLRunnable__auth_seq_id__End extends XMLRunnable
    {
 		public void run() {
-			final String trim = buf.trim();
-           
-           if (isCurrentNonProteinChain && !previousPdbResidueId.equals(trim))
-           	 curGeneratedNdbResidueId++;
-           
-           previousPdbResidueId = trim;
+			curAtom.auth_seq_id = buf.trim();
 		}
    }
    protected XMLRunnable__auth_seq_id__End createXMLRunnable__auth_seq_id__End()
@@ -1129,26 +1097,56 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
 
    protected class XMLRunnable__Atom_Site__Start extends XMLRunnable
    {
-   	public void run()
-   	{
-			curAtom = createAtom();		// user can override
-			curAtom.number = Integer.parseInt(super.attrs.getValue("id"));      // the primary key for this atom.
-			curAtom.coordinate = new double[3];
-   	}
+	   public void run()
+	   {
+		   curAtom = createXAtom();		// user can override
+		   curAtom.number = Integer.parseInt(super.attrs.getValue("id"));      // the primary key for this atom.
+		   setParsingFlag(eIsParsing.ATOM_SITE);
+	   }
    }
 
    protected class XMLRunnable__atom_site__End extends XMLRunnable
+   										// all the info for the current atom definition is collected.
    {
-		public void run() {
-       	// ignore all but the first model, for now.
-       	if(currentModelNumber != 1 && currentModelNumber != -1)
-       		return;
-       	
-           if (curAtom.residue_id == Integer.MIN_VALUE)
-           	  curAtom.residue_id = curGeneratedNdbResidueId;
- 
-           atomVector.add(curAtom);
-		}
+	   public void run()
+	   {
+		   // ignore all but the first model, for now.
+		   if(currentModelNumber != 1 && currentModelNumber != -1)
+			   return;
+
+		   curAtom.chain_id = getUnique(curAtom.label_asym_id);
+
+		   if (prevAtom == null || !prevAtom.chain_id.equals(curAtom.chain_id))
+			   curGeneratedNdbResidueId = -1;
+		   
+		   if (curAtom.label_seq_id.length() == 0)
+			   				// there's no ndb id, so we need to provide a generated version
+		   {
+			   if (prevAtom == null || !prevAtom.auth_seq_id.equals(curAtom.auth_seq_id) || curGeneratedNdbResidueId == -1)
+				   curGeneratedNdbResidueId++;
+			   				// if the pdb id changes (or this is a new chain), bump the generated ndb id
+
+			   curAtom.residue_id = curGeneratedNdbResidueId;
+			   				// set the generated ndb residue id
+		   }
+		   
+		   else
+			   curAtom.residue_id = Integer.parseInt(curAtom.label_seq_id);
+		   					// set the provided ndb residue id
+
+		   if (curAtom.isNonProteinChainAtom && !nonProteinChainIds.contains(curAtom.chain_id))
+			   nonProteinChainIds.add(curAtom.chain_id);
+
+		   atomVector.add(createFinalAtom(curAtom));
+		   							// add atom to the atom vector based on this definition
+		   
+		   prevAtom = curAtom;
+		   							// save the previous item
+		   
+		   curAtom = null;
+		   
+		   clearParsingFlag(eIsParsing.ATOM_SITE);
+	   }
    }
    protected XMLRunnable__atom_site__End createXMLRunnable__atom_site__End()
    { return new XMLRunnable__atom_site__End(); }
@@ -1184,6 +1182,7 @@ public class StructureXMLHandler extends DefaultHandler implements IStructureLoa
    		fractionalTransformation.values[15] = 1f;
    		
    		fractionalTransformation.printMatrix("fractional transform");
+   		clearParsingFlag(eIsParsing.ATOM_SITES);
    	}
    }
    protected XMLRunnable__atom_sites__End createXMLRunnable__atom_sites__End()

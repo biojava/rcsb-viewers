@@ -51,6 +51,7 @@ import org.rcsb.ks.model.AnnotatedAtom;
 import org.rcsb.ks.model.DisplayInformation;
 import org.rcsb.ks.model.EntityDescriptor;
 import org.rcsb.ks.model.GeneralEntityDescriptor;
+import org.rcsb.ks.model.IAtomAnnotator;
 import org.rcsb.ks.model.JournalIndex;
 import org.rcsb.ks.model.KSStructureInfo;
 import org.rcsb.ks.model.PrimaryCitation;
@@ -108,8 +109,29 @@ public class KSStructureXMLHandler extends StructureXMLHandler
 
 	protected ArrayList<EntityDescriptor> entityDescriptors = new ArrayList<EntityDescriptor>();
 	
+	protected class XAnnotatedAtom extends XAtom implements IAtomAnnotator
+	{
+		private String annotation = "";
+		private String entity_id = "";		
+
+		public String getAnnotation() {
+			return annotation;
+		}
+
+		public String getEntityId() {
+			return entity_id;
+		}
+
+		public void setEntityId(String eid) {
+			entity_id = eid;
+		}		
+	}
+	
 	@Override
-	protected Atom createAtom() { return new AnnotatedAtom(); }
+	protected XAtom createXAtom() { return new XAnnotatedAtom(); }
+	
+	@Override
+	protected Atom createFinalAtom(Atom src) { return new AnnotatedAtom(src); }
 
 	public KSStructureXMLHandler(final String urlString)
 	{
@@ -308,8 +330,8 @@ public class KSStructureXMLHandler extends StructureXMLHandler
 		public void run ()
 		{
 			String eid = buf.trim ();
-			if (curAtom instanceof AnnotatedAtom)
-				((AnnotatedAtom)curAtom).setEntityId(eid);				
+			if (curAtom instanceof IAtomAnnotator)
+				((IAtomAnnotator)curAtom).setEntityId(eid);				
 		}
 	}
 	

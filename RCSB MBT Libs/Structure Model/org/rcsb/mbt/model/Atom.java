@@ -70,6 +70,15 @@ public class Atom
 	public Atom( )
 	{
 	}
+	
+	/**
+	 * Copy Constructor
+	 * @param src
+	 */
+	public Atom(Atom src)
+	{
+		copyAtomMembers(src);
+	}
 
 	//
 	// StructureComponent methods
@@ -81,8 +90,11 @@ public class Atom
 	public void copy( final StructureComponent structureComponent )
 	{
 		this.setStructure( structureComponent.getStructure() );
-		final Atom atom = (Atom) structureComponent;
-
+		copyAtomMembers((Atom) structureComponent);
+	}
+	
+	protected void copyAtomMembers(final Atom atom)
+	{
 		this.element       = atom.element;
 		this.name          = atom.name;
 		this.number        = atom.number;

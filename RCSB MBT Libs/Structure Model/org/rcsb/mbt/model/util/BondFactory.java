@@ -415,9 +415,25 @@ public class BondFactory
 						if ( atom1 == null)
 							continue;  // Shouldn't happen
 						
+/* **
+						if (DebugState.isDebug())
+						{
+							String checkCompoundCode = "998",
+								   atomCheck0 = "O1",
+								   atomCheck1 = "C1";
+							if (compoundCode.equals(checkCompoundCode)) // &&
+								//(atom0.name.equals(atomCheck0) && atom1.name.equals(atomCheck1)) ||
+								//(atom0.name.equals(atomCheck1) && atom1.name.equals(atomCheck0)))
+							{
+								int xix = 0;
+											// just a place to stop...
+							}
+						}
+/* **/
 						final Bond bond = new Bond( atom0, atom1 );
+												
 						if ( bond == null )
-							continue;  // Shouldn't happen
+								continue;  // Shouldn't happen
 
 						// Don't allow an atom to bond to itself
 						if ( atom0 == atom1 )

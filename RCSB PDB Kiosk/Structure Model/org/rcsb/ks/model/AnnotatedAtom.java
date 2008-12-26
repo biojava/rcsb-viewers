@@ -49,19 +49,26 @@ import org.rcsb.mbt.model.Atom;
 
 
 
-public class AnnotatedAtom extends Atom
+public class AnnotatedAtom extends Atom implements IAtomAnnotator
 {
 	private String annotation = "";
 	private String entity_id = "";
 	
 	public AnnotatedAtom ()
+	{		
+	}
+	
+	public AnnotatedAtom(Atom src)
 	{
-		
+		super(src);
+		if (src instanceof IAtomAnnotator)
+		{
+			IAtomAnnotator nsrc = (IAtomAnnotator)src;
+			annotation = nsrc.getAnnotation();
+			entity_id = nsrc.getEntityId();
+		}
 	}
-	public AnnotatedAtom ( String _annotation, String _entity_id ){
-		annotation = _annotation;
-		entity_id = _entity_id;
-	}
+	
 	public String getAnnotation ()
 	{
 		return annotation;
