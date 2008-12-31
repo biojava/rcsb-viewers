@@ -474,8 +474,14 @@ public class LigandSideBar extends JPanel
 				{
 					DefaultMutableTreeNode chainNode = new DefaultMutableTreeNode(chain);
 					root.add(chainNode);
-					for (Residue residue : chain.getResidues())
-						chainNode.add(new DefaultMutableTreeNode(residue));					
+					if (chain.getClassification() == Residue.Classification.LIGAND)
+						for (Residue residue : chain.getResidues())
+							chainNode.add(new DefaultMutableTreeNode(residue));
+									// add all the residues.
+					
+					else if (chain.hasModifiedResidues())
+						for (Residue residue : chain.getModifiedResidues())
+							chainNode.add(new DefaultMutableTreeNode(residue));
 				}
 			
 				ligandJList.getSelectionModel().addTreeSelectionListener(
@@ -825,7 +831,8 @@ public class LigandSideBar extends JPanel
 		final Vector<Chain> ligandList = new Vector<Chain>();
 		
 		for (Chain chain : structure.getStructureMap().getChains())
-			if (chain.getClassification() == Residue.Classification.LIGAND)
+			if (chain.getClassification() == Residue.Classification.LIGAND ||
+			    chain.hasModifiedResidues())
 				ligandList.add(chain);
 
 		return ligandList;

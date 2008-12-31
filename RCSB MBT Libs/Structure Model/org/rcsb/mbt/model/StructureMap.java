@@ -442,11 +442,22 @@ public class StructureMap
 			assert(residue != null);
 			residue.addAtom( atom );
 
+			if (residue.getClassification() == Residue.Classification.LIGAND &&
+					 chain.getClassification() != Residue.Classification.LIGAND)
+					chain.addModifiedResidue(residue);
+						// this means a residue came up unclassified (and got classified
+						// as a ligand.)  But the whole chain is *not* a ligand.
+						//
+						// We're calling this a 'modified residue' at the moment,
+						// and we store that in the chain in a list.
+						//
+						// 31-Dec-08 - rickb
+			
 			// Need to add the chain to our master list LAST
 			// so that it has a valid chain id (that needs a residue and an atom)!
 			if ( newChain )
 				this.addChain( chain );
-		}
+			}
 
 		// Walk the tree and build our ordered linear lists (residues, atoms)
 

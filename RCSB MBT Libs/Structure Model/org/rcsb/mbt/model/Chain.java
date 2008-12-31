@@ -105,6 +105,20 @@ public class Chain
 	
 	public void setIsNonProteinChain(boolean flag) { isNonProteinChain = flag; }
 	public boolean isNonProteinChain() { return isNonProteinChain; }
+	
+	public ArrayList<Residue> modifiedResidues = null;
+	public void addModifiedResidue(Residue residue)
+	{
+		if (modifiedResidues == null)
+			modifiedResidues = new ArrayList<Residue>();
+		
+		if (!modifiedResidues.contains(residue))
+			modifiedResidues.add(residue);
+	}
+	
+	public boolean hasModifiedResidues() { return modifiedResidues != null && modifiedResidues.size() > 0; }
+	
+	public ArrayList<Residue> getModifiedResidues() { return modifiedResidues; }
 
 
 	//
