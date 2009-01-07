@@ -359,6 +359,7 @@ public class ChemicalComponentBonds
 			Status.output(Status.LEVEL_REMARK, "Looking up bond information for the ligand \"" + compoundCode + "\" on pdb.org...");
 			URL bondUrl = new URL(bondFileUrlPrefix + compoundCode + bondFileUrlSuffix);
 			URLConnection urlConnection = bondUrl.openConnection();
+	        urlConnection.addRequestProperty("User-agent", "Mozilla/4.0 (compatible; MSIE 6.0;Windows NT 5.1; SV1)");
 			InputStream inputStream = urlConnection.getInputStream();
 			GZIPInputStream zin = new GZIPInputStream(inputStream);
 			ArrayList<String> bondStrings = parseCifFileForBonds(zin, null);

@@ -104,8 +104,15 @@ public class XMLStructureLoader implements IFileStructureLoader
 	public Structure load(URL url) throws IOException
 	{
 		URLConnection urlConnection = url.openConnection();
+        urlConnection.addRequestProperty("User-agent", "Mozilla/4.0 (compatible; MSIE 6.0;Windows NT 5.1; SV1)");
 		InputStream inputStream = urlConnection.getInputStream();
 		parseXMLFile(url.getFile(), inputStream);
+		return handler.getStructure();
+	}
+	
+	public Structure load(String dataset, InputStream is)
+	{
+		parseXMLFile(dataset, is);
 		return handler.getStructure();
 	}
 

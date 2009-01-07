@@ -131,6 +131,8 @@ public abstract class VFAppBase extends AppBase
 			for (int i = 0; i < args.length; i++) {
 				if (args[i].equals("-structure_url")) {
 					properties.setProperty("structure_url", args[++i]);
+				} else if (args[i].equals("-structure_id_list")) {
+					properties.setProperty("structure_id_list", args[++i]);
 				} else if (args[i].equals("-screenshot_only")) {
 					AppBase.backgroundScreenshotOnly = true;
 				} else if (args[i].equals("-screenshot_width")) {

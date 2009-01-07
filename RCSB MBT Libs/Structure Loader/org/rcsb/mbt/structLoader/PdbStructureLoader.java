@@ -305,7 +305,8 @@ public class PdbStructureLoader
 			return null;
 		}
 
-		final URLConnection urlConnection = url.openConnection( );
+		URLConnection urlConnection = url.openConnection( );
+        urlConnection.addRequestProperty("User-agent", "Mozilla/4.0 (compatible; MSIE 6.0;Windows NT 5.1; SV1)");
 		this.expectedInputBytes = urlConnection.getContentLength( );
 //			if ( expectedInputBytes <= 0 ) return null;
 		final InputStream inputStream = urlConnection.getInputStream( );

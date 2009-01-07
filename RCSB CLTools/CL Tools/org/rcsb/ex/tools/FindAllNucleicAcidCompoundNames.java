@@ -82,6 +82,7 @@ public class FindAllNucleicAcidCompoundNames {
 				System.out.println("Connecting to ftp site...");
 				URL ComponentBondsUrl = new URL(ftpInputPath);
 				URLConnection urlConnection = ComponentBondsUrl.openConnection();
+		        urlConnection.addRequestProperty("User-agent", "Mozilla/4.0 (compatible; MSIE 6.0;Windows NT 5.1; SV1)");
 				urlConnection.setReadTimeout(10000);
 				inputStream = urlConnection.getInputStream();
 				connectedMsg = "Connected, streaming nucleotide information...";
