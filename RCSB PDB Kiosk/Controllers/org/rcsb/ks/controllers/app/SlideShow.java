@@ -45,6 +45,8 @@
  */ 
 package org.rcsb.ks.controllers.app;
 
+import java.awt.FileDialog;
+import java.awt.Frame;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -52,12 +54,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.InvalidPreferencesFormatException;
+import java.util.prefs.Preferences;
+
+import javax.swing.JFileChooser;
 
 import org.rcsb.ks.glscene.jogl.KSGlGeometryViewer;
 import org.rcsb.ks.model.AnnotatedAtom;
@@ -107,8 +118,10 @@ public class SlideShow extends Thread
 	private boolean threadSuspended = false;
 
 	public SlideShow(String args[]) {
+		getMoleculeDirLoc();
 		new KioskViewer(args);
 		loadList();
+		startPreemptiveListLoadingThread();
 	}
 
 	public void suspendSlideShow(boolean _suspendThread) {
@@ -119,53 +132,132 @@ public class SlideShow extends Thread
 		return threadSuspended;
 	}
 
-	private void loadList()
+	private void getMoleculeDirLoc()
 	{
 		String fileDirectory = null;
 		
-		try {
+		try
+		{
 			File pdbPropertiesFile = new File("pdbscreensaver.properties");
-			FileInputStream pdbPropertiesInputstream = new FileInputStream(
-					pdbPropertiesFile);
-			pdbProperties.load(pdbPropertiesInputstream);
-			fileDirectory = pdbProperties.getProperty("pdbFiles");
-			setPDBFileDirectory(fileDirectory);
+			if (pdbPropertiesFile.exists())
+							// check for local properties file, first
+			{
+				FileInputStream pdbPropertiesInputstream = new FileInputStream(
+						pdbPropertiesFile);
+				pdbProperties.load(pdbPropertiesInputstream);
+				fileDirectory = pdbProperties.getProperty("pdbFiles");
 
-			// {{}}
-			File file = new File(fileDirectory + "/list.txt");
-			if (file.exists()) {
-				FileReader file_reader = new FileReader(file);
-				BufferedReader reader = new BufferedReader(file_reader);
-				String line = reader.readLine();
-				while (line != null) {
-					// System.out.println(" the line " + line);
-					String pdbId = line.substring(0, 4);
-					// pdbIdList.add("http://www.pdb.org/pdb/files/" + pdbId +
-					// ".xml.gz");
-					pdbIdList.add(pdbId);
-					line = reader.readLine();
+				File file = new File(fileDirectory + "/list.txt");
+				if (file.exists()) {
+					FileReader file_reader = new FileReader(file);
+					BufferedReader reader = new BufferedReader(file_reader);
+					String line = reader.readLine();
+					while (line != null) {
+						// System.out.println(" the line " + line);
+						String pdbId = line.substring(0, 4);
+
+						pdbIdList.add(pdbId);
+						line = reader.readLine();
+					}
 				}
-			} else {
-				File moleculeDirectory = new File("" + fileDirectory);
-				String[] files = moleculeDirectory.list();
-				for (int i = 0; i < files.length; i++) {
-					String name = files[i];
-					if (name.matches("^[A-Za-z0-9]{4}.xml.gz$")) {
-						// determine the pdb id
-						name = name.substring(0, 4);
-						pdbIdList.add(name);
+				
+				else
+				{
+					File moleculeDirectory = new File("" + fileDirectory);
+					String[] files = moleculeDirectory.list();
+					for (int i = 0; i < files.length; i++) {
+						String name = files[i];
+						if (name.matches("^[A-Za-z0-9]{4}.xml.gz$")) {
+							// determine the pdb id
+							name = name.substring(0, 4);
+							pdbIdList.add(name);
+						}
 					}
 				}
 			}
-			startPreemptiveListLoadingThread();
-		} catch (Exception e)
+			
+			else
+						// no local properties dir - set one up for downloading
+			{
+				String strError = "accessing preferences";
+				boolean createdAppDir = false;
+				File appDir = null;
+
+				try
+				{	
+					final String prefsBase = "RCSB/KioskViewer";
+					final String moleculeDirPref = prefsBase + "MoleculeDir";
+					Preferences prefRoot = Preferences.systemRoot();
+					fileDirectory = prefRoot.get(moleculeDirPref, "");
+					
+					if (fileDirectory.length() == 0)
+					{
+						final String os = System.getProperty("os.name");
+						fileDirectory = System.getProperty("user.home") + 
+							(os.startsWith("Windows")?  "/My Documents/My Molecules" :
+							 os.startsWith("Mac OS X")? "/Documents/Molecules" :
+							/* unix, et al */           "/Molecules");
+										// suggest a directory loc						
+						
+						appDir = new File(fileDirectory);
+						File chosenDir = null;
+						if (!appDir.exists())
+						{
+							createdAppDir = true;
+							appDir.mkdir();
+						}
+						
+						JFileChooser dlg = new JFileChooser();
+						dlg.setDialogTitle("Choose directory to save structure files...");
+						dlg.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+						dlg.setSelectedFile(appDir);
+						if (dlg.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+							chosenDir = dlg.getSelectedFile();
+						
+						else
+							System.exit(1);
+						
+						strError = "creating molecule directory";
+						if (!chosenDir.getAbsolutePath().equals(fileDirectory) && createdAppDir)
+						{
+							appDir.delete();
+							if (!chosenDir.exists())
+								chosenDir.mkdirs();
+						}
+						
+						fileDirectory = chosenDir.getAbsolutePath();
+						prefRoot.put(moleculeDirPref, fileDirectory);
+					}
+				}
+				
+				catch (SecurityException e)
+				{
+					System.err.println("Error in " + strError + ".");
+					System.err.print(e.getMessage());
+					if (createdAppDir)
+						appDir.delete();
+					System.exit(1);
+				}
+			}
+		}
+			
+		catch (Exception e)
 		{
 			System.err.println(
-				fileDirectory == null? "Can't open file \"pdbscreensaver.properties\"." : 
-									   "Problems with file directory: " + fileDirectory);
-			System.err.println("Current Directory: " + System.getProperty("user.dir"));
-			System.exit(1);
+					fileDirectory == null? "Can't open file \"pdbscreensaver.properties\"." : 
+										   "Problems with file directory: " + fileDirectory);
+				System.err.println("Current Directory: " + System.getProperty("user.dir"));
+				System.exit(1);
 		}
+				
+		setPDBFileDirectory(fileDirectory);
+	}
+
+	private void loadList()
+	{
+		String[] ids = ((String)KioskViewer.getApp().properties.get("structure_id_list")).split(",");
+		for (String id : ids)
+			pdbIdList.add(id);
 	}
 
 	private void setPDBFileDirectory(String _fileDirectory) {
@@ -215,6 +307,7 @@ public class SlideShow extends Thread
 							URL fileurl = new URL(url);
 							// System.out.println(" loading : " + pdbidvalue);
 							URLConnection connection = fileurl.openConnection();
+					        connection.addRequestProperty("User-agent", "Mozilla/4.0 (compatible; MSIE 6.0;Windows NT 5.1; SV1)");
 							InputStream stream = connection.getInputStream();
 							BufferedInputStream in = new BufferedInputStream(
 									stream);

@@ -131,6 +131,8 @@ public class KioskViewer extends VFAppBase
 	public static KSGlGeometryViewer sgetGlGeometryViewer() { return sgetActiveFrame().getGlGeometryViewer(); }
 	
 	private boolean initializedComplete = false;
+	private boolean downloadMode = false;
+	public boolean isDownloadMode() { return downloadMode; }
 
 	public boolean isInitialized()
 	{
