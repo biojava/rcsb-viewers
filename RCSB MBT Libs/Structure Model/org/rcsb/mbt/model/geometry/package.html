@@ -1,25 +1,12 @@
 <html>
 <head></head>
 <body>
-A full suite of geometrical manipulation utilities - matrices, vectors, etc.
 <p>
-Loaders, et al, sometimes need to apply various transformations to structure components,
-particularly in biological unit and non-crystallographic construct generations.</p>
+This package contains transform utilities used to create various transformations, including symmetry operations.
 <p>
-So, yes, this also forms the root of the 3d vector and matrice definitions used by the
-3d scene visualization modules.  They are
-here, so that the model can make use of it without bringing in the entire 3d scene
-apparatus, for analytic or other type applications that don't render visualizations.</p>
+It is distinct from similar operations in the graphics libraries, in that it doesn't require OpenGL or any other
+graphics library support.</p>
 <p>
-An alternative might be to break these out in to their own jar available to the model
-and to the 3d apps, but I don't want to get into to jar proliferation, if I can avoid it.
-The model will always need it, 3d applications will always need the model, ergo the
-model seems to be a the proper 'parent'.  That could change if we used a different
-rendering package in which case we'd want to remove anything that looks gl specific
-and put those back in the glscene module.</p>
-<p>
-I'm not going to worry about it too much, right now.</p>
-<p style="color:red">
-Note: There is a certain amount of overlap between {@linkplain org.rcsb.mbt.model.geometry.Algebra}
-and the rest, which are a bit more convenient to use.</p>
-</body>
+It could be (and would be a good idea) to re-base this on the vecmath classes found in the 3rd Party libs, since
+much of what this does is duplicated there.  Doing so would eliminate redundant functionality, and would provide
+a natural out for expansion.</p>
