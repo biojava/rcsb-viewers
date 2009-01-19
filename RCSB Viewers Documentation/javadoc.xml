@@ -6,7 +6,7 @@
  |
  -->
 <project name="DoJavaDoc" default="all" basedir=".">
-  <target name="all" depends="clean,mbt-lib,viewer-framework"/>
+  <target name="all" depends="clean,mbt-lib,uiapp-framework,viewer-framework"/>
 	
 <!-- CLEAN -->
 	
@@ -15,13 +15,27 @@
 		<!-- we don't want to get the '.svn' directory, so we name out dirs, explicitly. -->
   </target>
 	
+<!-- UIApp FRAMEWORK -->
+	
+  <target name="uiapp-framework" >
+    <javadoc packagenames="org.rcsb.uiApp.*"
+		     overview="./src/Framework/RCSB UIApp Framework/reference/overview.html"
+    		 stylesheetfile="./src/reference/reference.css"
+		     sourcepath="../RCSB UIApp Framework/UI:../RCSB UIApp Framework/Controllers:../RCSB UIApp Framework/Structure Model:../RCSB MBT Libs/Structure Model:../RCSB MBT Libs/Structure Loader"
+             destdir="./doc/Developer/RCSB UIApp Framework/reference"
+             windowtitle="RCSB PDB - UIApp Framework">
+      <doctitle><![CDATA[<h1>RCSB UIApp Framework</h1>]]></doctitle>
+		  <bottom><![CDATA[<em>Copyright &#169; 2008 Regents of the University of California, All rights reserved.</em>]]></bottom>
+    </javadoc>
+  </target>
+	
 <!-- VIEWER FRAMEWORK -->
 	
   <target name="viewer-framework" >
     <javadoc packagenames="org.rcsb.vf.*"
 		     overview="./src/Framework/RCSB Viewer Framework/reference/overview.html"
     		 stylesheetfile="./src/reference/reference.css"
-		     sourcepath="../RCSB Viewer Framework/UI:../RCSB Viewer Framework/GL Scene:../RCSB Viewer Framework/Controllers"
+		     sourcepath="../RCSB Viewer Framework/UI:../RCSB Viewer Framework/GL Scene:../RCSB Viewer Framework/Controllers:../RCSB UIApp Framework/UI:../RCSB UIApp Framework/Controllers:../RCSB UIApp Framework/Structure Model:../RCSB MBT Libs/Structure Model:../RCSB MBT Libs/Structure Loader"
              destdir="./doc/Developer/RCSB Viewer Framework/reference"
              windowtitle="RCSB PDB - Viewer Framework">
       <doctitle><![CDATA[<h1>RCSB Viewer Framework</h1>]]></doctitle>
@@ -34,22 +48,13 @@
   <target name="mbt-lib">
   	<mkdir dir="./doc/Developer/RCSB MBT Libs/reference" />
     <javadoc packagenames="org.rcsb.mbt.*"
+    		 overview="./src/Framework/RCSB MBT Libs/reference/overview.html"
     		 stylesheetfile="./src/reference/reference.css"
-		     sourcepath="../RCSB MBT Libs/Structure Model:../RCSB MBT Libs/UI:../RCSB MBT Libs/GL Scene:../RCSB MBT Libs/Controllers:../RCSB MBT Libs/Structure Loader"
+		     sourcepath="../RCSB MBT Libs/Structure Model:../RCSB MBT Libs/Structure Loader"
              destdir="./doc/Developer/RCSB MBT Libs/reference"
              windowtitle="RCSB PDB - MBT Libs">
       <doctitle><![CDATA[<h1>RCSB MBT Libs</h1>]]></doctitle>
 		  <bottom><![CDATA[<em>Copyright &#169; 2008 Regents of the University of California, All rights reserved.</em>]]></bottom>
     </javadoc>
-<!--
-  - this will be its own target and will invoke php on the standalone files, instead of straight copies.
-  - TODO - implement PHP process
-  -
-  	<copy todir="doc">
-  		<fileset dir="doc-in" >
-  			<exclude name="reference" />
-  		</fileset>
-  	</copy>
- -->
   </target>
 </project>

@@ -1,0 +1,32 @@
+<html>
+<head>
+	<title>RCSB UIApp Framework</title>
+	<meta name="date" content="2008-Aug-08" />
+	<meta name="author" content="Rick Berger" />
+</head>
+<body>
+<p>
+The <em>UIApp Framework</em> provides components necessary to make a UI (windowing) application.
+Note that it is not specifically tied to any particular visualization technology.  It is dependent
+on <em>Swing</em>.</p>
+<p>
+In particular, there are no 2d or 3d graphics modules, here.  The <em>RCSB Viewer Framework</em>
+provides additional functionality to create 3d viewer applications.</p>
+
+<p>
+Source directories in the project break out as follows:</p>
+<dl>
+<dt>Controllers ({@link org.rcsb.uiApp.controllers})</dt>
+<dd>
+Controller modules to control assembly, sequencing, module behavior and inter-relationships, etc.  The application
+class (super-controller) is defined, here.</dd>
+<dt>UI ({@link org.rcsb.uiApp.ui})</dt>
+<dd>
+UI components including the mainframe, document frame, dialogs, progress panel, etc.</dd>
+<dt>Structure Model</dt>
+<dd>
+Extensions of the {@org.rcsb.mbt.model} classes, prefixed with <em>UIApp</em>.  Applications should derive
+from these classes, rather than the MBT base classes.</dd>
+</dl>
+</body>
+</html>
