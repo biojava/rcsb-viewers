@@ -1,0 +1,13 @@
+Viewers Documentation Project
+-----------------------------
+19-Jan-09 - rickb
+
+This project is a 'pseudo-java' project - the only thing it uses is the javadoc.xml ant script
+to generate javadoc documentation for the viewers.
+
+The 'src' and 'reference' top level directories provide input to javadoc, on a per-project basis.
+
+The output is in the 'doc' top-level directory, and is also generated on a per-project basis.
+
+Note the output dirs below 'doc' are excluded from SVN, since they're generated from the ant script.
+
