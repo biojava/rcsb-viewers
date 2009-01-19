@@ -6,7 +6,7 @@
  |
  -->
 <project name="DoJavaDoc" default="all" basedir=".">
-  <target name="all" depends="clean,mbt-lib,uiapp-framework,viewer-framework"/>
+  <target name="all" depends="clean,mbt-lib,uiapp-framework,viewer-framework,protein-workshop"/>
 	
 <!-- CLEAN -->
 	
@@ -14,6 +14,21 @@
   	<delete dir="./doc/Developer" includeemptydirs="true" />
 		<!-- we don't want to get the '.svn' directory, so we name out dirs, explicitly. -->
   </target>
+	
+<!-- Protein Workshop -->
+	
+  <target name="protein-workshop" >
+    <javadoc packagenames="org.rcsb.pw.*"
+		     overview="./src/Viewers/RCSB Protein Workshop/reference/overview.html"
+    		 stylesheetfile="./src/reference/reference.css"
+		     sourcepath="../RCSB Protein Workshop/Controllers:../RCSB Protein Workshop/UI:../RCSB Protein Workshop/GL Scene:../RCSB Viewer Framework/UI:../RCSB Viewer Framework/GL Scene:../RCSB Viewer Framework/Controllers:../RCSB UIApp Framework/UI:../RCSB UIApp Framework/Controllers:../RCSB UIApp Framework/Structure Model:../RCSB MBT Libs/Structure Model:../RCSB MBT Libs/Structure Loader"
+             destdir="./doc/Developer/Protein Workshop/reference"
+             windowtitle="RCSB PDB - Protein Workshop">
+      <doctitle><![CDATA[<h1>RCSB Protein Workshop</h1>]]></doctitle>
+		  <bottom><![CDATA[<em>Copyright &#169; 2008 Regents of the University of California, All rights reserved.</em>]]></bottom>
+    </javadoc>
+  </target>
+
 	
 <!-- UIApp FRAMEWORK -->
 	
