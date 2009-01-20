@@ -1,0 +1,27 @@
+<html>
+<head>
+<title>RCSB Viewers - PDB Kiosk</title>
+</head>
+<body>
+<p>
+The <em>PDB Kiosk</em> is a 'show' viewer - it runs through a set of structures and displays them
+in slide-show fashion, moving the camera in smooth animations to view the current structure from
+different angles and attributes.  In addition, it will focus in on any non-structural molecules.
+A panel at the base provides author and other information.</p>
+<p>
+This viewer is driven by either:</p>
+<ul>
+<li> a file in it's current directory (called screensaver.properties) to
+point to a directory containing structure files.</li>
+<li> a file in that directory called files.txt, naming files or bare structure ids
+<li> a list of structures provided after the argument <em>-structure-id-list</em>, comma separated.</li>
+</ul>
+<p>
+When only structure id's are present, they are downloaded from the <em>RCSB PDB Website</em>.  See the
+source documentation for details.</p>
+<p>
+Note that to debug the PDB Kiosk, you have to use two machines and debug remotely, since it puts the display in
+full-screen mode.  Read the <em>Eclipse</em> documentation (or whatever development environment
+you're working in) for instructions on how to do that.</p>
+</body>
+</html>
