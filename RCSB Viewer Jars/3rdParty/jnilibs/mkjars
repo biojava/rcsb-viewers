@@ -52,3 +52,8 @@ foreach DIRNAME (`ls -1d jogl-*`)
   endif
   popd
 end
+
+cd ..
+cp "../3rd Party Libs/jai/lib/*.jar" .
+cp "../3rd Party Libs/vecmath.jar" .
+## 						Overwrite these so they can be re-signed
