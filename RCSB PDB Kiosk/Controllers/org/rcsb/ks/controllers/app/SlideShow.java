@@ -45,8 +45,6 @@
  */ 
 package org.rcsb.ks.controllers.app;
 
-import java.awt.FileDialog;
-import java.awt.Frame;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -54,18 +52,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FilenameFilter;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Vector;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
 import javax.swing.JFileChooser;
@@ -117,7 +109,8 @@ public class SlideShow extends Thread
 
 	private boolean threadSuspended = false;
 
-	public SlideShow(String args[]) {
+	public SlideShow(String args[])
+	{
 		getMoleculeDirLoc();
 		new KioskViewer(args);
 		loadList();
@@ -187,7 +180,7 @@ public class SlideShow extends Thread
 				{	
 					final String prefsBase = "RCSB/KioskViewer";
 					final String moleculeDirPref = prefsBase + "MoleculeDir";
-					Preferences prefRoot = Preferences.systemRoot();
+					Preferences prefRoot = Preferences.userRoot();
 					fileDirectory = prefRoot.get(moleculeDirPref, "");
 					
 					if (fileDirectory.length() == 0)
@@ -197,7 +190,7 @@ public class SlideShow extends Thread
 							(os.startsWith("Windows")?  "/My Documents/My Molecules" :
 							 os.startsWith("Mac OS X")? "/Documents/Molecules" :
 							/* unix, et al */           "/Molecules");
-										// suggest a directory loc						
+										// suggest a directory loc		
 						
 						appDir = new File(fileDirectory);
 						File chosenDir = null;
