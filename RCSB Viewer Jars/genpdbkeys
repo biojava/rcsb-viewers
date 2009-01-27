@@ -4,5 +4,5 @@
 # expires. 
 #
 rm pdbkeys
-keytool -genkey -alias RCSB-PDB -keypass pdb0922 -keystore pdbkeys -storepass pdb0922 -dname "cn=Peter Rose, ou=PDB o=RCSB, c=US" -keystore pdbkeys
-keytool -selfcert -alias RCSB-PDB -keypass pdb0922 -dname "cn=Peter Rose, o=RCSB, c=US" -keystore pdbkeys -storepass pdb0922
+keytool -genkey -alias RCSB-PDB -keypass pdb0922 -keystore pdbkeys -storepass pdb0922 -dname "cn=RCSB PDB, ou=PDB o=RCSB, c=US" -keystore pdbkeys
+keytool -selfcert -alias RCSB-PDB -keypass pdb0922 -dname "cn=RCSB PDB, o=RCSB, c=US" -keystore pdbkeys -storepass pdb0922
