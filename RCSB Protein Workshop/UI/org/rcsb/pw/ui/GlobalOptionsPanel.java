@@ -69,7 +69,8 @@ public class GlobalOptionsPanel extends JPanel
     private final JButton resetButton = new JButton("Reset");
     private final JButton saveImageButton = new JButton("Save Image");
 //    JButton saveStateButton = new JButton("Save Orientation, Coloring, etc.");
-    private final JButton advancedSaveImageButton = new JButton("Advanced Image Editor");
+//    private final JButton advancedSaveImageButton = new JButton("Advanced Image Editor");
+    		// image editor removed, was non-functional, anyway - rickb
 //    JButton measureDistanceButton = new JButton("Draw Line");
 //    LoadStructurePanel loadStructurePanel;
     private final StatePanel statePanel = new StatePanel();
@@ -86,7 +87,7 @@ public class GlobalOptionsPanel extends JPanel
         super.add(this.resetButton);  
         super.add(this.saveImageButton);
 //        super.add(this.saveStateButton);
-        super.add(this.advancedSaveImageButton);
+//       super.add(this.advancedSaveImageButton);  
 //        super.add(this.loadStructurePanel);
         //super.add(this.measureDistanceButton);
         super.add(this.statePanel);
@@ -113,7 +114,7 @@ public class GlobalOptionsPanel extends JPanel
         
 //        this.measureDistanceButton.setToolTipText("Click two items in the 3d viewer (left) to draw a line between them. TODO: selections in the tree will work too.");
         
-        this.advancedSaveImageButton.addActionListener(new AdvancedImageAction());
+        // this.advancedSaveImageButton.addActionListener(new AdvancedImageAction());
      }
 
     private final class SaveImageListener implements ActionListener {
@@ -129,7 +130,10 @@ public class GlobalOptionsPanel extends JPanel
 //		    Controller.updateController().saveState();
 //		}
 //	}
-
+    
+ /* **
+ // Image Editor removed - not working.  28-Jan-08, rickb
+ //
 	private class AdvancedImageAction implements ActionListener {
     	private final class ImageEditorOpenerThread extends Thread {
     		private final class ScreenshotWaiterThread extends Thread {
@@ -188,4 +192,5 @@ public class GlobalOptionsPanel extends JPanel
 		}
     	
     }
+/* **/
 }
