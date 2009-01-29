@@ -30,6 +30,16 @@ Once the jars are created, they need signing before they can be sent to
 the server.  You can sign the jars by
 running the 'signjars.xml' file as an ant script.</p>
 
+<p>
+Note also the 'genpdbkeys' script (.csh script).  Running this will create a new pdbkeys file.
+Because we're self-signing jars, certificates only last three months (even though it says six
+in the signing operation.)  So, every three months, or so (or maybe every new release), the
+pdbkeys file needs to be regenerated with a new certifiate and <em>all</em> the jars need to
+be re-signed with that new certificate.</p>
+
+<p>
+In particular, note the 3rdParty documentation for re-creating unsigned 3rd party jars for re-signing.</p>
+
 <h1>Summary Jar Locations</h1>
 <ul>
   <li>3rd Party - these are done by hand as needed.</li>

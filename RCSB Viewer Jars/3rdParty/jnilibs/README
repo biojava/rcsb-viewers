@@ -21,7 +21,9 @@ These are the jnilibs re-jar'd and expanded for two purposes:
 
 Java Webstart is a bit more of an issue.  At least on Linux, 64 bit
 webstart isn't supported.  Presumably it will be in the future, and
-when it is, we should be ready for it with already signed jars.
+when it is, we should be ready for it with already signed jars.  Unfortunately,
+the names conflict with the 32 bit versions, so some further separation and
+organization is needed.
 
 64 bit Windows is an unknown as we haven't tried it under Vista on a
 dual-core machine, yet.
