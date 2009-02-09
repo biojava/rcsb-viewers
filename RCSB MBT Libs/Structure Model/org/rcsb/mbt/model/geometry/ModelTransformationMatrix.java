@@ -516,10 +516,10 @@ public class ModelTransformationMatrix {
 	public void updateFullSymmetryDataWithInverseFractionalTransform(
 			final ModelTransformationMatrix fractional,
 			final ModelTransformationMatrix fractionalInverse) {
-		ModelTransformationMatrix result = this.multiply4square_x_4square2(fractionalInverse,
+		ModelTransformationMatrix result = multiply4square_x_4square2(fractionalInverse,
 				this);
 		result.printMatrix("**fractional * symmetry**");
-		result = this.multiply4square_x_4square2(result, fractional);
+		result = multiply4square_x_4square2(result, fractional);
 		this.values = result.values;
 		
 		// quick fix, to remove rounding errors.
@@ -533,7 +533,7 @@ public class ModelTransformationMatrix {
 		this.printMatrix("**symmetry * inverse fractional**");
 	}
 
-	private ModelTransformationMatrix multiply4square_x_4square2(
+	public static ModelTransformationMatrix multiply4square_x_4square2(
 			final ModelTransformationMatrix leftMat, final ModelTransformationMatrix rightMat) {
 		final ModelTransformationMatrix result = new ModelTransformationMatrix();
 		result.init();
