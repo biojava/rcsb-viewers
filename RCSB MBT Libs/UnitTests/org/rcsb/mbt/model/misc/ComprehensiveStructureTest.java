@@ -43,24 +43,16 @@
  * Created on 2008/12/22
  *
  */ 
-package org.rcsb.mbt.tests.model;
+package org.rcsb.mbt.model.misc;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.TreeMap;
-import java.util.Vector;
 import java.util.zip.GZIPOutputStream;
 
-import org.rcsb.mbt.model.Bond;
-import org.rcsb.mbt.model.Structure;
-import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.util.DebugState;
-import org.rcsb.mbt.tests.utils.TestsInputOutputDirs;
-import org.rcsb.mbt.tests.utils.TestsInputOutputDirs.DirIndex;
-import org.rcsb.demo.MBT.SimpleReadStructureDemo;
+import org.rcsb.mbt.model.misc.TestsInputOutputDirs.DirIndex;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;

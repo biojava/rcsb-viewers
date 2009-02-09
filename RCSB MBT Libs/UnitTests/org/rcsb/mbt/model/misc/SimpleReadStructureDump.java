@@ -43,14 +43,13 @@
  * Created on 2008/12/22
  *
  */ 
-package org.rcsb.mbt.tests.model;
+package org.rcsb.mbt.model.misc;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.Vector;
 
 import org.rcsb.demo.MBT.SimpleReadStructureDemo;

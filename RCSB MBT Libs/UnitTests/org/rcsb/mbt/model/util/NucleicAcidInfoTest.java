@@ -43,7 +43,7 @@
  * Created on 2008/12/22
  *
  */ 
-package org.rcsb.mbt.tests.model;
+package org.rcsb.mbt.model.util;
 
 import org.rcsb.mbt.model.util.NucleicAcidInfo;
 import org.testng.Assert;

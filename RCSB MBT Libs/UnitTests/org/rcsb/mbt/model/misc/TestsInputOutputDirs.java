@@ -43,9 +43,8 @@
  * Created on 2008/12/22
  *
  */ 
-package org.rcsb.mbt.tests.utils;
+package org.rcsb.mbt.model.misc;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 

@@ -43,7 +43,7 @@
  * Created on 2008/12/22
  *
  */ 
-package org.rcsb.mbt.tests.model;
+package org.rcsb.mbt.model.util;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -52,7 +52,7 @@ import java.io.PrintStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.rcsb.demo.MBT.DumpPeriodicTable;
-import org.rcsb.mbt.tests.utils.TestsInputOutputDirs;
+import org.rcsb.mbt.model.misc.TestsInputOutputDirs;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
