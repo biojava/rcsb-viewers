@@ -79,7 +79,10 @@ public class StructurePanel extends Box
 			{
 				super.setBounds ( _x, _y, _w, _h );
 				structureIdPanel.setBounds ( 2, 2, 650, _h-2 );
-				stateAnnotationPanel.setBounds ( _w-300, 2, 298, _h-2 );
+//              long ligand names are cutoff in the annotation panel
+//              increased width by 100 pixels				
+//				stateAnnotationPanel.setBounds ( _w-300, 2, 298, _h-2 );
+				stateAnnotationPanel.setBounds ( _w-400, 2, 298, _h-2 );
 			}
 		};
 		panel.setBackground( Color.black );
