@@ -45,8 +45,6 @@
  */ 
 package org.rcsb.ks.controllers.app;
 
-// package edu.sdsc.vis.viewers;
-
 import java.net.URL;
 
 import org.rcsb.ks.controllers.doc.KSDocController;
@@ -66,8 +64,6 @@ import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
  * <P>
  * 
  * @author John L. Moreland
- * @copyright SDSC
- * @see
  */
 public class KioskViewer extends VFAppBase
 {
@@ -113,7 +109,11 @@ public class KioskViewer extends VFAppBase
 	{
 		super(args);
 		initialize();
-		sgetSceneController().setShowAsymmetricUnitOnly(true);
+		//sgetSceneController().setShowAsymmetricUnitOnly(true);
+		// Enable display of biological units. If the command line flag
+		// -show_asymmetric_unit_only is specified, the asymmetric unit will
+		// be displayed, otherwise the biological unit will be displayed.
+		sgetSceneController().setShowAsymmetricUnitOnly(false);
 	}
 	
 	private void initialize()
