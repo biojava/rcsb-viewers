@@ -56,6 +56,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.prefs.Preferences;
@@ -112,6 +113,7 @@ public class SlideShow extends Thread
 	public SlideShow(String args[])
 	{
 		getMoleculeDirLoc();
+		System.out.println("Kiosk Viewer arguments: " + Arrays.toString(args));
 		new KioskViewer(args);
 		loadList();
 		startPreemptiveListLoadingThread();
@@ -248,9 +250,15 @@ public class SlideShow extends Thread
 
 	private void loadList()
 	{
-		String[] ids = ((String)KioskViewer.getApp().properties.get("structure_id_list")).split(",");
-		for (String id : ids)
-			pdbIdList.add(id);
+		String structureList = ((String)KioskViewer.getApp().properties.get("structure_id_list"));
+
+		if (structureList != null) {
+			String[] ids = ((String)KioskViewer.getApp().properties.get("structure_id_list")).split(",");
+
+			for (String id : ids) {
+				pdbIdList.add(id);
+			}
+		}
 	}
 
 	private void setPDBFileDirectory(String _fileDirectory) {
@@ -298,7 +306,7 @@ public class SlideShow extends Thread
 								+ pdbidvalue + ".xml.gz";
 						try {
 							URL fileurl = new URL(url);
-							// System.out.println(" loading : " + pdbidvalue);
+						 System.out.println(" loading from www.pdb.org: " + pdbidvalue);
 							URLConnection connection = fileurl.openConnection();
 					        connection.addRequestProperty("User-agent", "Mozilla/4.0 (compatible; MSIE 6.0;Windows NT 5.1; SV1)");
 							InputStream stream = connection.getInputStream();
