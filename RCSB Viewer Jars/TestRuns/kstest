@@ -1,3 +1,4 @@
 #! /bin/tcsh
 source setargs.csh
+# Displays asymmetric units of molecules
 java $PATHARGS -jar ../RCSBViewers/RCSB-Kiosk.jar -show_asymmetric_unit_only
