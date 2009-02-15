@@ -45,30 +45,20 @@
  */ 
 package org.rcsb.vf.controllers.app;
 
-// package edu.sdsc.vis.viewers;
-
-// CORE JAVA
-
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.net.URL;
+import java.util.Arrays;
 
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.doc.DocController;
-import org.rcsb.uiApp.ui.mainframe.DocumentFrameBase;
 import org.rcsb.vf.controllers.doc.VFDocController;
 import org.rcsb.vf.controllers.scene.SceneController;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
-
-
-
-
 
 import com.sun.opengl.impl.GLPbufferImpl;
 
@@ -79,7 +69,6 @@ import com.sun.opengl.impl.GLPbufferImpl;
  * 
  * @author John L. Moreland
  * @author rickb
- * @copyright SDSC
  * @see
  */
 public abstract class VFAppBase extends AppBase
@@ -114,16 +103,11 @@ public abstract class VFAppBase extends AppBase
 	/**
 	 * Constructor - parses args and registers a panel(?)
 	 * 
-	 * @param args - passed in from the derived class (from the commandline)
-	 * @param isSimpleViewer - temporary indicator.  SimpleViewer has different
-	 * 						   display capabilities that will have to be addressed
-	 * 						   in the future.
-	 * 
-	 * 						   This is needed so the viewers will behave as they did
-	 * 						   before the massive refactoring.
+	 * @param args - passed in from the derived class (from the command line)
 	 */
 	public VFAppBase(String args[])
 	{
+		
 		super(args);
 		
 		if (args != null)
@@ -153,14 +137,11 @@ public abstract class VFAppBase extends AppBase
 					properties.setProperty("disable_global_transforms", "true");
 				} else if (args[i].equals("-show_asymmetric_unit_only")) {
 					properties.setProperty("show_asymmetric_unit_only", "true");
-	
 				} else if (args[i].equals("-global_rotation_matrices")) {
 					properties.setProperty("global_rotation_matrices", args[++i]);
 				} else if (args[i].equals("-global_translation_vectors")) {
 					properties.setProperty("global_translation_vectors", args[++i]);
 				}
-				// simpleViewer.properties.setProperty( "immuno_base_path",
-				// args[++i] );
 			}
 		}
 	}
@@ -214,11 +195,12 @@ public abstract class VFAppBase extends AppBase
 		getActiveFrame().getDocController().setInitialBiologicalUnitId(unitId);
 	
 		final String showAsymmetricUnitOnly = this.properties.getProperty("show_asymmetric_unit_only");
-		if (showAsymmetricUnitOnly != null && showAsymmetricUnitOnly.equals("true"))
+		if (showAsymmetricUnitOnly != null && showAsymmetricUnitOnly.equals("true")) {
 			sceneController.setShowAsymmetricUnitOnly(true);
-		
-		else
+		}
+		else {
 			sceneController.setShowAsymmetricUnitOnly(false);
+		}
 	
 		final String disableGlobalTransforms = this.properties
 				.getProperty("disable_global_transforms");
