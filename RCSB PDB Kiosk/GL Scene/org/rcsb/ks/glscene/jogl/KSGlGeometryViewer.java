@@ -51,6 +51,7 @@ import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 
 public class KSGlGeometryViewer extends GlGeometryViewer
 {	
+	private static final long serialVersionUID = -6513415655162930527L;
 	private boolean suspendAllPainting = false;
 	
 	@Override
