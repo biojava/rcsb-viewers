@@ -45,51 +45,47 @@
  */ 
 package org.rcsb.ks.model;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+/**
+ * The StructureAuthor class hold the author names of a structure.
+ * 
+ * @author Peter Rose
+ *
+ */
+public class StructureAuthor {
 
-public class PrimaryCitation {
-
-	private JournalIndex journalIndex = null;
-
-	private ArrayList authors = null;
+	private List<String> authors = Collections.emptyList();
 
 	/**
-	 * We're going to start with this.. but I know there is more we can add in
-	 * the future. For example, I can see that Mesh terms may be applicable to
-	 * this object...
+	 * Set the structure authors (audit_author)
+	 * @param authors of the structure
 	 */
-	public PrimaryCitation(JournalIndex _journal, ArrayList _authors) {
-		journalIndex = _journal;
-		authors = _authors;
-//		System.out.println (" the title of the priary citation is : " + journalIndex.getTitle () );
+	public void setAuthors(List<String> authors) {
+		this.authors = authors;
 	}
-
-	public ArrayList getAuthors() {
-		return authors;
-	}
-
-	public JournalIndex getJournalIndex() {
-		return journalIndex;
-	}
-
-	public String getAuthorsAsString() {
-
-		if ( authors == null || authors.size() <= 0 )
-			return "Unknown";
-		String authorsList = "";
-		for (int i = 0; i < authors.size(); i++) {
-			String a = (String) authors.get(i);
+	
+	/**
+	 * Gets a comma separated list of the authors of this article.
+	 * If the number of authors exceeds the maximum number of
+	 * specified authors, et al. is added at the end of the list.
+	 * @param maxAuthorNames maximum number of authors to display
+	 * @return
+	 */
+	public String getAuthorsAsString(int maxAuthorNames) {
+		StringBuilder sb = new StringBuilder();
+		
+		int n = Math.min(maxAuthorNames, authors.size());
+		for (int i = 0; i < n; i++) {
+			sb.append(authors.get(i));
 			if (i < authors.size()-1) {
-				authorsList += a + ", ";
-			} else {
-				authorsList += a;
+				sb.append(", ");
 			}
 		}
-		return authorsList;
+		
+		if (n < authors.size()) {
+			sb.append("et al.");
+		}
+		return sb.toString();
 	}
-
-	public void setAuthors(ArrayList _authors) {
-		authors = _authors;
-	}
-
 }

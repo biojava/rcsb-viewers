@@ -42,94 +42,80 @@
  *
  * Created on 2006/06/30
  *
- */ 
+ */
 package org.rcsb.ks.model;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.List;
 
-import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.StructureInfo;
 
-
-
 /**
- *  Implements a StructureComponent container for Structure information data.
- *  This information includes data such as authors, dates, and data sources.
- *  <P>
- *  @author	John L. Moreland, Jeff Milton (modified for the outreach viewer)
- *  @see	org.rcsb.mbt.model.Structure
- *  
- *  This may either contain duplicate information in the MBT lib StructureInfo, or
- *  supercede it - not sure.  The *Primary Citation* field looks suspiciously like
- *  the *author* field in the lib version.
- *  
- *  Anyway, the only place the lib version is created is in cifStructureLoader, so
- *  if cif files are being read, it may either be clobbered by or clobber this, but
- *  only for cif files.
- *  
- *  More study required.
- *  
- *  TODO: reconcile this with the MBT lib StructureInfo.
- *  
- *  30-May-08 - rickb
- *  
+ * Implements a StructureComponent container for Structure information data.
+ * This information includes data such as authors, dates, and data sources.
+ * <P>
+ * 
+ * @author John L. Moreland, Jeff Milton (modified for the outreach viewer)
+ * @see org.rcsb.mbt.model.Structure This may either contain duplicate
+ *      information in the MBT lib StructureInfo, or supercede it - not sure.
+ *      The *Primary Citation* field looks suspiciously like the *author* field
+ *      in the lib version.
+ * 
+ *      Anyway, the only place the lib version is created is in
+ *      cifStructureLoader, so if cif files are being read, it may either be
+ *      clobbered by or clobber this, but only for cif files.
+ * 
+ *      More study required.
+ * 
+ *      TODO: reconcile this with the MBT lib StructureInfo.
+ * 
+ *      30-May-08 - rickb
+ * 
  */
-public class KSStructureInfo extends StructureInfo
-{
-	//
-	// Constructor
-	//
+public class KSStructureInfo extends StructureInfo {
+	private StructureAuthor structureAuthor = new StructureAuthor();
+	private JournalArticle journalArticle = new JournalArticle();
+	private List<EntityDescriptor> entityDescriptors = new ArrayList<EntityDescriptor>();
 
-
-	private PrimaryCitation primaryCitation = null;
-	
-	/**
-	 *  Constructs a new StructureInfo object and initializes the fields
-	 *  to empty values.
-	 */
-	public KSStructureInfo( )
-	{
-	}
-	
-	public void setPrimaryCitation ( PrimaryCitation _primaryCitation )
-	{
-		primaryCitation = _primaryCitation;
+	public void setStructureAuthor(StructureAuthor structureAuthor) {
+		this.structureAuthor = structureAuthor;
 	}
 
-	private ArrayList descriptors = null;
-
-	public PrimaryCitation getPrimaryCitation() {
-		return primaryCitation;
+	public void setJournalArticle(JournalArticle journalArticle) {
+		this.journalArticle = journalArticle;
 	}
 
-	public void setDescriptors(ArrayList entityDescriptors) {
-		descriptors  = entityDescriptors;		
+	public StructureAuthor getStructureAuthor() {
+		return structureAuthor;
 	}
-	public void addDescriptor ( EntityDescriptor _descriptor ){
-		descriptors.add( _descriptor );
+
+	public JournalArticle getJournalArticle() {
+		return journalArticle;
 	}
-	
-	public EntityDescriptor getDescriptor ( String _id )
-	{
-		for (int i = 0; i < descriptors.size (); i++) {
-			EntityDescriptor desc = ( EntityDescriptor ) descriptors.get ( i );
-			if ( desc.getEntityId ().equalsIgnoreCase ( _id ))
-				return desc;
-			
+
+	public void setDescriptors(List<EntityDescriptor> entityDescriptors) {
+		this.entityDescriptors = entityDescriptors;
+	}
+
+	public void addDescriptor(EntityDescriptor entityDescriptor) {
+		entityDescriptors.add(entityDescriptor);
+	}
+
+	public EntityDescriptor getDescriptor(String id) {
+		for (EntityDescriptor descriptor : entityDescriptors) {
+			if (descriptor.getEntityId().equalsIgnoreCase(id)) {
+				return descriptor;
+			}
 		}
 		return null;
 	}
-	
-	
-	public ArrayList getDescriptors ()
-	{
-		return descriptors;
+
+	public List<EntityDescriptor> getDescriptors() {
+		return entityDescriptors;
 	}
 
-	public EntityDescriptor getDescriptor ( Residue _r ) {
-		return null;
-		
-	}
+//	public EntityDescriptor getDescriptor(Residue _r) {
+//		return null;
+//
+//	}
 }
-
