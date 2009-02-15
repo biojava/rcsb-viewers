@@ -57,6 +57,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.prefs.Preferences;
@@ -94,14 +97,15 @@ import org.rcsb.vf.glscene.jogl.JoglSceneNode;
  * specified in a 'screensaver.properties' file, then insures they're retrieved if
  * on the net to a local area, and runs through them, displaying them in various states.
  * 
- * @author rickb
+ * @author Rick Berger
+ * @author Peter Rose (revisions)
  *
  */
 public class SlideShow extends Thread
 {
 	private boolean slideShow = true;
 
-	private ArrayList<String> pdbIdList = new ArrayList<String>();
+	private List<String> pdbIdList = new ArrayList<String>();
 
 	// {{ load in the properties files }}
 	private Properties pdbProperties = new Properties();
@@ -355,7 +359,8 @@ public class SlideShow extends Thread
 			}
 		}
 		int index = 0;
-		int movementDuration = 5000;  // milliseconds
+//		int movementDuration = 5000;  // milliseconds
+		int movementDuration = 4000;
 		int pause = 1000;
 		
 		ViewMovementThread.setDuration(movementDuration);
@@ -391,9 +396,9 @@ public class SlideShow extends Thread
 
 			// {{ check the size of the structure. If it is too big then we will
 			// punt }}
-			Structure structure = model.getStructures().get(0);
-			System.out.println(" atom count : "
-					+ structure.getStructureMap().getAtomCount());
+//			Structure structure = model.getStructures().get(0);
+//			System.out.println(" atom count : "
+//					+ structure.getStructureMap().getAtomCount());
 
 			// double[] ccc = model.getStructures()[0].getStructureMap()
 			// .getAtomCoordinateAverage();
@@ -406,7 +411,8 @@ public class SlideShow extends Thread
 				System.err.println(" failed... failed ... failed ");
 			}
 			gviewer.suspendAllPainting();
-			ArrayList<SceneState> states = generateStates();
+
+			List<SceneState> states = generateStates();
 			gviewer.resumePainting();
 
 			for (SceneState state : states)
@@ -495,31 +501,9 @@ public class SlideShow extends Thread
 		AppBase.sgetDocController().loadStructure(url, _id);
 	}
 
-/* **
-	private StateAnnotationPanel createStateAnnotationPanel() {
-		return new StateAnnotationPanel();
-	}
-
-	private StructureIdPanel createStuctureIdPanel() {
-		StructureIdPanel structureIdPanel = new StructureIdPanel();
-		return structureIdPanel;
-	}
-
-	private ArrayList generateSlowStates()
+	private List<SceneState> generateStates()
 	{
-		ArrayList list = new ArrayList();
-		StructureModel model = AppBase.sgetModel();
-		KSGlGeometryViewer gl = KioskViewer.sgetGlGeometryViewer();
-		double[] pivot = model.getStructures().get(0).getStructureMap().getAtomCoordinateAverage();
-		generateState(pivot, list, "");
-		return list;
-	}
-* **/
-
-	private ArrayList<SceneState> generateStates()
-	{
-
-		ArrayList<SceneState> statelist = new ArrayList<SceneState>();
+		List<SceneState> statelist = new ArrayList<SceneState>();
 		StructureModel model = AppBase.sgetModel();
 		KSGlGeometryViewer gl = KioskViewer.sgetGlGeometryViewer();
 		double[] pivot = model.getStructures().get(0).getStructureMap()
@@ -536,89 +520,37 @@ public class SlideShow extends Thread
 		KSStructureInfo structureInfo = (KSStructureInfo)model.getStructures().get(0).getStructureInfo();
 
 		StructureMap sm = model.getStructures().get(0).getStructureMap();
-		int ligandCount = sm.getLigandCount();
-		if (ligandCount <= 4)
-		{
-			for (int j = 0; j < ligandCount; j++) {
-				Residue r = sm.getLigandResidue(j);
-				if (!r.getCompoundCode().equalsIgnoreCase("HOH")) {
-					if (r.getAtoms().size() > 5) {
-						Atom atom = r.getAtom(0);
-						double c[] = atom.coordinate;
-						double[] eye = new double[3];
-						eye[0] = c[0] - 20;
-						eye[1] = c[1] - 20;
-						eye[2] = c[2] - 20;
-						SceneState viewerState = new SceneState();
 
-						// EntityDescriptor ed = structureInfo.getDescriptor( r
-						// );
-						String descr = "nope!";
-						Atom aatom = r.getAlphaAtom();
-						if (aatom instanceof AnnotatedAtom) {
-							AnnotatedAtom aa = (AnnotatedAtom) atom;
-							descr = aa.getEntityId();
-							EntityDescriptor ee = structureInfo.getDescriptor(descr);
-							if (ee != null)
-								descr = ee.getDescription();
-						}
+		SceneState orig = new SceneState();
+		orig.captureCurrentState("");
+		statelist.add(orig);
+		Collection<Residue> ligands = getLigandsForAnimation(sm);
+		for (Residue ligand: ligands) {
+			Atom atom = ligand.getAtom(0);
+			double c[] = atom.coordinate;
+			double[] eye = new double[3];
+			eye[0] = c[0] - 20;
+			eye[1] = c[1] - 20;
+			eye[2] = c[2] - 20;
+			String descr = "nope!";
+			Atom aatom = ligand.getAlphaAtom();
+			if (aatom instanceof AnnotatedAtom) {
+				AnnotatedAtom aa = (AnnotatedAtom) atom;
+				descr = aa.getEntityId();
+				EntityDescriptor ee = structureInfo
+				.getDescriptor(descr);
+				if (ee != null)
+					descr = ee.getDescription();
 
-						generateState(c, 40, statelist, " " + descr);
-						// generateState(model, c, 40, statelist, " "
-						// + r.getCompoundCode());
-						gl.lookAt(eye, c);
-						viewerState.captureCurrentState("");
-						statelist.add(viewerState);
-					}
-				}
 			}
-		}
-		
-		else
-		{
-			SceneState orig = new SceneState();
-			orig.captureCurrentState("");
+			SceneState viewerState = new SceneState();
+			generateOscilatingState(c, 40, statelist, descr);
+			gl.lookAt(eye, c);
+
+			viewerState.captureCurrentState("" + descr);
+			statelist.add(viewerState);
+			statelist.add(viewerState);
 			statelist.add(orig);
-			for (int j = 0; j < ligandCount; j++)
-			{
-				Residue r = sm.getLigandResidue(j);
-
-				if (!r.getCompoundCode().equalsIgnoreCase("HOH")) {
-					if (r.getAtoms().size() > 5) {
-						Atom atom = r.getAtom(0);
-						double c[] = atom.coordinate;
-						double[] eye = new double[3];
-						eye[0] = c[0] - 20;
-						eye[1] = c[1] - 20;
-						eye[2] = c[2] - 20;
-						String descr = "nope!";
-						Atom aatom = r.getAlphaAtom();
-						if (aatom instanceof AnnotatedAtom) {
-							AnnotatedAtom aa = (AnnotatedAtom) atom;
-							descr = aa.getEntityId();
-							EntityDescriptor ee = structureInfo
-									.getDescriptor(descr);
-							if (ee != null)
-								descr = ee.getDescription();
-
-						}
-						SceneState viewerState = new SceneState();
-						generateOscilatingState(c, 40, statelist, descr);
-						gl.lookAt(eye, c);
-
-						viewerState.captureCurrentState("" + descr);
-						statelist.add(viewerState);
-
-						// ViewerState viewerState = new ViewerState();
-						// GlGeometryViewer viewer = model.getViewer();
-						// viewer.lookAt(eye, c);
-						// viewerState.captureCurrentState("booyaa" + j
-						// + r.getCompoundCode());
-						statelist.add(viewerState);
-						statelist.add(orig);
-					}
-				}
-			}
 		}
 
 		int chainCount = sm.getChainCount();
@@ -691,8 +623,6 @@ public class SlideShow extends Thread
 			
 			DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(c);
 			if (renderable != null) {
-				// this.options.getCurrentColor().getColorComponents(colorFl);
-
 				ChainStyle style = (ChainStyle) ss.getStyle(c);
 				IResidueColor residueColor = style.getResidueColor();
 				ResidueColorByRgb residueColorByRgb = null;
@@ -706,15 +636,7 @@ public class SlideShow extends Thread
 					ss.setStyle(c, style);
 				}
 				residueColorByRgb.setColor(r, _color);
-
-				// for(int i = 0; i < renderable.arrayLists.length; i++) {
-				// if(renderable.arrayLists[i] != null) {
-				// renderable.arrayLists[i].setEntityColor(r, colorFl);
-				// }
-				// }
-
 				renderable.style = style;
-				// renderable.setDirty();
 			}
 			break;
 		}
@@ -793,7 +715,7 @@ public class SlideShow extends Thread
 
 
 	private void generateOscilatingState(double[] pivot,
-			double _distance, ArrayList<SceneState> _list, String _title)
+			double _distance, List<SceneState> _list, String _title)
 	{
 		double[] c = pivot;
 		double[] eye = new double[3];
@@ -811,7 +733,8 @@ public class SlideShow extends Thread
 		double y = (distance * Math.sin(theta)) * Math.sin(phi);
 		double z = (distance * Math.cos(theta));
 
-		for (double i = 0; i < 120.0; i += 20) {
+//		for (double i = 0; i < 120.0; i += 20) {
+		for (double i = 0; i < 120.0; i += 30) {
 			theta = Math.toRadians(i);
 			x = (distance * Math.sin(theta)) * Math.cos(phi);
 			y = (distance * Math.sin(theta)) * Math.sin(phi);
@@ -843,21 +766,10 @@ public class SlideShow extends Thread
 		}
 	}
 
-	private void generateState(double[] pivot, ArrayList<SceneState> _list,
+	private void generateState(double[] pivot, List<SceneState> _list,
 			String _title) {
-		// distance = sqrt( x*x + y*y + z*z )
-		// x /= distance;
-		// y /= distance;
-		// z /= distance;
-		//
-		// xz_dist = sqrt( x*x + z*z )
-		// latitude = atan2( xz_dist, y ) * RADIANS
-		// longitude = atan2( x, z ) * RADIANS
-
-//		double radius = 90; // back about 10 angstroms
 		double[] c = pivot;
 		double[] eye = new double[3];
-		// double[] centerPoint = new double[3];
 		eye[0] = c[0] - 120;
 		eye[1] = c[1] - 120;
 		eye[2] = c[2] - 120;
@@ -911,60 +823,23 @@ public class SlideShow extends Thread
 * **/
 		}
 	}
+	
+	/**
+	 * Returns a collection of unique ligands with at least 6 atoms for animation.
+	 * @param structureMap
+	 * @return collection of unique ligands
+	 */
+	private Collection<Residue> getLigandsForAnimation(StructureMap structureMap) {
+		HashMap<String, Residue> ligands = new HashMap<String, Residue>();
 
-	private void generateState(double[] pivot, double _distance,
-			ArrayList<SceneState> _list, String _title) {
-		// distance = sqrt( x*x + y*y + z*z )
-		// x /= distance;
-		// y /= distance;
-		// z /= distance;
-		//
-		// xz_dist = sqrt( x*x + z*z )
-		// latitude = atan2( xz_dist, y ) * RADIANS
-		// longitude = atan2( x, z ) * RADIANS
-
-		double[] c = pivot;
-		double[] eye = new double[3];
-		// double[] centerPoint = new double[3];
-		eye[0] = c[0] - 120;
-		eye[1] = c[1] - 120;
-		eye[2] = c[2] - 120;
-
-		double distance = _distance;// Math.sqrt(eye[0]*eye[0] + eye[1]*eye[1] +
-		// eye[2]*eye[2]);
-		double phi = 0;
-		double theta = Math.PI;
-		double x = (distance * Math.sin(theta)) * Math.cos(phi);
-		double y = (distance * Math.sin(theta)) * Math.sin(phi);
-		double z = (distance * Math.cos(theta));
-
-		for (double i = 0; i < 360.0; i += 80) {
-			theta = Math.toRadians(i);
-			x = (distance * Math.sin(theta)) * Math.cos(phi);
-			y = (distance * Math.sin(theta)) * Math.sin(phi);
-			z = (distance * Math.cos(theta));
-			SceneState state = new SceneState();
-
-			if (i > 90) {
-				y *= (-1);
-			} else if (i > 180) {
-				y *= (-1);
-				x *= (-1);
-			} else if (i > 270) {
-				x *= (-1);
-			} else {
-
-			}
-			eye[0] = c[0] - x;
-			eye[1] = c[1] - y;
-			eye[2] = c[2] - z;
-
-			KioskViewer.sgetGlGeometryViewer().lookAt(eye, c);
-			try {
-				state.captureCurrentState("" + _title);
-				_list.add(state);
-			} catch (Exception _ee) {
+		for (int i = 0; i < structureMap.getLigandCount(); i++) {
+			Residue r = structureMap.getLigandResidue(i);
+			if (r.getAtoms().size() > 5) {
+				if (! ligands.containsKey(r.getCompoundCode())) {
+					ligands.put(r.getCompoundCode(), r);
+				}
 			}
 		}
+		return ligands.values();
 	}
 }
