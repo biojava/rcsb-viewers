@@ -53,18 +53,23 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import org.rcsb.ks.model.JournalIndex;
+import org.rcsb.ks.model.JournalArticle;
 import org.rcsb.ks.model.KSStructureInfo;
-import org.rcsb.ks.model.PrimaryCitation;
+import org.rcsb.ks.model.StructureAuthor;
 import org.rcsb.mbt.model.Structure;
 
 
-@SuppressWarnings("serial")
-/*
- * This is the panel on the left.
+/**
+ * Represents the left lower panel in the Kiosk Viewer.
+ * This area displays the structure author and journal reference.
+ * 
+ * @author Peter Rose (revised)
+ *
  */
 public class StructureIdPanel extends JPanel
 {
+	private static final long serialVersionUID = -6698576408588609143L;
+
 	private Structure structure = null;
 
 	private JTextArea author_area = new JTextArea ();
@@ -82,7 +87,7 @@ public class StructureIdPanel extends JPanel
 		author_area.setWrapStyleWord( true );
 		author_area.setLineWrap( true );
 		
-		journal_area.setFont( new Font ( "Helvetica", Font.PLAIN, 12 ));
+		journal_area.setFont( new Font ( "Helvetica", Font.PLAIN, 14 ));
 		journal_area.setBackground ( Color.black);
 		journal_area.setForeground( Color.white );
 		journal_area.setWrapStyleWord( true );
@@ -98,11 +103,9 @@ public class StructureIdPanel extends JPanel
 		return structure;
 	}
 
-	public void updateStructure(Structure _structure) {
-		structure = _structure;
-		KSStructureInfo structureInfo = (KSStructureInfo)structure.getStructureInfo();
-		PrimaryCitation primaryCitation = structureInfo.getPrimaryCitation();
-
+	public void updateStructure(Structure structure) {
+		this.structure = structure;
+		
 		// {{ get the pdb id from the url }}
 		String ktemp = structure.getUrlString();
 		
@@ -113,15 +116,16 @@ public class StructureIdPanel extends JPanel
 		}
 		String pdbid = ktemp.substring( findex, findex+4 );
 		
+		KSStructureInfo structureInfo = (KSStructureInfo)structure.getStructureInfo();
 		
-		author_area.setText(primaryCitation.getAuthorsAsString() +"\n" + 
-				"["+ pdbid  + "] " );
+		StructureAuthor primaryCitation = structureInfo.getStructureAuthor();
+		author_area.setText(primaryCitation.getAuthorsAsString(8) +"\n" + 
+				"PDB Id: "+ pdbid.toUpperCase());
 		
-		JournalIndex journalIndex = primaryCitation.getJournalIndex();
-		
-		journal_area.setText( journalIndex.getTitle () );
+		JournalArticle journalArticle = structureInfo.getJournalArticle();
+		journal_area.setText(journalArticle.getTitle());
 		journal_area.append( "\n");
-		journal_area.append ( journalIndex.getJournalInfo () + "  "+journalIndex.getYear () );
+		journal_area.append (journalArticle.getJournalReference());
 
 		repaint();
 	}

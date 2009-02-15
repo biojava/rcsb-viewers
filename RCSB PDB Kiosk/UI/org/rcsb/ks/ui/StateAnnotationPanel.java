@@ -47,45 +47,52 @@ package org.rcsb.ks.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
-
+import java.awt.Font;
+import javax.swing.BoxLayout;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
 import org.rcsb.vf.controllers.scene.SceneState;
 
-/*
- * This is the panel on the right.
+/**
+ * Represents the right lower panel in the Kiosk Viewer.
+ * This area displays the ligand being animated in the Kiosk Viewer.
+ * 
+ * @author Peter Rose
+ *
  */
-@SuppressWarnings("serial")
 public class StateAnnotationPanel extends JPanel {
+	private static final long serialVersionUID = 8133311298423034878L;
+	private JTextArea ligandName = new JTextArea ();
 
-	private SceneState state = null;
 
-	public StateAnnotationPanel()
-	{
+	/**
+	 * Sets up the StateAnnoationPanel
+	 */
+	public StateAnnotationPanel() {
+		setLayout ( new BoxLayout ( this, BoxLayout.Y_AXIS ));
+		setBackground(Color.black);
+		
+		ligandName.setFont( new Font ("Helvetica", Font.BOLD, 15));
+		ligandName.setBackground (Color.black);
+		ligandName.setForeground(Color.green);
+		ligandName.setWrapStyleWord(true);
+		ligandName.setLineWrap(true);
+		
+		add(ligandName);
 	}
-
+	
 	public Dimension getPreferredSize() {
-		return new Dimension(250, 150);
+		return new Dimension(400, 150);
 	}
 
-	public void paintComponent(Graphics _graphics)
-	{
-		Dimension size = getSize();
-		_graphics.setColor(Color.black);
-		_graphics.fill3DRect(0, 0, size.width, size.height, true);
-
-		if (state != null) {
-
-			String stateName = state.toString();
-			_graphics.setColor(Color.white);
-			_graphics.drawString(stateName, 20, 20);
-		}
-	}
-
-	public void updateState(SceneState _state) {
-		state = _state;
+	/**
+	 * Updated the ligand name and repaints the panel
+	 * 
+	 * @param state
+	 */
+	public void updateState(SceneState state) {
+		ligandName.setText(state.toString());
 		repaint ();
 	}
-
 }
