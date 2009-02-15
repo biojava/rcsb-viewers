@@ -61,7 +61,6 @@ import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 
 /**
  * KioskViewer.java
- * <P>
  * 
  * @author John L. Moreland
  */
@@ -109,11 +108,12 @@ public class KioskViewer extends VFAppBase
 	{
 		super(args);
 		initialize();
-		//sgetSceneController().setShowAsymmetricUnitOnly(true);
-		// Enable display of biological units. If the command line flag
-		// -show_asymmetric_unit_only is specified, the asymmetric unit will
-		// be displayed, otherwise the biological unit will be displayed.
 		sgetSceneController().setShowAsymmetricUnitOnly(false);
+		for (String arg: args) {
+			if (arg.equals("-show_asymmetric_unit_only")) {
+				sgetSceneController().setShowAsymmetricUnitOnly(true);
+			}
+		}
 	}
 	
 	private void initialize()
