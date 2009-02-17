@@ -47,6 +47,7 @@ package org.rcsb.mbt.model.attributes;
 
 
 import org.rcsb.mbt.model.*;
+import org.rcsb.mbt.model.util.PeriodicTable;
 
 
 /**
@@ -54,6 +55,7 @@ import org.rcsb.mbt.model.*;
  *  to the given Bond by using the AtomRadius class.
  *  <P>
  *  @author	John L. Moreland
+ *  @author Peter Rose (revisions)
  *  @see	org.rcsb.mbt.model.attributes.IBondRadius
  *  @see	org.rcsb.mbt.model.Bond
  */
@@ -93,7 +95,16 @@ public class BondRadiusByAtomRadius
 		final StructureMap structureMap = atom.getStructure().getStructureMap( );
 		final StructureStyles structureStyles = structureMap.getStructureStyles( );
 		final AtomStyle atomStyle = (AtomStyle) structureStyles.getStyle( atom );
-		return atomStyle.getAtomRadius( atom );
+//		return atomStyle.getAtomRadius( atom );
+        // all bonds should have the same radius based on the relative size of
+		// the atoms
+		int atomicNumber = PeriodicTable.getElementNumber(atom.element);
+		float radius = ElementStyles.getElementRadius(atomicNumber);
+		float actualRadius = atomStyle.getAtomRadius(atom);
+		float scale = actualRadius/radius;
+		// make sure we don't draw bonds that appear to thick
+		scale = Math.min(scale, 0.2f);
+		return scale * 1.7f; // radius of a typical atom
 	}
 
 	/**
@@ -105,7 +116,16 @@ public class BondRadiusByAtomRadius
 		final StructureMap structureMap = atom.getStructure().getStructureMap( );
 		final StructureStyles structureStyles = structureMap.getStructureStyles( );
 		final AtomStyle atomStyle = (AtomStyle) structureStyles.getStyle( atom );
-		return atomStyle.getAtomRadius( atom );
+//		return atomStyle.getAtomRadius( atom );
+		// all bonds should have the same radius based on the relative size of
+		// the atoms
+		int atomicNumber = PeriodicTable.getElementNumber(atom.element);
+		float radius = ElementStyles.getElementRadius(atomicNumber);
+		float actualRadius = atomStyle.getAtomRadius(atom);
+		float scale = actualRadius/radius;
+		// make sure we don't draw bonds that appear to thick
+		scale = Math.min(scale, 0.2f);
+		return scale * 1.7f; // radius of a typical atom
 	}
 }
 
