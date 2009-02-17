@@ -53,6 +53,7 @@ import java.util.Hashtable;
  *  Provides a container object to hold chemical Element objects.
  *  <P>
  *  @author	John L. Moreland
+ *  @author Peter Rose (revised)
  *  @see	org.rcsb.mbt.model.util.Element
  */
 public class PeriodicTable
@@ -69,6 +70,8 @@ public class PeriodicTable
 		//    group_name, period_number, block
 
 		// First entry is placeholder so the index matches the atomic number
+		
+		//  group name: http://www.dayah.com/periodic/
 		new Element( "xxx", "xxx", 0, 0.0, 0, "x", 0, "x" ),
 
 		new Element( "Hydrogen", "H", 1, 1.00794, 1, "-", 1, PeriodicTable.SBLOCK ),
@@ -76,7 +79,7 @@ public class PeriodicTable
 		new Element( "Lithium", "Li", 3, 6.941, 1, "Alkali metal", 2, PeriodicTable.SBLOCK ),
 		new Element( "Beryllium", "Be", 4, 9.012182, 2, "Alkaline earth metal", 2, PeriodicTable.SBLOCK ),
 
-		new Element( "Boron", "B", 5, 10.811, 13, "-", 2, PeriodicTable.PBLOCK ),
+		new Element( "Boron", "B", 5, 10.811, 13, "Metalloid", 2, PeriodicTable.PBLOCK ),
 		new Element( "Carbon", "C", 6, 12.0107, 14, "-", 2, PeriodicTable.PBLOCK ),
 		new Element( "Nitrogen", "N", 7, 14.0067, 15, "Pnictogen", 2, PeriodicTable.PBLOCK ),
 		new Element( "Oxygen", "O", 8, 15.9994, 16, "Chalcogen", 2, PeriodicTable.PBLOCK ),
@@ -84,45 +87,45 @@ public class PeriodicTable
 		new Element( "Neon", "Ne", 10, 20.1797, 18, "Noble gas", 2, PeriodicTable.PBLOCK ),
 		new Element( "Sodium", "Na", 11, 22.989770, 1, "Alkali metal", 3, PeriodicTable.SBLOCK ),
 		new Element( "Magnesium", "Mg", 12, 24.3050, 2, "Alkaline earth metal", 3, PeriodicTable.SBLOCK ),
-		new Element( "Aluminum", "Al", 13, 26.981538, 13, "-", 3, PeriodicTable.PBLOCK ),
-		new Element( "Silicon", "Si", 14, 28.0855, 14, "-", 3, PeriodicTable.PBLOCK ),
+		new Element( "Aluminum", "Al", 13, 26.981538, 13, "Post-transition metal", 3, PeriodicTable.PBLOCK ),
+		new Element( "Silicon", "Si", 14, 28.0855, 14, "Metalloid", 3, PeriodicTable.PBLOCK ),
 		new Element( "Phosphorus", "P", 15, 30.973761, 15, "Pnictogen", 3, PeriodicTable.PBLOCK ),
 		new Element( "Sulfur", "S", 16, 32.065, 16, "Chalcogen", 3, PeriodicTable.PBLOCK ),
 		new Element( "Chlorine", "Cl", 17, 35.453, 17, "Halogen", 3, PeriodicTable.PBLOCK ),
 		new Element( "Argon", "Ar", 18, 39.948, 18, "Noble gas", 3, PeriodicTable.PBLOCK ),
 		new Element( "Potassium", "K", 19, 39.0983, 1, "Alkali metal", 4, PeriodicTable.SBLOCK ),
 		new Element( "Calcium", "Ca", 20, 40.078, 2, "Alkaline earth metal", 4, PeriodicTable.SBLOCK ),
-		new Element( "Scandium", "Sc", 21, 44.955910, 3, "-", 4, PeriodicTable.DBLOCK ),
-		new Element( "Titanium", "Ti", 22, 47.867, 4, "-", 4, PeriodicTable.DBLOCK ),
-		new Element( "Vanadium", "V", 23, 50.9415, 5, "-", 4, PeriodicTable.DBLOCK ),
-		new Element( "Chromium", "Cr", 24, 51.9961, 6, "-", 4, PeriodicTable.DBLOCK ),
-		new Element( "Manganese", "Mn", 25, 54.938049, 7, "-", 4, PeriodicTable.DBLOCK ),
-		new Element( "Iron", "Fe", 26, 55.845, 8, "-", 4, PeriodicTable.DBLOCK ),
-		new Element( "Cobalt", "Co", 27, 58.9332, 9, "-", 4, PeriodicTable.DBLOCK ),
-		new Element( "Nickel", "Ni", 28, 58.6934, 10, "-", 4, PeriodicTable.DBLOCK ),
-		new Element( "Copper", "Cu", 29, 63.546, 11, "Coinage metal", 4, PeriodicTable.DBLOCK ),
-		new Element( "Zinc", "Zn", 30, 65.409, 12, "-", 4, PeriodicTable.DBLOCK ),
-		new Element( "Gallium", "Ga", 31, 69.723, 13, "-", 4, PeriodicTable.PBLOCK ),
-		new Element( "Germanium", "Ge", 32, 72.64, 14, "-", 4, PeriodicTable.PBLOCK ),
-		new Element( "Arsenic", "As", 33, 74.9216, 15, "Pnictogen", 4, PeriodicTable.PBLOCK ),
+		new Element( "Scandium", "Sc", 21, 44.955910, 3, "Transition metal", 4, PeriodicTable.DBLOCK ),
+		new Element( "Titanium", "Ti", 22, 47.867, 4, "Transition metal", 4, PeriodicTable.DBLOCK ),
+		new Element( "Vanadium", "V", 23, 50.9415, 5, "Transition metal", 4, PeriodicTable.DBLOCK ),
+		new Element( "Chromium", "Cr", 24, 51.9961, 6, "Transition metal", 4, PeriodicTable.DBLOCK ),
+		new Element( "Manganese", "Mn", 25, 54.938049, 7, "Transition metal", 4, PeriodicTable.DBLOCK ),
+		new Element( "Iron", "Fe", 26, 55.845, 8, "Transition metal", 4, PeriodicTable.DBLOCK ),
+		new Element( "Cobalt", "Co", 27, 58.9332, 9, "Transition metal", 4, PeriodicTable.DBLOCK ),
+		new Element( "Nickel", "Ni", 28, 58.6934, 10, "Transition metal", 4, PeriodicTable.DBLOCK ),
+		new Element( "Copper", "Cu", 29, 63.546, 11, "Transition metal", 4, PeriodicTable.DBLOCK ),
+		new Element( "Zinc", "Zn", 30, 65.409, 12, "Transition metal", 4, PeriodicTable.DBLOCK ),
+		new Element( "Gallium", "Ga", 31, 69.723, 13, "Post-transition metal", 4, PeriodicTable.PBLOCK ),
+		new Element( "Germanium", "Ge", 32, 72.64, 14, "Metalloid", 4, PeriodicTable.PBLOCK ),
+		new Element( "Arsenic", "As", 33, 74.9216, 15, "Metalloid", 4, PeriodicTable.PBLOCK ),
 		new Element( "Selenium", "Se", 34, 78.96, 16, "Chalcogen", 4, PeriodicTable.PBLOCK ),
 		new Element( "Bromine", "Br", 35, 79.904, 17, "Halogen", 4, PeriodicTable.PBLOCK ),
 		new Element( "Krypton", "Kr", 36, 83.798, 18, "Noble gas", 4, PeriodicTable.PBLOCK ),
 		new Element( "Rubidium", "Rb", 37, 85.4678, 1, "Alkali metal", 5, PeriodicTable.SBLOCK ),
 		new Element( "Strontium", "Sr", 38, 87.62, 2, "Alkaline earth metal", 5, PeriodicTable.SBLOCK ),
-		new Element( "Yttrium", "Y", 39, 88.90585, 3, "-", 5, PeriodicTable.DBLOCK ),
-		new Element( "Zirconium", "Zr", 40, 91.224, 4, "-", 5, PeriodicTable.DBLOCK ),
-		new Element( "Niobium", "Nb", 41, 92.90638, 5, "-", 5, PeriodicTable.DBLOCK ),
-		new Element( "Molybdenum", "Mo", 42, 95.94, 6, "-", 5, PeriodicTable.DBLOCK ),
-		new Element( "Technetium", "Tc", 43, 98.0, 7, "-", 5, PeriodicTable.DBLOCK ),
-		new Element( "Ruthenium", "Ru", 44, 101.07, 8, "Precious metal", 5, PeriodicTable.DBLOCK ),
-		new Element( "Rhodium", "Rh", 45, 102.9055, 9, "Precious metal", 5, PeriodicTable.DBLOCK ),
-		new Element( "Palladium", "Pd", 46, 106.42, 10, "Precious metal", 5, PeriodicTable.DBLOCK ),
-		new Element( "Silver", "Ag", 47, 107.8682, 11, "Coinage metal", 5, PeriodicTable.DBLOCK ),
-		new Element( "Cadmium", "Cd", 48, 112.411, 12, "-", 5, PeriodicTable.DBLOCK ),
-		new Element( "Indium", "In", 49, 114.818, 13, "-", 5, PeriodicTable.PBLOCK ),
-		new Element( "Tin", "Sn", 50, 118.710, 14, "-", 5, PeriodicTable.PBLOCK ),
-		new Element( "Antimony", "Sb", 51, 121.76, 15, "Pnictogen", 5, PeriodicTable.PBLOCK ),
+		new Element( "Yttrium", "Y", 39, 88.90585, 3, "Transition metal", 5, PeriodicTable.DBLOCK ),
+		new Element( "Zirconium", "Zr", 40, 91.224, 4, "Transition metal", 5, PeriodicTable.DBLOCK ),
+		new Element( "Niobium", "Nb", 41, 92.90638, 5, "Transition metal", 5, PeriodicTable.DBLOCK ),
+		new Element( "Molybdenum", "Mo", 42, 95.94, 6, "Transition metal", 5, PeriodicTable.DBLOCK ),
+		new Element( "Technetium", "Tc", 43, 98.0, 7, "Transition metal", 5, PeriodicTable.DBLOCK ),
+		new Element( "Ruthenium", "Ru", 44, 101.07, 8, "Transition metal", 5, PeriodicTable.DBLOCK ),
+		new Element( "Rhodium", "Rh", 45, 102.9055, 9, "Transition metal", 5, PeriodicTable.DBLOCK ),
+		new Element( "Palladium", "Pd", 46, 106.42, 10, "Transition metal", 5, PeriodicTable.DBLOCK ),
+		new Element( "Silver", "Ag", 47, 107.8682, 11, "Transition metal", 5, PeriodicTable.DBLOCK ),
+		new Element( "Cadmium", "Cd", 48, 112.411, 12, "Transition metal", 5, PeriodicTable.DBLOCK ),
+		new Element( "Indium", "In", 49, 114.818, 13, "Post-transition metal", 5, PeriodicTable.PBLOCK ),
+		new Element( "Tin", "Sn", 50, 118.710, 14, "Post-transition metal", 5, PeriodicTable.PBLOCK ),
+		new Element( "Antimony", "Sb", 51, 121.76, 15, "Metalloid", 5, PeriodicTable.PBLOCK ),
 		new Element( "Tellurium", "Te", 52, 127.6, 16, "Chalcogen", 5, PeriodicTable.PBLOCK ),
 		new Element( "Iodine", "I", 53, 126.90447, 17, "Halogen", 5, PeriodicTable.PBLOCK ),
 		new Element( "Xenon", "Xe", 54, 131.293, 18, "Noble gas", 5, PeriodicTable.PBLOCK ),
@@ -142,18 +145,18 @@ public class PeriodicTable
 		new Element( "Erbium", "Er", 68, 167.259, -1, "Lanthanoid", 6, PeriodicTable.FBLOCK ),
 		new Element( "Thulium", "Tm", 69, 168.93421, -1, "Lanthanoid", 6, PeriodicTable.FBLOCK ),
 		new Element( "Ytterbium", "Yb", 70, 173.04, -1, "Lanthanoid", 6, PeriodicTable.FBLOCK ),
-		new Element( "Lutetium", "Lu", 71, 174.967, 3, "-", 6, PeriodicTable.DBLOCK ),
-		new Element( "Hafnium", "Hf", 72, 178.49, 4, "-", 6, PeriodicTable.DBLOCK ),
-		new Element( "Tantalum", "Ta", 73, 180.9479, 5, "-", 6, PeriodicTable.DBLOCK ),
-		new Element( "Tungsten", "W", 74, 183.84, 6, "-", 6, PeriodicTable.DBLOCK ),
-		new Element( "Rhenium", "Re", 75, 186.207, 7, "-", 6, PeriodicTable.DBLOCK ),
-		new Element( "Osmium", "Os", 76, 190.23, 8, "Precious metal", 6, PeriodicTable.DBLOCK ),
-		new Element( "Iridium", "Ir", 77, 192.217, 9, "Precious metal", 6, PeriodicTable.DBLOCK ),
-		new Element( "Platinum", "Pt", 78, 195.078, 10, "Precious metal", 6, PeriodicTable.DBLOCK ),
-		new Element( "Gold", "Au", 79, 196.96655, 11, "Coinage metal", 6, PeriodicTable.DBLOCK ),
-		new Element( "Mercury", "Hg", 80, 200.59, 12, "-", 6, PeriodicTable.DBLOCK ),
-		new Element( "Thallium", "Tl", 81, 204.3833, 13, "-", 6, PeriodicTable.PBLOCK ),
-		new Element( "Lead", "Pb", 82, 207.2, 14, "-", 6, PeriodicTable.PBLOCK ),
+		new Element( "Lutetium", "Lu", 71, 174.967, 3, "Lanthanoid", 6, PeriodicTable.DBLOCK ),
+		new Element( "Hafnium", "Hf", 72, 178.49, 4, "Transition metal", 6, PeriodicTable.DBLOCK ),
+		new Element( "Tantalum", "Ta", 73, 180.9479, 5, "Transition metal", 6, PeriodicTable.DBLOCK ),
+		new Element( "Tungsten", "W", 74, 183.84, 6, "Transition metal", 6, PeriodicTable.DBLOCK ),
+		new Element( "Rhenium", "Re", 75, 186.207, 7, "Transition metal", 6, PeriodicTable.DBLOCK ),
+		new Element( "Osmium", "Os", 76, 190.23, 8, "Transition metal", 6, PeriodicTable.DBLOCK ),
+		new Element( "Iridium", "Ir", 77, 192.217, 9, "Transition metal", 6, PeriodicTable.DBLOCK ),
+		new Element( "Platinum", "Pt", 78, 195.078, 10, "Transition metal", 6, PeriodicTable.DBLOCK ),
+		new Element( "Gold", "Au", 79, 196.96655, 11, "Transition metal", 6, PeriodicTable.DBLOCK ),
+		new Element( "Mercury", "Hg", 80, 200.59, 12, "Transition metal", 6, PeriodicTable.DBLOCK ),
+		new Element( "Thallium", "Tl", 81, 204.3833, 13, "Post-transition metal", 6, PeriodicTable.PBLOCK ),
+		new Element( "Lead", "Pb", 82, 207.2, 14, "Post-transition metal", 6, PeriodicTable.PBLOCK ),
 		new Element( "Bismuth", "Bi", 83, 208.98038, 15, "Pnictogen", 6, PeriodicTable.PBLOCK ),
 		new Element( "Polonium", "Po", 84, 209.0, 16, "Chalcogen", 6, PeriodicTable.PBLOCK ),
 		new Element( "Astatine", "At", 85, 210.0, 17, "Halogen", 6, PeriodicTable.PBLOCK ),
@@ -174,7 +177,7 @@ public class PeriodicTable
 		new Element( "Fermium", "Fm", 100, 257.0, -1, "Actinoid", 7, PeriodicTable.FBLOCK ),
 		new Element( "Mendelevium", "Md", 101, 258.0, -1, "Actinoid", 7, PeriodicTable.FBLOCK ),
 		new Element( "Nobelium", "No", 102, 259.0, -1, "Actinoid", 7, PeriodicTable.FBLOCK ),
-		new Element( "Lawrencium", "Lr", 103, 262.0, 3, "-", 7, PeriodicTable.DBLOCK ),
+		new Element( "Lawrencium", "Lr", 103, 262.0, 3, "Actinoid", 7, PeriodicTable.DBLOCK ),
 		new Element( "Rutherfordium", "Rf", 104, 261.0, 4, "-", 7, PeriodicTable.DBLOCK ),
 		new Element( "Dubnium", "Db", 105, 262.0, 5, "-", 7, PeriodicTable.DBLOCK ),
 		new Element( "Seaborgium", "Sg", 106, 266.0, 6, "-", 7, PeriodicTable.DBLOCK ),
@@ -307,6 +310,27 @@ public class PeriodicTable
 			return 0.0;
 		}
 		return element.atomic_weight;
+	}
+	
+	/**
+	 * Returns true if the Element is a metal
+	 * @param atomic_number
+	 * @return true if the Element is a metal
+	 */
+	public static boolean isMetal(final int atomic_number) {
+		if ( atomic_number < 1 ) {
+			return false;
+		}
+		if ( atomic_number >= PeriodicTable.elements.length ) {
+			return false;
+		}
+		String groupName = PeriodicTable.elements[atomic_number].group_name;
+		if (groupName.endsWith("metal") 
+				|| groupName.equals("Lanthanoid") 
+				|| atomic_number > 88) {
+			return true;
+		}
+		return false;
 	}
 }
 
