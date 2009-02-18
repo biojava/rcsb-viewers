@@ -74,10 +74,12 @@ import org.xml.sax.SAXException;
 public class KSStructureXMLHandler extends StructureXMLHandler
 {
 	private List<String> authors = new ArrayList<String>();
+	private String structureTitle = "";
 	private JournalArticle journalArticle = new JournalArticle();
 
 	protected boolean inStructId = false;
 	protected boolean insideEntity = false;
+	protected boolean insideStruct = false;
 	private boolean isInCitation = false;
 
 	class EntityObject {
@@ -131,6 +133,7 @@ public class KSStructureXMLHandler extends StructureXMLHandler
 		startElementRunnables.put(xmlPrefix + "audit_author", createXMLRunner__audit_author__Start());
 		startElementRunnables.put(xmlPrefix + "entityCategory", createXMLRunnable__entityCategory__Start());
 		startElementRunnables.put(xmlPrefix + "entity", createXMLRunnable__entity__Start());
+	//	startElementRunnables.put(xmlPrefix + "structCategory", createXMLRunnable__struct__Start());
 		endElementAtomRunnables.put(xmlPrefix + "label_entity_id", createXMLRunnable__label_entity_id__End());
 	}
 
@@ -145,6 +148,7 @@ public class KSStructureXMLHandler extends StructureXMLHandler
 		StructureAuthor structureAuthor = new StructureAuthor();
 		structureAuthor.setAuthors(authors);
 		structureInfo.setStructureAuthor(structureAuthor);
+		structureInfo.setStructureTitle(structureTitle);
 		structureInfo.setJournalArticle(journalArticle);
 		structure.setStructureInfo(structureInfo);
 	}
@@ -159,9 +163,20 @@ public class KSStructureXMLHandler extends StructureXMLHandler
 		super.startElement(namespaceURI, sName, qName, attrs);
 
 		if (qName.equals(xmlPrefix + "citation")) {
-			if (attrs.getValue("id").equalsIgnoreCase("primary")) {
+			String attribute = attrs.getValue("id");
+			if (attribute != null && attribute.equalsIgnoreCase("primary")) {
 				isInCitation = true;
 			}
+		} else if (qName.equals(xmlPrefix + "citation_author")) {
+			String attribute = attrs.getValue("citation_id");
+			if (attribute != null && attribute.equalsIgnoreCase("primary")) {
+				String author = attrs.getValue("name");
+				if (author != null) {
+					journalArticle.appendAuthor(author.trim());
+				}
+			}
+		}	else if (qName.equals(xmlPrefix + "struct")) {
+			insideStruct = true;
 		}
 	}
 
@@ -173,14 +188,17 @@ public class KSStructureXMLHandler extends StructureXMLHandler
 	{
 	    if (qName.equals(xmlPrefix + "citation")) {
 			isInCitation = false;
-		} else if (isInCitation && qName.equals(xmlPrefix + "title")) {
-				journalArticle.setTitle(buf.trim());
+	    } else if (qName.equals(xmlPrefix + "struct")) {
+	    	insideStruct = false;
 		} else if (isInCitation
 				&& qName.equals(xmlPrefix + "journal_abbrev")) {
 				journalArticle.setAbbreviation(buf.trim());
 		} else if (isInCitation
 				&& qName.equals(xmlPrefix + "journal_volume")) {
 				journalArticle.setJournalVolume(buf.trim());
+		} else if (isInCitation
+				&& qName.equals(xmlPrefix + "author")) {
+				journalArticle.appendAuthor(buf.trim());
 		} else if (isInCitation && qName.equals(xmlPrefix + "page_first")) {
 				try {
 					int page = Integer.parseInt(buf.trim());
@@ -227,6 +245,8 @@ public class KSStructureXMLHandler extends StructureXMLHandler
 			if (au != null && au.length() > 0) {
 				authors.add(au);
 			}
+		} else if (insideStruct && qName.equals(xmlPrefix + "title")) {
+			structureTitle = buf.trim();
 		}
 		else {
 			super.endElement(namespaceURI, sName, qName);
@@ -246,9 +266,9 @@ public class KSStructureXMLHandler extends StructureXMLHandler
 		    //  <PDBx:audit_author name="Salemme, F.R."></PDBx:audit_author>
 		    // </PDBx:audit_authorCategory>
 
-			String au = attrs.getValue("name").trim();
+			String au = attrs.getValue("name");
 			if (au != null && au.length() > 0) {
-			    authors.add(au);
+			    authors.add(au.trim());
 			}
 		}
 	}
