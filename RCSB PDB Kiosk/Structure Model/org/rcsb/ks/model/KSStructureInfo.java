@@ -74,11 +74,16 @@ import org.rcsb.mbt.model.StructureInfo;
  */
 public class KSStructureInfo extends StructureInfo {
 	private StructureAuthor structureAuthor = new StructureAuthor();
+	private String structureTitle = "";
 	private JournalArticle journalArticle = new JournalArticle();
 	private List<EntityDescriptor> entityDescriptors = new ArrayList<EntityDescriptor>();
 
 	public void setStructureAuthor(StructureAuthor structureAuthor) {
 		this.structureAuthor = structureAuthor;
+	}
+	
+	public void setStructureTitle(String structureTitle) {
+		this.structureTitle = structureTitle;
 	}
 
 	public void setJournalArticle(JournalArticle journalArticle) {
@@ -89,6 +94,10 @@ public class KSStructureInfo extends StructureInfo {
 		return structureAuthor;
 	}
 
+	public String getStructureTitle() {
+		return structureTitle;
+	}
+	
 	public JournalArticle getJournalArticle() {
 		return journalArticle;
 	}
