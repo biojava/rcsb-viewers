@@ -55,35 +55,38 @@ import javax.swing.JPanel;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.vf.controllers.scene.SceneState;
 
-
-@SuppressWarnings("serial")
+/**
+ * This is the lower panel that contains two subpanels:
+ * - structureIdPanel (displays structure title and journal reference)
+ * - stateAnnotationPanel (displays information about the state: ligand name)
+ * 
+ * @author Peter Rose (revised)
+ *
+ */
 public class StructurePanel extends Box
 {
+	private static final long serialVersionUID = 3015095300052220693L;
 	private StructureIdPanel structureIdPanel = new StructureIdPanel();
 	private StateAnnotationPanel stateAnnotationPanel = new StateAnnotationPanel();
 	private JPanel panel = null;
+	private int margin = 10;
 	
-	/**
-	 * This is the lower panel that contains two subpanels:
-	 *   - structureIdPanel (displays the author and id of the structure)
-	 *   - stateAnnotationPanel (displays information about the state.)
-	 */
 	public StructurePanel()
 	{
 		super(BoxLayout.X_AXIS);
+	
+		panel = new JPanel(){;
+			private static final long serialVersionUID = -7478706474331043668L;
 
-		
-		panel = new JPanel(){
 			@Override
-			public void setBounds ( int _x, int _y, int _w, int _h)
+			public void setBounds ( int x, int y, int w, int h)
 			{
-				super.setBounds ( _x, _y, _w, _h );
-//				structureIdPanel.setBounds ( 2, 2, 650, _h-2 );
-				structureIdPanel.setBounds ( 2, 2, 500, _h-2 );
-//              long ligand names are cutoff in the annotation panel
-//              increased width by 200 pixels				
-//				stateAnnotationPanel.setBounds ( _w-300, 2, 298, _h-2 );
-				stateAnnotationPanel.setBounds ( _w-500, 2, 500, _h-2 );
+				super.setBounds ( x, y, w, h );
+				int panelWidth = (w - 2*margin)/2;
+				// left panel
+				structureIdPanel.setBounds ( 2, 2, panelWidth, h-2 );	
+				// right panel
+				stateAnnotationPanel.setBounds ( (w/2), 2, panelWidth, h-2 );
 			}
 		};
 		panel.setBackground( Color.black );
@@ -91,18 +94,18 @@ public class StructurePanel extends Box
 
 		panel.add(structureIdPanel);
 		panel.add(stateAnnotationPanel);
-		add(createHorizontalStrut(10));
-		add( panel);
-		add(createHorizontalStrut(10));
+		add(createHorizontalStrut(margin));
+		add(panel);
+		add(createHorizontalStrut(margin));
 		
-		panel.setPreferredSize(new Dimension ( 880, 150));
+		panel.setPreferredSize(new Dimension (1024, 150));
 	}
 	
 	@Override
-	public void setBounds ( int _x, int _y, int _w, int _h )
+	public void setBounds ( int x, int y, int w, int h )
 	{
-		super.setBounds ( _x,  _y, _w, _h );
-		panel.setBounds ( 0, 0, _w, _h );
+		super.setBounds ( x,  y, w, h );
+		panel.setBounds ( 0, 0, w, h );
 	}
 	
 	
