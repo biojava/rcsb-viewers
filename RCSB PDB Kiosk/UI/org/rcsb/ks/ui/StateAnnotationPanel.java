@@ -92,7 +92,15 @@ public class StateAnnotationPanel extends JPanel {
 	 * @param state
 	 */
 	public void updateState(SceneState state) {
-		ligandName.setText(state.toString());
+		String name = state.toString();
+		// pad short names with blanks
+		int diff = 25 - name.length();
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < diff; i++) {
+			sb.append(" ");
+		}
+		sb.append(name);
+		ligandName.setText(sb.toString());
 		repaint ();
 	}
 }
