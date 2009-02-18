@@ -55,7 +55,6 @@ import javax.swing.JTextArea;
 
 import org.rcsb.ks.model.JournalArticle;
 import org.rcsb.ks.model.KSStructureInfo;
-import org.rcsb.ks.model.StructureAuthor;
 import org.rcsb.mbt.model.Structure;
 
 
@@ -72,8 +71,8 @@ public class StructureIdPanel extends JPanel
 
 	private Structure structure = null;
 
-	private JTextArea author_area = new JTextArea ();
-	private JTextArea journal_area = new JTextArea ();
+	private JTextArea titleArea = new JTextArea();
+	private JTextArea journalArea = new JTextArea();
 	
 	
 	public StructureIdPanel() {
@@ -81,20 +80,20 @@ public class StructureIdPanel extends JPanel
 		setLayout ( new BoxLayout ( this, BoxLayout.Y_AXIS ));
 		setBackground(Color.black);
 			
-		author_area.setFont( new Font ( "Helvetica", Font.BOLD, 15 ));
-		author_area.setBackground ( Color.black);
-		author_area.setForeground( Color.orange );
-		author_area.setWrapStyleWord( true );
-		author_area.setLineWrap( true );
+		titleArea.setFont( new Font ( "Helvetica", Font.BOLD, 15 ));
+		titleArea.setBackground ( Color.black);
+		titleArea.setForeground( Color.orange );
+		titleArea.setWrapStyleWord( true );
+		titleArea.setLineWrap( true );
 		
-		journal_area.setFont( new Font ( "Helvetica", Font.PLAIN, 14 ));
-		journal_area.setBackground ( Color.black);
-		journal_area.setForeground( Color.white );
-		journal_area.setWrapStyleWord( true );
-		journal_area.setLineWrap( true );	
+		journalArea.setFont( new Font ( "Helvetica", Font.PLAIN, 14 ));
+		journalArea.setBackground ( Color.black);
+		journalArea.setForeground( Color.white );
+		journalArea.setWrapStyleWord( true );
+		journalArea.setLineWrap( true );	
 		
-		add( author_area );
-		add ( journal_area );
+		add(titleArea);
+		add (journalArea );
 	}
 	
 	
@@ -106,31 +105,42 @@ public class StructureIdPanel extends JPanel
 	public void updateStructure(Structure structure) {
 		this.structure = structure;
 		
-		// {{ get the pdb id from the url }}
-		String ktemp = structure.getUrlString();
-		
-		int findex = ktemp.lastIndexOf( "/" )+1;
-		if ( ktemp.endsWith ( ".xml.gz")){
-			int indexof = ktemp.lastIndexOf( ".xml.gz" );
-			findex = indexof - 4;
-		}
-		String pdbid = ktemp.substring( findex, findex+4 );
-		
 		KSStructureInfo structureInfo = (KSStructureInfo)structure.getStructureInfo();
 		
-		StructureAuthor primaryCitation = structureInfo.getStructureAuthor();
-		author_area.setText(primaryCitation.getAuthorsAsString(8) +"\n" + 
-				"PDB Id: "+ pdbid.toUpperCase());
-		
+	    titleArea.setText("PDB " 
+	    		+ getPdbId(structure) + ": "
+	    		+ structureInfo.getStructureTitle());
+	    	
+//	    StructureAuthor structureAuthor = structureInfo.getStructureAuthor();
+	    
+	    // print journal authors and reference
 		JournalArticle journalArticle = structureInfo.getJournalArticle();
-		journal_area.setText(journalArticle.getTitle());
-		journal_area.append( "\n");
-		journal_area.append (journalArticle.getJournalReference());
+		journalArea.setText(journalArticle.getAuthorsAsString(4)
+				+ "\n"
+				+ journalArticle.getJournalReference());
 
 		repaint();
 	}
 
 	public Dimension getPreferredSize() {
-		return new Dimension(250, 150);
+		return new Dimension(500, 150);
+	}
+	
+	/**
+	 * get PDB id from structure url
+	 * @param structure
+	 * @return PDB id
+	 */
+	private String getPdbId(Structure structure) {
+		String temp = structure.getUrlString();
+		
+		int findex = temp.lastIndexOf( "/" )+1;
+		if (temp.endsWith ( ".xml.gz")){
+			int indexof = temp.lastIndexOf( ".xml.gz" );
+			findex = indexof - 4;
+		}
+		
+		return temp.substring( findex, findex+4 ).toUpperCase();
+		
 	}
 }
