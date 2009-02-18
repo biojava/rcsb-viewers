@@ -109,7 +109,12 @@ public class AtomRadiusByScaledCpk
 		if ( element == null ) {
 			return this.scale * 1.0f; // Unknown element
 		}
-		final float radius = this.scale * ElementStyles.getElementRadius( element.atomic_number );
+		float radius = this.scale * ElementStyles.getElementRadius( element.atomic_number );
+		
+		// display metal larger
+		if (PeriodicTable.isMetal(element.atomic_number)) {
+			radius = 0.5f * ElementStyles.getElementRadius( element.atomic_number );
+		}
 		
 		/*
 		 * TODO: Seems like the better way to do this is to construct
