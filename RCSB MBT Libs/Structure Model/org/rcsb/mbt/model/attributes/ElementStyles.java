@@ -207,9 +207,9 @@ public class ElementStyles
 		// Element Radii
 		//
 
-		// Initially set element radii to 1.0
+		// Initially set element radii to 1.7
 		for ( int i=0; i<ElementStyles.elementCount; i++ ) {
-			ElementStyles.elementRadii[i] = 1.0f;
+			ElementStyles.elementRadii[i] = 1.7f;
 		}
 
 		// Common elements get set to Van Der Waals Radii
