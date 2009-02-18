@@ -49,5 +49,5 @@ import org.rcsb.uiApp.controllers.app.VersionInformation;
 
 public class KSVersionInformation extends VersionInformation
 {
-	public static String version() { return "3.2"; }
+	public static String version() { return "3.3"; }
 }
