@@ -475,18 +475,15 @@ public class SlideShow extends Thread
 		try {
 			File lk = new File(getPDBFileDirectory() + "/" + pdbId + ".xml.gz");
 
-			System.out.println(" file " + lk.getAbsolutePath());
+			System.out.println("Loading file " + lk.getAbsolutePath());
 			if (lk.exists())
 				loadFromFile(lk, pdbId);
 			else
 				loadFromURL(pdbId);
-		}
-		
-		catch (Exception _e)
+		} catch (Exception _e)
 		{
-			// System.exit( 1 );
-			throw new Exception("pdb file index " + _index + " id : " + pdbId
-					+ " is not found ");
+			throw new Exception("PDB file index " + _index + " id : " + pdbId
+					+ " not found ");
 		}
 	}
 
