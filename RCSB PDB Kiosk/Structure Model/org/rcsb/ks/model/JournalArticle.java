@@ -122,6 +122,14 @@ public class JournalArticle {
 	}
 	
 	/**
+	 * Append an author to the list of authors for this article.
+	 * @param author the author to be appended
+	 */
+	public void appendAuthor(String author) {
+		this.authors.add(author);
+	}
+	
+	/**
 	 * Gets the title of this article
 	 * @return title of this article
 	 */
