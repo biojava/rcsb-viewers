@@ -2182,7 +2182,6 @@ public class StructureMap
         
         for(int i = this.getResidueCount() - 1; i >= 0; i--) {
             final Residue r = this.getResidue(i);
-        	System.out.println("StructureMap: residue" + r.getCompoundCode());
             final Object[] pdbIds = converter.getPdbIds(r.getChainId(), new Integer(r.getResidueId()));
             if(pdbIds == null) {
             	System.out.println("StructureMap: pdbId == null for residue" + r.getCompoundCode());
