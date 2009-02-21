@@ -2182,19 +2182,21 @@ public class StructureMap
         
         for(int i = this.getResidueCount() - 1; i >= 0; i--) {
             final Residue r = this.getResidue(i);
+        	System.out.println("StructureMap: residue" + r.getCompoundCode());
             final Object[] pdbIds = converter.getPdbIds(r.getChainId(), new Integer(r.getResidueId()));
             if(pdbIds == null) {
+            	System.out.println("StructureMap: pdbId == null for residue" + r.getCompoundCode());
 				continue;
 			}
             final String pdbChainId = (String)pdbIds[0];
-            if(pdbChainId == null) {
-            	if (r.getClassification() == Residue.Classification.WATER)
-                    waterResidues.add(r);
-                
-                else   //  is a non-protein residue...
-                    nonProteinResidues.add(r);
 
+            if (r.getClassification() == Residue.Classification.WATER) {
+                waterResidues.add(r); 
                 continue;
+            } else if (r.getClassification() != Residue.Classification.AMINO_ACID &&
+            		r.getClassification() != Residue.Classification.NUCLEIC_ACID) {
+            	nonProteinResidues.add(r);
+            	continue;
             }
             
             Vector<Residue> residues = byPdbId.get(pdbChainId);
