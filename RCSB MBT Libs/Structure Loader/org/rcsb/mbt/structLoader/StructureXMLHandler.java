@@ -146,7 +146,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * 
  * @author John Beaver, Jeff Milton
  * @author Rick Berger
- * @author Peter Rose
+ * @author Peter Rose (revised)
  */
 public class StructureXMLHandler extends DefaultHandler implements
 		IStructureLoader {
@@ -175,8 +175,10 @@ public class StructureXMLHandler extends DefaultHandler implements
 	// atomVector.
 	protected class XAtom extends Atom {
 		boolean isNonProteinChainAtom = false;
+		String auth_asym_id;
 		String auth_seq_id;
-		String label_asym_id, label_seq_id;
+		String label_asym_id;
+		String label_seq_id;
 	}
 
 	protected XAtom curAtom = null, prevAtom = null;
@@ -397,6 +399,8 @@ public class StructureXMLHandler extends DefaultHandler implements
 				createXMLRunnable__label_comp_id__End());
 		endElementAtomRunnables.put(xmlPrefix + "label_asym_id",
 				createXMLRunnable__label_asym_id__End());
+		endElementAtomRunnables.put(xmlPrefix + "auth_asym_id",
+				createXMLRunnable__auth_asym_id__End());
 		endElementAtomRunnables.put(xmlPrefix + "label_seq_id",
 				createXMLRunnable__label_seq_id__End());
 		endElementAtomRunnables.put(xmlPrefix + "auth_seq_id",
@@ -488,8 +492,8 @@ public class StructureXMLHandler extends DefaultHandler implements
 				+ "pdbx_nonpoly_scheme",
 				createXMLRunnable_pdbx_nonpoly_scheme__End());
 		// -------------------------
-		endElementNonpolyConversionsRunnables.put(xmlPrefix + "pdb_strand_id",
-				createXMLRunnable__pdb_seq_num__End_np());
+// pr		endElementNonpolyConversionsRunnables.put(xmlPrefix + "pdb_strand_id",
+// pr				createXMLRunnable__pdb_seq_num__End_np());
 		endElementNonpolyConversionsRunnables.put(xmlPrefix + "pdb_seq_num",
 				createXMLRunnable__pdb_seq_num__End_np());
 	}
@@ -595,7 +599,8 @@ public class StructureXMLHandler extends DefaultHandler implements
 	}
 
 	private Set<String> nonProteinChainIds = new TreeSet<String>();
-	private int curGeneratedNdbResidueId = -1;
+//	private int curGeneratedNdbResidueId = -1;
+	private int curGeneratedNdbResidueId = 0;
 	private int currentModelNumber = -1;
 
 	@Override
@@ -1137,6 +1142,15 @@ public class StructureXMLHandler extends DefaultHandler implements
 		return new XMLRunnable__label_asym_id__End();
 	}
 
+	protected class XMLRunnable__auth_asym_id__End extends XMLRunnable {
+		public void run() {
+			curAtom.auth_asym_id = buf.trim();
+		}
+	}
+
+	protected XMLRunnable__auth_asym_id__End createXMLRunnable__auth_asym_id__End() {
+		return new XMLRunnable__auth_asym_id__End();
+	}
 	protected class XMLRunnable__label_seq_id__End extends XMLRunnable {
 		public void run() {
 			curAtom.label_seq_id = buf.trim();
@@ -1233,19 +1247,26 @@ public class StructureXMLHandler extends DefaultHandler implements
 			curAtom.chain_id = getUnique(curAtom.label_asym_id);
 
 			if (prevAtom == null || !prevAtom.chain_id.equals(curAtom.chain_id))
-				curGeneratedNdbResidueId = -1;
+				curGeneratedNdbResidueId = 0;
+//				curGeneratedNdbResidueId = -1;
 
 			if (curAtom.label_seq_id.length() == 0)
 			// there's no ndb id, so we need to provide a generated version
 			{
+//				if (prevAtom == null
+//						|| !prevAtom.auth_seq_id.equals(curAtom.auth_seq_id)
+//						|| curGeneratedNdbResidueId == -1)
 				if (prevAtom == null
 						|| !prevAtom.auth_seq_id.equals(curAtom.auth_seq_id)
-						|| curGeneratedNdbResidueId == -1)
+						|| curGeneratedNdbResidueId == 0)
 					curGeneratedNdbResidueId++;
+				
 				// if the pdb id changes (or this is a new chain), bump the
 				// generated ndb id
 
-				curAtom.residue_id = curGeneratedNdbResidueId;
+//				curAtom.residue_id = curGeneratedNdbResidueId;
+				// pr
+				curAtom.residue_id = Integer.parseInt(curAtom.auth_seq_id);
 				// set the generated ndb residue id
 			}
 
@@ -1483,9 +1504,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected class XMLRunnable__ndb_seq_num__End extends XMLRunnable {
 		public void run() {
 			final String trim = buf.trim();
-
 			ndbResidueIds.add(new Integer(trim));
-
 			ndbSeqNumEncountered = true;
 		}
 	}
@@ -1499,7 +1518,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 			final String trim = buf.trim();
 
 			pdbResidueIds.add(trim);
-
 			pdbSeqNumEncountered = true;
 		}
 	}
@@ -1533,6 +1551,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 					ndbResidueIds);
 
 			pdbChainIds = null;
+			ndbChainIds = null;
 			ndbResidueIds = null;
 			pdbResidueIds = null;
 			curNdbChainId = null;
@@ -1545,12 +1564,15 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__pdbx_nonpoly_scheme__Start extends XMLRunnable {
 		public void run() {
-			curNdbChainId = super.attrs.getValue("asym_id");
+			curNdbChainId = super.attrs.getValue("asym_id");;
 			ndbChainIds.add(curNdbChainId);
-
-			curPdbChainId = null;
-
-			ndbResidueIds.add(new Integer(this.attrs.getValue("ndb_seq_num")));
+			// set both ndbChainIds and ndbChainIds to the same values for
+			// now. The handing of chains needs to be completely revamped.
+			pdbChainIds.add(curNdbChainId);
+			curPdbChainId = curNdbChainId;
+            // don't use ndb_seq_num anymore
+    		// curPdbChainId = null;
+			// ndbResidueIds.add(new Integer(this.attrs.getValue("ndb_seq_num")));
 		}
 	}
 
@@ -1560,10 +1582,10 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__pdb_strand_id__End_np extends XMLRunnable {
 		public void run() {
-			String trim = buf.trim();
-			trim = getUnique(trim);
-
-			curPdbChainId = trim;
+			// we are using asym_id instead
+//			String trim = buf.trim();
+//			trim = getUnique(trim);
+//			curPdbChainId = trim;
 		}
 	}
 
@@ -1574,8 +1596,8 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected class XMLRunnable__pdb_seq_num__End_np extends XMLRunnable {
 		public void run() {
 			final String trim = buf.trim();
-
 			pdbResidueIds.add(trim);
+			ndbResidueIds.add(Integer.parseInt(trim));
 		}
 	}
 
@@ -1585,12 +1607,14 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable_pdbx_nonpoly_scheme__End extends XMLRunnable {
 		public void run() {
-			if (curPdbChainId != null) {
-				pdbChainIds.add(curPdbChainId);
-			} else {
-				pdbChainIds.add(""); // many nonpolymers have no chain ids. This
-										// is a flag to IdConverter.append().
-			}
+			// this method should be removed when chain handling will be
+			// revamped.
+//			if (curPdbChainId != null) {
+//				pdbChainIds.add(curPdbChainId);
+//			} else {
+//				pdbChainIds.add(""); // many nonpolymers have no chain ids. This
+//										// is a flag to IdConverter.append().
+//			}
 		}
 	}
 
