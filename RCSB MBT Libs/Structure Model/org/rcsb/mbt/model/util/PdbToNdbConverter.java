@@ -53,6 +53,9 @@ import org.rcsb.mbt.model.Residue;
 
 
 /**
+ * This class should be made obsolete. We keep it for now since it requires significant code
+ * changes in many places. ndbChainIds and ndbResidueIds are not used anymore. -Peter Rose
+ * 
  * for converting residue and chain ids from pdb values to their ndb equivalents.
  *
  * These are ordered by chain id, first, then residue id (for each conversion map).
@@ -170,18 +173,23 @@ public class PdbToNdbConverter {
      */
     public Object[] getNdbIds(final String pdbChainId, final String pdbResidueId)
     {
-        final HashMap<String,Object[]> residueIds = byPdbIds.get(pdbChainId); 
-        
-        if(residueIds == null) {
-            Status.output(Status.LEVEL_DEBUG,"Error: " + pdbChainId + " is not a valid pdb chain id.");
-            return null;
-        }
-        
-        final Object[] ndbIds = residueIds.get(pdbResidueId);
-        if(ndbIds == null) {
-            Status.output(Status.LEVEL_DEBUG,"Error: " + pdbResidueId + " is not a valid pdb residue id in pdb chain " + pdbChainId);
-            return null;
-        }
+    	// ndb and pdb chainIds/residueIds are now the same.
+    	Object[] ndbIds = new Object[2];
+    	ndbIds[0] = pdbChainId;
+    	ndbIds[1] = pdbResidueId;
+    	
+//        final HashMap<String,Object[]> residueIds = byPdbIds.get(pdbChainId); 
+//        
+//        if(residueIds == null) {
+//            Status.output(Status.LEVEL_DEBUG,"Error: " + pdbChainId + " is not a valid pdb chain id.");
+//            return null;
+//        }
+//        
+//        final Object[] ndbIds = residueIds.get(pdbResidueId);
+//        if(ndbIds == null) {
+//            Status.output(Status.LEVEL_DEBUG,"Error: " + pdbResidueId + " is not a valid pdb residue id in pdb chain " + pdbChainId);
+//            return null;
+//        }
         
         return ndbIds;
     }
@@ -194,20 +202,28 @@ public class PdbToNdbConverter {
      */
     public Object[] getPdbIds(final String ndbChainId, final Integer ndbResidueId)
     {
-        final HashMap<Integer,Object[]> residueIds = byNdbIds.get(ndbChainId); 
-        
-        if(residueIds == null) {
-            Status.output(Status.LEVEL_DEBUG,"Error: " + ndbChainId + " is not a valid pdb chain id.");
-            return null;
-        }
-        
-        final Object[] ndbIds = residueIds.get(ndbResidueId);
-        if(ndbIds == null) {
-            Status.output(Status.LEVEL_DEBUG,"Error: " + ndbResidueId + " is not a valid pdb residue id in pdb chain " + ndbChainId);
-            return null;
-        }
-        
-        return ndbIds;
+    	// ndb and pdb chainIds/residueIds are now the same.
+    	Object[] pdbIds = new Object[2];
+    	pdbIds[0] = ndbChainId;
+    	pdbIds[1] = String.valueOf(ndbResidueId);
+    	return pdbIds;
+//        final HashMap<Integer,Object[]> residueIds = byNdbIds.get(ndbChainId); 
+//        
+//        System.out.println("PdbTpNdbConverter.getPdbIds: " + ndbChainId + ", " + ndbResidueId);
+//        if(residueIds == null) {
+//        	System.out.println(ndbChainId + " is not a valid pdb chain id.");
+//            Status.output(Status.LEVEL_DEBUG,"Error: " + ndbChainId + " is not a valid pdb chain id.");
+//            return null;
+//        }
+//        
+//        final Object[] ndbIds = residueIds.get(ndbResidueId);
+//        if(ndbIds == null) {
+//        	System.out.println(ndbResidueId + " is not a valid pdb residue id in pdb chain " + ndbChainId);
+//            Status.output(Status.LEVEL_DEBUG,"Error: " + ndbResidueId + " is not a valid pdb residue id in pdb chain " + ndbChainId);
+//            return null;
+//        }
+//        
+ //       return ndbIds;
     }
     
     public String getFirstPdbChainId(final String ndbChainId)
