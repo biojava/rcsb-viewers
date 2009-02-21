@@ -57,11 +57,9 @@ import org.rcsb.mbt.model.ExternChain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
-import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.LineStyle;
-import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.options.LinesOptions;
@@ -219,7 +217,6 @@ public class LinesMutator extends MutatorBase
 			{
 				final Residue r = (Residue) structureComponent;
 				final Fragment f = r.getFragment();
-				final ComponentType conformationTypeIdentifier = f.getConformationType();
 				ComponentType conformationType = (f.getConformationType().isConformationType())? 
 						f.getConformationType() : ComponentType.UNDEFINED_CONFORMATION;
 	
@@ -309,7 +306,8 @@ public class LinesMutator extends MutatorBase
 				// remove all but the local name for the secondary structure class.
 				message = (c.isBasicChain())? "Chain " + c.getChainId() : 
 						  (c.isWaterChain())? "Water Molecules" :
-							  "Miscellaneous Molecules (no chain ID)";
+							  "Miscellaneous Molecules";
+//							  "Miscellaneous Molecules (no chain ID)";
 			} 
 			
 		} else if(mutee instanceof Structure){	// not a StructureComponent
