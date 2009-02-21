@@ -86,7 +86,7 @@ import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 
 
 /**
- * This class impements a pop-out list-based tree viewer.
+ * This class implements a pop-out list-based tree viewer.
  * <P>
  * 
  * @author John L. Moreland
@@ -222,7 +222,7 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 
 				componentText = (xc.isBasicChain())? "Chain " + xc.getChainId() :
 							    (xc.isWaterChain())? "Water molecules" :
-							    	"Miscellaneous molecules (no pdb chain id)";
+							    	"Miscellaneous molecules";
 
 				imageIcon = this.chainIcon;
 			}
@@ -646,12 +646,15 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 		this.tree.expandPath(treePath);
 
 		// expand the path for the non-protein atoms, if any are present...
-		for (StructureComponent next : structureMap.getPdbTopLevelElements())
+		for (StructureComponent next : structureMap.getPdbTopLevelElements()) {
+			System.out.println("TreeViewer: " + next.getStructureComponentType().toString());
+			System.out.println("ExternChain: " + ((ExternChain)next).getChainId());
 			if (next instanceof ExternChain && ((ExternChain)next).isMiscellaneousChain())
-			{
+			{	
 				treePath = new TreePath(new Object[] { model, structure, next });
 				this.tree.expandPath(treePath);
 			}
+		}
 	}
 
 	/**
