@@ -540,23 +540,29 @@ public class SlideShow extends Thread
 					descr = ee.getDescription();
 
 			}
-			SceneState viewerState = new SceneState();
-			generateOscilatingState(c, 40, statelist, descr);
-			gl.lookAt(eye, c);
+			if (isInterestingLigand(descr)) {
+				SceneState viewerState = new SceneState();
+				generateOscilatingState(c, 40, statelist, descr);
+				gl.lookAt(eye, c);
 
-			viewerState.captureCurrentState("" + descr);
-			statelist.add(viewerState);
-			statelist.add(viewerState);
-			statelist.add(orig);
+				viewerState.captureCurrentState("" + descr);
+				statelist.add(viewerState);
+				statelist.add(viewerState);
+				statelist.add(orig);
+			}
 		}
 
 		int chainCount = sm.getChainCount();
 		for (int i = 0; i < chainCount; i++) {
-			double colorv = Math.random();
+	//		double colorv = Math.random();
+			float colorv = (float)Math.random()/chainCount;
 
 			float[] colorf = new float[3];
-			colorf[0] = (float) colorv;
-			colorf[1] = 0.0f;
+	//		colorf[0] = (float) colorv;
+			colorf[0] = (float)i/chainCount + (float) colorv;
+	//		colorf[1] = 0.0f;
+			colorf[1] = 0.3f*(float)Math.random();
+	//		colorf[2] = 1.0f;
 			colorf[2] = 1.0f;
 			Chain c = sm.getChain(i);
 			changeColor(c, colorf);
@@ -838,5 +844,22 @@ public class SlideShow extends Thread
 			}
 		}
 		return ligands.values();
+	}
+	
+	/**
+	 * Returns true if ligand is interesting for display purposes.
+	 * Sugars, glycols, etc. are eliminated. This list needs to be 
+	 * expanded.
+	 * @param ligandName name of the ligand
+	 * @return true if ligand is suitable for display in Kiosk viewer
+	 */
+	private boolean isInterestingLigand(String ligandName) {
+		String name = ligandName.toLowerCase();
+		if (name.contains("sugar") 
+				|| name.contains("glycol")
+				|| name.contains("citrate")) {
+			return false;
+		}
+		return true;
 	}
 }
