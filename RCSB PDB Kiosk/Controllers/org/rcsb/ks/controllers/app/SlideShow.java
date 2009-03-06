@@ -554,16 +554,12 @@ public class SlideShow extends Thread
 
 		int chainCount = sm.getChainCount();
 		for (int i = 0; i < chainCount; i++) {
-	//		double colorv = Math.random();
 			float colorv = (float)Math.random()/chainCount;
 
 			float[] colorf = new float[3];
-	//		colorf[0] = (float) colorv;
-			colorf[0] = (float)i/chainCount + (float) colorv;
-	//		colorf[1] = 0.0f;
+			colorf[0] = ((float)i)/chainCount + (float) colorv;
 			colorf[1] = 0.3f*(float)Math.random();
-	//		colorf[2] = 1.0f;
-			colorf[2] = 1.0f;
+			colorf[2] = 1.0f - 0.3f*(float)Math.random();
 			Chain c = sm.getChain(i);
 			changeColor(c, colorf);
 		}
@@ -849,7 +845,8 @@ public class SlideShow extends Thread
 	/**
 	 * Returns true if ligand is interesting for display purposes.
 	 * Sugars, glycols, etc. are eliminated. This list needs to be 
-	 * expanded.
+	 * expanded. In most cases the residue id could be used instead
+	 * of the name.
 	 * @param ligandName name of the ligand
 	 * @return true if ligand is suitable for display in Kiosk viewer
 	 */
@@ -857,6 +854,13 @@ public class SlideShow extends Thread
 		String name = ligandName.toLowerCase();
 		if (name.contains("sugar") 
 				|| name.contains("glycol")
+				|| name.contains("glycerol")
+			    || name.contains("peg")
+			    || name.contains("3,6,9,12,15,18-hexaoxaicosane-1,20-diol") // P33 PEG 330
+			    || name.contains("3,6,9,12,15,18,21,24-octaoxahexacosan-1-ol") // PE5
+			    || name.contains("2-(2-methoxyethoxy)ethanol") // PEG 6000
+			    || name.contains("2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,53,56,59,62,65,68,71,74,77,80-heptacosaoxadooctacontan-82-ol") // PEG 8000
+			    || name.contains("2-methyl-2,4-pentanediol") // MDP
 				|| name.contains("citrate")) {
 			return false;
 		}
