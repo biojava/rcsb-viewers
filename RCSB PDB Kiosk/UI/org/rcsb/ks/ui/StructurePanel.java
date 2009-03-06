@@ -66,12 +66,12 @@ import org.rcsb.vf.controllers.scene.SceneState;
 public class StructurePanel extends Box
 {
 	private static final long serialVersionUID = 3015095300052220693L;
-	private StructureIdPanel structureIdPanel = new StructureIdPanel();
-	private StateAnnotationPanel stateAnnotationPanel = new StateAnnotationPanel();
+	private StructureIdPanel structureIdPanel = null;
+	private StateAnnotationPanel stateAnnotationPanel = null;
 	private JPanel panel = null;
 	private int margin = 10;
 	
-	public StructurePanel()
+	public StructurePanel(Dimension size)
 	{
 		super(BoxLayout.X_AXIS);
 	
@@ -82,13 +82,19 @@ public class StructurePanel extends Box
 			public void setBounds ( int x, int y, int w, int h)
 			{
 				super.setBounds ( x, y, w, h );
-				int panelWidth = (w - 2*margin)/2;
-				// left panel
-				structureIdPanel.setBounds ( 2, 2, panelWidth, h-2 );	
-				// right panel
-				stateAnnotationPanel.setBounds ( (w/2), 2, panelWidth, h-2 );
+				int width = w - 2*margin;
+				// left panel (60% of width)
+				structureIdPanel.setBounds ( 2, 2, (int)(width*0.6f), h-2 );	
+				// right panel (40% of width)
+				stateAnnotationPanel.setBounds ( margin + (int)(width*0.6f), 2, (int)(width*0.4f), h-2 );
 			}
 		};
+		
+		// set height of lower panel to 1/6 of the display
+		panel.setPreferredSize(new Dimension (size.width, size.height/6));	
+		structureIdPanel = new StructureIdPanel(new Dimension ((int)(size.width*0.6f), size.height/6));
+		stateAnnotationPanel = new StateAnnotationPanel(new Dimension ((int)(size.width*0.4f), size.height/6));
+
 		panel.setBackground( Color.black );
 		panel.setLayout(null);
 
@@ -98,7 +104,6 @@ public class StructurePanel extends Box
 		add(panel);
 		add(createHorizontalStrut(margin));
 		
-		panel.setPreferredSize(new Dimension (1024, 150));
 	}
 	
 	@Override
