@@ -69,21 +69,18 @@ public class StateAnnotationPanel extends JPanel {
 	/**
 	 * Sets up the StateAnnoationPanel
 	 */
-	public StateAnnotationPanel() {
+	public StateAnnotationPanel(Dimension size) {
 		setLayout ( new BoxLayout ( this, BoxLayout.Y_AXIS ));
 		setBackground(Color.black);
 		
-		ligandName.setFont( new Font ("Helvetica", Font.BOLD, 15));
+		// scale font size by height of the panel
+		ligandName.setFont( new Font ("Helvetica", Font.BOLD, size.height/6));
 		ligandName.setBackground (Color.black);
 		ligandName.setForeground(Color.green);
 		ligandName.setWrapStyleWord(true);
 		ligandName.setLineWrap(true);
 		
 		add(ligandName);
-	}
-	
-	public Dimension getPreferredSize() {
-		return new Dimension(400, 150);
 	}
 
 	/**
