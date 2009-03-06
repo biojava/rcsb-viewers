@@ -191,17 +191,17 @@ public class KSDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 			try
 			{
 				Container container = getContentPane();
-				container.setBackground ( Color.black );
+				container.setBackground ( Color.BLACK);
 
 				container.setLayout(new BoxLayout(container,
 						BoxLayout.Y_AXIS));
 				KSGlGeometryViewer glViewer = getGlGeometryViewer();
-				glViewer.setPreferredSize( new Dimension ( size.width-10, size.height-20 ) );
-				glViewer.setBackground( Color.blue );
+	
+				glViewer.setPreferredSize( new Dimension ( size.width-10, size.height- (size.height/6) ) );
 
 				container.add(glViewer);
 
-				structurePanel = new StructurePanel();
+				structurePanel = new StructurePanel(size);
 				structurePanel.setDoubleBuffered(true);
 				container.add(structurePanel);
 				pack();
