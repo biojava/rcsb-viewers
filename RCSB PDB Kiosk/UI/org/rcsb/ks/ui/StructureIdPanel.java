@@ -75,25 +75,27 @@ public class StructureIdPanel extends JPanel
 	private JTextArea journalArea = new JTextArea();
 	
 	
-	public StructureIdPanel() {
+	public StructureIdPanel(Dimension size) {
 	
 		setLayout ( new BoxLayout ( this, BoxLayout.Y_AXIS ));
 		setBackground(Color.black);
 			
-		titleArea.setFont( new Font ( "Helvetica", Font.BOLD, 15 ));
+		// scale font size by height of the panel
+		titleArea.setFont( new Font ( "Helvetica", Font.BOLD, size.height/6));
 		titleArea.setBackground ( Color.black);
 		titleArea.setForeground( Color.orange );
 		titleArea.setWrapStyleWord( true );
 		titleArea.setLineWrap( true );
 		
-		journalArea.setFont( new Font ( "Helvetica", Font.PLAIN, 14 ));
+		// scale font size by height of the panel
+		journalArea.setFont( new Font ( "Helvetica", Font.PLAIN, size.height/8));
 		journalArea.setBackground ( Color.black);
 		journalArea.setForeground( Color.white );
 		journalArea.setWrapStyleWord( true );
 		journalArea.setLineWrap( true );	
 		
 		add(titleArea);
-		add (journalArea );
+		add(journalArea);
 	}
 	
 	
@@ -115,15 +117,11 @@ public class StructureIdPanel extends JPanel
 	    
 	    // print journal authors and reference
 		JournalArticle journalArticle = structureInfo.getJournalArticle();
-		journalArea.setText(journalArticle.getAuthorsAsString(4)
+		journalArea.setText(journalArticle.getAuthorsAsString(5)
 				+ "\n"
 				+ journalArticle.getJournalReference());
 
 		repaint();
-	}
-
-	public Dimension getPreferredSize() {
-		return new Dimension(500, 150);
 	}
 	
 	/**
