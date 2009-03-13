@@ -95,6 +95,7 @@ import org.rcsb.mbt.model.util.*;
  *  
  *  @author	John L. Moreland
  *  @author rickb (revisions)
+ *  @author Peter Rose (additions)
  *  @see	org.rcsb.mbt.model.StructureComponent
  *  @see	org.rcsb.mbt.model.StructureComponentRegistry
  */
@@ -172,6 +173,8 @@ public class StructureMap
 		{
 			if(biologicalUnitGenerationMatrices != null && biologicalUnitGenerationMatrices.size() > 0)
 			{
+				System.out.println("setBiologicalUnitGenerationMatrices, chain id: " + (biologicalUnitGenerationMatrices.get(0)).ndbChainId); //pr
+				
 				// if the biological units have chain information, index them.
 				if((biologicalUnitGenerationMatrices.get(0)).ndbChainId != null)
 				{
@@ -1132,6 +1135,33 @@ public class StructureMap
 		return AtomStats.getAtomCoordinateAverage( this.structure );
 	}
 
+	/**
+	 * Returns the centroid of the biological molecule.
+	 * @return centroid
+	 */
+	public double[] getBiologicalMoleculeCentroid( )
+	{
+		return AtomStats.getBiologicalMoleculeCentroid(this.structure);
+	}
+
+	/**
+	 * Returns the maximum extend of the structure in x, y, or z direction.
+	 * @return maximum extend
+	 */
+	public double getMaximumExtend( )
+	{
+		return AtomStats.getMaximumExtend(this.structure);
+	}
+	
+	/**
+	 * Returns the maximum extend of the biological molecule in x, y, or z direction.
+	 * @return maximum extend
+	 */
+	public double getBiologicalMoleculeMaximumExtend( )
+	{
+		return AtomStats.getBiologicalMoleculeMaximumExtend(this.structure);
+	}
+	
 	/**
 	 * Return the total Atom count extracted from the Structure.
 	 */
