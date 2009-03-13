@@ -396,12 +396,7 @@ public class SlideShow extends Thread
 
 			// {{ check the size of the structure. If it is too big then we will
 			// punt }}
-//			Structure structure = model.getStructures().get(0);
-//			System.out.println(" atom count : "
-//					+ structure.getStructureMap().getAtomCount());
 
-			// double[] ccc = model.getStructures()[0].getStructureMap()
-			// .getAtomCoordinateAverage();
 			while (model == null) {
 				try {
 					sleep(100L);
@@ -498,15 +493,64 @@ public class SlideShow extends Thread
 		AppBase.sgetDocController().loadStructure(url, _id);
 	}
 
+	/**
+	 * Returns true if viewer should display asymmetric unit, and false
+	 * if viewer should display biological molecule.
+	 * @return true if viewer displays asymmetric unit
+	 */
+	private boolean showAsymmetricUnitOnly() {
+		return KioskViewer.sgetSceneController().showAsymmetricUnitOnly();
+	}
+	
+	/**
+	 * Returns the pivot point for rotation of structures.
+	 * 
+	 * @return pivot point for rotation of structures
+	 */
+	private double[] getPivotPoint() {
+		double[] pivot = new double[3];
+		StructureModel model = AppBase.sgetModel();
+		StructureMap sm = model.getStructures().get(0).getStructureMap();
+		
+		if (showAsymmetricUnitOnly()) {
+			pivot = sm.getAtomCoordinateAverage();
+		} else {
+			pivot = sm.getBiologicalMoleculeCentroid();
+		}
+		return pivot;
+	}
+	
+	
+	/**
+	 * Returns the maximum extend of a structure in x, y, or z direction.
+	 * 
+	 * @return maximum extend
+	 */
+	private double getMaximumExtend() {
+		StructureModel model = AppBase.sgetModel();
+		StructureMap sm = model.getStructures().get(0).getStructureMap();
+		
+		if (showAsymmetricUnitOnly()) {
+			return sm.getMaximumExtend();
+		} else {
+			return sm.getBiologicalMoleculeMaximumExtend();
+		}
+	}
+	
 	private List<SceneState> generateStates()
 	{
 		List<SceneState> statelist = new ArrayList<SceneState>();
 		StructureModel model = AppBase.sgetModel();
 		KSGlGeometryViewer gl = KioskViewer.sgetGlGeometryViewer();
-		double[] pivot = model.getStructures().get(0).getStructureMap()
-				.getAtomCoordinateAverage();
 		
-		generateState(pivot, statelist, "");
+		StructureMap sm = model.getStructures().get(0).getStructureMap();
+		
+		double[] pivot = getPivotPoint();
+		// use size of structure to set distance of camera
+		double extend = getMaximumExtend();
+
+		generateState(pivot, extend*2, statelist, "");
+//		generateState(pivot, 150, statelist, "");
 		
 /* **
 // uncomment if you want only the pivot states generated.
@@ -515,8 +559,6 @@ public class SlideShow extends Thread
 * **/
 
 		KSStructureInfo structureInfo = (KSStructureInfo)model.getStructures().get(0).getStructureInfo();
-
-		StructureMap sm = model.getStructures().get(0).getStructureMap();
 
 		SceneState orig = new SceneState();
 		orig.captureCurrentState("");
@@ -572,16 +614,17 @@ public class SlideShow extends Thread
 		} catch (Exception _ee) {
 			_ee.printStackTrace();
 		}
-		double coords[] = sm.getAtomCoordinateAverage();
-		double[] eye = new double[3];
-		eye[0] = coords[0] - 20;
-		eye[1] = coords[1] - 20;
-		eye[2] = coords[2] - 20;
 
-		generateOscilatingState(coords, 140, statelist, "");
+		double[] eye = new double[3];
+		eye[0] = pivot[0] - 20;
+		eye[1] = pivot[1] - 20;
+		eye[2] = pivot[2] - 20;
+
+		generateOscilatingState(pivot, extend*1.8, statelist, "");
+//		generateOscilatingState(pivot, 140, statelist, "");
 		SceneState viewerState = new SceneState();
 		try {
-			gl.lookAt(eye, coords);
+			gl.lookAt(eye, pivot);
 			viewerState.captureCurrentState("");
 			statelist.add(viewerState);
 		} catch (Exception _ee) {
@@ -765,7 +808,7 @@ public class SlideShow extends Thread
 		}
 	}
 
-	private void generateState(double[] pivot, List<SceneState> _list,
+	private void generateState(double[] pivot, double distance, List<SceneState> _list,
 			String _title) {
 		double[] c = pivot;
 		double[] eye = new double[3];
@@ -773,7 +816,7 @@ public class SlideShow extends Thread
 		eye[1] = c[1] - 120;
 		eye[2] = c[2] - 120;
 
-		double distance = 150;// Math.sqrt(eye[0]*eye[0] + eye[1]*eye[1] +
+		//double distance = 150;// Math.sqrt(eye[0]*eye[0] + eye[1]*eye[1] +
 		// eye[2]*eye[2]);
 		double phi = 0;
 		double theta = Math.PI;
