@@ -45,6 +45,7 @@
  */ 
 package org.rcsb.testbed.glscene;
 
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -64,6 +65,7 @@ import javax.media.opengl.glu.GLU;
 import org.rcsb.testbed.app.TestBed;
 
 import com.sun.opengl.util.Animator;
+import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.GLUT;
 
 @SuppressWarnings("serial")
@@ -145,14 +147,24 @@ public class GLViewer extends JPanel implements GLEventListener
 	{
 		drawable.setGL(new DebugGL(drawable.getGL()));
 		
-		float lightColor[] = new float[] { 0.8f, 0.8f, 0.8f, 1.0f };
+		float lightColor[] = new float[] {1.0f, 1.0f, 1.0f, 1.0f };
 
 		GL gl = drawable.getGL();
+		
+		FloatBuffer ambient = BufferUtil.newFloatBuffer(4);
+		ambient.put(0, 0.2f);
+		ambient.put(1, 0.2f);
+		ambient.put(2, 0.2f);
+		ambient.put(3, 1.0f);
+		ambient.rewind();
+		
+		gl.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, ambient);
+		
 /* **/
 		// Lighting
 		gl.glEnable(GL.GL_LIGHTING);
 		gl.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, lightColor, 0);
-		gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, new float[] {-5.0f, 10.0f, 10.0f, 0.0f}, 0);
+		gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, new float[] {-1.0f, 1.0f, 5.0f, 0.0f}, 0);
 		gl.glEnable(GL.GL_LIGHT0);
 
 		// Rendering
@@ -166,6 +178,7 @@ public class GLViewer extends JPanel implements GLEventListener
 		gl.glCullFace(GL.GL_BACK);
 		gl.glPolygonMode(GL.GL_FRONT, GL.GL_FILL);
 		
+		gl.glColorMaterial(GL.GL_FRONT, GL.GL_AMBIENT);
 		gl.glColorMaterial(GL.GL_FRONT, GL.GL_DIFFUSE);
 		gl.glEnable(GL.GL_COLOR_MATERIAL);
 
@@ -187,5 +200,10 @@ public class GLViewer extends JPanel implements GLEventListener
 	public void reshape(GLAutoDrawable drawable, int arg1, int arg2, int arg3,
 			int arg4)
 	{
+		GL gl = drawable.getGL();
+		gl.glViewport(0, 0, getWidth(), getHeight());
+		gl.glMatrixMode(gl.GL_PROJECTION);
+		gl.glLoadIdentity();
+		glu.gluPerspective(60.0f, (float)getWidth()/(float)getHeight(), 0.2f, 10.0f);
 	}
 }

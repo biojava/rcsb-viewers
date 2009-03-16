@@ -49,62 +49,96 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUquadric;
+import javax.vecmath.Matrix4f;
+
+import org.rcsb.testbed.util.PrimitiveDisplayListsFactory;
 
 import com.sun.opengl.util.GLUT;
 
 public class BasicConeTestScene extends SceneBase implements IScene
 {
-	static private final float angleInc = 10.0f;
+	static private final float angleInc = 10.0f/180.f; // vecmath wants radians (yay)
 	
 	private float xaxisRot = 0.0f, yaxisRot = 0.0f, zaxisRot = 0.0f;
+	private float currentMatrixValues[] = new float[16];
+	private int coneListId = -1;
+	
+	private Matrix4f currentMatrix = new Matrix4f(), rotMatrix = new Matrix4f();
 	
 	public float getXRot() { return xaxisRot; }
 	public float getYRot() { return yaxisRot; }
 	public float getZRot() { return zaxisRot; }
 	
 	private enum RotAxis { X_AXIS, Y_AXIS, Z_AXIS, NONE }
+
+	public void incXRot() { xaxisRot -= angleInc; accumRotation(RotAxis.X_AXIS, -angleInc); }
+	public void incYRot() { yaxisRot += angleInc; accumRotation(RotAxis.Y_AXIS, angleInc); }
+	public void incZRot() { zaxisRot += angleInc; accumRotation(RotAxis.Z_AXIS, angleInc); }
+	public void decXRot() { xaxisRot += angleInc; accumRotation(RotAxis.X_AXIS, angleInc); }
+	public void decYRot() { yaxisRot -= angleInc; accumRotation(RotAxis.Y_AXIS, -angleInc); }
+	public void decZRot() { zaxisRot -= angleInc; accumRotation(RotAxis.Z_AXIS, -angleInc); }
 	
-	private RotAxis rotAxis = RotAxis.NONE;
-	
-	public void incXRot() { xaxisRot += angleInc; if (xaxisRot >= 360.0f) xaxisRot -= 360.0f; rotAxis = RotAxis.X_AXIS; }
-	public void incYRot() { yaxisRot += angleInc; if (yaxisRot >= 360.0f) yaxisRot -= 360.0f; rotAxis = RotAxis.Y_AXIS; }
-	public void incZRot() { zaxisRot += angleInc; if (zaxisRot >= 360.0f) zaxisRot -= 360.0f; rotAxis = RotAxis.Z_AXIS; }
-	public void decXRot() { xaxisRot -= angleInc; if (xaxisRot <= -360.0f) xaxisRot += 360.0f; rotAxis = RotAxis.X_AXIS; }
-	public void decYRot() { yaxisRot -= angleInc; if (yaxisRot <= -360.0f) yaxisRot += 360.0f; rotAxis = RotAxis.Y_AXIS; }
-	public void decZRot() { zaxisRot -= angleInc; if (zaxisRot <= -360.0f) zaxisRot += 360.0f; rotAxis = RotAxis.Z_AXIS; }
-	
+	public BasicConeTestScene()
+	{
+		reset();
+	}
+
+	@Override
 	public void display(GLAutoDrawable drawable, GLUT glut, GLU glu)
 	{
 		super.display(drawable, glut, glu);
-	
 		GL gl = drawable.getGL();
-		
-		gl.glRotatef(xaxisRot, 1.0f, 0.0f, 0.0f);
-		gl.glRotatef(yaxisRot, 0.0f, 1.0f, 0.0f);
-		gl.glRotatef(zaxisRot, 0.0f, 0.0f, 1.0f);
 
+		int ix = 0;
+		for (int row = 0; row < 4; row++)
+			for (int col = 0; col < 4; col++)
+				currentMatrixValues[ix++] = currentMatrix.getElement(row, col);
+		
+ 		gl.glPushMatrix();
+		gl.glMultMatrixf(currentMatrixValues, 0);
+		
 		gl.glColor3f(1.0f, 0.0f, 0.0f);
 
-		gl.glPushMatrix();
-		gl.glTranslatef(0.0f, -.5f, 0.0f);
-		gl.glRotatef(-90, 1.0f, 0.0f, 0.0f);
-
-		glut.glutSolidCone(.5, 1.0, 40, 1);
+		if (coneListId == -1)
+			coneListId = PrimitiveDisplayListsFactory.genCone(0.75f, gl, glut, glu);
 		
-		GLUquadric qDisk = glu.gluNewQuadric();
-		glu.gluQuadricOrientation(qDisk, GLU.GLU_INSIDE);
-		glu.gluDisk(qDisk, 0.0, 0.5f, 40, 1);
-		glu.gluDeleteQuadric(qDisk);
+		gl.glCallList(coneListId);
 		gl.glPopMatrix();
 	}
 	
+	@Override
 	public void init(GLAutoDrawable drawable, GLUT glut, GLU glu)
 	{
 		super.init(drawable, glut, glu);
 	}
 	
+	@Override
 	public void reset()
 	{
 		xaxisRot = yaxisRot = zaxisRot = 0.0f;
+		currentMatrix.setIdentity();
+	}
+	
+	/**
+	 * We want the rotation to act on the *accumulated* rotation, not individually.
+	 * So, we have to create a matrix and keep the current rotation value in that, 
+	 * then multiply this rotation against that to get what we want.
+	 * 
+	 * @param axis - the axis about which to rotate
+	 * @param angle - the angle to rotate
+	 */
+	private void accumRotation(RotAxis axis, float angle)
+	{
+		rotMatrix.setIdentity();
+		
+		switch (axis)
+		{
+			case X_AXIS: rotMatrix.rotX(angle); break;
+			case Y_AXIS: rotMatrix.rotY(angle); break;
+			case Z_AXIS: rotMatrix.rotZ(angle); break;
+		}
+		
+		currentMatrix.mul(rotMatrix);
+					// multiply against the current rotation.
 	}
 }

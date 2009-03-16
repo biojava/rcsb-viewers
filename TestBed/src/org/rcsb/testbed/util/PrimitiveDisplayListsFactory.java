@@ -76,11 +76,13 @@ public class PrimitiveDisplayListsFactory
 		
 		GLUquadric qObj = glu.gluNewQuadric();
 		glu.gluQuadricOrientation(qObj, GLU.GLU_OUTSIDE);
+		glu.gluQuadricNormals(qObj, GL.GL_FLAT);
 		glu.gluCylinder(qObj, radius, radius, 1.0, 40, 1);
 		glu.gluDeleteQuadric(qObj);
 		
 		qObj = glu.gluNewQuadric();
-		glu.gluQuadricOrientation(qObj, GLU.GLU_INSIDE);
+		glu.gluQuadricOrientation(qObj, GLU.GLU_OUTSIDE);
+		glu.gluQuadricNormals(qObj, GL.GL_FLAT);
 		glu.gluDisk(qObj, 0.0, radius, 40, 1);
 		glu.gluDeleteQuadric(qObj);
 		
@@ -97,7 +99,8 @@ public class PrimitiveDisplayListsFactory
 	{
 		int ballId = gl.glGenLists(1);
 		GLUquadric qObj = glu.gluNewQuadric();
-		glu.gluQuadricOrientation(qObj, GLU.GLU_INSIDE);
+		glu.gluQuadricOrientation(qObj, GLU.GLU_OUTSIDE);
+		glu.gluQuadricNormals(qObj, GL.GL_FLAT);
 		gl.glNewList(ballId, GL.GL_COMPILE);
 		glu.gluSphere(qObj, radius, 40, 40);
 		gl.glEndList();
@@ -105,4 +108,29 @@ public class PrimitiveDisplayListsFactory
 		return ballId;
 	}
 
+	public static int genCone(float size, GL gl, GLUT glut, GLU glu)
+	{
+		int coneId = gl.glGenLists(1);
+		gl.glNewList(coneId, GL.GL_COMPILE);
+		gl.glPushMatrix();
+		gl.glTranslatef(0.0f, -size/3, 0.0f);
+		gl.glRotatef(-90, 1.0f, 0.0f, 0.0f);
+
+//		glut.glutSolidCone(size / 2, size, 40, 1);
+
+		GLUquadric qCone = glu.gluNewQuadric();
+		glu.gluQuadricOrientation(qCone, GLU.GLU_OUTSIDE);
+		glu.gluQuadricNormals(qCone, GL.GL_FLAT);
+		glu.gluCylinder(qCone, size/2, 0.0f, size, 40, 1);
+		glu.gluDeleteQuadric(qCone);
+		
+		GLUquadric qDisk = glu.gluNewQuadric();
+		glu.gluQuadricOrientation(qDisk, GLU.GLU_INSIDE);
+		glu.gluQuadricNormals(qDisk, GL.GL_FLAT);
+		glu.gluDisk(qDisk, 0.0, size / 2, 40, 1);
+		glu.gluDeleteQuadric(qDisk);
+		gl.glPopMatrix();
+		gl.glEndList();
+		return coneId;
+	}
 }

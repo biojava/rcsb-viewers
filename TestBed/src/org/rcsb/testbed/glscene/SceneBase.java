@@ -60,7 +60,11 @@ public class SceneBase implements IScene
 	{
 		GL gl = drawable.getGL();
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+		gl.glMatrixMode(GL.GL_MODELVIEW);
 		gl.glLoadIdentity();
+		glu.gluLookAt(0.0f, 0.0f, 1.0f,
+				  0.0f, 0.0f, 0.0f,
+				  0.0f, 1.0f, 0.0f);
 
 		if (drawAxes)
 			gl.glCallList(axisId);
