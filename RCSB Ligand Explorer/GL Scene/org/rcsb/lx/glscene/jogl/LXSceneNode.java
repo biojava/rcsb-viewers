@@ -656,6 +656,7 @@ public class LXSceneNode extends JoglSceneNode
 	@Override
 	protected void drawTypeLabels(GL gl, Object key, Integer label)
 	{
+		float LABEL_DISPLACEMENT = 0.2f; // was 0.5f originally
 		if (key instanceof Interaction)
 		{
 			final Interaction line = (Interaction) key;
@@ -672,9 +673,9 @@ public class LXSceneNode extends JoglSceneNode
 								.getFirstAtom().coordinate[i] + line
 								.getSecondAtom().coordinate[i]) / 2;
 					}
-					gl.glTranslated(this.tempMidpoint[0] + .5f,
-							this.tempMidpoint[1] - .5f,
-							this.tempMidpoint[2] + .5f);
+					gl.glTranslated(this.tempMidpoint[0] + LABEL_DISPLACEMENT,
+							this.tempMidpoint[1] - LABEL_DISPLACEMENT,
+							this.tempMidpoint[2] + LABEL_DISPLACEMENT);
 					// constants represent arbitrary displacement to separate
 					// the label from the line.
 
