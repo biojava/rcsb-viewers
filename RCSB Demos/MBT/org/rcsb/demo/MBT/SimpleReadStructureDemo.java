@@ -117,6 +117,7 @@ public class SimpleReadStructureDemo
 		}
 
 		
+		
 		File file = new File(fileName);
 		
 		if (file == null || !file.exists())
@@ -250,8 +251,10 @@ public class SimpleReadStructureDemo
 			Output.lineOut("Detail by chain:");
 			Output.indent();
 			
-			for (Chain chain : structMap.getChains())
+			for (Chain chain : structMap.getChains()) {
+				Output.lineOut("Structure style: " + structMap.getStructureStyles().getStyle(chain)); // pr
 				outputChainInfo(chain, null);
+			}
 				
 			Output.outdent();
 			Output.lineOut("--End StructureMap--");
@@ -291,6 +294,9 @@ public class SimpleReadStructureDemo
 		
 		else
 			Output.lineOut("Chain Id : " + chainId);
+		
+		StructureMap sm = chain.getStructure().getStructureMap(); // pr
+		Output.lineOut("Structure style: " + sm.getStructureStyles().getStyle(chain)); // pr
 		
 		if (chainId.equals("_") || chainId.equals("HOH"))
 						// don't output the default chain id - if it contains ions/ligands,
