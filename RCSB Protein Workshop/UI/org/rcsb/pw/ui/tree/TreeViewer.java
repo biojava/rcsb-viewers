@@ -647,8 +647,6 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 
 		// expand the path for the non-protein atoms, if any are present...
 		for (StructureComponent next : structureMap.getPdbTopLevelElements()) {
-			System.out.println("TreeViewer: " + next.getStructureComponentType().toString());
-			System.out.println("ExternChain: " + ((ExternChain)next).getChainId());
 			if (next instanceof ExternChain && ((ExternChain)next).isMiscellaneousChain())
 			{	
 				treePath = new TreePath(new Object[] { model, structure, next });
