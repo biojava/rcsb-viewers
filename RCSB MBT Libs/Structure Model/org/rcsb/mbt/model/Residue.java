@@ -252,6 +252,13 @@ public class Residue
 			else if (atom.getStructure().getStructureMap().getChain(atom.chain_id).isNonProteinChain())
 				classification = Classification.LIGAND;
 			
+			// ACE often appears as an n-terminal cap of proteins, treat it as an Amino Acid, 
+			// or else the protein chain is reclassified as a ligand.
+			else if ( compoundCode.equals("ACE") && 
+					! atom.getStructure().getStructureMap().getChain(atom.chain_id).isNonProteinChain()) {
+				classification = Classification.AMINO_ACID;
+			}
+				
 			else if ( AminoAcidInfo.getNameFromCode( compoundCode ) != null )
 				classification = Classification.AMINO_ACID;
 			
