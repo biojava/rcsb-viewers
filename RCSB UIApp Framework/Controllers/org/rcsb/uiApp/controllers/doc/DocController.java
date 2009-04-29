@@ -48,6 +48,8 @@ package org.rcsb.uiApp.controllers.doc;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
@@ -120,6 +122,7 @@ public class DocController
 		{
 			try
 			{
+				datasets[i] = datasets[i].trim();
 				final String dataset = datasets[i];
 				IFileStructureLoader loader = null;
 			
@@ -193,7 +196,8 @@ public class DocController
 		for (int i = 0; i < structures.length; i++)
 		{
 			structures[i] = structuresVec.get(i);
-			structures[i].getStructureMap().setPdbId("NOID");
+//			structures[i].getStructureMap().setPdbId("NOID");
+			structures[i].getStructureMap().setPdbId(parsePdbId(datasets[i]));
 			structures[i].getStructureMap().setImmutable();
 		}
 		
@@ -204,6 +208,23 @@ public class DocController
 		return structures;
 	}
 
+	/**
+	 * Parses the PDB ID from a url string
+	 * @param urlString
+	 * @return PdbId
+	 */
+	private String parsePdbId(String urlString) {
+		String[] extensions = {".xml", ".xml.gz", ".pdb", ".pdb.gz", ".ent", ".ent.gz", ".pdb1.gz", ".pdb2.gz,", ".pdb3.gz", ".pdb4.gz", ".pdb5.gz"};
+		
+		for (String extension: extensions) {
+			int endIndex = urlString.indexOf(extension);
+			if (endIndex > 0) {
+				int beginIndex = Math.max(0, endIndex-4);
+				return urlString.substring(beginIndex, endIndex).toUpperCase();
+			}
+		}
+		return "NOID";
+	}
 
 	/**
 	 * 
