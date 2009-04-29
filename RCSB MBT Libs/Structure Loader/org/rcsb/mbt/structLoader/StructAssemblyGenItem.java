@@ -174,6 +174,9 @@ public class StructAssemblyGenItem {
 	 */
 	public void parseOperatorExpressionString(String operatorExpression) throws IllegalArgumentException {
 		String expression = operatorExpression.trim();
+		
+		// remove single quotes, i.e. '(1-49)' in 1CGM
+		expression = expression.replaceAll("'", "");
 
 		if (isUnaryExpression(expression)) {
 			unaryOperators = parseUnaryOperatorExpression(expression);
@@ -186,6 +189,7 @@ public class StructAssemblyGenItem {
 		StringBuilder sb = new StringBuilder();
 		sb.append("assemblyId: " + assemblyId + "\n");
 		sb.append("detail: " + detail + "\n");
+		sb.append("asym_id_list: " + asymIdList + "\n");
 		sb.append("unary operators: " + unaryOperators + "\n");
 		sb.append("binary operators: " + binaryOperators + "\n");
 		return sb.toString();
