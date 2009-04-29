@@ -110,7 +110,6 @@ public class TreeViewerModel
 		else if ( parent instanceof Structure )
 		{
 			final Structure struc = (Structure)parent;
-			System.out.println("TreeViewerModel: #ligs " + struc.getStructureMap().getLigandCount());
             return struc.getStructureMap().getPdbTopLevelElements().get(index);
 		}
         else if ( parent instanceof ExternChain )
@@ -124,7 +123,6 @@ public class TreeViewerModel
 			if ( type == ComponentType.CHAIN )
 			{
 				final Chain chain = (Chain) structureComponent;
-                System.out.println("TreeViewerModel: " + chain.getChainId() + " res: " + chain.getResidueCount());
                 if(chain.structure.getStructureMap().isNonproteinChainId(chain.getChainId())) {
                     return chain.getResidue(index);
                 }
@@ -134,13 +132,11 @@ public class TreeViewerModel
             else if ( type == ComponentType.FRAGMENT )
             {
                 final Fragment fragment = (Fragment) structureComponent;
-                System.out.println("TreeViewerModel: frag # res " + fragment.getResidueCount());
                 return fragment.getResidue( index );
             }
 			else if ( type == ComponentType.RESIDUE )
 			{
 				final Residue residue = (Residue) structureComponent;
-				System.out.println("TreeViewerModel: res " + residue.getResidueId());
 				return residue.getAtom( index );
 			} else {
 				return null;
@@ -174,7 +170,6 @@ public class TreeViewerModel
 			if ( type == ComponentType.CHAIN )
 			{
                 final Chain chain = (Chain) structureComponent;
-                System.out.println("TreeViewerModel: " + chain.getChainId() + " res" + chain.getResidueCount());
 			    if(chain.structure.getStructureMap().isNonproteinChainId(chain.getChainId())) {
                     return chain.getResidueCount();
                 }
@@ -184,7 +179,6 @@ public class TreeViewerModel
             else if ( type == ComponentType.FRAGMENT )
             {
                 final Fragment fragment = (Fragment) structureComponent;
-                System.out.println("TreeViewerModel: frag # res " + fragment.getResidueCount());
                 return fragment.getResidueCount( );
             }
 			else if ( type == ComponentType.RESIDUE )
