@@ -1001,7 +1001,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		} else if (interactionType == InteractionConstants.hydrophobicType) {
 			InteractionConstants.hydrophobicBondColor.getRGBColorComponents(textColor);
 		} else if (interactionType == InteractionConstants.metalInteractionType) {
-			InteractionConstants.hydrophobicBondColor.getRGBColorComponents(textColor);
+			InteractionConstants.metalInteractionColor.getRGBColorComponents(textColor);
 		} else if (interactionType == InteractionConstants.waterMediatedType) {
 			InteractionConstants.waterMediatedColor.getRGBColorComponents(textColor);
 		}
