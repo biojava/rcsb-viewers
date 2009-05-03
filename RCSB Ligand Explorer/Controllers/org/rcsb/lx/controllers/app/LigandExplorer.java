@@ -173,7 +173,7 @@ public class LigandExplorer extends VFAppBase
 	public void initialize(final boolean isApplication)
 	{
 		appModuleFactory = new LXAppModuleFactory();
-		activeFrame = appModuleFactory.createDocFrame("PDB Ligand Explorer (Powered by the MBT)",
+		activeFrame = appModuleFactory.createDocFrame("PDB Ligand Explorer " + LXVersionInformation.version() + " (Powered by the MBT)",
 												      LigandExplorer.class.getResource("images/icon_128_LX.png"));
 	
 		super.initialize(true);
