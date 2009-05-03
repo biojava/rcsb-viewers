@@ -673,7 +673,12 @@ public class StructureXMLHandler extends DefaultHandler implements
 				break;
 
 			case ATOM_SITES:
-				runnable = endElementAtomSitesRunnables.get(qName);
+				// make sure not to parse atom sites for models 2 and above
+	//			if (currentModelNumber == 1 || currentModelNumber == -1) {
+					runnable = endElementAtomSitesRunnables.get(qName);
+	//			} else {
+	//				return;
+	//			}
 				break;
 
 			case DATABASE_PDB_MATRIX:
@@ -1112,9 +1117,10 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__label_atom_id__End extends XMLRunnable {
 		public void run() {
-			final String trim = buf.trim();
-
-			curAtom.name = getUnique(trim);
+			if (currentModelNumber == 1 || currentModelNumber == -1) {
+				final String trim = buf.trim();
+				curAtom.name = getUnique(trim);
+			}
 		}
 	}
 
@@ -1124,7 +1130,9 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__label_comp_id__End extends XMLRunnable {
 		public void run() {
-			curAtom.compound = getUnique(buf.trim());
+			if (currentModelNumber == 1 || currentModelNumber == -1) {
+				curAtom.compound = getUnique(buf.trim());
+			}
 		}
 	}
 
@@ -1134,7 +1142,9 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__label_asym_id__End extends XMLRunnable {
 		public void run() {
-			curAtom.label_asym_id = buf.trim();
+			if (currentModelNumber == 1 || currentModelNumber == -1) {
+				curAtom.label_asym_id = buf.trim();
+			}
 		}
 	}
 
@@ -1144,7 +1154,9 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__auth_asym_id__End extends XMLRunnable {
 		public void run() {
-			curAtom.auth_asym_id = buf.trim();
+			if (currentModelNumber == 1 || currentModelNumber == -1) {
+			    curAtom.auth_asym_id = buf.trim();
+			} 
 		}
 	}
 
@@ -1153,7 +1165,9 @@ public class StructureXMLHandler extends DefaultHandler implements
 	}
 	protected class XMLRunnable__label_seq_id__End extends XMLRunnable {
 		public void run() {
-			curAtom.label_seq_id = buf.trim();
+			if (currentModelNumber == 1 || currentModelNumber == -1) {
+			    curAtom.label_seq_id = buf.trim();
+			} 
 		}
 	}
 
@@ -1163,7 +1177,9 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__auth_seq_id__End extends XMLRunnable {
 		public void run() {
-			curAtom.auth_seq_id = buf.trim();
+			if (currentModelNumber == 1 || currentModelNumber == -1) {
+			    curAtom.auth_seq_id = buf.trim();
+			} 
 		}
 	}
 
@@ -1173,8 +1189,10 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__Cartn_x__End extends XMLRunnable {
 		public void run() {
-			final String trim = buf.trim();
-			curAtom.coordinate[0] = Double.parseDouble(trim);
+			if (currentModelNumber == 1 || currentModelNumber == -1) {
+				final String trim = buf.trim();
+				curAtom.coordinate[0] = Double.parseDouble(trim);
+			}
 		}
 	}
 
@@ -1184,8 +1202,10 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__Cartn_y__End extends XMLRunnable {
 		public void run() {
-			final String trim = buf.trim();
-			curAtom.coordinate[1] = Double.parseDouble(trim);
+			if (currentModelNumber == 1 || currentModelNumber == -1) {
+				final String trim = buf.trim();
+				curAtom.coordinate[1] = Double.parseDouble(trim);
+			}
 		}
 	}
 
@@ -1195,8 +1215,10 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__Cartn_z__End extends XMLRunnable {
 		public void run() {
-			final String trim = buf.trim();
-			curAtom.coordinate[2] = Double.parseDouble(trim);
+			if (currentModelNumber == 1 || currentModelNumber == -1) {
+				final String trim = buf.trim();
+				curAtom.coordinate[2] = Double.parseDouble(trim);
+			}
 		}
 	}
 
@@ -1206,9 +1228,10 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__occupancy__End extends XMLRunnable {
 		public void run() {
-			final String trim = buf.trim();
-
-			curAtom.occupancy = Float.parseFloat(trim);
+			if (currentModelNumber == 1 || currentModelNumber == -1) {
+				final String trim = buf.trim();
+				curAtom.occupancy = Float.parseFloat(trim);
+			}
 		}
 	}
 
@@ -1218,9 +1241,10 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__B_iso_or_equiv__End extends XMLRunnable {
 		public void run() {
-			final String trim = buf.trim();
-
-			curAtom.bfactor = Float.parseFloat(trim);
+			if (currentModelNumber == 1 || currentModelNumber == -1) {
+				final String trim = buf.trim();
+				curAtom.bfactor = Float.parseFloat(trim);
+			}
 		}
 	}
 
