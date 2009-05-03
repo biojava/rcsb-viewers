@@ -80,27 +80,16 @@ public class LXSceneController extends SceneController
 	
 	public void processLeftPanelEvent(final Structure structure,
 		    final float ligwaterbondupper, final boolean ligWaterProOn, 
-// pr			final float intLigandBondupper, final float intLigandBondlower, final boolean intLigandOn, 
 			final boolean hbondflag,
 		 final float hbondupper, final boolean hydroflag,
 			final float hydroupper, final boolean otherflag,
 			final float otherupper, final boolean displayDisLabel,
 			final float neighborUpper, final boolean neighborFlag,
 			boolean saveInteractionsToFile) {
-		// XXX Status.progress(0.3f, "StructureViewer adding structure...Please wait");
 
 		PrintWriter interactionsOut = null;
 		if (saveInteractionsToFile) {
 			final JFileChooser chooser = new JFileChooser();
-			// chooser.addChoosableFileFilter(new FileFilter() {
-			// public boolean accept(File f) {
-			// return true;
-			// }
-			//
-			// public String getDescription() {
-			// return "Everything";
-			// }
-			// });
 
 			chooser.addChoosableFileFilter (
 				new FileFilter()
@@ -203,11 +192,6 @@ public class LXSceneController extends SceneController
 		if (ligWaterProOn) {
 			interactionsCalculator.calWaterInteractions(structure, 0.0f, ligwaterbondupper, displayDisLabel, interactionsOut);
 		}
-
-		// added for protein-ligand interactions
-// pr		if (intLigandOn) {
-//			interactionsCalculator.calInterLigInteractions(structure, intLigandBondlower, intLigandBondupper, displayDisLabel, interactionsOut);
-//		}
 
 		// added for protein-ligand interactions
 		interactionsCalculator.calculateInteractions(structure, hbondflag, hydroflag, otherflag,
