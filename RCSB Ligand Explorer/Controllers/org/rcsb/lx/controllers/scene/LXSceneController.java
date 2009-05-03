@@ -79,10 +79,13 @@ public class LXSceneController extends SceneController
 	public void setNewDocument(boolean flag) { newDocument = flag; }
 	
 	public void processLeftPanelEvent(final Structure structure,
-			final float ligwaterbondlower, final float ligwaterbondupper, final boolean ligWaterProOn, final float intLigandBondupper, final float intLigandBondlower, final boolean intLigandOn, final boolean hbondflag,
-			final float hbondlower, final float hbondupper, final boolean hydroflag,
-			final float hydrolower, final float hydroupper, final boolean otherflag,
-			final float otherlower, final float otherupper, final boolean displayDisLabel,
+		    final float ligwaterbondupper, final boolean ligWaterProOn, 
+// pr			final float intLigandBondupper, final float intLigandBondlower, final boolean intLigandOn, 
+			final boolean hbondflag,
+		 final float hbondupper, final boolean hydroflag,
+			final float hydroupper, final boolean otherflag,
+			final float otherupper, final boolean displayDisLabel,
+			final float neighborUpper, final boolean neighborFlag,
 			boolean saveInteractionsToFile) {
 		// XXX Status.progress(0.3f, "StructureViewer adding structure...Please wait");
 
@@ -198,18 +201,22 @@ public class LXSceneController extends SceneController
 		// added for protein-ligand interaction. calculate interaction with H2O
 		// in the binding site
 		if (ligWaterProOn) {
-			interactionsCalculator.calWaterInteractions(structure, ligwaterbondlower, ligwaterbondupper, displayDisLabel, interactionsOut);
+			interactionsCalculator.calWaterInteractions(structure, 0.0f, ligwaterbondupper, displayDisLabel, interactionsOut);
 		}
 
 		// added for protein-ligand interactions
-		if (intLigandOn) {
-			interactionsCalculator.calInterLigInteractions(structure, intLigandBondlower, intLigandBondupper, displayDisLabel, interactionsOut);
-		}
+// pr		if (intLigandOn) {
+//			interactionsCalculator.calInterLigInteractions(structure, intLigandBondlower, intLigandBondupper, displayDisLabel, interactionsOut);
+//		}
 
 		// added for protein-ligand interactions
 		interactionsCalculator.calculateInteractions(structure, hbondflag, hydroflag, otherflag,
-				hbondupper, hbondlower, hydroupper, hydrolower, otherupper,
-				otherlower, displayDisLabel, interactionsOut);
+				hbondupper, 0.0f, hydroupper, 0.0f, otherupper,
+				0.0f, displayDisLabel, interactionsOut);
+		
+		if (neighborFlag) {
+			interactionsCalculator.calcNeighbors(structure, neighborUpper, interactionsOut);
+		}
 		
 		if (interactionsOut != null) {
 			interactionsOut.close();

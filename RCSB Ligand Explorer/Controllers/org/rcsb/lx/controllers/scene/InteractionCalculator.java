@@ -46,7 +46,10 @@
 package org.rcsb.lx.controllers.scene;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Vector;
 
 import org.rcsb.lx.controllers.app.LigandExplorer;
@@ -54,6 +57,7 @@ import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
 import org.rcsb.lx.glscene.jogl.LXSceneNode;
 import org.rcsb.lx.model.InteractionConstants;
 import org.rcsb.mbt.model.Atom;
+import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
@@ -62,6 +66,8 @@ import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
+import org.rcsb.mbt.model.util.Element;
+import org.rcsb.mbt.model.util.PeriodicTable;
 import org.rcsb.vf.glscene.jogl.AtomGeometry;
 import org.rcsb.vf.glscene.jogl.BondGeometry;
 import org.rcsb.vf.glscene.jogl.DisplayListRenderable;
@@ -120,6 +126,7 @@ public class InteractionCalculator
 
 			final Atom atom_i = ligandAtoms.get(i);
 
+			// should this loop start at 0 ?? -pr
 			for (int j = i + 1; j < proteinAtoms.size(); j++) {
 				final Atom atom_j = proteinAtoms.get(j);
 
@@ -134,7 +141,7 @@ public class InteractionCalculator
 								atom_j.coordinate);
 
 						if (distance <= hbondupper && distance >= hbondlower) {
-							interactionType = InteractionConstants.hydrophilicType;
+							interactionType = InteractionConstants.hydrogenBondType;
 							distString = LXGlGeometryViewer.getDistString(distance);
 
 							if (interactionsOut == null) {
@@ -175,37 +182,41 @@ public class InteractionCalculator
 						}
 					}
 				}
-				if (otherflag) {
-
-					if (!(atom_i.element.equals("C") && atom_j.element
-							.equals("C"))
-							&& !((atom_i.element.equals("N") || atom_i.element
-									.equals("O")) && (atom_j.element
-									.equals("N") || atom_j.element.equals("O")))) {
-						distance = ArrayLinearAlgebra.distance(atom_i.coordinate,
-								atom_j.coordinate);
-						if (distance <= otherupper && distance >= otherlower) {
-							interactionType = InteractionConstants.otherType;
-							distString = LXGlGeometryViewer.getDistString(distance);
-
-							count_other++;
-
-							if (interactionsOut == null) {
-								glViewer.renderResidue(structureMap
-										.getResidue(atom_j), as, ag, bs, bg,
-										true);
-							}
-
-							glViewer.drawInteraction(structure, atom_i, atom_j,
-									interactionType, displayDisLabel,
-									distString, distance, interactionsOut);
-
-						}
-
-					}
-				}
-
+				
+//				if (otherflag) {
+//
+//					if (!(atom_i.element.equals("C") && atom_j.element
+//							.equals("C"))
+//							&& !((atom_i.element.equals("N") || atom_i.element
+//									.equals("O")) && (atom_j.element
+//									.equals("N") || atom_j.element.equals("O")))) {
+//						distance = ArrayLinearAlgebra.distance(atom_i.coordinate,
+//								atom_j.coordinate);
+//						if (distance <= otherupper && distance >= otherlower) {
+//							interactionType = InteractionConstants.otherType;
+//							distString = LXGlGeometryViewer.getDistString(distance);
+//
+//							count_other++;
+//
+//							if (interactionsOut == null) {
+//								glViewer.renderResidue(structureMap
+//										.getResidue(atom_j), as, ag, bs, bg,
+//										true);
+//							}
+//
+//							glViewer.drawInteraction(structure, atom_i, atom_j,
+//									interactionType, displayDisLabel,
+//									distString, distance, interactionsOut);
+//
+//						}
+//
+//					}
+//				}
+//
 			}
+		}
+		if (otherflag) {
+			calMetalInteractions(structure, otherlower, otherupper, displayDisLabel, interactionsOut);
 		}
 	}
 	
@@ -231,6 +242,8 @@ public class InteractionCalculator
 			//
 			for (Residue residue : currentLigandResidues)
 				for (Atom ligAtom : residue.getAtoms())
+					// restrict to polar atoms
+					if (isNOSAtom(ligAtom)) {
 					for (Residue hohResidue : hohChain.getResidues())
 						if (hohResidue.getClassification() == Residue.Classification.WATER)
 						{
@@ -249,6 +262,7 @@ public class InteractionCalculator
 								waterAtoms.add(hohAtom);
 							}							
 						}
+					}
 		}
 		
 		this.calWaterProInt(structure, waterAtoms, lowerBound, upperBound, displayDisLabel, interactionsOut);
@@ -314,76 +328,352 @@ public class InteractionCalculator
 		{
 			for (int k = 0; k < proAtoms.size(); k++) {
 				final Atom atom_k = proAtoms.get(k);
-				distance = ArrayLinearAlgebra.distance(atom_j.coordinate,
-						atom_k.coordinate);
-				distString = LXGlGeometryViewer.getDistString(distance);
-				final Residue res = structureMap.getResidue(atom_k);
-				if (!uniqRes.contains(res)) {
+				if (isNOSAtom(atom_k)) {
+					distance = ArrayLinearAlgebra.distance(atom_j.coordinate,
+							atom_k.coordinate);
+					distString = LXGlGeometryViewer.getDistString(distance);
+					final Residue res = structureMap.getResidue(atom_k);
+					if (!uniqRes.contains(res)) {
 
-					if (distance < upperBound && distance > lowerBound) {
-						glViewer.drawInteraction(structure, atom_j, atom_k,
-								interactionType, displayDisLabel, distString, distance,
-								interactionsOut);
+						if (distance < upperBound && distance > lowerBound) {
+							glViewer.drawInteraction(structure, atom_j, atom_k,
+									interactionType, displayDisLabel, distString, distance,
+									interactionsOut);
 
-						if (interactionsOut == null) {
-							if (!node.isRendered(atom_j)) {
-								final DisplayListRenderable renderable = new DisplayListRenderable(
-										atom_j, as, ag);
-								node.addRenderable(renderable);
+							if (interactionsOut == null) {
+								if (!node.isRendered(atom_j)) {
+									final DisplayListRenderable renderable = new DisplayListRenderable(
+											atom_j, as, ag);
+									node.addRenderable(renderable);
+								}
+
+								glViewer.renderResidue(res, as, ag, bs, bg, true);
 							}
 
-							glViewer.renderResidue(res, as, ag, bs, bg, true);
+							ct++;
 						}
-
-						ct++;
+						uniqRes.add(res);
 					}
-					uniqRes.add(res);
 				}
 			}
 		}
 	}
 
-	public void calInterLigInteractions(final Structure structure, final float lowerBound, final float upperBound,
+	public void calMetalInteractions(final Structure structure, final double lowerBound, final double upperBound,
 			final boolean displayDisLabel, final PrintWriter interactionsOut) {
-		final StructureMap structureMap = structure.getStructureMap();
-		final int ligCount = structureMap.getLigandCount();
-		// System.out.println("lig count is " + ligCount);
 
-		final Vector<Atom> atoms = new Vector<Atom>();
 		double distance = 0.0;
-		String distString = null;
-		final String interactionType = InteractionConstants.interLigandType;
-		for (int i = 0; i < ligCount; i++) {
-			final int ligAtomCt = structureMap.getLigandResidue(i).getAtomCount();
-			for (int j = 0; j < ligAtomCt; j++) {
-				atoms.add(structureMap.getLigandResidue(i).getAtom(j));
+		final String interactionType = InteractionConstants.metalInteractionType;
+		
+		List<Atom> metalAtoms = getMetalAtoms(structure);
+		
+		final HashSet<Atom> coordinatedMetal = new HashSet<Atom>();
+		
+		
+		//
+		// First, find the closest waters to any of the atoms in the the current ligand.
+		// Traverse all the atoms in the current ligand and compare against all the water
+		// atoms
+		//
+		List<Atom> currentLigandAtoms = getCurrentLigandAtoms();
+		
+		for (Atom ligAtom : currentLigandAtoms) {
+			Element element = PeriodicTable.getElement(ligAtom.element);
+			if (PeriodicTable.isMetal(element.atomic_number)) {
+				coordinatedMetal.add(ligAtom);
+			}
+			if (isNOSAtom(ligAtom)) {
+				for (Atom metalAtom : metalAtoms) {
+					distance = ArrayLinearAlgebra.distance(ligAtom.coordinate,
+							metalAtom.coordinate);
+					if (distance < upperBound && distance > lowerBound)
+					{
+						String distString = LXGlGeometryViewer.getDistString(distance);
+						LigandExplorer.sgetGlGeometryViewer().drawInteraction(structure, ligAtom, metalAtom,
+								interactionType, displayDisLabel, distString, distance,
+								interactionsOut);
+
+						coordinatedMetal.add(metalAtom);
+					}							
+				}
 			}
 		}
 
-		for (int m = 0; m < atoms.size(); m++) {
-			final Atom atom_m = atoms.get(m);
-			final Residue atomResidueM = structureMap.getResidue(atom_m);
-			Atom atom_n = null;
-			for (int n = m + 1; n < atoms.size(); n++) {
-				atom_n = atoms.get(n);
-				final Residue atomResidueN = structureMap.getResidue(atom_n);
-				
-				if (!atom_m.compound.equals("HOH")
-						&& !atom_n.compound.equals("HOH")
-						&& (atomResidueM != atomResidueN) &&
-							(atomResidueM.getChainId().equals(currentLigandResidues[0].getChainId()) ||
-							 atomResidueN.getChainId().equals(currentLigandResidues[0].getChainId()))) {
-					distance = ArrayLinearAlgebra.distance(atom_m.coordinate,
-							atom_n.coordinate);
-					distString = LXGlGeometryViewer.getDistString(distance);
+		// find other ligand atoms that may interact with the metal
+		List<Atom> otherLigandAtoms = getLigandNOSAtoms(structure);
+		otherLigandAtoms.removeAll(currentLigandAtoms);
 
+		// now calculate the protein interactions with the located metal atoms and other ligand atoms
+		this.calMetalProInt(structure, coordinatedMetal, otherLigandAtoms, lowerBound, upperBound, displayDisLabel, interactionsOut);
+
+
+		if (interactionsOut == null) {
+			final LXSceneNode node = (LXSceneNode)structure.getStructureMap().getUData();
+
+			final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry
+			.get(ComponentType.ATOM);
+			final AtomStyle as = (AtomStyle) structure.getStructureMap()
+			.getStructureStyles().getDefaultStyle(
+					ComponentType.ATOM);
+
+			for (Atom a : coordinatedMetal)
+			{
+				if (!node.isRendered(a)) {
+					final DisplayListRenderable renderable = new DisplayListRenderable(
+							a, as, ag);
+					node.addRenderable(renderable);
+				}
+			}
+		}
+	}
+
+//	public void calInterLigInteractions(final Structure structure, final float lowerBound, final float upperBound,
+//			final boolean displayDisLabel, final PrintWriter interactionsOut) {
+//		final StructureMap structureMap = structure.getStructureMap();
+//		final int ligCount = structureMap.getLigandCount();
+//		// System.out.println("lig count is " + ligCount);
+//
+//		final Vector<Atom> atoms = new Vector<Atom>();
+//		double distance = 0.0;
+//		String distString = null;
+////		final String interactionType = InteractionConstants.interLigandType;
+//		for (int i = 0; i < ligCount; i++) {
+//			final int ligAtomCt = structureMap.getLigandResidue(i).getAtomCount();
+//			for (int j = 0; j < ligAtomCt; j++) {
+//				atoms.add(structureMap.getLigandResidue(i).getAtom(j));
+//			}
+//		}
+//
+//		for (int m = 0; m < atoms.size(); m++) {
+//			final Atom atom_m = atoms.get(m);
+//			final Residue atomResidueM = structureMap.getResidue(atom_m);
+//			Atom atom_n = null;
+//			for (int n = m + 1; n < atoms.size(); n++) {
+//				atom_n = atoms.get(n);
+//				final Residue atomResidueN = structureMap.getResidue(atom_n);
+//				
+//				if (!atom_m.compound.equals("HOH")
+//						&& !atom_n.compound.equals("HOH")
+//						&& (atomResidueM != atomResidueN) &&
+//							(atomResidueM.getChainId().equals(currentLigandResidues[0].getChainId()) ||
+//							 atomResidueN.getChainId().equals(currentLigandResidues[0].getChainId()))) {
+//					distance = ArrayLinearAlgebra.distance(atom_m.coordinate,
+//							atom_n.coordinate);
+//					distString = LXGlGeometryViewer.getDistString(distance);
+//
+//					if (distance < upperBound && distance > lowerBound) {
+//						LigandExplorer.sgetGlGeometryViewer().drawInteraction(structure, atom_m, atom_n,
+//								interactionType, displayDisLabel, distString, distance,
+//								interactionsOut);
+//					}
+//				}
+//			}
+//		}
+//	}
+	
+	public void calMetalProInt(final Structure structure, HashSet<Atom> metalAtoms, List<Atom> ligandAtoms, final double lowerBound, final double upperBound,
+			final boolean displayDisLabel, final PrintWriter interactionsOut) {
+
+		final StructureMap structureMap = structure.getStructureMap();
+		final int atomCt = structureMap.getAtomCount();
+		
+		double distance = 0.0;
+		String distString = null;
+		final String interactionType = InteractionConstants.metalInteractionType;
+		HashSet<Residue> uniqRes = new HashSet<Residue>();
+
+		List<Atom> proAtoms = new ArrayList<Atom>();
+		proAtoms.addAll(ligandAtoms);
+		for (int i = 0; i < atomCt; i++) {
+			final Atom atom = structureMap.getAtom(i);
+			if (structureMap.getChain(atom).getClassification() ==
+				Residue.Classification.AMINO_ACID)
+				proAtoms.add(atom);
+		}
+
+		LXGlGeometryViewer glViewer = LigandExplorer.sgetGlGeometryViewer();
+
+		final LXSceneNode node = (LXSceneNode)structure.getStructureMap().getUData();
+		final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry
+		.get(ComponentType.ATOM);
+		final AtomStyle as = (AtomStyle) structure.getStructureMap()
+		.getStructureStyles().getDefaultStyle(
+				ComponentType.ATOM);
+		final BondGeometry bg = (BondGeometry) GlGeometryViewer.defaultGeometry
+		.get(ComponentType.BOND);
+		final BondStyle bs = (BondStyle) structure.getStructureMap()
+		.getStructureStyles().getDefaultStyle(
+				ComponentType.BOND);
+
+		for (Atom metalAtom : metalAtoms)
+		{
+			for (Atom proteinAtom: proAtoms) {
+				if (proteinAtom.element.equals("N") || proteinAtom.element.equals("O") || proteinAtom.element.equals("S")) {
+					distance = ArrayLinearAlgebra.distance(metalAtom.coordinate,
+							proteinAtom.coordinate);
+					distString = LXGlGeometryViewer.getDistString(distance);
+				
 					if (distance < upperBound && distance > lowerBound) {
-						LigandExplorer.sgetGlGeometryViewer().drawInteraction(structure, atom_m, atom_n,
+						glViewer.drawInteraction(structure, metalAtom, proteinAtom,
 								interactionType, displayDisLabel, distString, distance,
 								interactionsOut);
+
+						if (interactionsOut == null) {
+							if (!node.isRendered(metalAtom)) {
+								final DisplayListRenderable renderable = new DisplayListRenderable(
+										metalAtom, as, ag);
+								node.addRenderable(renderable);
+							}
+							
+							Residue res = structureMap.getResidue(proteinAtom);
+				// pr			
+							if (!uniqRes.contains(res) && !node.isRendered(proteinAtom)) {
+								glViewer.renderResidue(res, as, ag, bs, bg, true);
+								uniqRes.add(res);
+							}
+						}
 					}
 				}
 			}
 		}
+	}
+	
+	public void calcNeighbors(final Structure structure, final float upperBound,final PrintWriter interactionsOut) {
+		
+		final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry
+		.get(ComponentType.ATOM);
+		final AtomStyle as = (AtomStyle) structure.getStructureMap()
+		.getStructureStyles().getDefaultStyle(
+				ComponentType.ATOM);
+		final BondGeometry bg = (BondGeometry) GlGeometryViewer.defaultGeometry
+		.get(ComponentType.BOND);
+		final BondStyle bs = (BondStyle) structure.getStructureMap()
+		.getStructureStyles().getDefaultStyle(
+				ComponentType.BOND);
+		
+		LXGlGeometryViewer glViewer = LigandExplorer.sgetGlGeometryViewer();
+		StructureMap structureMap = structure.getStructureMap();
+		
+		List<Atom> otherAtoms = getAtoms(structure);
+		List<Atom> currentLigandAtoms = getCurrentLigandAtoms();
+		otherAtoms.removeAll(currentLigandAtoms);
+		HashSet<Residue> uniqRes = new HashSet<Residue>();
+		
+		for (Atom ligAtom : currentLigandAtoms) {
+			for (Atom otherAtom: otherAtoms) {
+					double distance = ArrayLinearAlgebra.distance(ligAtom.coordinate,
+							otherAtom.coordinate);
+				
+					if (distance < upperBound) {
+						if (interactionsOut == null) {
+							Residue res = structureMap.getResidue(otherAtom);		
+							if (!uniqRes.contains(res)) {
+								glViewer.renderResidue(res, as, ag, bs, bg, true);
+								uniqRes.add(res);
+							}
+						}
+					}
+			}
+		}
+	}
+	/**
+	 * Returns a list of metal atoms in ligand residues
+	 * @param structure
+	 * @return metal atoms
+	 */
+	private List<Atom> getMetalAtoms(Structure structure) {
+		List<Atom> metalAtoms = new ArrayList<Atom>();
+
+		final StructureMap structureMap = structure.getStructureMap();
+		for (Residue residue : structureMap.getLigands()) {	
+
+			for (Atom atom: residue.getAtoms()) {
+				Element element = PeriodicTable.getElement(atom.element);
+				if (PeriodicTable.isMetal(element.atomic_number)) {
+					metalAtoms.add(atom);
+				}
+			}
+		}
+
+		return metalAtoms;
+	}
+	
+	private List<Atom> getLigandNOSAtoms(Structure structure) {
+		List<Atom> atoms = new ArrayList<Atom>();
+
+		final StructureMap structureMap = structure.getStructureMap();
+		for (Residue residue : structureMap.getLigands()) {	
+
+			for (Atom atom: residue.getAtoms()) {
+				if (isNOSAtom(atom) ) {
+					atoms.add(atom);
+				}
+			}
+		}
+
+		return atoms;
+	}
+	/**
+	 * Returns a list of current ligand atoms
+	 * @return current ligand atoms
+	 */
+	private List<Atom> getCurrentLigandAtoms() {
+		List<Atom> atoms = new ArrayList<Atom>();
+		for (Residue residue : currentLigandResidues) {
+			atoms.addAll(residue.getAtoms());
+		}
+		return atoms;
+	}
+	
+	/**
+	 * Returns true if passed in atom is a nitrogen, oxygen, or sulfur atom
+	 * @param atom
+	 * @return true if atom is a nitrogen, oxygen, or sulfur atom
+	 */
+	private boolean isNOSAtom(Atom atom) {
+		if (atom.element.equals("N")) {
+			return true;
+		}
+		if (atom.element.equals("O")) {
+			return true;
+		}
+		if (atom.element.equals("S")) {
+			Vector<Bond> bonds = atom.structure.getStructureMap().getBonds(atom);
+			// only bivalent sulfur can coordinate metal
+			if (bonds.size() < 3) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Returns a list of protein atoms in the structure
+	 * @param structure
+	 * @return list of protein atoms
+	 */
+	private List<Atom> getProteinAtoms(Structure structure) {
+		List<Atom> atoms = new ArrayList<Atom>();
+		
+		StructureMap structureMap = structure.getStructureMap();
+		for (Atom atom: structureMap.getAtoms()) {
+			if (structureMap.getChain(atom).getClassification() ==
+				Residue.Classification.AMINO_ACID) {
+					atoms.add(atom);
+			}
+		}
+		
+		return atoms;
+	}
+	
+	/**
+	 * Returns a list of atoms in the structure
+	 * @param structure
+	 * @return list of atoms
+	 */
+	private List<Atom> getAtoms(Structure structure) {
+		List<Atom> atoms = new ArrayList<Atom>();
+		atoms.addAll(structure.getStructureMap().getAtoms());
+		return atoms;
 	}
 }

@@ -193,17 +193,17 @@ public class ContactMap_SquarePanel extends JPanel implements MouseListener, Mou
 					final double interactionTypeIndicatorHeight = indicatorsHeight / 5d;
 					final int interactionTypeIndicatorHeightInt = (int)interactionTypeIndicatorHeight;
 					
-					boolean hasHydrophilic = false, hasHydrophobic = false, hasInterLigand = false, hasBridgedH2O = false, hasOther = false;
+					boolean hasHydrophilic = false, hasHydrophobic = false, hasMetal = false, hasBridgedH2O = false, hasOther = false;
 					for(int k = 0; k < interCount; k++) {
 						final Interaction inter = (Interaction)interactions.get(k);
 						if(inter.getFirstAtom() == atomRange.atom || inter.getSecondAtom() == atomRange.atom) {
-							if(inter.getInteractionType() == InteractionConstants.hydrophilicType) {
+							if(inter.getInteractionType() == InteractionConstants.hydrogenBondType) {
 								hasHydrophilic = true;
 							} else if(inter.getInteractionType() == InteractionConstants.hydrophobicType) {
 								hasHydrophobic = true;
-							} else if(inter.getInteractionType() == InteractionConstants.interLigandType) {
-								hasInterLigand = true;
-							} else if(inter.getInteractionType() == InteractionConstants.otherType) {
+							} else if(inter.getInteractionType() == InteractionConstants.metalInteractionType) {
+								hasMetal = true;
+							} else if(inter.getInteractionType() == InteractionConstants.metalInteractionType) {
 								hasOther = true;
 							} else if(inter.getInteractionType() == InteractionConstants.waterMediatedType) {
 								hasBridgedH2O = true;
@@ -219,28 +219,28 @@ public class ContactMap_SquarePanel extends JPanel implements MouseListener, Mou
 					buf.fill(border);
 					
 					int tmpY = startIndicatorsY;
-					if(hasInterLigand) {
-						buf.setColor(InteractionConstants.interLigandBondColorOb);
+					if(hasMetal) {
+						buf.setColor(InteractionConstants.metalInteractionColor);
 						buf.fillRect(startIndicatorsX, tmpY, indicatorsWidth, interactionTypeIndicatorHeightInt);
 					}
 					tmpY = (int)(startIndicatorsY + interactionTypeIndicatorHeight);
 					if(hasHydrophilic) {
-						buf.setColor(InteractionConstants.hydrophilicBondColorOb);
+						buf.setColor(InteractionConstants.hydrogenBondColor);
 						buf.fillRect(startIndicatorsX, tmpY, indicatorsWidth, interactionTypeIndicatorHeightInt);
 					}
 					tmpY = (int)(startIndicatorsY + interactionTypeIndicatorHeight * 2);
 					if(hasHydrophobic) {
-						buf.setColor(InteractionConstants.hydrophobicBondColorOb);
+						buf.setColor(InteractionConstants.hydrophobicBondColor);
 						buf.fillRect(startIndicatorsX, tmpY, indicatorsWidth, interactionTypeIndicatorHeightInt);
 					}
 					tmpY = (int)(endIndicatorsY - interactionTypeIndicatorHeight * 2);
 					if(hasBridgedH2O) {
-						buf.setColor(InteractionConstants.waterBondColorOb);
+						buf.setColor(InteractionConstants.waterMediatedColor);
 						buf.fillRect(startIndicatorsX, tmpY, indicatorsWidth, interactionTypeIndicatorHeightInt);
 					}
 					tmpY = (int)(endIndicatorsY - interactionTypeIndicatorHeight);
 					if(hasOther) {
-						buf.setColor(InteractionConstants.otherColorOb);
+						buf.setColor(InteractionConstants.metalInteractionColor);
 						buf.fillRect(startIndicatorsX, tmpY, indicatorsWidth, endIndicatorsY - tmpY);
 					}
 				}

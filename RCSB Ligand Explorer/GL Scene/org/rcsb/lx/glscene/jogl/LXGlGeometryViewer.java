@@ -722,12 +722,6 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 	// added for protein-ligand interactions
 	public void ligandView(final Structure structure)
 	{
-		// if (inLigName != null && inLigName.length() > 0) {
-		// // GeometryViewer gv = getGeometryViewer();
-		// Transform3D trans3D = new Transform3D();
-		// trans3D.set(getLigandVector(structure, inLigName));
-		// this.setTransform(trans3D);
-		// }
 
 		final double[][] ligandBounds =
 			getLigandBounds(structure, LigandExplorer.sgetSceneController().getLigandResidues());
@@ -1000,18 +994,16 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 
 		lg.setForm(ls.lineStyle);
 
-		float[] textColor = null;
+		float[] textColor = new float[3];
 
-		if (interactionType == InteractionConstants.hydrophilicType) {
-			textColor = InteractionConstants.hydrophilicBondColor;
+		if (interactionType == InteractionConstants.hydrogenBondType) {
+			InteractionConstants.hydrogenBondColor.getRGBColorComponents(textColor);
 		} else if (interactionType == InteractionConstants.hydrophobicType) {
-			textColor = InteractionConstants.hydrophobicBondColor;
-		} else if (interactionType == InteractionConstants.otherType) {
-			textColor = InteractionConstants.otherBondColor;
-		} else if (interactionType == InteractionConstants.interLigandType) {
-			textColor = InteractionConstants.interLigandBondColor;
+			InteractionConstants.hydrophobicBondColor.getRGBColorComponents(textColor);
+		} else if (interactionType == InteractionConstants.metalInteractionType) {
+			InteractionConstants.hydrophobicBondColor.getRGBColorComponents(textColor);
 		} else if (interactionType == InteractionConstants.waterMediatedType) {
-			textColor = InteractionConstants.waterBondColor;
+			InteractionConstants.waterMediatedColor.getRGBColorComponents(textColor);
 		}
 
 		ls.setColor(textColor);
@@ -1043,6 +1035,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		final Residue r = structure.getStructureMap().getResidue(atom);
 		final String label = structure.getStructureMap().getChain(atom).getChainId()
 				+ ":" + r.getCompoundCode() + r.getResidueId();
-		node.lxCreateAndAddLabel(r, label, InteractionConstants.hydrophilicBondColor);
+		float[] colors = new float[3];
+		node.lxCreateAndAddLabel(r, label, InteractionConstants.hydrogenBondColor.getRGBColorComponents(colors));
 	}
 }

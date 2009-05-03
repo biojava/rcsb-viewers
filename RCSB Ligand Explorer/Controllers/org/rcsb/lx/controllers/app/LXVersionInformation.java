@@ -54,5 +54,5 @@ public class LXVersionInformation extends VersionInformation
 	 * 
 	 * @return - version string
 	 */
-	public static String version() { return "3.3"; }
+	public static String version() { return "3.4"; }
 }
