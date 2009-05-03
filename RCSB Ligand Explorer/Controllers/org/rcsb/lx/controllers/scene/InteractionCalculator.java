@@ -182,37 +182,6 @@ public class InteractionCalculator
 						}
 					}
 				}
-				
-//				if (otherflag) {
-//
-//					if (!(atom_i.element.equals("C") && atom_j.element
-//							.equals("C"))
-//							&& !((atom_i.element.equals("N") || atom_i.element
-//									.equals("O")) && (atom_j.element
-//									.equals("N") || atom_j.element.equals("O")))) {
-//						distance = ArrayLinearAlgebra.distance(atom_i.coordinate,
-//								atom_j.coordinate);
-//						if (distance <= otherupper && distance >= otherlower) {
-//							interactionType = InteractionConstants.otherType;
-//							distString = LXGlGeometryViewer.getDistString(distance);
-//
-//							count_other++;
-//
-//							if (interactionsOut == null) {
-//								glViewer.renderResidue(structureMap
-//										.getResidue(atom_j), as, ag, bs, bg,
-//										true);
-//							}
-//
-//							glViewer.drawInteraction(structure, atom_i, atom_j,
-//									interactionType, displayDisLabel,
-//									distString, distance, interactionsOut);
-//
-//						}
-//
-//					}
-//				}
-//
 			}
 		}
 		if (otherflag) {
@@ -427,50 +396,7 @@ public class InteractionCalculator
 		}
 	}
 
-//	public void calInterLigInteractions(final Structure structure, final float lowerBound, final float upperBound,
-//			final boolean displayDisLabel, final PrintWriter interactionsOut) {
-//		final StructureMap structureMap = structure.getStructureMap();
-//		final int ligCount = structureMap.getLigandCount();
-//		// System.out.println("lig count is " + ligCount);
-//
-//		final Vector<Atom> atoms = new Vector<Atom>();
-//		double distance = 0.0;
-//		String distString = null;
-////		final String interactionType = InteractionConstants.interLigandType;
-//		for (int i = 0; i < ligCount; i++) {
-//			final int ligAtomCt = structureMap.getLigandResidue(i).getAtomCount();
-//			for (int j = 0; j < ligAtomCt; j++) {
-//				atoms.add(structureMap.getLigandResidue(i).getAtom(j));
-//			}
-//		}
-//
-//		for (int m = 0; m < atoms.size(); m++) {
-//			final Atom atom_m = atoms.get(m);
-//			final Residue atomResidueM = structureMap.getResidue(atom_m);
-//			Atom atom_n = null;
-//			for (int n = m + 1; n < atoms.size(); n++) {
-//				atom_n = atoms.get(n);
-//				final Residue atomResidueN = structureMap.getResidue(atom_n);
-//				
-//				if (!atom_m.compound.equals("HOH")
-//						&& !atom_n.compound.equals("HOH")
-//						&& (atomResidueM != atomResidueN) &&
-//							(atomResidueM.getChainId().equals(currentLigandResidues[0].getChainId()) ||
-//							 atomResidueN.getChainId().equals(currentLigandResidues[0].getChainId()))) {
-//					distance = ArrayLinearAlgebra.distance(atom_m.coordinate,
-//							atom_n.coordinate);
-//					distString = LXGlGeometryViewer.getDistString(distance);
-//
-//					if (distance < upperBound && distance > lowerBound) {
-//						LigandExplorer.sgetGlGeometryViewer().drawInteraction(structure, atom_m, atom_n,
-//								interactionType, displayDisLabel, distString, distance,
-//								interactionsOut);
-//					}
-//				}
-//			}
-//		}
-//	}
-	
+
 	public void calMetalProInt(final Structure structure, HashSet<Atom> metalAtoms, List<Atom> ligandAtoms, final double lowerBound, final double upperBound,
 			final boolean displayDisLabel, final PrintWriter interactionsOut) {
 
@@ -526,7 +452,7 @@ public class InteractionCalculator
 							}
 							
 							Residue res = structureMap.getResidue(proteinAtom);
-				// pr			
+						
 							if (!uniqRes.contains(res) && !node.isRendered(proteinAtom)) {
 								glViewer.renderResidue(res, as, ag, bs, bg, true);
 								uniqRes.add(res);
@@ -645,25 +571,6 @@ public class InteractionCalculator
 			}
 		}
 		return false;
-	}
-	
-	/**
-	 * Returns a list of protein atoms in the structure
-	 * @param structure
-	 * @return list of protein atoms
-	 */
-	private List<Atom> getProteinAtoms(Structure structure) {
-		List<Atom> atoms = new ArrayList<Atom>();
-		
-		StructureMap structureMap = structure.getStructureMap();
-		for (Atom atom: structureMap.getAtoms()) {
-			if (structureMap.getChain(atom).getClassification() ==
-				Residue.Classification.AMINO_ACID) {
-					atoms.add(atom);
-			}
-		}
-		
-		return atoms;
 	}
 	
 	/**
