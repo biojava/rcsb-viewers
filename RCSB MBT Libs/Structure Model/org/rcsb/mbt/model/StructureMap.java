@@ -173,7 +173,6 @@ public class StructureMap
 		{
 			if(biologicalUnitGenerationMatrices != null && biologicalUnitGenerationMatrices.size() > 0)
 			{
-				System.out.println("setBiologicalUnitGenerationMatrices, chain id: " + (biologicalUnitGenerationMatrices.get(0)).ndbChainId); //pr
 				
 				// if the biological units have chain information, index them.
 				if((biologicalUnitGenerationMatrices.get(0)).ndbChainId != null)
