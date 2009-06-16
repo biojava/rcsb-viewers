@@ -637,6 +637,15 @@ public class AminoAcidInfo
 	{
 		return (AminoAcid) AminoAcidInfo.nameHash.get( name );
 	}
+	
+	/**
+	 * Returns true is the amino acid 3-letter code refers to a non-standard amino acid
+	 * @param code
+	 * @return
+	 */
+	public static boolean isNonStandardAminoAcid(String code) {
+		return 	nonStandardCodes.keySet().contains(code);
+	}
 
 	//
 	// Unit testing.

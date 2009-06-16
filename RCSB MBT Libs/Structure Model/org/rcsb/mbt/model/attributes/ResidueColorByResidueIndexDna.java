@@ -47,7 +47,6 @@ package org.rcsb.mbt.model.attributes;
 
 
 import org.rcsb.mbt.model.*;
-import org.rcsb.mbt.model.attributes.*;
 
 
 /**

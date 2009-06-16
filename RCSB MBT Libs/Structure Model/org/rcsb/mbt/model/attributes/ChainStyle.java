@@ -70,7 +70,7 @@ public class ChainStyle
 
 	private IResidueLabel residueLabel = ResidueLabelCustom.getSingleton();
 
-	private boolean residueBinding = false;
+//	private boolean residueBinding = false;
 	private final HashMap rBinding = new HashMap();
 	//
 	// Constructors

@@ -59,13 +59,13 @@ import org.rcsb.mbt.model.attributes.IAtomLabel;
  *  @see	org.rcsb.mbt.model.Atom
  */
 public class AtomLabelByAtomCompound
-	implements IAtomLabel
+implements IAtomLabel
 {
 	public static final String NAME = "By Atom Compound";
 
 	// Holds a singleton instance of this class.
 	private static AtomLabelByAtomCompound singleton = null;
-	
+
 	/**
 	 *  The constructor is PRIVATE so that the "create" method
 	 *  is used to produce a singleton instance of this class.
@@ -90,14 +90,7 @@ public class AtomLabelByAtomCompound
 	 */
 	public String getAtomLabel( final Atom atom )
 	{
-		final Object[] ids = atom.structure.getStructureMap().getPdbToNdbConverter().getPdbIds(atom.chain_id, new Integer(atom.residue_id));
-		if(ids != null) {
-			final String residueId = (String) ids[1];
-			
-			return residueId + " " + atom.compound;
-		}
-		
-		return atom.compound;
+		return atom.authorResidue_id + " " + atom.compound;
 	}
 }
 

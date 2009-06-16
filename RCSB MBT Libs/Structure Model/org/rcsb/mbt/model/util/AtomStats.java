@@ -45,8 +45,6 @@
  */ 
 package org.rcsb.mbt.model.util;
 
-import java.util.Map;
-
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms;

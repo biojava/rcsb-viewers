@@ -80,10 +80,10 @@ public class ExternReferences
 	 */
 	public static String getModifiedResidueName(Residue residue)
 	{
-		if (residueNameModifier != null)
+		if (residueNameModifier != null) {
 			return residueNameModifier.getModifiedResidueName(residue);
-		
-		else
-			return ((Integer)residue.getResidueId()).toString();
+		} else {
+			return String.valueOf(residue.getAuthorResidueId());
+		}
 	}
 }

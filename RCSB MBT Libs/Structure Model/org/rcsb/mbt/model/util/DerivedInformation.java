@@ -53,6 +53,7 @@ import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.Residue.Classification;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 
@@ -97,7 +98,7 @@ public class DerivedInformation
 	 * Sets the residue flags according to the extended classification in the
 	 * Kabsch-Sander algorithm.
 	 */
-	public Object[] setSsExtendedFlags() {
+	private Object[] setSsExtendedFlags() {
 		Vector<BondInfo> bondList = null; // Candidate H bonds
 		
 	try {
@@ -134,10 +135,19 @@ public class DerivedInformation
 		Residue residue = null;
 		for (int i = 0; i < resCount; i++) {
 			residue = this.structureMap.getResidue(i);
+			// TODO pr try including non-standard aa's
+//		   if (residue.getClassification() == Residue.Classification.AMINO_ACID ||
+//				   AminoAcidInfo.isNonStandardAminoAcid(residue.getCompoundCode())) { // Is
+																				// aa
+			   
 			if (residue.getClassification() == Residue.Classification.AMINO_ACID) { // Is
 																				// aa
 				aaCount++;
 				this.ssFlags[i] = ' ';
+				// TODO pr try setting beta sheet structure for nucleic acids - has no effect ??
+//			} else if (residue.getClassification() == Residue.Classification.NUCLEIC_ACID) { 
+//				aaCount++;
+//				this.ssFlags[i] = ' ';
 			} else {
 				this.ssFlags[i] = '-'; // Non aa
 			}
@@ -146,8 +156,6 @@ public class DerivedInformation
 			//
 			beta1[i] = beta2[i] = -1;
 		}
-
-		// System.err.println( "Number of aa: " + aaCount );
 
 		// Initialize different data arrays: hbonds, pointers to original
 		// residues, pattern fields
@@ -214,7 +222,7 @@ public class DerivedInformation
 			caCoord[i][0] = atom1.coordinate[0];
 			caCoord[i][1] = atom1.coordinate[1];
 			caCoord[i][2] = atom1.coordinate[2];
-			treeData[i] = new OctreeAtomItem(atom1, i);
+		    treeData[i] = new OctreeAtomItem(atom1, i);
 			if (!atom1.chain_id.equals(previousChainId)) {
 				chainStarts.add(new Integer(resPointers[i]));
 				if (i > 0) {
@@ -271,9 +279,9 @@ public class DerivedInformation
 
 		final ListIterator<BondInfo> iterator = bondList.listIterator();
 
-		double time1, time2, time;
-		time = 0.0;
-		int strCalls = 0;
+//		double time1, time2, time;
+//		time = 0.0;
+//		int strCalls = 0;
 
 		int atIded;
 
@@ -310,11 +318,11 @@ public class DerivedInformation
 			if (index1 != previousIndex1) {
 				atIded = 0;
 				for (int j = resStart; (atIded < 1) && (j <= resEnd); j++) {
-					time1 = System.currentTimeMillis();
+//					time1 = System.currentTimeMillis();
 					atom1 = residue.getAtom(j);
-					strCalls++;
-					time2 = System.currentTimeMillis();
-					time += (time2 - time1);
+//					strCalls++;
+//					time2 = System.currentTimeMillis();
+//					time += (time2 - time1);
 					if (atom1.name.equals("N")) {
 						nCoord1[0] = atom1.coordinate[0];
 						nCoord1[1] = atom1.coordinate[1];
@@ -327,11 +335,11 @@ public class DerivedInformation
 				cFound = false;
 				oFound = false;
 				for (int j = resCa + 1; (atIded < 2) && (j <= resEnd); j++) {
-					time1 = System.currentTimeMillis();
+//					time1 = System.currentTimeMillis();
 					atom1 = residue.getAtom(j);
-					strCalls++;
-					time2 = System.currentTimeMillis();
-					time += (time2 - time1);
+//					strCalls++;
+//					time2 = System.currentTimeMillis();
+//					time += (time2 - time1);
 					if (atom1.name.equals("C") && (!cFound)) {
 						cCoord1[0] = atom1.coordinate[0];
 						cCoord1[1] = atom1.coordinate[1];
@@ -367,11 +375,11 @@ public class DerivedInformation
 					cFound = false;
 					oFound = false;
 					for (int j = resCa + 1; (atIded < 2) && (j <= resEnd); j++) {
-						time1 = System.currentTimeMillis();
+//						time1 = System.currentTimeMillis();
 						atom1 = residue.getAtom(j);
-						strCalls++;
-						time2 = System.currentTimeMillis();
-						time += (time2 - time1);
+//						strCalls++;
+//						time2 = System.currentTimeMillis();
+//						time += (time2 - time1);
 						if (atom1.name.equals("C") && (!cFound)) {
 							cCoordM1[0] = atom1.coordinate[0];
 							cCoordM1[1] = atom1.coordinate[1];
@@ -409,11 +417,11 @@ public class DerivedInformation
 			resCa = residue.getAlphaAtomIndex();
 			atIded = 0;
 			for (int j = resStart; (atIded < 1) && (j <= resEnd); j++) {
-				time1 = System.currentTimeMillis();
+//				time1 = System.currentTimeMillis();
 				atom1 = residue.getAtom(j);
-				strCalls++;
-				time2 = System.currentTimeMillis();
-				time += (time2 - time1);
+//				strCalls++;
+//				time2 = System.currentTimeMillis();
+//				time += (time2 - time1);
 				if (atom1.name.equals("N")) {
 					nCoord2[0] = atom1.coordinate[0];
 					nCoord2[1] = atom1.coordinate[1];
@@ -426,11 +434,11 @@ public class DerivedInformation
 			cFound = false;
 			oFound = false;
 			for (int j = resCa + 1; (atIded < 2) && (j <= resEnd); j++) {
-				time1 = System.currentTimeMillis();
+//				time1 = System.currentTimeMillis();
 				atom1 = residue.getAtom(j);
-				strCalls++;
-				time2 = System.currentTimeMillis();
-				time += (time2 - time1);
+//				strCalls++;
+//				time2 = System.currentTimeMillis();
+//				time += (time2 - time1);
 				if (atom1.name.equals("C") && (!cFound)) {
 					cCoord2[0] = atom1.coordinate[0];
 					cCoord2[1] = atom1.coordinate[1];
@@ -460,11 +468,11 @@ public class DerivedInformation
 			cFound = false;
 			oFound = false;
 			for (int j = resCa + 1; (atIded < 2) && (j <= resEnd); j++) {
-				time1 = System.currentTimeMillis();
+//				time1 = System.currentTimeMillis();
 				atom1 = residue.getAtom(j);
-				strCalls++;
-				time2 = System.currentTimeMillis();
-				time += (time2 - time1);
+//				strCalls++;
+//				time2 = System.currentTimeMillis();
+//				time += (time2 - time1);
 				if (atom1.name.equals("C") && (!cFound)) {
 					cCoordM1[0] = atom1.coordinate[0];
 					cCoordM1[1] = atom1.coordinate[1];
@@ -961,11 +969,11 @@ public class DerivedInformation
 			}
 		}
 
-		/*
-		 * System.out.println( " SS Flags for residues: " + resCount ); for( int
-		 * i = 0; i < resCount; i++ ) { System.out.println( " " + i + " " +
-		 * ssFlags[i] ); }
-		 */
+		
+//		 System.out.println( " SS Flags for residues: " + resCount ); for( int
+//		 i = 0; i < resCount; i++ ) { System.out.println( " " + i + " " +
+//		 ssFlags[i] ); }
+		
 
 		bondList.trimToSize();
 
@@ -981,248 +989,247 @@ public class DerivedInformation
 	/**
 	 * Return the char array of the residue flags.
 	 */
-	public char[] getSsFlags() {
-		return this.ssFlags;
-	}
+//	private char[] getSsFlags() {
+//		return this.ssFlags;
+//	}
 
 	/**
 	 * Return the number of aa chains found in this structure.
 	 */
-	public int getNumberOfChains() {
-		return this.chains.length;
-	}
+//	private int getNumberOfChains() {
+//		return this.chains.length;
+//	}
 
 	/**
 	 * Return the index number associated with a given fragment (represented as
 	 * pair of two integers, the start and the end of the fragment).
 	 */
-	public int getChain(final int[] fragment) {
-		for (int i = 0; i < this.chains.length; i++) {
-			if (fragment[0] < this.chains[i][1]) {
-				return i;
-			}
-		}
-		return 100000;
-	}
+//	private int getChain(final int[] fragment) {
+//		for (int i = 0; i < this.chains.length; i++) {
+//			if (fragment[0] < this.chains[i][1]) {
+//				return i;
+//			}
+//		}
+//		return 100000;
+//	}
 
 	/**
 	 * Generate the fragments and their associated conformation types.
 	 * <P>
 	 * Here, the fragments generated share in general connecting residues.
 	 */
-	public boolean getFragments(final Vector<int[]> fragments, final Vector<ComponentType> conformationType) {
-
-		if (this.chains.length == 0) {
-			// System.err.println( " No chains in this structure " );
-			return false;
-		}
-
-		// ssFlags is the array of characters denoting the extended secondary
-		// structure flags
-		//
-		// char[] ssFlags = new char[resCount];
-		// setSsExtendedFlags( ssFlags );
-		if (this.ssFlags == null) {
-			System.out
-					.println("getFragments: null ssFlags. One should first run setSsExtendedFlags on this class");
-		}
-
-		this.reinterpretSsFlags();
-
-		// We are done, output the list of secondary structures
-		//
-		/*
-		 * for( int i = 0; i < ssFlags.length; i++ ) { System.out.println( " " +
-		 * i + " " + ssFlags[i] ); }
-		 */
-		int[] fragment;
-		ComponentType confType = ComponentType.UNDEFINED_CONFORMATION;
-		int start = 0;
-		char ss = this.ssFlags[0];
-		if (ss == '-') {
-			start = -1;
-		}
-		char ss1;
-		int ssIndex = 0;
-		boolean newChain = false;
-		int chnIndex = 0;
-		int chn = this.chains[chnIndex][0];
-		for (int i = 0; i < this.ssFlags.length; i++) {
-			newChain = (i == chn);
-			// System.out.println( " " + newChain + " " + ssFlags[i] + " " + ss
-			// );
-			if (newChain) {
-				if (chnIndex < this.chains.length - 1) {
-					chn = this.chains[++chnIndex][0];
-				}
-				ss = this.ssFlags[i];
-				start = i;
-				continue;
-			}
-
-			if ((this.ssFlags[i] != ss) || (i == this.ssFlags.length - 1) // Should we
-																// check for
-																// this? It
-																// appears as
-																// needed
-			) {
-				fragment = new int[2];
-				switch (ss) {
-				case '-':
-					start = i;
-					break;
-
-				case ' ':
-					confType = ComponentType.COIL;
-					fragment[0] = start;
-					ss1 = Character.toUpperCase(this.ssFlags[i]);
-					switch (ss1) {
-					case '-':
-						fragment[1] = i - 1;
-						start = -1;
-						break;
-					case 'T':
-						fragment[1] = i - 1;
-						start = i - 1;
-						break;
-					case 'H':
-					case 'E':
-						fragment[1] = i;
-						start = i;
-						break;
-					}
-					fragments.add(fragment);
-					conformationType.add(confType);
-					ssIndex++;
-					break;
-
-				case 'T':
-					confType = ComponentType.TURN;
-					fragment[0] = start;
-					ss1 = Character.toUpperCase(this.ssFlags[i]);
-					switch (ss1) {
-					case '-':
-						fragment[1] = i - 1;
-						start = -1;
-						fragments.add(fragment);
-						conformationType.add(confType);
-						break;
-					case ' ':
-					case 'H':
-					case 'E':
-						fragment[1] = i;
-						start = i;
-						fragments.add(fragment);
-						conformationType.add(confType);
-						break;
-					}
-					ssIndex++;
-					break;
-
-				case 'H':
-					confType = ComponentType.HELIX;
-					fragment[0] = start;
-					ss1 = Character.toUpperCase(this.ssFlags[i]);
-					switch (ss1) {
-					case '-':
-						fragment[1] = i - 1;
-						start = -1;
-						fragments.add(fragment);
-						conformationType.add(confType);
-						break;
-					case ' ':
-					case 'T':
-						fragment[1] = i - 1;
-						start = i - 1;
-						fragments.add(fragment);
-						conformationType.add(confType);
-						break;
-					case 'H':
-					case 'E':
-						fragment[1] = i - 1;
-						fragments.add(fragment);
-						conformationType.add(confType);
-						ssIndex++;
-
-						fragment = new int[2];
-						fragment[0] = i - 1;
-						fragment[1] = i;
-						confType = ComponentType.TURN;
-						start = i;
-						fragments.add(fragment);
-						conformationType.add(confType);
-						break;
-					}
-					ssIndex++;
-					break;
-
-				case 'E':
-					confType = ComponentType.STRAND;
-					fragment[0] = start;
-					ss1 = Character.toUpperCase(this.ssFlags[i]);
-					switch (ss1) {
-					case '-':
-						fragment[1] = i - 1;
-						start = -1;
-						fragments.add(fragment);
-						conformationType.add(confType);
-						break;
-					case ' ':
-					case 'T':
-						fragment[1] = i - 1;
-						start = i - 1;
-						fragments.add(fragment);
-						conformationType.add(confType);
-						break;
-					case 'H':
-					case 'E':
-						fragment[1] = i - 1;
-						fragments.add(fragment);
-						conformationType.add(confType);
-						ssIndex++;
-
-						fragment = new int[2];
-						fragment[0] = i - 1;
-						fragment[1] = i;
-						confType = ComponentType.TURN;
-						start = i;
-						fragments.add(fragment);
-						conformationType.add(confType);
-						break;
-					}
-					ssIndex++;
-					break;
-				}
-				ss = Character.toUpperCase(this.ssFlags[i]);
-			}
-		}
-
-		if (fragments.size() == 0) {
-			return false;
-		}
-
-		this.openDistanceGaps(fragments, conformationType);
-
-		/*
-		 * System.out.println( "\nFragments after removing distance gaps" ); fIt =
-		 * fragments.listIterator(); cIt = conformationType.listIterator();
-		 * while( fIt.hasNext() ) { frag = (int[])fIt.next(); cType = (String)
-		 * cIt.next(); System.out.println( cType + " from " + frag[0] + " to " +
-		 * frag[1] ); }
-		 */
-
-		return true;
-	}
+//	public boolean getFragments(final Vector<int[]> fragments, final Vector<ComponentType> conformationType) {
+//
+//		if (this.chains.length == 0) {
+//			// System.err.println( " No chains in this structure " );
+//			return false;
+//		}
+//
+//		// ssFlags is the array of characters denoting the extended secondary
+//		// structure flags
+//		//
+//		// char[] ssFlags = new char[resCount];
+//		// setSsExtendedFlags( ssFlags );
+//		if (this.ssFlags == null) {
+//			System.out
+//					.println("getFragments: null ssFlags. One should first run setSsExtendedFlags on this class");
+//		}
+//
+//		this.reinterpretSsFlags();
+//
+//		// We are done, output the list of secondary structures
+//		//
+//		/*
+//		 * for( int i = 0; i < ssFlags.length; i++ ) { System.out.println( " " +
+//		 * i + " " + ssFlags[i] ); }
+//		 */
+//		int[] fragment;
+//		ComponentType confType = ComponentType.UNDEFINED_CONFORMATION;
+//		int start = 0;
+//		char ss = this.ssFlags[0];
+//		if (ss == '-') {
+//			start = -1;
+//		}
+//		char ss1;
+//		int ssIndex = 0;
+//		boolean newChain = false;
+//		int chnIndex = 0;
+//		int chn = this.chains[chnIndex][0];
+//		for (int i = 0; i < this.ssFlags.length; i++) {
+//			newChain = (i == chn);
+//			// System.out.println( " " + newChain + " " + ssFlags[i] + " " + ss
+//			// );
+//			if (newChain) {
+//				if (chnIndex < this.chains.length - 1) {
+//					chn = this.chains[++chnIndex][0];
+//				}
+//				ss = this.ssFlags[i];
+//				start = i;
+//				continue;
+//			}
+//
+//			if ((this.ssFlags[i] != ss) || (i == this.ssFlags.length - 1) // Should we
+//																// check for
+//																// this? It
+//																// appears as
+//																// needed
+//			) {
+//				fragment = new int[2];
+//				switch (ss) {
+//				case '-':
+//					start = i;
+//					break;
+//
+//				case ' ':
+//					confType = ComponentType.COIL;
+//					fragment[0] = start;
+//					ss1 = Character.toUpperCase(this.ssFlags[i]);
+//					switch (ss1) {
+//					case '-':
+//						fragment[1] = i - 1;
+//						start = -1;
+//						break;
+//					case 'T':
+//						fragment[1] = i - 1;
+//						start = i - 1;
+//						break;
+//					case 'H':
+//					case 'E':
+//						fragment[1] = i;
+//						start = i;
+//						break;
+//					}
+//					fragments.add(fragment);
+//					conformationType.add(confType);
+//					ssIndex++;
+//					break;
+//
+//				case 'T':
+//					confType = ComponentType.TURN;
+//					fragment[0] = start;
+//					ss1 = Character.toUpperCase(this.ssFlags[i]);
+//					switch (ss1) {
+//					case '-':
+//						fragment[1] = i - 1;
+//						start = -1;
+//						fragments.add(fragment);
+//						conformationType.add(confType);
+//						break;
+//					case ' ':
+//					case 'H':
+//					case 'E':
+//						fragment[1] = i;
+//						start = i;
+//						fragments.add(fragment);
+//						conformationType.add(confType);
+//						break;
+//					}
+//					ssIndex++;
+//					break;
+//
+//				case 'H':
+//					confType = ComponentType.HELIX;
+//					fragment[0] = start;
+//					ss1 = Character.toUpperCase(this.ssFlags[i]);
+//					switch (ss1) {
+//					case '-':
+//						fragment[1] = i - 1;
+//						start = -1;
+//						fragments.add(fragment);
+//						conformationType.add(confType);
+//						break;
+//					case ' ':
+//					case 'T':
+//						fragment[1] = i - 1;
+//						start = i - 1;
+//						fragments.add(fragment);
+//						conformationType.add(confType);
+//						break;
+//					case 'H':
+//					case 'E':
+//						fragment[1] = i - 1;
+//						fragments.add(fragment);
+//						conformationType.add(confType);
+//						ssIndex++;
+//
+//						fragment = new int[2];
+//						fragment[0] = i - 1;
+//						fragment[1] = i;
+//						confType = ComponentType.TURN;
+//						start = i;
+//						fragments.add(fragment);
+//						conformationType.add(confType);
+//						break;
+//					}
+//					ssIndex++;
+//					break;
+//
+//				case 'E':
+//					confType = ComponentType.STRAND;
+//					fragment[0] = start;
+//					ss1 = Character.toUpperCase(this.ssFlags[i]);
+//					switch (ss1) {
+//					case '-':
+//						fragment[1] = i - 1;
+//						start = -1;
+//						fragments.add(fragment);
+//						conformationType.add(confType);
+//						break;
+//					case ' ':
+//					case 'T':
+//						fragment[1] = i - 1;
+//						start = i - 1;
+//						fragments.add(fragment);
+//						conformationType.add(confType);
+//						break;
+//					case 'H':
+//					case 'E':
+//						fragment[1] = i - 1;
+//						fragments.add(fragment);
+//						conformationType.add(confType);
+//						ssIndex++;
+//
+//						fragment = new int[2];
+//						fragment[0] = i - 1;
+//						fragment[1] = i;
+//						confType = ComponentType.TURN;
+//						start = i;
+//						fragments.add(fragment);
+//						conformationType.add(confType);
+//						break;
+//					}
+//					ssIndex++;
+//					break;
+//				}
+//				ss = Character.toUpperCase(this.ssFlags[i]);
+//			}
+//		}
+//
+//		if (fragments.size() == 0) {
+//			return false;
+//		}
+//
+//		this.openDistanceGaps(fragments, conformationType);
+//
+//		/*
+//		 * System.out.println( "\nFragments after removing distance gaps" ); fIt =
+//		 * fragments.listIterator(); cIt = conformationType.listIterator();
+//		 * while( fIt.hasNext() ) { frag = (int[])fIt.next(); cType = (String)
+//		 * cIt.next(); System.out.println( cType + " from " + frag[0] + " to " +
+//		 * frag[1] ); }
+//		 */
+//
+//		return true;
+//	}
 
 	/**
 	 * Generate the fragments and their associated main conformation types.
 	 * Here, the fragments generated DO NOT share connecting residues.
 	 */
-	public boolean getDisjointFragments(final Vector<int[]> fragments,
+	private boolean getDisjointFragments(final Vector<int[]> fragments,
 			final Vector<ComponentType> conformationType) {
 
 		if (this.chains.length == 0) {
-			// System.err.println( " No chains in this structure " );
 			return false;
 		}
 
@@ -1237,17 +1244,17 @@ public class DerivedInformation
 		}
 
 		this.reinterpretSsFlags();
-		/*
-		 * System.err.println( "Chains" ); for( int i = 0; i < chains.length;
-		 * i++ ) { System.err.println( chains[i][0] + " " + chains[i][1] ); }
-		 */
+		
+//		 System.err.println( "Chains" ); for( int i = 0; i < chains.length;
+//		 i++ ) { System.err.println( chains[i][0] + " " + chains[i][1] ); }
+		
 		// We are done, output the list of secondary structures
 		//
-		/*
-		 * System.err.println( "Ss Flags after reinterpretation " ); for( int i =
-		 * 0; i < ssFlags.length; i++ ) { System.out.println( " " + i + " " +
-		 * ssFlags[i] ); }
-		 */
+		
+//		 System.out.println( "Ss Flags after reinterpretation " ); for( int i =
+//		 0; i < ssFlags.length; i++ ) { System.out.println( " " + i + " " +
+//		 ssFlags[i] ); }
+		 
 
 		int[] fragment;
 		ComponentType confType = ComponentType.UNDEFINED_CONFORMATION;
@@ -1677,8 +1684,10 @@ public class DerivedInformation
 						fragments.add(newStartIndex, newFrag);
 						conformationType.insertElementAt(conf, newStartIndex);
 					} else {
-						adjacentFrag = fragments.get(fragIndex + 1);
-						adjacentFrag[0] = startIndex + i;
+						if (fragIndex + 1 < fragments.size()) {
+							adjacentFrag = fragments.get(fragIndex + 1);
+							adjacentFrag[0] = startIndex + i;
+						}
 					}
 					break;
 				}
@@ -1741,13 +1750,46 @@ public class DerivedInformation
 			cType = confTypes.elementAt(i);
 			residue = residues.elementAt(frag[0]);
 			chainId = residue.getChainId();
-			// System.err.println( "Fragment from " + frag[0] + " to " + frag[1]
-			// + " Type " + cType + " chainId " + chainId );
+//			 System.err.println( "Fragment from " + frag[0] + " to " + frag[1]
+//			 + " Type " + cType + " chainId " + chainId );
 			chain = this.structureMap.getChain(chainId);
 			globalIndex = chain.getResidueIndex(residue);
 			chain.setFragmentRange(globalIndex, globalIndex + frag[1] - frag[0],
 					cType);
 
+		}
+		
+		setNucleicAcids(residues);
+	}
+	
+	private void setNucleicAcids(Vector<Residue> residues) {
+		int start = -1;
+		int end = -1;
+		String startChainId = "";
+		boolean isNucleicAcid = false;
+
+		for (Residue r: residues) {
+			if (! r.getChainId().equals(startChainId) || residues.indexOf(r) == residues.size()) {
+				if (start != -1 && end != -1) {
+					Chain chain = this.structureMap.getChain(startChainId);
+					chain.setFragmentRange(start, end, ComponentType.STRAND);
+					start = -1;
+					end = -1;
+					isNucleicAcid = false;
+				}
+			}
+			if (r.getClassification() == Classification.NUCLEIC_ACID) {
+				String chainId = r.getChainId();
+				Chain chain = this.structureMap.getChain(chainId);
+			    int index = chain.getResidueIndex(r);
+				if (isNucleicAcid == false) {
+					isNucleicAcid = true;
+					startChainId = chainId;
+				    start = index;
+				}
+				end = index;
+			} 
+			
 		}
 	}
 
@@ -1765,15 +1807,15 @@ public class DerivedInformation
 		difference[2] = v1[2] - v2[2];
 	}
 
-	private final float length(final float[] v) {
-		float len = 0.0f;
-		len += v[0] * v[0];
-		len += v[1] * v[1];
-		len += v[2] * v[2];
-		len = (float) Math.sqrt(len);
-
-		return len;
-	}
+//	private final float length(final float[] v) {
+//		float len = 0.0f;
+//		len += v[0] * v[0];
+//		len += v[1] * v[1];
+//		len += v[2] * v[2];
+//		len = (float) Math.sqrt(len);
+//
+//		return len;
+//	}
 
 	private final double length(final double[] v) {
 		double len = 0.0f;
@@ -1785,11 +1827,11 @@ public class DerivedInformation
 		return len;
 	}
 
-	private final void scale(final float[] scaled, final float[] v, final float s) {
-		scaled[0] = v[0] * s;
-		scaled[1] = v[1] * s;
-		scaled[2] = v[2] * s;
-	}
+//	private final void scale(final float[] scaled, final float[] v, final float s) {
+//		scaled[0] = v[0] * s;
+//		scaled[1] = v[1] * s;
+//		scaled[2] = v[2] * s;
+//	}
 
 	private final void scale(final double[] scaled, final double[] v, final double s) {
 		scaled[0] = v[0] * s;
@@ -1818,7 +1860,7 @@ public class DerivedInformation
 		this.scale(normed, v, 1 / len);
 	}
 
-	public void clearStructure() {
-		this.structureMap = null;
-	}
+//	private void clearStructure() {
+//		this.structureMap = null;
+//	}
 }

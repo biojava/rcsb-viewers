@@ -130,7 +130,7 @@ public class CodonInfo
 		return -1;
 	}
 
-	private static final String letters[] = { "U", "C", "A", "G" };
+//	private static final String letters[] = { "U", "C", "A", "G" };
 	/**
 	 *  Returns the number of codon/amino-acid tuples in the database.
 	 *  <P>

@@ -45,7 +45,6 @@
  */ 
 package org.rcsb.mbt.model.interim;
 
-import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 
 

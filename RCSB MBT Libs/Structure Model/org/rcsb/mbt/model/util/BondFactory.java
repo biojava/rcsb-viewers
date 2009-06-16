@@ -49,7 +49,6 @@ package org.rcsb.mbt.model.util;
 
 import java.util.*;
 
-import javax.vecmath.Vector3d;
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;

@@ -50,11 +50,9 @@ import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.attributes.ElementStyles;
 import org.rcsb.mbt.model.attributes.IAtomRadius;
-import org.rcsb.mbt.model.util.AminoAcidInfo;
 import org.rcsb.mbt.model.util.Element;
 import org.rcsb.mbt.model.util.ExternReferences;
 import org.rcsb.mbt.model.util.PeriodicTable;
-import org.rcsb.mbt.model.util.Status;
 
 
 

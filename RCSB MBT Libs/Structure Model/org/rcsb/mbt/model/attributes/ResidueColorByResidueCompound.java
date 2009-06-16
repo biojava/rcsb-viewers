@@ -50,7 +50,6 @@ import java.awt.Color;
 import java.util.TreeMap;
 
 import org.rcsb.mbt.model.*;
-import org.rcsb.mbt.model.attributes.*;
 
 
 
