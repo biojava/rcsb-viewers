@@ -258,15 +258,9 @@ public class AngleDialog extends JDialog implements IPickInfoReceiver
 			this.setLocationRelativeTo(null);
 		}
 		else
-		{
-		
+		{	
 			//set location
 			final Dimension d1 = getSize();
-			final Dimension d2 = p.getSize();
-		
-//			int x = Math.max((d2.width - d1.width)/2, 0);
-//			int y = Math.max((d2.height - d1.height)/2, 0);
-
 			final int x = 5;
 			final int y = 45;
 		
