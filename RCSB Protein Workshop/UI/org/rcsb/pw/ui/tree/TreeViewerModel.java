@@ -123,10 +123,6 @@ public class TreeViewerModel
 			if ( type == ComponentType.CHAIN )
 			{
 				final Chain chain = (Chain) structureComponent;
-                if(chain.structure.getStructureMap().isNonproteinChainId(chain.getChainId())) {
-                    return chain.getResidue(index);
-                }
-                
                 return chain.getFragment( index );
 			}
             else if ( type == ComponentType.FRAGMENT )
@@ -170,10 +166,6 @@ public class TreeViewerModel
 			if ( type == ComponentType.CHAIN )
 			{
                 final Chain chain = (Chain) structureComponent;
-			    if(chain.structure.getStructureMap().isNonproteinChainId(chain.getChainId())) {
-                    return chain.getResidueCount();
-                }
-                
 				return chain.getFragmentCount( );
 			}
             else if ( type == ComponentType.FRAGMENT )

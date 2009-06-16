@@ -67,7 +67,6 @@ import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.MutatorEnum;
 import org.rcsb.pw.ui.CommonDialogs;
 import org.rcsb.pw.ui.FullWidthBoxLayout;
-import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.uiApp.ui.dialogs.ColorChooserDialog;

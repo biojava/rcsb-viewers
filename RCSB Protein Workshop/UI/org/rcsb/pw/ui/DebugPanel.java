@@ -50,9 +50,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.io.PrintStream;
 
 import javax.swing.JPanel;
@@ -65,12 +63,10 @@ public class DebugPanel extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 747173995048569880L;
-	//JPanel innerPanel = new JPanel();   // otherwise, BorderLayout doesn't work with tabbed panes.
     private final JTextArea area = new JTextArea();
     public JScrollPane scroller = null;
     
     private PipedInputStream piErr;
-    private PipedOutputStream poErr;
 
     private PrintStream normalErrOut;
     
@@ -126,7 +122,6 @@ public class DebugPanel extends JPanel {
         
         // Set up System.err
         this.piErr = new PipedInputStream();
-        this.poErr = new PipedOutputStream(this.piErr);
         
         // Add a scrolling text area
         this.area.setEditable(false);
@@ -135,8 +130,6 @@ public class DebugPanel extends JPanel {
 
         // Create reader threads
         new ReaderThread(this.piErr).start();
-        
-        //System.setErr(new PrintStream(poErr, true));
     }
 
     class ReaderThread extends Thread {

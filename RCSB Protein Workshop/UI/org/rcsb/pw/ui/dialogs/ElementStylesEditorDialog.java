@@ -52,13 +52,6 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import org.rcsb.mbt.model.StructureModel;
-import org.rcsb.mbt.model.attributes.*;
-
-
-
-
-
 
 /**
  *  An ElementStylesEditorDialog shows a dialog window for controlling the

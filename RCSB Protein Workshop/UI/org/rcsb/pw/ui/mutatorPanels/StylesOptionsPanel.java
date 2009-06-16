@@ -66,7 +66,6 @@ import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
-import org.rcsb.vf.glscene.jogl.ChainGeometry;
 import org.rcsb.vf.glscene.jogl.Geometry;
 import org.rcsb.vf.glscene.jogl.ChainGeometry.RibbonForm;
 

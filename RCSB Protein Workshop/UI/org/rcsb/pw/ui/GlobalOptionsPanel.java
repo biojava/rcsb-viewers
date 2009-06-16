@@ -49,12 +49,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.LookAndFeel;
-import javax.swing.UIManager;
 
-import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.vf.controllers.app.VFAppBase;
-import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 
 
 public class GlobalOptionsPanel extends JPanel

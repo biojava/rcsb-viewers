@@ -48,7 +48,6 @@ package org.rcsb.pw.ui;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-import org.rcsb.mbt.model.Structure;
 import org.rcsb.pw.ui.coloringDescriptions.backbone.BackboneColoringOptions;
 
 

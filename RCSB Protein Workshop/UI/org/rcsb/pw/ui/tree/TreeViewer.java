@@ -76,7 +76,6 @@ import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
 import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
-import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
@@ -94,7 +93,7 @@ import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
  * @see org.rcsb.uiApp.controllers.update.UpdateEvent
  */
 public class TreeViewer extends JPanel implements IUpdateListener,
-		TreeSelectionListener, IStructureStylesEventListener, MouseListener
+TreeSelectionListener, IStructureStylesEventListener, MouseListener
 {
 	private static final long serialVersionUID = -3564103946574642455L;
 
@@ -123,30 +122,6 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 		public CustomJTree(final TreeViewerModel tvm) {
 			super(tvm);
 		}
-
-		/*
-		 * public void addSelectionPath(TreePath path) {
-		 * super.addSelectionPath(path);
-		 * 
-		 * Mutator m = this.model.getMutatorModel().getCurrentMutator(); if(m !=
-		 * null) { Object[] pathArray = path.getPath(); for(int i = 0; i <
-		 * pathArray.length; i++) { m.toggleMutee(pathArray[i]); } } }
-		 * 
-		 * public void setSelectionPath(TreePath path) {
-		 * super.setSelectionPath(path);
-		 * 
-		 * Mutator m = this.model.getMutatorModel().getCurrentMutator(); if(m !=
-		 * null) { Object[] pathArray = path.getPath(); for(int i = 0; i <
-		 * pathArray.length; i++) { m.toggleMutee(pathArray[i]); } } }
-		 * 
-		 * public void removeSelectionPath(TreePath path) {
-		 * super.removeSelectionPath(path);
-		 *  }
-		 * 
-		 * public void setSelectionInterval(int index0, int index1) {
-		 * super.setSelectionInterval(index0, index1);
-		 *  }
-		 */
 	}
 
 	private class CustomTreeCellRenderer extends DefaultTreeCellRenderer {
@@ -161,7 +136,7 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 			final float color[] = new float[3];
 			StructureStyles.getSelectionColor(color);
 			super.backgroundSelectionColor = // Color.lightGray;
-			new Color(color[0], color[1], color[2]);
+				new Color(color[0], color[1], color[2]);
 
 		}
 
@@ -186,8 +161,8 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 				final boolean expanded, final boolean leaf, final int row,
 				final boolean hasFocus) {
 			final CustomTreeCellRenderer component = (CustomTreeCellRenderer) super
-					.getTreeCellRendererComponent(tree, value, selected,
-							expanded, leaf, row, hasFocus);
+			.getTreeCellRendererComponent(tree, value, selected,
+					expanded, leaf, row, hasFocus);
 
 			ImageIcon imageIcon = null;
 			String componentText = null;
@@ -211,28 +186,28 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 					if (ctLen > 20) {
 						// Shorten the url so that the ends are visible.
 						componentText = componentText.substring(0, 5) + " ... "
-								+ componentText.substring(ctLen - 15, ctLen);
+						+ componentText.substring(ctLen - 15, ctLen);
 					}
 				}
 			}
-			
+
 			else if (value instanceof ExternChain)
 			{
 				final ExternChain xc = (ExternChain) value;
 
 				componentText = (xc.isBasicChain())? "Chain " + xc.getChainId() :
-							    (xc.isWaterChain())? "Water molecules" :
-							    	"Miscellaneous molecules";
+					(xc.isWaterChain())? "Water molecules" :
+						"Miscellaneous molecules";
 
 				imageIcon = this.chainIcon;
 			}
-			
+
 			else if (value instanceof StructureComponent) {
 				final StructureComponent structureComponent = (StructureComponent) value;
 				final StructureMap structureMap = structureComponent.structure
-						.getStructureMap();
+				.getStructureMap();
 				final StructureStyles structureStyles = structureMap
-						.getStructureStyles();
+				.getStructureStyles();
 				final ComponentType type = structureComponent.getStructureComponentType();
 				componentText = type.toString(); // Default
 
@@ -249,7 +224,7 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 					break;
 				default:
 					isBackboneMode = true;
-					break;
+				break;
 				}
 				// }
 				// break;
@@ -290,22 +265,9 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 				} else if (type == ComponentType.RESIDUE) {
 					final Residue residue = (Residue) value;
 
-					// StructureMap structureMap =
-					// residue.structure.getStructureMap( );
-					// StructureStyles structureStyles =
-					// structureMap.getStructureStyles( );
+					componentText = residue.getAuthorResidueId() + " "
+					+ residue.getCompoundCode();
 
-					final PdbToNdbConverter converter = residue.structure
-							.getStructureMap().getPdbToNdbConverter();
-					final Object[] pdbIds = converter.getPdbIds(residue
-							.getChainId(), new Integer(residue.getResidueId()));
-
-					if (pdbIds != null) {
-						componentText = pdbIds[1] + " "
-								+ residue.getCompoundCode();
-					} else {
-						componentText = "not found";
-					}
 					imageIcon = this.residueIcon;
 
 					boolean isVisible = false;
@@ -319,7 +281,7 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 								break;
 							}
 					}
-					
+
 					else if (isBackboneMode) {
 						final Fragment f = residue.getFragment();
 						if (f != null && structureStyles.isVisible(f)) {
@@ -336,30 +298,17 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 					final Fragment fragment = (Fragment) value;
 					ComponentType conformation = fragment.getConformationType();
 
-					final PdbToNdbConverter converter = fragment.structure
-							.getStructureMap().getPdbToNdbConverter();
 					final Chain c = fragment.getChain();
-					final Object[] startIds = converter.getPdbIds(c
-							.getChainId(), new Integer(c.getResidue(
-							fragment.getStartResidueIndex()).getResidueId()));
-					if (startIds != null) {
-						final Object[] endIds = converter.getPdbIds(fragment
-								.getChain().getChainId(), new Integer(c
-								.getResidue(fragment.getEndResidueIndex())
-								.getResidueId()));
-						componentText = conformation + ": " + startIds[1]
-								+ " to " + endIds[1];
-						imageIcon = this.chainIcon;
-					} else { // many nonpolymers have no pdb ids, and so I
-								// can't convert them.
-						componentText = "<nonpolymer>";
-					}
-					// setToolTipText( chain.getClassification() );
+					componentText = conformation + ": " + 
+					c.getResidue(fragment.getStartResidueIndex()).getAuthorResidueId()
+					+ " to " + 
+					c.getResidue(fragment.getEndResidueIndex()).getAuthorResidueId();
+					imageIcon = this.chainIcon;
+
+					//					// setToolTipText( chain.getClassification() );
 				} else if (type == ComponentType.CHAIN) {
 					final Chain chain = (Chain) value;
-					componentText = chain.structure.getStructureMap()
-							.getPdbToNdbConverter().getFirstPdbChainId(
-									chain.getChainId());
+					componentText = chain.getAuthorChainId();
 					imageIcon = this.chainIcon;
 
 					if (componentText == null) {
@@ -371,7 +320,7 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 					final Atom atom0 = bond.getAtom(0);
 					final Atom atom1 = bond.getAtom(1);
 					componentText = atom0.number + " " + atom0.name + " - "
-							+ atom1.number + " " + atom1.name;
+					+ atom1.number + " " + atom1.name;
 					imageIcon = this.bondIcon;
 					// setToolTipText( chain.getClassification() );
 				}
@@ -403,8 +352,8 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 	{
 		super(null, false);
 		super.setBorder(BorderFactory.createCompoundBorder(
-								BorderFactory.createTitledBorder("4)  Choose items from the tree or 3d viewer."),
-								BorderFactory.createEmptyBorder(-1, 1, 1, 1)));
+				BorderFactory.createTitledBorder("4)  Choose items from the tree or 3d viewer."),
+				BorderFactory.createEmptyBorder(-1, 1, 1, 1)));
 
 		// Create a JTree with default models/nodes
 		this.treeViewerModel = new TreeViewerModel();
@@ -418,14 +367,9 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 		for (int i = 0; i < listeners.length; i++) {
 			this.tree.addMouseListener(listeners[i]);
 		}
-		// this.tree.setCellRenderer(new DefaultTreeCellRenderer() {
-
-		// });
-		// ((DefaultTreeCellRenderer)this.tree.getCellRenderer()).setBackgroundSelectionColor(Color.lightGray);
-		// ((DefaultTreeCellRenderer)this.tree.getCellRenderer()).setBackgroundNonSelectionColor(Color.red);
 
 		this.multipleSelectionModel
-				.setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+		.setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 
 		ProteinWorkshop.sgetActiveFrame().setTreeViewer(this);
 
@@ -498,7 +442,7 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 					}
 				}
 			}
-			
+
 			else if (userObject instanceof StructureComponent)
 			{
 				final StructureComponent structureComponent = (StructureComponent) userObject;
@@ -568,19 +512,19 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 		case STRUCTURE_ADDED:
 			structureAdded(evt.structure);
 			break;
-			
+
 		case STRUCTURE_REMOVED:
 			structureRemoved(evt.structure);
 			break;
-			
+
 		case VIEW_ADDED:
 			viewerAdded(evt.view);
 			break;
-			
+
 		case VIEW_REMOVED:
 			viewerRemoved(evt.view);
 			break;
-			
+
 		case VIEW_RESET:
 			reset();
 			break;
@@ -618,7 +562,7 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 		}
 
 		this.treeViewerModel.setRoot(null); // Ditch the StructureDocument
-											// reference.
+		// reference.
 	}
 
 	/**
@@ -636,9 +580,9 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 		// Add a StructureStylesEventListener so we recieve updates.
 		final StructureMap structureMap = structure.getStructureMap();
 		final StructureStyles structureStyles = structureMap
-				.getStructureStyles();
+		.getStructureStyles();
 		structureStyles.addStructureStylesEventListener(this);
-		
+
 		StructureModel model = AppBase.sgetModel();
 
 		// Expand the path for the structure
@@ -670,7 +614,7 @@ public class TreeViewer extends JPanel implements IUpdateListener,
 		// Remove the StructureStylesEventListener so don't recieve updates.
 		final StructureMap structureMap = structure.getStructureMap();
 		final StructureStyles structureStyles = structureMap
-				.getStructureStyles();
+		.getStructureStyles();
 		structureStyles.removeStructureStylesEventListener(this);
 	}
 

@@ -51,13 +51,6 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import org.rcsb.mbt.model.StructureModel;
-import org.rcsb.mbt.model.attributes.*;
-
-
-
-
-
 
 /**
  *  A StyleEditorDialog shows a dialog window for controlling the style

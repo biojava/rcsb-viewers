@@ -47,8 +47,6 @@ package org.rcsb.pw.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Iterator;
-import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;

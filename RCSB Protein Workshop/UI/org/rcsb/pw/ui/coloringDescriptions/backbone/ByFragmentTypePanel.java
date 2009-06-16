@@ -55,10 +55,8 @@ import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
 import java.util.Hashtable;
 
-import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.ResidueColorByFragmentType;
-import org.rcsb.mbt.model.interim.Conformation;
 import org.rcsb.pw.ui.DescriptionPanel;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.ui.dialogs.ColorChooserDialog;
