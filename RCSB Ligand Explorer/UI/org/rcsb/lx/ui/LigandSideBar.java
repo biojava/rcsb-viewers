@@ -667,6 +667,7 @@ public class LigandSideBar extends JPanel
 		DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode)ligandJList.getModel().getRoot();
 		TreePath paths[] = null;
 
+
 		for (int ix = 0; ix < rootNode.getChildCount(); ix++)
 		{
 			DefaultMutableTreeNode chainNode = (DefaultMutableTreeNode)rootNode.getChildAt(ix);
@@ -676,6 +677,7 @@ public class LigandSideBar extends JPanel
 				{
 					DefaultMutableTreeNode residueNode = (DefaultMutableTreeNode)chainNode.getChildAt(lx);
 					Residue residue = (Residue)residueNode.getUserObject();
+					
 					if (residue.getCompoundCode().startsWith(initialLigand))
 					{
 						if (paths == null)

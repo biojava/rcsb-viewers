@@ -94,7 +94,7 @@ public class ContactMap extends JPanel implements IUpdateListener
 	public static final int INFORMATION_PANE_WIDTH = 350;
 	
 	public BufferedImage createImage() {
-		final int visualBuffer = 0;
+//		final int visualBuffer = 0;
 		
 		int totalWidth = this.contactingResiduesPane.fullSize.width + this.ligandAtomsPane.fullSize.width;
 		int totalHeight = this.contactingResiduesPane.fullSize.height + this.ligandAtomsPane.fullSize.height;

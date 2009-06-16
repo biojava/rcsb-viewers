@@ -51,7 +51,6 @@ import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 
 import org.rcsb.lx.ui.FloatLimitField;
-import org.rcsb.lx.ui.FloatLimitField.FloatLimitDocument;
 
 
 /**

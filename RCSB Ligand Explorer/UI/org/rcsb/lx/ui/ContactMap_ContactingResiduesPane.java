@@ -66,13 +66,8 @@ import org.rcsb.lx.glscene.jogl.ResidueFontInfo;
 import org.rcsb.lx.model.ComparablePdbResidueId;
 import org.rcsb.lx.model.InteractionMap;
 import org.rcsb.lx.model.LXModel;
-import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
-import org.rcsb.mbt.model.Structure;
-import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.util.AminoAcidInfo;
-import org.rcsb.mbt.model.util.PdbToNdbConverter;
 
 
 public class ContactMap_ContactingResiduesPane extends JPanel
@@ -122,7 +117,7 @@ public class ContactMap_ContactingResiduesPane extends JPanel
 	private static LineMetrics letterMetrics = null;
 	private static Rectangle2D residueIdBounds = null;
 	private static LineMetrics residueIdMetrics = null;
-	private static int breakpointWidth = -1;
+//	private static int breakpointWidth = -1;
 	
 	public Dimension fullSize = new Dimension(0,0);
 	
@@ -137,7 +132,7 @@ public class ContactMap_ContactingResiduesPane extends JPanel
 			ContactMap_ContactingResiduesPane.letterMetrics = ResidueFontInfo.contactsResidueFont.getLineMetrics("M",g2.getFontRenderContext());
 			ContactMap_ContactingResiduesPane.residueIdBounds = ResidueFontInfo.contactsResidueIdFont.getStringBounds("1",g2.getFontRenderContext());
 			ContactMap_ContactingResiduesPane.residueIdMetrics = ResidueFontInfo.contactsResidueIdFont.getLineMetrics("1",g2.getFontRenderContext());
-			ContactMap_ContactingResiduesPane.breakpointWidth = (int)ResidueFontInfo.contactsResidueFont.getStringBounds(ContactMap_ContactingResiduesPane.BREAKPOINT_SYMBOL,g2.getFontRenderContext()).getWidth();
+//			ContactMap_ContactingResiduesPane.breakpointWidth = (int)ResidueFontInfo.contactsResidueFont.getStringBounds(ContactMap_ContactingResiduesPane.BREAKPOINT_SYMBOL,g2.getFontRenderContext()).getWidth();
 		}
 		
 		final LXModel model = LigandExplorer.sgetModel();
@@ -145,10 +140,6 @@ public class ContactMap_ContactingResiduesPane extends JPanel
 		// hack.
 		if (!model.hasStructures())
 			return;
-
-		final Structure struc = model.getStructures().get(0);
-		final StructureMap sm = struc.getStructureMap();
-		final PdbToNdbConverter converter = sm.getPdbToNdbConverter();
 		
 		// initialize, if necessary...
 		if(!this.isInitialized) {
@@ -174,18 +165,8 @@ public class ContactMap_ContactingResiduesPane extends JPanel
 					continue;
 				}
 				
-				final String ndbChainId = r.getChainId();
-				final Integer ndbResId = new Integer(r.getResidueId());
-				final Object[] pdbIds = converter.getPdbIds(ndbChainId, ndbResId);
-				String pdbChainId;
-				String pdbResId;
-				if(pdbIds == null) {
-					pdbChainId = ndbChainId;
-					pdbResId = ndbResId.toString();
-				} else {
-					pdbChainId = (String)pdbIds[0];
-					pdbResId = (String)pdbIds[1];
-				}
+				String pdbChainId = r.getAuthorChainId();
+				String pdbResId = String.valueOf(r.getAuthorResidueId());
 				
 				ByResidueId byResidueId = byChain.get(pdbChainId);
 				if(byResidueId == null) {
@@ -193,7 +174,7 @@ public class ContactMap_ContactingResiduesPane extends JPanel
 					byChain.put(pdbChainId, byResidueId);
 				}
 				
-				byResidueId.put(new ComparablePdbResidueId(pdbResId), r);	// the ndb residue id is an integer, and so will sort properly; the pdb residue id is a string.
+				byResidueId.put(new ComparablePdbResidueId(pdbResId), r);	
 			}
 			
 			int curX = insets.left + 3;	// visual buffer
@@ -267,15 +248,7 @@ public class ContactMap_ContactingResiduesPane extends JPanel
 				}
 				buf.drawString(residueLetter, range.startX, curY);
 				
-				final String ndbChainId = range.residue.getChainId();
-				final Integer ndbResId = new Integer(range.residue.getResidueId());
-				final Object[] pdbIds = converter.getPdbIds(ndbChainId, ndbResId);
-				String pdbResId;
-				if(pdbIds == null) {
-					pdbResId = ndbResId.toString();
-				} else {
-					pdbResId = (String)pdbIds[1];
-				}
+				String pdbResId = String.valueOf(range.residue.getAuthorResidueId());
 				
 				// draw the residue id
 				buf.setFont(ResidueFontInfo.contactsResidueIdFont);

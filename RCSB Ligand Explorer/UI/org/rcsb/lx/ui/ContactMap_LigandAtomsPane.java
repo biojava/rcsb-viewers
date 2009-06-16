@@ -64,9 +64,6 @@ import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.attributes.StructureStyles;
-import org.rcsb.mbt.model.util.PdbToNdbConverter;
-import org.rcsb.mbt.model.Chain;
 
 
 public class ContactMap_LigandAtomsPane extends JPanel {
@@ -125,7 +122,7 @@ public class ContactMap_LigandAtomsPane extends JPanel {
 
 		final Structure struc = model.getStructures().get(0);
 		final StructureMap sm = struc.getStructureMap();
-		final StructureStyles ss = sm.getStructureStyles();
+//		final StructureStyles ss = sm.getStructureStyles();
 		
 		final int padding = 3;
 		

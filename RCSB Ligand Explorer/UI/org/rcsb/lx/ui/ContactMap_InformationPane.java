@@ -63,7 +63,6 @@ import org.rcsb.lx.model.LXModel;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
-import org.rcsb.mbt.model.util.PdbToNdbConverter;
 
 
 public class ContactMap_InformationPane extends JScrollPane
@@ -93,16 +92,6 @@ public class ContactMap_InformationPane extends JScrollPane
 				super.expandRow(i);
 			}
 		}
-		
-//		public void paintComponent(Graphics g) {
-//			Graphics2D g2 = (Graphics2D)g;
-//			
-//			g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-////			g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-//			g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-//			
-//			super.paintComponent(g);
-//		}
 	}
 	
 	public class InteractionTypes {
@@ -251,44 +240,19 @@ public class ContactMap_InformationPane extends JScrollPane
 		System.out.println(a.name);
 	}
 	
-//	private class InteractionWrapper {
-//		public InteractionWrapper(Interaction ia, boolean isLigandAtomFirstAtom, int number) {
-//			this.ia = ia;
-//			this.contactingAtom = new ContactingAtom(isLigandAtomFirstAtom ? ia.getSecondAtom() : ia.getFirstAtom(), number);
-//		}
-//		
-//		public String toString() {
-//			Atom residueAtom = this.contactingAtom.atom;
-//			
-//			return residueAtom.name;
-//		}
-//		
-//		public final Interaction ia;
-//		public final ContactingAtom contactingAtom;
-//	}
-	
 	private class LigandAtom {
 		private final String[] children = new String[6];
 		private final String overviewDescription;
 		public final int childCount;
 		
 		public LigandAtom(final Atom atom) {
-			final Object[] atomPdbIds = atom.structure.getStructureMap().getPdbToNdbConverter().getPdbIds(atom.chain_id, new Integer(atom.residue_id));
-			String atomChainId;
-			String atomResId;
-			if(atomPdbIds == null) {
-				atomChainId = atom.chain_id;
-				atomResId = Integer.toString(atom.residue_id);
-			} else {
-				atomChainId = (String)atomPdbIds[0];
-				atomResId = (String)atomPdbIds[1];
-			}
+			String atomChainId = atom.authorChain_id;
 			
 			int curIndex = 0;
 			if(atomChainId != null && atomChainId.length() != 0) {
-				this.children[curIndex++] = "Chain " + atomChainId;
+				this.children[curIndex++] = "Chain: " + atomChainId;
 			}
-			this.children[curIndex++] = "Residue: " + atomResId;
+			this.children[curIndex++] = "Residue: " + atom.authorResidue_id;
 			this.children[curIndex++] = "Compound: " + atom.compound;
 			this.children[curIndex++] = "Name: " + atom.name;
 			this.children[curIndex++] = "Element: " + atom.element;
@@ -302,7 +266,7 @@ public class ContactMap_InformationPane extends JScrollPane
 				overviewDescription.append(atomChainId);
 				overviewDescription.append('/');
 			}
-			overviewDescription.append(atomResId);
+			overviewDescription.append(atom.authorResidue_id);
 			overviewDescription.append('/');
 			overviewDescription.append(atom.name);
 			this.overviewDescription = overviewDescription.toString();
@@ -324,16 +288,7 @@ public class ContactMap_InformationPane extends JScrollPane
 		public final int childCount;
 		
 		public ContactingResidue(final Residue res) {
-			final Object[] resPdbIds = res.structure.getStructureMap().getPdbToNdbConverter().getPdbIds(res.getChainId(), new Integer(res.getResidueId()));
-			String atomChainId;
-			String atomResId;
-			if(resPdbIds == null) {
-				atomChainId = res.getChainId();
-				atomResId = Integer.toString(res.getResidueId());
-			} else {
-				atomChainId = (String)resPdbIds[0];
-				atomResId = (String)resPdbIds[1];
-			}
+			String atomChainId = res.getAuthorChainId();
 			
 			ComponentType conformation = res.getConformationType();
 			
@@ -341,7 +296,7 @@ public class ContactMap_InformationPane extends JScrollPane
 			if(atomChainId != null && atomChainId.length() != 0) {
 				this.children[curIndex++] = "Chain: " + atomChainId;
 			}
-			this.children[curIndex++] = "Residue: " + atomResId;
+			this.children[curIndex++] = "Residue: " + res.getAuthorResidueId();
 			this.children[curIndex++] = "Compound: " + res.getCompoundCode();
 			this.children[curIndex++] = "Conformation: " + conformation;
 			this.children[curIndex++] = "Hydrophobicity: " + res.getHydrophobicity();
@@ -354,7 +309,7 @@ public class ContactMap_InformationPane extends JScrollPane
 				overviewDescription.append(atomChainId);
 				overviewDescription.append('/');
 			}
-			overviewDescription.append(atomResId);
+			overviewDescription.append(res.getAuthorResidueId());
 			overviewDescription.append('/');
 			overviewDescription.append(res.getCompoundCode());
 			this.overviewDescription = overviewDescription.toString();
@@ -379,7 +334,6 @@ public class ContactMap_InformationPane extends JScrollPane
 		public ContactingAtom(final Atom atom, final Interaction interaction)
 		{
 			this.interaction = interaction;
-//			this.atom = atom;
 			
 			this.children[0] = "Name: " + atom.name;
 			this.children[1] = "ID: " + atom.number;
@@ -387,38 +341,12 @@ public class ContactMap_InformationPane extends JScrollPane
 			this.children[3] = "BFactor: " + atom.bfactor;
 			this.children[4] = "Occupancy: " + atom.occupancy;
 			
-//			Object[] resPdbIds = atom.structure.getStructureMap().getPdbToNdbConverter().getPdbIds(atom.chain_id, new Integer(atom.residue_id));
-//			String atomChainId;
-//			String atomResId;
-//			if(resPdbIds == null) {
-//				atomChainId = atom.chain_id;
-//				atomResId = Integer.toString(atom.residue_id);
-//			} else {
-//				atomChainId = (String)resPdbIds[0];
-//				atomResId = (String)resPdbIds[1];
-//			}
-			
-//			StringBuffer overviewDescription = new StringBuffer();
-//			overviewDescription.append("Contacting Atom: ");
-//			if(atomChainId != null && atomChainId.length() != 0) {
-//				overviewDescription.append(atomChainId);
-//				overviewDescription.append('/');
-//			}
-//			overviewDescription.append(atomResId);
-//			overviewDescription.append('/');
-//			overviewDescription.append(atom.name);
 			this.overviewDescription = "Contacting atom: " + atom.name + ", " + interaction.getDistance();
 		}
 		
 		public Object getChild(final int index) {
 			return this.children[index];
 		}
-		
-//		public void setNumber(int number) {
-//			this.number = number;
-//			
-//			
-//		}
 		
 		@Override
 		public String toString() {
@@ -428,7 +356,6 @@ public class ContactMap_InformationPane extends JScrollPane
 	
 	public void reportInteractions(final Residue contactingResidue, final Atom ligandAtom) {
 		final LXModel model = LigandExplorer.sgetModel();
-		final PdbToNdbConverter conv = contactingResidue.structure.getStructureMap().getPdbToNdbConverter();
 		final Vector interactions = model.getInteractionMap().getInteractions(contactingResidue);
 		final int interCount = interactions.size();
 		
@@ -454,35 +381,10 @@ public class ContactMap_InformationPane extends JScrollPane
 					inters = new Vector();
 					interactionsByType.put(ia.getInteractionType(), inters);
 				}
-//				ca.number = inters.size() + 1;
 				inters.add(contactingAtom);
 			}
 		}
 		
-//		Object[] atomPdbIds = ligandAtom.structure.getStructureMap().getPdbToNdbConverter().getPdbIds(ligandAtom.chain_id, new Integer(ligandAtom.residue_id));
-//		String atomChainId;
-//		String atomResId;
-//		if(atomPdbIds == null) {
-//			atomChainId = ligandAtom.chain_id;
-//			atomResId = Integer.toString(ligandAtom.residue_id);
-//		} else {
-//			atomChainId = (String)atomPdbIds[0];
-//			atomResId = (String)atomPdbIds[1];
-//		}
-//		
-//		String resNdbChainId = contactingResidue.getChainId();
-//		int resNdbResidueId = contactingResidue.getResidueId();
-//		Object[] residuePdbIds = conv.getPdbIds(resNdbChainId, new Integer(resNdbResidueId));
-//		String residueChainId;
-//		String residueResId;
-//		if(atomPdbIds == null) {
-//			residueChainId = resNdbChainId;
-//			residueResId = Integer.toString(resNdbResidueId);
-//		} else {
-//			residueChainId = (String)residuePdbIds[0];
-//			residueResId = (String)residuePdbIds[1];
-//		}
-//		
 		final Vector treeRootChildren = this.model.root.children;
 		treeRootChildren.clear();
 		
