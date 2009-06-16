@@ -52,8 +52,6 @@ import org.rcsb.mbt.structLoader.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 
@@ -85,7 +83,7 @@ public class SimpleReadStructureDemo
 	static boolean doAtoms = true;
 	static boolean doResidues = true;
 	static boolean doBreakout = true;
-	
+
 	/**
 	 * Here's the main...
 	 * 
@@ -94,59 +92,55 @@ public class SimpleReadStructureDemo
 	public static void main(String args[])
 	{
 		String fileName = null;
-		
+
 		for (String arg : args)
 		{
 			if (arg.equals("-noatoms"))
 				doAtoms = false;
-			
+
 			if (arg.equals("-noresidues"))
 				doResidues = doAtoms = false;
-			
+
 			else if (arg.equals("-nobreakout"))
 				doBreakout = false;
-			
+
 			else
 				fileName = arg;
 		}
-		
+
 		if (fileName == null)
 		{
 			System.err.println("Error: you need to specify a structure file or URL.");
 			System.exit(1);
 		}
 
-		
-		
+
+
 		File file = new File(fileName);
-		
+
 		if (file == null || !file.exists())
 		{
 			System.err.println("Error: can't open file '" + fileName + "'");
 			System.exit(2);
 		}
-			
+
 		String fnTmp = fileName.endsWith(".gz")? fileName.substring(0, fileName.lastIndexOf('.')) : fileName;
 		String sfx = fnTmp.substring(fnTmp.lastIndexOf('.') + 1);
 		isPdb = sfx.equalsIgnoreCase("pdb");
-							// get the true suffix - pdb or xml
-		
+		// get the true suffix - pdb or xml
+
 		IFileStructureLoader loader = null;
-		
+
 		Structure struct = null;
-		
+
 		if (isPdb)
 		{
 			loader = new PdbStructureLoader();
-		    ((PdbStructureLoader)loader).setBreakoutEmptyChainsByResId(doBreakout);
-		    			// default behavior is to lump all the unassociated residues (including waters) into a single
-		    			// default chain labelled "_".   Setting this flag will cause the loader to break out 'pseudo-chains'
-		    			// by residue id.
 		}
-		
+
 		else if (sfx.equalsIgnoreCase("xml"))
 			loader = new XMLStructureLoader(new StructureXMLHandler(fileName));
-			
+
 		else
 		{
 			System.err.print("Error: a '.pdb' or '.xml' url is expected.");
@@ -156,47 +150,32 @@ public class SimpleReadStructureDemo
 		try
 		{
 			struct = loader.load(file);
-								// load up the structures
+			// load up the structures
 		}
-		
+
 		catch (IOException e)
 		{
 			System.err.print("Error: " + e.getMessage());
 		}		
-		
+
 		if (struct == null)
 		{
 			System.err.println("Error: could not read structure from '" + fileName + "'");
 			System.exit(4);
 		}
-		
-		new StructureMap(struct, null, loader.getIDConverter(), loader.getNonProteinChainIds());
-							// create a structuremap associated with the structure.
-							// the second argument is for user data.
-		
+
+		new StructureMap(struct, null);
+
 		Output.lineOut("Structure Loaded");
-		Set<String> nprids = loader.getNonProteinChainIds();
-		Output.lineOut("Non Protein Chain ID Count: " + nprids.size());
-		if (nprids.size() > 0)
-		{
-			Output.indent();
-			Output.lineOut("IDs:");
-			Output.indent();
-			for (String id : nprids)
-				Output.lineOut(id);
-			Output.outdent();
-			Output.outdent();
-			Output.lineOut("");
-		}
-		
+
 		reportChains(struct);
-							// and output the report
-		
+		// and output the report
+
 		reportTransforms(loader, struct);
-		
+
 		System.exit(0);
 	}
-	
+
 	/**
 	 * Walk the list of chains, outputting the internals of each chain
 	 * 
@@ -207,9 +186,9 @@ public class SimpleReadStructureDemo
 		StructureMap structMap = struct.getStructureMap();
 		StructureInfo structInfo = struct.getStructureInfo();
 		TreeMap<String, Chain> auxChains = extractAuxilliaries(structMap);
-		
+
 		Output.lineOut("Url : " + struct.getUrlString());
-		
+
 		/*
 		 * output the structureInfo - haven't seen this filled by anything, yet.
 		 */
@@ -226,15 +205,15 @@ public class SimpleReadStructureDemo
 			Output.lineOut("Authors:" + structInfo.getAuthors());
 			Output.outdent();
 		}
-		
+
 		Output.lineOut("");
-		
+
 		/*
 		 * output the chain info using the structure map
 		 */
 		if (structMap == null)
 			Output.lineOut("(No StructureMap - skipping Structure Map section)");
-		
+
 		else
 		{
 			Output.lineOut("StructureMap Info:");
@@ -246,20 +225,20 @@ public class SimpleReadStructureDemo
 			Output.lineOut("Chain Count : " + structMap.getChainCount());
 			Output.lineOut("Aux Chain Count : " + ((doBreakout)? "(N/A - breakout set)" : auxChains.size() + " (no breakout"));
 			Output.outdent();
-			
+
 			Output.lineOut("");
 			Output.lineOut("Detail by chain:");
 			Output.indent();
-			
+
 			for (Chain chain : structMap.getChains()) {
 				Output.lineOut("Structure style: " + structMap.getStructureStyles().getStyle(chain)); // pr
 				outputChainInfo(chain, null);
 			}
-				
+
 			Output.outdent();
 			Output.lineOut("--End StructureMap--");
 		}
-		
+
 		if (isPdb)
 		{
 			if (auxChains.size() > 0)
@@ -267,17 +246,17 @@ public class SimpleReadStructureDemo
 				Output.lineOut("");
 				Output.lineOut("Auxilliary Chains (pdb file) (psuedo-ids):");
 				Output.indent();
-				
+
 				for (String key : auxChains.keySet())
 					outputChainInfo(auxChains.get(key), key);
-				
+
 				Output.outdent();
 			}
 		}
-		
+
 		Output.lineOut("");
 	}
-	
+
 	/**
 	 * Traverse the contents of the chain and output.
 	 * 
@@ -286,22 +265,22 @@ public class SimpleReadStructureDemo
 	 */
 	static private void outputChainInfo(Chain chain, String auxChainId)
 	{
-		boolean isNonProteinChain = auxChainId != null || chain.isNonProteinChain();
-		
+//		boolean isNonProteinChain = auxChainId != null || chain.isNonProteinChain();
+
 		String chainId = (auxChainId != null)? auxChainId : chain.getChainId();
-		if (isNonProteinChain)
-			Output.lineOut("Pseudo (Non-Protein) Chain Id : " + chainId);
-		
-		else
+//		if (isNonProteinChain)
+//			Output.lineOut("Pseudo (Non-Protein) Chain Id : " + chainId);
+//
+//		else
 			Output.lineOut("Chain Id : " + chainId);
-		
+
 		StructureMap sm = chain.getStructure().getStructureMap(); // pr
 		Output.lineOut("Structure style: " + sm.getStructureStyles().getStyle(chain)); // pr
-		
+
 		if (chainId.equals("_") || chainId.equals("HOH"))
-						// don't output the default chain id - if it contains ions/ligands,
-						// they'll be extracted and displayed elsewhere.
-						// otherwise, it just shows waters - we don't care.
+			// don't output the default chain id - if it contains ions/ligands,
+			// they'll be extracted and displayed elsewhere.
+			// otherwise, it just shows waters - we don't care.
 		{
 			Output.indent();
 			Output.lineOut("(default chain id group or explicit water chain)");
@@ -309,36 +288,36 @@ public class SimpleReadStructureDemo
 			Output.outdent();
 			return;
 		}
-		
+
 		Output.indent();
-		if (!isNonProteinChain)
-						// non-protein chains don't have fragments - put out fragment
-						// info for protein chain
-		{
-			Output.lineOut("Fragments: ");
-			Output.indent();
-			
-			for (Fragment fragment : chain.getFragments())
-			{
-				Output.lineOut("--New Fragment--");
-				Output.lineOut("Conformation Type : " + fragment.getConformationType());
-				outputResidueInfo(fragment.getResidues());
-				Output.lineOut("--End Fragment--");
-				Output.lineOut("");
-			}
-			
-			Output.outdent();
-			Output.lineOut("--End Fragments--");
-		}
-		
-		else	// auxChain - no fragments
+//		if (!isNonProteinChain)
+//			// non-protein chains don't have fragments - put out fragment
+//			// info for protein chain
+//		{
+//			Output.lineOut("Fragments: ");
+//			Output.indent();
+//
+//			for (Fragment fragment : chain.getFragments())
+//			{
+//				Output.lineOut("--New Fragment--");
+//				Output.lineOut("Conformation Type : " + fragment.getConformationType());
+//				outputResidueInfo(fragment.getResidues());
+//				Output.lineOut("--End Fragment--");
+//				Output.lineOut("");
+//			}
+//
+//			Output.outdent();
+//			Output.lineOut("--End Fragments--");
+//		}
+//
+//		else	// auxChain - no fragments
 			outputResidueInfo(chain.getResidues());
-		
+
 		Output.outdent();
 		Output.lineOut("--End Chain--");
 		Output.lineOut("");
 	}
-	
+
 	/**
 	 * Walk the residue list, either from the Fragment or the Chain, and output internals
 	 * 
@@ -349,41 +328,41 @@ public class SimpleReadStructureDemo
 		Output.lineOut("Residues: " + residues.size());
 
 		if (!doResidues) return;
-		
+
 		Output.indent();
 		for (Residue residue : residues)
 		{
 			if (residue.getClassification() == Residue.Classification.WATER)
 				continue;
-							// let's ignore waters
-			
+			// let's ignore waters
+
 			Output.lineOut("Residue Id : " + residue.getResidueId());
-		    Output.lineOut("Compound Code : " + residue.getCompoundCode());
-		    Output.lineOut("Hydrophobicity : " + residue.getHydrophobicity());
-		    Output.lineOut("Num Atoms : " + residue.getAtomCount());
-		    if (doAtoms)
-		    {
-		    	Output.lineOut("Atoms:");
-		    	Output.indent();
+			Output.lineOut("Compound Code : " + residue.getCompoundCode());
+			Output.lineOut("Hydrophobicity : " + residue.getHydrophobicity());
+			Output.lineOut("Num Atoms : " + residue.getAtomCount());
+			if (doAtoms)
+			{
+				Output.lineOut("Atoms:");
+				Output.indent();
 
-			    for (Atom atom : residue.getAtoms())
-			    {
-			    	Output.lineOut("Atom Name : " + atom.name);
-			    	Output.lineOut("Element : " + atom.element);
-			    	Output.lineOut("Partial Charge : " + atom.partialCharge);
-			    	Output.lineOut("Occupancy : " + atom.occupancy);
-			    	Output.lineOut("");
-			    }
-			    
-			    Output.outdent();
-		    }
+				for (Atom atom : residue.getAtoms())
+				{
+					Output.lineOut("Atom Name : " + atom.name);
+					Output.lineOut("Element : " + atom.element);
+					Output.lineOut("Partial Charge : " + atom.partialCharge);
+					Output.lineOut("Occupancy : " + atom.occupancy);
+					Output.lineOut("");
+				}
 
-		    Output.lineOut("--End Residue");
+				Output.outdent();
+			}
+
+			Output.lineOut("--End Residue");
 		}
-		
+
 		Output.outdent();
 	}
-	
+
 	/**
 	 * PDB files will typically contain a number of records that don't specify
 	 * chains.  They specify ligands, ions and waters.  The pdb loader accumulates
@@ -404,7 +383,7 @@ public class SimpleReadStructureDemo
 	static private TreeMap<String, Chain> extractAuxilliaries(StructureMap structMap)
 	{
 		TreeMap<String, Chain> auxChains = new TreeMap<String, Chain>();
-		
+
 		Chain defaultChain = structMap.getChain("_");
 		if (defaultChain != null)
 		{
@@ -412,7 +391,7 @@ public class SimpleReadStructureDemo
 			{
 				if (residue.getClassification() == Residue.Classification.WATER)
 					continue;
-								// ignore waters
+				// ignore waters
 				String key = residue.getCompoundCode() + " (" + residue.getResidueId() + ")";
 				Chain auxChain = auxChains.get(key);
 				if (auxChain == null)
@@ -420,20 +399,20 @@ public class SimpleReadStructureDemo
 					auxChain = new Chain();
 					auxChains.put(key, auxChain);
 				}
-				
+
 				auxChain.addResidue(residue);
 			}
 		}
 		return auxChains;
 	}
-	
+
 	static private void reportTransforms(IStructureLoader loader, Structure struct)
 	{
 		int txIX;
-		
+
 		Output.lineOut("Unit Cell:");
 		Output.indent();
-		
+
 		if (loader.hasUnitCell())
 		{
 			UnitCell unitCell = loader.getUnitCell();
@@ -444,13 +423,13 @@ public class SimpleReadStructureDemo
 			Output.lineOut("length B: " + unitCell.lengthB);
 			Output.lineOut("length C: " + unitCell.lengthC);
 		}
-		
+
 		else
 			Output.lineOut("(None)");
-		
+
 		Output.outdent();
 		Output.lineOut("");
-		
+
 		Output.lineOut("Biological Unit Transforms:");
 		Output.indent();
 
@@ -460,13 +439,13 @@ public class SimpleReadStructureDemo
 			for (ModelTransformationMatrix modelTransform : loader.getBiologicalUnitTransformationMatrices())
 				outputTransformValues(txIX++, modelTransform.values);
 		}
-		
+
 		else
 			Output.lineOut("(None)");
-		
+
 		Output.outdent();
 		Output.lineOut("");
-		
+
 		Output.lineOut("Non-Crystallographic Transforms:");
 		Output.indent();
 		if (loader.hasNonCrystallographicOperations())
@@ -475,11 +454,11 @@ public class SimpleReadStructureDemo
 			for (ModelTransformationMatrix modelTransform : loader.getNonCrystallographicOperations())
 				outputTransformValues(txIX++, modelTransform.values);
 		}
-		
+
 		else
 			Output.lineOut("(None)");
 	}
-	
+
 	static private void outputTransformValues(int ix, float[] values)
 	{
 		Output.lineOut(ix + ": " + values[0] + ", " + values[1] + ", " + values[2] + ", " + values[3] + ",");
