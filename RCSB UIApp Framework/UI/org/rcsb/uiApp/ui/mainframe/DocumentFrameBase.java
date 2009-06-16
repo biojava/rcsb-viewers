@@ -55,7 +55,6 @@ import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.doc.DocController;
 import org.rcsb.uiApp.controllers.update.UpdateController;
 import org.rcsb.uiApp.model.UIAppStructureModel;
-import org.rcsb.mbt.model.StructureModel;
 
 
 /**

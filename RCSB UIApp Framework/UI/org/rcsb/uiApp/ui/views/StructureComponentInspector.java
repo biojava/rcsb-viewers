@@ -81,7 +81,6 @@ public class StructureComponentInspector
 	 * 
 	 */
 	private static final long serialVersionUID = 6761807003699371212L;
-	private StructureModel structureDocument = null;
 	private final int itemCount = 20;
 	private JTable table = null;
 	private JLabel data[][] = null;
@@ -351,13 +350,17 @@ public class StructureComponentInspector
 					label = (JLabel) this.table.getValueAt( row, 0 );
 					label.setText( "Chain:" );
 					label = (JLabel) this.table.getValueAt( row, 1 );
-					label.setText( atom.chain_id );
+					// PR
+//					label.setText( atom.chain_id );
+					label.setText( atom.authorChain_id );
 					row++;
 
 					label = (JLabel) this.table.getValueAt( row, 0 );
 					label.setText( "Residue:" );
 					label = (JLabel) this.table.getValueAt( row, 1 );
-					label.setText( Integer.toString( atom.residue_id ) );
+					// PR
+//					label.setText( Integer.toString( atom.residue_id ) );
+					label.setText( Integer.toString( atom.authorResidue_id ) );
 					row++;
 
 					label = (JLabel) this.table.getValueAt( row, 0 );
@@ -487,7 +490,7 @@ public class StructureComponentInspector
 				final Fragment fragment = (Fragment) structureComponent;
 				final int fragmentIndex = structureMap.getFragmentIndex( fragment );
 				final Chain chain = fragment.getChain( );
-				final int chainIndex = structureMap.getChainIndex( chain );
+
 				if ( structureStyles.isSelected( fragment ) )
 				{
 					label = (JLabel) this.table.getValueAt( row, 0 );
