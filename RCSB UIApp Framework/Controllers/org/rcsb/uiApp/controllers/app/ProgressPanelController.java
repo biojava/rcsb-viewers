@@ -73,7 +73,6 @@ import org.rcsb.uiApp.ui.dialogs.ProgressPanel;
  * </ul>
  * 
  */
-@SuppressWarnings("serial")
 public class ProgressPanelController
 {
 

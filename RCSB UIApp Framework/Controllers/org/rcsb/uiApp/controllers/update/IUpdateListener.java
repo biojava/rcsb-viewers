@@ -45,8 +45,6 @@
  */ 
 package org.rcsb.uiApp.controllers.update;
 
-import org.rcsb.mbt.model.StructureModel;
-
 
 /**
  *  Anything that wants to be notified when the model changes (structures added, removed)

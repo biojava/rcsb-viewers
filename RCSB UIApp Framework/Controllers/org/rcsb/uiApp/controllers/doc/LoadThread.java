@@ -93,6 +93,20 @@ public class LoadThread extends Thread
 						// extract the id from the file specification
 	}
 	
+	/**
+	 * Converts an array of PDB Ids to a comma-separated string of urls
+	 * @param pdbIds list of PDB Ids
+	 */
+	public LoadThread(String[] pdbIds)
+	{
+		_url = "";
+	    for (String id: pdbIds) {
+	    	_url += "http://www.pdb.org/pdb/files/" + id + ".xml.gz" + ",";
+	    }
+	    _url = _url.substring(0, _url.length()); // remove last comma
+		_pdbid = pdbIds[0];
+	}
+	
 	public LoadThread(String url, String pdbid)
 	{ _url = url; _pdbid = pdbid; }
 	

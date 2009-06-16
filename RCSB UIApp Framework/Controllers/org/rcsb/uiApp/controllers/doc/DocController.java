@@ -48,8 +48,6 @@ package org.rcsb.uiApp.controllers.doc;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
@@ -65,13 +63,13 @@ import org.rcsb.uiApp.controllers.app.AppBase;
 
 public class DocController
 {
-    private String initialBiologicalUnitId = null; 
-    
-    /**
-     * This is used by the StructureXMLHandler - nothing seems to set it, though...
-     * 
-     * @return - initial biological unit identifier.
-     */
+	private String initialBiologicalUnitId = null; 
+
+	/**
+	 * This is used by the StructureXMLHandler - nothing seems to set it, though...
+	 * 
+	 * @return - initial biological unit identifier.
+	 */
 	public String getInitialBiologicalUnitId() {
 		return this.initialBiologicalUnitId;
 	}
@@ -84,18 +82,18 @@ public class DocController
 			if(initialBiologicalUnitId.length() == 0)
 				initialBiologicalUnitId = null;
 		}
-		
+
 		this.initialBiologicalUnitId = initialBiologicalUnitId;
 	}
-	
-	
+
+
 	public void loadStructure(final String url, final String pdbId)
 	{
 		if (url == null)
 			; // stick up an error message box?
-		
+
 		AppBase.sgetUpdateController().clear();
-		
+
 		Structure[] structure = readStructuresFromUrl(url);
 		if (structure != null)
 		{
@@ -116,7 +114,7 @@ public class DocController
 	{
 		final Vector<Structure> structuresVec = new Vector<Structure>();
 		Structure structureTmp = null;
-		
+
 		final String[] datasets = structureUrlParam.split(",");
 		for (int i = 0; i < datasets.length; i++)
 		{
@@ -125,86 +123,85 @@ public class DocController
 				datasets[i] = datasets[i].trim();
 				final String dataset = datasets[i];
 				IFileStructureLoader loader = null;
-			
+
 				if (dataset.endsWith(".xml.gz") || dataset.endsWith(".xml"))
 				{
 					// long time = System.currentTimeMillis();
 					Status.progress(-1, "Reading XML file: " + dataset);
-					
+
 					loader =
 						new XMLStructureLoader(AppBase.sgetAppModuleFactory().createStructureXMLHandler(dataset));
 					((XMLStructureLoader)loader).setInitialBiologicalUnitId(initialBiologicalUnitId);
-					
+
 					structureTmp = loader.load(dataset);
 				}
-					
-				
+
+
 				else if (dataset.matches("^.+\\.pdb\\d*(\\.gz)?$")
 						|| dataset.endsWith(".ent.gz")
 						|| dataset.endsWith(".ent"))
 				{
 					loader = new PdbStructureLoader();
-					((PdbStructureLoader)loader).setBreakoutEmptyChainsByResId(true);
 					((PdbStructureLoader)loader).setTreatModelsAsSubunits(
-						AppBase.getApp().properties.contains("treat_models_as_subunits") &&
-						AppBase.getApp().properties.get("treat_models_as_subunits").equals("true"));
-					
+							AppBase.getApp().properties.contains("treat_models_as_subunits") &&
+							AppBase.getApp().properties.get("treat_models_as_subunits").equals("true"));
+
 					Status.progress(0, "Reading PDB file: " + dataset);
-					
+
 					structureTmp = loader.load(dataset);
 				}
-				
+
 				else
 					Status.output(Status.LEVEL_ERROR,
-									"Could not open file: the file must have an extension of .xml, xml.gz, .pdb, .pdb.gz, .ent, or .ent.gz.");
-		
+					"Could not open file: the file must have an extension of .xml, xml.gz, .pdb, .pdb.gz, .ent, or .ent.gz.");
+
 				if (structureTmp == null)
 				{
 					Status.output(Status.LEVEL_ERROR, "Could not load: " + dataset);
 					return null;
 				}
-				
+
 				else
 					System.out.println("Data set loaded: " + dataset);
-		
-				new StructureMap(structureTmp, AppBase.sgetAppModuleFactory().createStructureMapUserData(),
-						loader.getIDConverter(), loader.getNonProteinChainIds());
+// PR
+//				new StructureMap(structureTmp, AppBase.sgetAppModuleFactory().createStructureMapUserData(),
+//						loader.getNonProteinChainIds());
+				new StructureMap(structureTmp, AppBase.sgetAppModuleFactory().createStructureMapUserData());
 				finalizeNewStructure(loader, structureTmp);
-								
+
 				if (loader.getUnitCell() != null)
 					structureTmp.getStructureMap().setUnitCell(loader.getUnitCell());
-		
+
 				structuresVec.add(structureTmp);			
 			}
-			
+
 			catch (final MalformedURLException e)
 			{
 				Status.output(Status.LEVEL_ERROR, "Error: Bad url to the structure xml file.");
 			}
-			
+
 			catch (final IOException e)
 			{
 				Status.output(Status.LEVEL_ERROR, e.getMessage());
 			}
 
 		}
-			// global transforms set in _BU version...
-		
+		// global transforms set in _BU version...
+
 		// else no structure loaded.
-	
+
 		final Structure[] structures = new Structure[structuresVec.size()];
 		for (int i = 0; i < structures.length; i++)
 		{
 			structures[i] = structuresVec.get(i);
-//			structures[i].getStructureMap().setPdbId("NOID");
 			structures[i].getStructureMap().setPdbId(parsePdbId(datasets[i]));
 			structures[i].getStructureMap().setImmutable();
 		}
-		
+
 		if (DebugState.isDebug())
 			System.err.println("--> DocController: Memory used: " +
 					(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
-	
+
 		return structures;
 	}
 
@@ -215,7 +212,7 @@ public class DocController
 	 */
 	private String parsePdbId(String urlString) {
 		String[] extensions = {".xml", ".xml.gz", ".pdb", ".pdb.gz", ".ent", ".ent.gz", ".pdb1.gz", ".pdb2.gz,", ".pdb3.gz", ".pdb4.gz", ".pdb5.gz"};
-		
+
 		for (String extension: extensions) {
 			int endIndex = urlString.indexOf(extension);
 			if (endIndex > 0) {
