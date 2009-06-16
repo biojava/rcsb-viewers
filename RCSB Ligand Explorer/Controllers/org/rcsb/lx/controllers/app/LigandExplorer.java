@@ -186,14 +186,18 @@ public class LigandExplorer extends VFAppBase
 
 		else
 			sceneController.setShowAsymmetricUnitOnly(false);
-
-
-		final String structureUrlParam = this.properties.getProperty("structure_url");
 		
 		activeFrame.initialize(true);
 		
+		final String structureUrlParam = this.properties.getProperty("structure_url");
+		
 		if (structureUrlParam != null)
 			((VFDocumentFrameBase)activeFrame).loadURL(structureUrlParam);
+		
+		String structureIdList = this.properties.getProperty("structure_id_list");
+
+		if (structureIdList != null)
+			((VFDocumentFrameBase)activeFrame).loadURL(structureIdList.split(","));
 	}
 	
 
