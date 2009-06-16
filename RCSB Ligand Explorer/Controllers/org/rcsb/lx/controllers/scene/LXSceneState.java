@@ -48,11 +48,7 @@ package org.rcsb.lx.controllers.scene;
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.glscene.jogl.LXSceneNode;
 import org.rcsb.lx.model.LXModel;
-import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.vf.controllers.scene.SceneState;
-import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 public class LXSceneState extends SceneState

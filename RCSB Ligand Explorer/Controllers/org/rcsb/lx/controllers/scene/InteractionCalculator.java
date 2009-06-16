@@ -47,7 +47,6 @@ package org.rcsb.lx.controllers.scene;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
@@ -88,7 +87,6 @@ public class InteractionCalculator
 			final PrintWriter interactionsOut) {
 		int count = 0;
 		int count_hydro = 0;
-		int count_other = 0;
 		final StructureMap structureMap = structure.getStructureMap();
 		Vector<Atom> ligandAtoms = new Vector<Atom>();
 		for (Residue residue : currentLigandResidues)
@@ -107,7 +105,8 @@ public class InteractionCalculator
 		LXGlGeometryViewer glViewer = LigandExplorer.sgetGlGeometryViewer();
 
 		for (Chain chain : structureMap.getChains())
-			if (chain.getClassification() == Residue.Classification.AMINO_ACID)
+			if (chain.getClassification() == Residue.Classification.AMINO_ACID ||
+					chain.getClassification() == Residue.Classification.NUCLEIC_ACID)
 				proteinAtoms.addAll(chain.getAtoms());
 
 		final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry
