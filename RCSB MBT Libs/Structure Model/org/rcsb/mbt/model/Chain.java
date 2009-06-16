@@ -98,14 +98,6 @@ public class Chain
 	private RangeMap fragmentRanges = null;
 	private Vector<Fragment> fragmentObjects = null;
 	
-	/**
-	 * Simply an indicator to the caller - not used internally
-	 */
-	private boolean isNonProteinChain = false;
-	
-	public void setIsNonProteinChain(boolean flag) { isNonProteinChain = flag; }
-	public boolean isNonProteinChain() { return isNonProteinChain; }
-	
 	public ArrayList<Residue> modifiedResidues = null;
 	public void addModifiedResidue(Residue residue)
 	{
@@ -278,6 +270,30 @@ public class Chain
 		}
 		return atom.chain_id;
 	}
+	
+	/**
+	 * Return the author assigned chain ID by asking the first Atom of the first Residue.
+	 * If there are no residues or atoms, "A" is returned.
+	 */
+	public String getAuthorChainId( )
+	{
+		if ( this.residues == null ) {
+			return Chain.defaultChainId;
+		}
+		final Residue residue = this.getResidue( 0 );
+		if ( residue == null ) {
+			return Chain.defaultChainId;
+		}
+		final int atomCount = residue.getAtomCount( );
+		if ( atomCount <= 0 ) {
+			return Chain.defaultChainId;
+		}
+		final Atom atom = residue.getAtom( 0 );
+		if ( atom == null ) {
+			return Chain.defaultChainId;
+		}
+		return atom.authorChain_id;
+	}
 
 	/**
 	 * Get the number of Atoms contained in the Residues of this Chain.
@@ -384,28 +400,6 @@ public class Chain
 			this.residueToIndexHash = new Hashtable<Residue,Integer>( );
 		}
 
-		// Do a binary search to determine where this new residue should be added.
-	/*
-		int low = 0;
-		int high = residues.size() - 1;
-		int mid = 0;
-		int residueId = residue.getResidueId( );
-		while ( low <= high )
-		{
-			mid = (low + high) / 2;
-			Residue residue2 = (Residue) residues.elementAt( mid );
-			int residueId2 = residue2.getResidueId( );
-
-			if ( residue == residue2 )
-				throw new IllegalArgumentException( "residue alreay exists!" );
-			else if ( residueId < residueId2 )
-				high = mid - 1;
-			else // ( residueId > residueId2 )
-				low = mid + 1;
-		}
-		if ( mid < 0 ) mid = 0;
-		residues.add( mid, residue );
-	*/
 		this.residueToIndexHash.put( residue, new Integer( this.residues.size() ) );
 		this.residues.add( residue );
 
@@ -669,7 +663,7 @@ public class Chain
 	@Override
 	public String toString()
 	{
-		return getChainId();
+		return getAuthorChainId();
 	}
 }
 

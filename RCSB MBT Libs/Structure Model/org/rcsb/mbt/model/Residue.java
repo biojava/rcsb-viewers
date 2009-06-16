@@ -245,25 +245,28 @@ public class Residue
 		else
 		{
 			compoundCode = atom.compound; 
-		
+		   
 			if ( compoundCode.equals("HOH"))
 				classification = Classification.WATER;
 			
-			else if (atom.getStructure().getStructureMap().getChain(atom.chain_id).isNonProteinChain())
-				classification = Classification.LIGAND;
-			
 			// ACE often appears as an n-terminal cap of proteins, treat it as an Amino Acid, 
 			// or else the protein chain is reclassified as a ligand.
-			else if ( compoundCode.equals("ACE") && 
-					! atom.getStructure().getStructureMap().getChain(atom.chain_id).isNonProteinChain()) {
+		    else if ( compoundCode.equals("ACE") ) {
+					classification = Classification.AMINO_ACID;
 				classification = Classification.AMINO_ACID;
 			}
-				
-			else if ( AminoAcidInfo.getNameFromCode( compoundCode ) != null )
+			
+			// TODO should this be ||
+//			else if ( AminoAcidInfo.getNameFromCode( compoundCode ) != null && AminoAcidInfo.isNonStandardAminoAcid(compoundCode) )
+//				classification = Classification.AMINO_ACID;
+			else if ( AminoAcidInfo.getNameFromCode( compoundCode ) != null || AminoAcidInfo.isNonStandardAminoAcid(compoundCode) )
 				classification = Classification.AMINO_ACID;
 			
 			else if ( NucleicAcidInfo.isNucleotide( compoundCode ) )
 				classification = Classification.NUCLEIC_ACID;
+			
+			else
+				classification = Classification.LIGAND;
 		}
 	}
 
@@ -486,7 +489,8 @@ public class Residue
 		if ( alphaAtomIndex >= atoms.size() ) {
 			return null;
 		}
-		return alphaAtomIndex >= 0 ? atoms.elementAt( alphaAtomIndex ) : atoms.elementAt(atoms.size() / 2);
+		Atom atom = alphaAtomIndex >= 0 ? atoms.elementAt( alphaAtomIndex ) : atoms.elementAt(atoms.size() / 2);
+		return atom;
 	}
 
 	/**
@@ -565,6 +569,22 @@ public class Residue
 		}
 		return atom.chain_id;
 	}
+	
+	/**
+	 * Get the author assigned chain id (as it is assigned in the first Atom record).
+	 * Return null if there are no atom records.
+	 */
+	public String getAuthorChainId( )
+	{
+		if ( atoms == null ) {
+			return null;
+		}
+		final Atom atom = atoms.elementAt( 0 );
+		if ( atom == null ) {
+			return null;
+		}
+		return atom.authorChain_id;
+	}
 
 	/**
 	 * Get the residue id (as it is assigned in the first Atom record).
@@ -580,6 +600,22 @@ public class Residue
 			return -1;
 		}
 		return atom.residue_id;
+	}
+	
+	/**
+	 * Get the author assigned residue id (as it is assigned in the first Atom record).
+	 * Return -1 if there are no atom records.
+	 */
+	public int getAuthorResidueId( )
+	{
+		if ( atoms == null ) {
+			return -1;
+		}
+		final Atom atom = atoms.elementAt( 0 );
+		if ( atom == null ) {
+			return -1;
+		}
+		return atom.authorResidue_id;
 	}
 	
 	/**

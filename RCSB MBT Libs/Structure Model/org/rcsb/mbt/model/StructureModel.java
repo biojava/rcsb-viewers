@@ -48,7 +48,6 @@ package org.rcsb.mbt.model;
 
 
 import java.util.ArrayList;
-import java.util.Vector;
 
 
 /**

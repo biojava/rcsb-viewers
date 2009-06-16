@@ -163,7 +163,6 @@ public class ExternChain extends StructureComponent
 	public Iterator<Chain> getMbtChainIterator() { return mbtChains.iterator(); }
 	public Residue getResidue(final int index) { return this.residuesVec.get(index); }
 	public int getResidueCount() { return this.residuesSet.size(); }
-//	public Iterator<Residue> getResidueIterator() { return this.residuesVec.iterator(); }
 	public boolean contains(final Residue r) { return this.residuesSet.contains(r); }
 	public Vector<Residue> getResiduesVec() { return this.residuesVec; }	
 	public Set<Chain> getMbtChains() { return mbtChains; }

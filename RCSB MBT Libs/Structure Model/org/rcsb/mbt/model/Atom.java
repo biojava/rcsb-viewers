@@ -101,7 +101,9 @@ public class Atom
 		this.altLoc        = atom.altLoc;
 		this.compound      = atom.compound;
 		this.chain_id      = atom.chain_id;
+		this.authorChain_id = atom.authorChain_id;
 		this.residue_id    = atom.residue_id;
+		this.authorResidue_id    = atom.authorResidue_id;
 		this.coordinate[0] = atom.coordinate[0];
 		this.coordinate[1] = atom.coordinate[1];
 		this.coordinate[2] = atom.coordinate[2];
@@ -179,17 +181,30 @@ public class Atom
 
 
 	/**
-	 *  Chain/Asymetric unit ID.
+	 *  Chain/Asymm unit ID.
 	 *  For example, "A", "B", "C", etc.
 	 */
 	public String chain_id = null; // _atom_site.label_asym_id
-
+	
+	/**
+	 *  Chain/Author assigned unit ID.
+	 *  For example, "A", "B", "C", etc.
+	 */
+	public String authorChain_id = null; // _atom_site.author_asym_id
+	
 	/**
 	 *  Residue/Sequence ID.
 	 *  Must be a positive integer.
 	 *  For example, "10", "11", "13", etc.
 	 */
 	public int residue_id = -1; // _atom_site.label_seq_id
+	
+	/**
+	 *  Residue/Author assigned Sequence ID.
+	 *  Must be a positive integer.
+	 *  For example, "10", "11", "13", etc.
+	 */
+	public int authorResidue_id = -1; // _atom_site.author_seq_id
 
 	/**
 	 *  The x,y,z coordinate in angstroms.
