@@ -47,9 +47,7 @@ package org.rcsb.mbt.structLoader;
 
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Set;
 import java.util.Stack;
-import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.vecmath.Matrix3f;
@@ -61,7 +59,6 @@ import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.UnitCell;
 import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
-import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -107,42 +104,9 @@ import org.xml.sax.helpers.DefaultHandler;
  * 
  * <h3>Non-Protein Chains (ligands/waters/ions)</h3>
  * <p>
- * Non protein chains are accumulated into their own chains, typically by using
- * the Ndb identifier (hence the need for the
- * {@linkplain org.rcsb.mbt.model.util.PdbToNdbConverter}, created by the loader
- * and passed off to the {@linkplain org.rcsb.mbt.model.StructureMap} class.
+ * Non protein chains are accumulated into their own chains.
  * </p>
  * 
- * <p>
- * Some important mappings:
- * </p>
- * <h3>Atoms</h3>
- * <dl>
- * <dt>group_PDB</dt>
- * <dd>The PDB Atom record identifier equivalent (ATOM or HETATM)</dd>
- * 
- * <dt>label_atom_id</dt>
- * <dd>The atom NAME</dd>
- * 
- * <dt>label_comp_id</dt>
- * <dd>The atom's residue compound code</dd>
- * 
- * <dt>label_asym_id</dt>
- * <dd>The atom's NDB chain id</dd>
- * 
- * <dt>label_seq_id</dt>
- * <dd>The atom's NDB residue id (can be empty) (Integer)</dd>
- * 
- * <dt>auth_seq_id</dt>
- * <dd>The atom's PDB residue id (also tracks non-protein chain changes.)</dd>
- * 
- * <dt>pdb_strand_id</dt>
- * <dd>The atom's PDB id (only recorded for strands [secondary structures])
- * 
- * <p>
- * Note that what is stored in the atom is <em>NDB</em> ids. PDB ids are looked
- * up as needed.
- * </p>
  * 
  * @author John Beaver, Jeff Milton
  * @author Rick Berger
@@ -171,25 +135,10 @@ public class StructureXMLHandler extends DefaultHandler implements
 		}
 	}
 
-	// used temporarily to store the current atom before putting it into
-	// atomVector.
-	protected class XAtom extends Atom {
-		boolean isNonProteinChainAtom = false;
-		String auth_asym_id;
-		String auth_seq_id;
-		String label_asym_id;
-		String label_seq_id;
-	}
 
-	protected XAtom curAtom = null, prevAtom = null;
+	protected Atom curAtom = null; 
+	protected Atom prevAtom = null;
 	protected Vector<Atom> atomVector = new Vector<Atom>();
-	// used temporarily to store the information needed by the
-	// ResidueIdConverter constructor.
-	// parallel arrays.
-	protected Vector<String> pdbChainIds = null;
-	protected Vector<String> ndbChainIds = null;
-	protected Vector<String> pdbResidueIds = new Vector<String>();
-	protected Vector<Integer> ndbResidueIds = null;
 
 	/**
 	 * Parsing flags - some of the end element operations are controlled by
@@ -199,7 +148,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 	 * 
 	 */
 	protected enum eIsParsing {
-		NONE, CONVERSIONS, CELL, ATOM_SITES, ATOM_SITE, DATABASE_PDB_MATRIX, NON_POLY_CONVERSIONS, STRUCT_BIOLGEN, STRUCT_ASSEMBLY, NON_CRYSTALLOGRAPHIC_OPERATIONS, LEGACY_BIOLOGIC_UNIT_OPERATIONS
+		NONE, CELL, ATOM_SITES, ATOM_SITE, DATABASE_PDB_MATRIX, STRUCT_BIOLGEN, STRUCT_ASSEMBLY, NON_CRYSTALLOGRAPHIC_OPERATIONS, LEGACY_BIOLOGIC_UNIT_OPERATIONS
 	}
 
 	private Stack<eIsParsing> isParsingStack = new Stack<eIsParsing>();
@@ -238,11 +187,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 				: eIsParsing.NONE;
 	}
 
-	// used temporarily to store the information needed by the ChainIdConverter
-	// constructor.
-	private String curNdbChainId = null;
-	private String curPdbChainId = null;
-
 	ModelTransformationMatrix currentModelTransform = null;
 	ModelTransformationMatrix fractionalTransformation = null;
 	ModelTransformationMatrix fractionalTransformationInverse = null;
@@ -251,20 +195,13 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	private Hashtable<ComponentType, Vector<Atom>> componentsHash = new Hashtable<ComponentType, Vector<Atom>>();
 	protected Structure structure = null;
-	private PdbToNdbConverter idConverter = new PdbToNdbConverter();
 
 	// key : qName , value : Runnable
 	protected HashMap<String, XMLRunnable> startElementRunnables = new HashMap<String, XMLRunnable>(); 
 	protected HashMap<String, XMLRunnable> endElementAtomRunnables = new HashMap<String, XMLRunnable>(); 
-	protected HashMap<String, XMLRunnable> endElementPolyConversionsRunnables = new HashMap<String, XMLRunnable>(); 
-	protected HashMap<String, XMLRunnable> endElementNonpolyConversionsRunnables = new HashMap<String, XMLRunnable>(); 
 	protected HashMap<String, XMLRunnable> endElementNonCrystallographicRunnables = new HashMap<String, XMLRunnable>(); 
 	protected HashMap<String, XMLRunnable> endElementDatabasePDBMatrixRunnables = new HashMap<String, XMLRunnable>(); 
 	protected HashMap<String, XMLRunnable> endElementAtomSitesRunnables = new HashMap<String, XMLRunnable>(); 
-
-	protected boolean pdbStrandIdEncountered = false;
-	protected boolean ndbSeqNumEncountered = false;
-	protected boolean pdbSeqNumEncountered = false;
 
 	protected static final String xmlPrefix = "PDBx:";
 
@@ -276,10 +213,9 @@ public class StructureXMLHandler extends DefaultHandler implements
 	 * 
 	 * @return
 	 */
-	protected XAtom createXAtom() {
-		return new XAtom();
+	protected Atom createXAtom() {
+		return new Atom();
 	}
-
 	protected Atom createFinalAtom(Atom src) {
 		return new Atom(src);
 	}
@@ -292,8 +228,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 		//
 		startElementRunnables.put(xmlPrefix + "database_PDB_matrix",
 				createXMLRunnable__database_PDB_matrix__Start());
-		startElementRunnables.put(xmlPrefix + "pdbx_poly_seq_schemeCategory",
-				createXMLRunnable__pdbx_poly_seq_schemeCategory__Start());
 		startElementRunnables.put(xmlPrefix + "cell",
 				createXMLRunnable__cell__Start());
 		//
@@ -391,8 +325,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 				createXMLRunnable__atom_siteCategory__End());
 		endElementAtomRunnables.put(xmlPrefix + "type_symbol",
 				createXMLRunnable__type_symbol__End());
-		endElementAtomRunnables.put(xmlPrefix + "group_PDB",
-				createXMLRunnable__group_PDB__End());
 		endElementAtomRunnables.put(xmlPrefix + "label_atom_id",
 				createXMLRunnable__label_atom_id__End());
 		endElementAtomRunnables.put(xmlPrefix + "label_comp_id",
@@ -451,51 +383,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 				createXMLRunnable__fract_transf_matrix32__End());
 		endElementAtomSitesRunnables.put(xmlPrefix + "fract_transf_matrix33",
 				createXMLRunnable__fract_transf_matrix33__End());
-		//
-		// END Atom Sites
-		// BEG Poly Conversions
-		//
 
-		// ---------------
-		startElementRunnables.put(xmlPrefix + "pdbx_poly_seq_scheme",
-				createXMLRunnable__pdbx_poly_seq_scheme__Start());
-		endElementPolyConversionsRunnables.put(xmlPrefix
-				+ "pdbx_poly_seq_scheme",
-				createXMLRunnable__pdbx_poly_seq_scheme__End());
-		// -------------
-		endElementPolyConversionsRunnables.put(xmlPrefix + "pdb_strand_id",
-				createXMLRunnable__pdb_strand_id__End());
-		endElementPolyConversionsRunnables.put(xmlPrefix
-				+ "pdbx_poly_seq_schemeCategory",
-				createXMLRunnable__pdbx_poly_seq_schemeCategory__End());
-		endElementPolyConversionsRunnables.put(xmlPrefix + "ndb_seq_num",
-				createXMLRunnable__ndb_seq_num__End());
-		endElementPolyConversionsRunnables.put(xmlPrefix + "pdb_seq_num",
-				createXMLRunnable__pdb_seq_num__End());
-		//
-		// END Poly Conversions
-		// BEG Non Poly Conversions
-		//
-
-		// -------------
-		startElementRunnables.put(xmlPrefix + "pdbx_nonpoly_schemeCategory",
-				createXMLRunnable__pdbx_nonpoly_schemeCategory__Start());
-		endElementNonpolyConversionsRunnables.put(xmlPrefix
-				+ "pdbx_nonpoly_schemeCategory",
-				createXMLRunnable__pdbx_nonpoly_schemeCategory__End());
-		// ------------------------
-
-		// -------------------------
-		startElementRunnables.put(xmlPrefix + "pdbx_nonpoly_scheme",
-				createXMLRunnable__pdbx_nonpoly_scheme__Start());
-		endElementNonpolyConversionsRunnables.put(xmlPrefix
-				+ "pdbx_nonpoly_scheme",
-				createXMLRunnable_pdbx_nonpoly_scheme__End());
-		// -------------------------
-// pr		endElementNonpolyConversionsRunnables.put(xmlPrefix + "pdb_strand_id",
-// pr				createXMLRunnable__pdb_seq_num__End_np());
-		endElementNonpolyConversionsRunnables.put(xmlPrefix + "pdb_seq_num",
-				createXMLRunnable__pdb_seq_num__End_np());
 	}
 
 	/*
@@ -505,24 +393,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 	 */
 	public Structure getStructure() {
 		return this.structure;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see edu.sdsc.lx.model.IStructureXMLHandler#getIDConverter()
-	 */
-	public PdbToNdbConverter getIDConverter() {
-		return this.idConverter;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see edu.sdsc.lx.model.IStructureXMLHandler#getNonProteinChainIds()
-	 */
-	public Set<String> getNonProteinChainIds() {
-		return this.nonProteinChainIds;
 	}
 
 	@Override
@@ -598,9 +468,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 		this.buf = emptyString;
 	}
 
-	private Set<String> nonProteinChainIds = new TreeSet<String>();
-//	private int curGeneratedNdbResidueId = -1;
-	private int curGeneratedNdbResidueId = 0;
 	private int currentModelNumber = -1;
 
 	@Override
@@ -615,15 +482,8 @@ public class StructureXMLHandler extends DefaultHandler implements
 				runnable = endElementAtomRunnables.get(qName);
 				break;
 
-			case CONVERSIONS:
-				runnable = endElementPolyConversionsRunnables.get(qName);
-				break;
-
-			case NON_POLY_CONVERSIONS:
-				runnable = endElementNonpolyConversionsRunnables.get(qName);
-				break;
-
 			case NON_CRYSTALLOGRAPHIC_OPERATIONS:
+				
 			case LEGACY_BIOLOGIC_UNIT_OPERATIONS:
 				runnable = endElementNonCrystallographicRunnables.get(qName);
 				break;
@@ -674,11 +534,9 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 			case ATOM_SITES:
 				// make sure not to parse atom sites for models 2 and above
-	//			if (currentModelNumber == 1 || currentModelNumber == -1) {
+				if (currentModelNumber == 1 || currentModelNumber == -1) {
 					runnable = endElementAtomSitesRunnables.get(qName);
-	//			} else {
-	//				return;
-	//			}
+				} 
 				break;
 
 			case DATABASE_PDB_MATRIX:
@@ -705,22 +563,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 			final String tmpString = new String(inbuf, offset, len);
 			buf += tmpString;
 		}
-	}
-
-	// ensure the uniqueness of all strings to save space.
-	Hashtable<String, String> uniqueStrings = new Hashtable<String, String>();
-
-	protected String getUnique(final String s) {
-		if (s == null) {
-			return null;
-		}
-
-		final String unique = this.uniqueStrings.get(s);
-		if (unique == null) {
-			this.uniqueStrings.put(s, s);
-			return s;
-		}
-		return unique;
 	}
 
 	public boolean hasBiologicUnitTransformationMatrices() {
@@ -780,21 +622,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected XMLRunnable__database_PDB_matrix__Start createXMLRunnable__database_PDB_matrix__Start() {
 		return new XMLRunnable__database_PDB_matrix__Start();
-	}
-
-	protected class XMLRunnable__pdbx_poly_seq_schemeCategory__Start extends
-			XMLRunnable {
-		public void run() {
-			setParsingFlag(eIsParsing.CONVERSIONS);
-			pdbChainIds = new Vector<String>();
-			ndbChainIds = new Vector<String>();
-			pdbResidueIds = new Vector<String>();
-			ndbResidueIds = new Vector<Integer>();
-		}
-	}
-
-	protected XMLRunnable__pdbx_poly_seq_schemeCategory__Start createXMLRunnable__pdbx_poly_seq_schemeCategory__Start() {
-		return new XMLRunnable__pdbx_poly_seq_schemeCategory__Start();
 	}
 
 	protected class XMLRunnable__cell__Start extends XMLRunnable {
@@ -1087,8 +914,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__type_symbol__End extends XMLRunnable {
 		public void run() {
-			final String trim = buf.trim();
-			curAtom.element = getUnique(trim);
+			curAtom.element = buf.trim();
 		}
 	}
 
@@ -1096,31 +922,9 @@ public class StructureXMLHandler extends DefaultHandler implements
 		return new XMLRunnable__type_symbol__End();
 	}
 
-	class XMLRunnable__group_PDB__End extends XMLRunnable {
-		public void run() {
-			final String trim = buf.trim();
-
-			curAtom.isNonProteinChainAtom = !trim.equals("ATOM");
-			// in particular HETATM records, but any other type of atom PDB
-			// types
-			// (other than ATOM) would fall under the 'non-protein'
-			// classification.
-
-			curAtom.name = getUnique(trim); // (??) -- this must be a fallback
-											// "make sure something is there" op
-		}
-	}
-
-	protected XMLRunnable__group_PDB__End createXMLRunnable__group_PDB__End() {
-		return new XMLRunnable__group_PDB__End();
-	}
-
 	protected class XMLRunnable__label_atom_id__End extends XMLRunnable {
 		public void run() {
-			if (currentModelNumber == 1 || currentModelNumber == -1) {
-				final String trim = buf.trim();
-				curAtom.name = getUnique(trim);
-			}
+				curAtom.name = buf.trim();
 		}
 	}
 
@@ -1130,9 +934,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__label_comp_id__End extends XMLRunnable {
 		public void run() {
-			if (currentModelNumber == 1 || currentModelNumber == -1) {
-				curAtom.compound = getUnique(buf.trim());
-			}
+				curAtom.compound = buf.trim();
 		}
 	}
 
@@ -1142,9 +944,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__label_asym_id__End extends XMLRunnable {
 		public void run() {
-			if (currentModelNumber == 1 || currentModelNumber == -1) {
-				curAtom.label_asym_id = buf.trim();
-			}
+				curAtom.chain_id = buf.trim();
 		}
 	}
 
@@ -1154,9 +954,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__auth_asym_id__End extends XMLRunnable {
 		public void run() {
-			if (currentModelNumber == 1 || currentModelNumber == -1) {
-			    curAtom.auth_asym_id = buf.trim();
-			} 
+			    curAtom.authorChain_id = buf.trim();
 		}
 	}
 
@@ -1165,9 +963,19 @@ public class StructureXMLHandler extends DefaultHandler implements
 	}
 	protected class XMLRunnable__label_seq_id__End extends XMLRunnable {
 		public void run() {
-			if (currentModelNumber == 1 || currentModelNumber == -1) {
-			    curAtom.label_seq_id = buf.trim();
-			} 
+			    try {
+			    	curAtom.residue_id =  Integer.parseInt(buf.trim());
+				} catch (Exception e) {
+					// mark this residue id as undefined.
+					curAtom.residue_id = Integer.MIN_VALUE;
+				}
+//
+//			    _atom_site.label_seq_id can be ".", i.e. for GD9
+//			    ATOM   6811 C CG1 . VAL A 1 949 ? 32.433  83.946 14.442 1.00 53.95 ? ? ? ? ? ? 1091 VAL A CG1 1 
+//			    ATOM   6812 C CG2 . VAL A 1 949 ? 31.651  81.961 15.822 1.00 55.57 ? ? ? ? ? ? 1091 VAL A CG2 1 
+//			    HETATM 6813 O O3  . GD9 B 2 .   ? 19.686  59.525 24.439 1.00 89.60 ? ? ? ? ? ? 1    GD9 A O3  1 
+//			    HETATM 6814 C C4  . GD9 B 2 .   ? 22.255  61.781 22.108 1.00 90.57 ? ? ? ? ? ? 1    GD9 A C4  1 
+//	    
 		}
 	}
 
@@ -1177,9 +985,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__auth_seq_id__End extends XMLRunnable {
 		public void run() {
-			if (currentModelNumber == 1 || currentModelNumber == -1) {
-			    curAtom.auth_seq_id = buf.trim();
-			} 
+			    curAtom.authorResidue_id = Integer.parseInt(buf.trim());
 		}
 	}
 
@@ -1189,10 +995,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__Cartn_x__End extends XMLRunnable {
 		public void run() {
-			if (currentModelNumber == 1 || currentModelNumber == -1) {
-				final String trim = buf.trim();
-				curAtom.coordinate[0] = Double.parseDouble(trim);
-			}
+				curAtom.coordinate[0] = Double.parseDouble(buf.trim());
 		}
 	}
 
@@ -1202,10 +1005,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__Cartn_y__End extends XMLRunnable {
 		public void run() {
-			if (currentModelNumber == 1 || currentModelNumber == -1) {
-				final String trim = buf.trim();
-				curAtom.coordinate[1] = Double.parseDouble(trim);
-			}
+				curAtom.coordinate[1] = Double.parseDouble(buf.trim());
 		}
 	}
 
@@ -1215,10 +1015,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__Cartn_z__End extends XMLRunnable {
 		public void run() {
-			if (currentModelNumber == 1 || currentModelNumber == -1) {
-				final String trim = buf.trim();
-				curAtom.coordinate[2] = Double.parseDouble(trim);
-			}
+				curAtom.coordinate[2] = Double.parseDouble(buf.trim());
 		}
 	}
 
@@ -1228,10 +1025,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__occupancy__End extends XMLRunnable {
 		public void run() {
-			if (currentModelNumber == 1 || currentModelNumber == -1) {
-				final String trim = buf.trim();
-				curAtom.occupancy = Float.parseFloat(trim);
-			}
+				curAtom.occupancy = Float.parseFloat(buf.trim());
 		}
 	}
 
@@ -1241,10 +1035,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__B_iso_or_equiv__End extends XMLRunnable {
 		public void run() {
-			if (currentModelNumber == 1 || currentModelNumber == -1) {
-				final String trim = buf.trim();
-				curAtom.bfactor = Float.parseFloat(trim);
-			}
+				curAtom.bfactor = Float.parseFloat(buf.trim());
 		}
 	}
 
@@ -1265,52 +1056,29 @@ public class StructureXMLHandler extends DefaultHandler implements
 	{
 		public void run() {
 			// ignore all but the first model, for now.
-			if (currentModelNumber != 1 && currentModelNumber != -1)
+			if (currentModelNumber != 1 && currentModelNumber != -1) {
+				clearParsingFlag(eIsParsing.ATOM_SITE);
 				return;
-
-			curAtom.chain_id = getUnique(curAtom.label_asym_id);
-
-			if (prevAtom == null || !prevAtom.chain_id.equals(curAtom.chain_id))
-				curGeneratedNdbResidueId = 0;
-//				curGeneratedNdbResidueId = -1;
-
-			if (curAtom.label_seq_id.length() == 0)
-			// there's no ndb id, so we need to provide a generated version
-			{
-//				if (prevAtom == null
-//						|| !prevAtom.auth_seq_id.equals(curAtom.auth_seq_id)
-//						|| curGeneratedNdbResidueId == -1)
-				if (prevAtom == null
-						|| !prevAtom.auth_seq_id.equals(curAtom.auth_seq_id)
-						|| curGeneratedNdbResidueId == 0)
-					curGeneratedNdbResidueId++;
-				
-				// if the pdb id changes (or this is a new chain), bump the
-				// generated ndb id
-
-//				curAtom.residue_id = curGeneratedNdbResidueId;
-				// pr
-				curAtom.residue_id = Integer.parseInt(curAtom.auth_seq_id);
-				// set the generated ndb residue id
 			}
 
-			else
-				curAtom.residue_id = Integer.parseInt(curAtom.label_seq_id);
-			// set the provided ndb residue id
-
-			if (curAtom.isNonProteinChainAtom
-					&& !nonProteinChainIds.contains(curAtom.chain_id))
-				nonProteinChainIds.add(curAtom.chain_id);
-
 			atomVector.add(createFinalAtom(curAtom));
-			// add atom to the atom vector based on this definition
-
+			assignMissingResidueIds();
 			prevAtom = curAtom;
-			// save the previous item
-
 			curAtom = null;
 
 			clearParsingFlag(eIsParsing.ATOM_SITE);
+		}
+	}
+	
+	/** 
+	 * Heterogen residues (ligands, waters, etc.) don't have a label_seq_id.
+	 * Assign the auth_seq_id as a placeholder.
+	 */
+	private void assignMissingResidueIds() {
+		for (Atom atom: atomVector) {
+			if (atom.residue_id == Integer.MIN_VALUE) {
+				atom.residue_id = atom.authorResidue_id;
+			}
 		}
 	}
 
@@ -1320,8 +1088,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__pdbx_PDB_model_num__End extends XMLRunnable {
 		public void run() {
-			final String trim = buf.trim();
-			currentModelNumber = Integer.parseInt(trim);
+			currentModelNumber = Integer.parseInt(buf.trim());
 		}
 	}
 
@@ -1446,209 +1213,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected XMLRunnable__fract_transf_matrix33__End createXMLRunnable__fract_transf_matrix33__End() {
 		return new XMLRunnable__fract_transf_matrix33__End();
 	}
-
-	protected class XMLRunnable__pdbx_poly_seq_scheme__Start extends
-			XMLRunnable {
-		public void run() {
-			curNdbChainId = super.attrs.getValue("asym_id");
-			ndbChainIds.add(curNdbChainId);
-		}
-	}
-
-	protected XMLRunnable__pdbx_poly_seq_scheme__Start createXMLRunnable__pdbx_poly_seq_scheme__Start() {
-		return new XMLRunnable__pdbx_poly_seq_scheme__Start();
-	}
-
-	protected class XMLRunnable__pdbx_poly_seq_scheme__End extends XMLRunnable { 
-		// handles cases when not all tags were encountered.
-		public void run() {
-			if (!pdbStrandIdEncountered) {
-				buf = emptyString;
-				final XMLRunnable runnable = (XMLRunnable) endElementPolyConversionsRunnables
-						.get(xmlPrefix + "pdb_strand_id");
-				runnable.run();
-			}
-			if (!ndbSeqNumEncountered) {
-				buf = emptyString;
-				final XMLRunnable runnable = (XMLRunnable) endElementPolyConversionsRunnables
-						.get(xmlPrefix + "ndb_seq_num");
-				runnable.run();
-			}
-			if (!pdbSeqNumEncountered) {
-				buf = emptyString;
-				final XMLRunnable runnable = (XMLRunnable) endElementPolyConversionsRunnables
-						.get(xmlPrefix + "pdb_seq_num");
-				runnable.run();
-			}
-
-			pdbStrandIdEncountered = false;
-			ndbSeqNumEncountered = false;
-			pdbSeqNumEncountered = false;
-		}
-	}
-
-	protected XMLRunnable__pdbx_poly_seq_scheme__End createXMLRunnable__pdbx_poly_seq_scheme__End() {
-		return new XMLRunnable__pdbx_poly_seq_scheme__End();
-	}
-
-	protected class XMLRunnable__pdb_strand_id__End extends XMLRunnable {
-		public void run() {
-			String trim = buf.trim();
-			trim = getUnique(trim);
-
-			pdbChainIds.add(trim);
-
-			pdbStrandIdEncountered = true;
-		}
-	}
-
-	protected XMLRunnable__pdb_strand_id__End createXMLRunnable__pdb_strand_id__End() {
-		return new XMLRunnable__pdb_strand_id__End();
-	}
-
-	protected class XMLRunnable__pdbx_poly_seq_schemeCategory__End extends
-			XMLRunnable {
-		public void run() {
-			clearParsingFlag(eIsParsing.CONVERSIONS);
-
-			idConverter.append(pdbChainIds, ndbChainIds, pdbResidueIds,
-					ndbResidueIds);
-
-			pdbChainIds = null;
-			ndbResidueIds = null;
-			pdbResidueIds = null;
-			curNdbChainId = null;
-		}
-	}
-
-	protected XMLRunnable__pdbx_poly_seq_schemeCategory__End createXMLRunnable__pdbx_poly_seq_schemeCategory__End() {
-		return new XMLRunnable__pdbx_poly_seq_schemeCategory__End();
-	}
-
-	protected class XMLRunnable__ndb_seq_num__End extends XMLRunnable {
-		public void run() {
-			final String trim = buf.trim();
-			ndbResidueIds.add(new Integer(trim));
-			ndbSeqNumEncountered = true;
-		}
-	}
-
-	protected XMLRunnable__ndb_seq_num__End createXMLRunnable__ndb_seq_num__End() {
-		return new XMLRunnable__ndb_seq_num__End();
-	}
-
-	protected class XMLRunnable__pdb_seq_num__End extends XMLRunnable {
-		public void run() {
-			final String trim = buf.trim();
-
-			pdbResidueIds.add(trim);
-			pdbSeqNumEncountered = true;
-		}
-	}
-
-	protected XMLRunnable__pdb_seq_num__End createXMLRunnable__pdb_seq_num__End() {
-		return new XMLRunnable__pdb_seq_num__End();
-	}
-
-	protected class XMLRunnable__pdbx_nonpoly_schemeCategory__Start extends
-			XMLRunnable {
-		public void run() {
-			setParsingFlag(eIsParsing.NON_POLY_CONVERSIONS);
-
-			pdbChainIds = new Vector<String>();
-			ndbChainIds = new Vector<String>();
-			pdbResidueIds = new Vector<String>();
-			ndbResidueIds = new Vector<Integer>();
-		}
-	}
-
-	protected XMLRunnable__pdbx_nonpoly_schemeCategory__Start createXMLRunnable__pdbx_nonpoly_schemeCategory__Start() {
-		return new XMLRunnable__pdbx_nonpoly_schemeCategory__Start();
-	}
-
-	protected class XMLRunnable__pdbx_nonpoly_schemeCategory__End extends
-			XMLRunnable {
-		public void run() {
-			clearParsingFlag(eIsParsing.NON_POLY_CONVERSIONS);
-
-			idConverter.append(pdbChainIds, ndbChainIds, pdbResidueIds,
-					ndbResidueIds);
-
-			pdbChainIds = null;
-			ndbChainIds = null;
-			ndbResidueIds = null;
-			pdbResidueIds = null;
-			curNdbChainId = null;
-		}
-	}
-
-	protected XMLRunnable__pdbx_nonpoly_schemeCategory__End createXMLRunnable__pdbx_nonpoly_schemeCategory__End() {
-		return new XMLRunnable__pdbx_nonpoly_schemeCategory__End();
-	}
-
-	protected class XMLRunnable__pdbx_nonpoly_scheme__Start extends XMLRunnable {
-		public void run() {
-			curNdbChainId = super.attrs.getValue("asym_id");;
-			ndbChainIds.add(curNdbChainId);
-			// set both ndbChainIds and ndbChainIds to the same values for
-			// now. The handing of chains needs to be completely revamped.
-			pdbChainIds.add(curNdbChainId);
-			curPdbChainId = curNdbChainId;
-            // don't use ndb_seq_num anymore
-    		// curPdbChainId = null;
-			// ndbResidueIds.add(new Integer(this.attrs.getValue("ndb_seq_num")));
-		}
-	}
-
-	protected XMLRunnable__pdbx_nonpoly_scheme__Start createXMLRunnable__pdbx_nonpoly_scheme__Start() {
-		return new XMLRunnable__pdbx_nonpoly_scheme__Start();
-	}
-
-	protected class XMLRunnable__pdb_strand_id__End_np extends XMLRunnable {
-		public void run() {
-			// we are using asym_id instead
-//			String trim = buf.trim();
-//			trim = getUnique(trim);
-//			curPdbChainId = trim;
-		}
-	}
-
-	protected XMLRunnable__pdb_strand_id__End_np createXMLRunnable__pdb_strand_id__End_np() {
-		return new XMLRunnable__pdb_strand_id__End_np();
-	}
-
-	protected class XMLRunnable__pdb_seq_num__End_np extends XMLRunnable {
-		public void run() {
-			final String trim = buf.trim();
-			pdbResidueIds.add(trim);
-			ndbResidueIds.add(Integer.parseInt(trim));
-		}
-	}
-
-	protected XMLRunnable__pdb_seq_num__End_np createXMLRunnable__pdb_seq_num__End_np() {
-		return new XMLRunnable__pdb_seq_num__End_np();
-	}
-
-	protected class XMLRunnable_pdbx_nonpoly_scheme__End extends XMLRunnable {
-		public void run() {
-			// this method should be removed when chain handling will be
-			// revamped.
-//			if (curPdbChainId != null) {
-//				pdbChainIds.add(curPdbChainId);
-//			} else {
-//				pdbChainIds.add(""); // many nonpolymers have no chain ids. This
-//										// is a flag to IdConverter.append().
-//			}
-		}
-	}
-
-	protected XMLRunnable_pdbx_nonpoly_scheme__End createXMLRunnable_pdbx_nonpoly_scheme__End() {
-		return new XMLRunnable_pdbx_nonpoly_scheme__End();
-	}
-
-	// /
-	// / END Overrideable Runnables
-	// /
 
 	public boolean canLoad(String name) {
 		return true;

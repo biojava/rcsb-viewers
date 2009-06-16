@@ -47,12 +47,10 @@ package org.rcsb.mbt.structLoader;
 
 
 import java.io.IOException;
-import java.util.Set;
 
 import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.UnitCell;
-import org.rcsb.mbt.model.util.PdbToNdbConverter;
 
 
 /**
@@ -103,16 +101,6 @@ public interface IStructureLoader
 	 * @return
 	 */
     public abstract Structure getStructure();
-
-    /**
-     */
-	public abstract PdbToNdbConverter getIDConverter();
-
-	/**
-	 * Accessor
-	 * @return - the nonProteinChainIds.  Anything not labelled 'ATOM' (typically, HETATM).
-	 */
-	public abstract Set<String> getNonProteinChainIds();
 	
 	/**
 	 * Test

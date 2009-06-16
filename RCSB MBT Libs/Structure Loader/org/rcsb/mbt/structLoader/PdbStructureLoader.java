@@ -110,11 +110,8 @@ public class PdbStructureLoader
 {
 	protected String urlString = null;
 	private long expectedInputBytes = 1;
-	private PdbToNdbConverter converter = null;
 	private Structure structure;
 	private boolean treatModelsAsSubunits = false;
-	private boolean breakoutByResId = false;
-	private Set<String> nonProteinChainIds = new TreeSet<String>();
 	
 	/**
 	 * Set this if the models are part of a greater whole.
@@ -123,18 +120,6 @@ public class PdbStructureLoader
 	 * @param flag
 	 */
 	public void setTreatModelsAsSubunits(boolean flag) { treatModelsAsSubunits = flag; }
-	
-	/**
-	 * Set this if you want to break out residues not belonging to a chain into
-	 * their own pseudo-chains.  Psuedo-chains are identified by '_' prefix
-	 * ('_A', '_B', etc.)
-	 * 
-	 * Waters are broken out into their own chain, as well.
-	 * 
-	 * Default is no.
-	 * @param flag
-	 */
-	public void setBreakoutEmptyChainsByResId(boolean flag) { breakoutByResId = flag; }
 	
 	// A hashtable of vectors where
 	// each hash KEY is the StructureComponent type String.
@@ -208,7 +193,6 @@ public class PdbStructureLoader
 	 */
 	public boolean canLoad( final String name)
 	{
-		// System.err.println( "PdbStructureLoader.canLoad(String)" );
 		if ( name.indexOf( ".pdb" ) < 0 ) {
 			return false;
 		}
@@ -231,8 +215,6 @@ public class PdbStructureLoader
 	 */
 	public Structure load( final File file ) throws IOException
 	{
-		// System.err.println( "PdbStructureLoader.load(File)" );
-
 		if ( ! this.canLoad( file ) ) {
 			return null;
 		}
@@ -278,7 +260,6 @@ public class PdbStructureLoader
 	 */
 	public boolean canLoad( final File file )
 	{
-		// System.err.println( "PdbStructureLoader.canLoad(File)" );
 		if ( ! file.exists() ) {
 			return false;
 		}
@@ -308,7 +289,6 @@ public class PdbStructureLoader
 		URLConnection urlConnection = url.openConnection( );
         urlConnection.addRequestProperty("User-agent", "Mozilla/4.0 (compatible; MSIE 6.0;Windows NT 5.1; SV1)");
 		this.expectedInputBytes = urlConnection.getContentLength( );
-//			if ( expectedInputBytes <= 0 ) return null;
 		final InputStream inputStream = urlConnection.getInputStream( );
 
 		InputStreamReader ir = null;
@@ -335,7 +315,6 @@ public class PdbStructureLoader
 	 */
 	public boolean canLoad( final URL url )
 	{
-		// System.err.println( "PdbStructureLoader.canLoad(URL)" );
 		return this.canLoad( url.toExternalForm( ) );
 	}
 
@@ -349,29 +328,14 @@ public class PdbStructureLoader
 	 */
 	public Structure load( final BufferedReader rdr ) throws IOException
 	{
-		// System.err.println( "PdbStructureLoader.load(BufferedInputStream)" );
 		if ( rdr == null ) {
 			return null;
 		}
-		
-		Vector<String> pdbChainIds = new Vector<String>();
-		Vector<String> pdbResidueIds = new Vector<String>();
-		Vector<String> ndbChainIds = new Vector<String>();
-		Vector<Integer> ndbResidueIds = new Vector<Integer>();
-		String previousResidueIdRaw = "";	// the untouched residue id.
-		int previousResidueIdInt = Integer.MIN_VALUE;	// the residue id which was assigned to the Atom.residue_id field
-		int previousResidueIdIntSimple = Integer.MIN_VALUE;	// the simple int conversion of the file's residue id, minus any letters.  
-
-		SharedObjects sharedStrings = new SharedObjects( );
-		Integer currentPseudoChainId = 0;
 
 		this.passComponents = new Hashtable<ComponentType, Vector<StructureComponent>>( );
 		final long expectedBytes = this.expectedInputBytes;
-		// System.err.println( "PdbStructureLoader.load: expectedBytes = " + expectedBytes );
 
 		String line;
-
-		// System.err.println( "PdbStructureLoader.load: expectedReads = " + expectedReads );
 
 		int percentDone = 0;
 
@@ -432,7 +396,6 @@ public class PdbStructureLoader
 				atom.number =  Integer.parseInt(line.substring( 6, 11 ).trim());
 
 				atom.name = line.substring(12, 16 ).trim().replace('*', '\'');	//**JB quick fix: the dictionary expects ' instead of *
-				atom.name = sharedStrings.share( atom.name );
 
 				atom.element = line.substring(76, 78).trim();
 				atom.element = atom.element.replaceAll( "[0-9]", "" );
@@ -446,24 +409,25 @@ public class PdbStructureLoader
 						throw new IllegalArgumentException( "no atom element symbol around line " + lines );
 					}
 				}
-				atom.element = sharedStrings.share( atom.element );
 
 				atom.altLoc = line.substring(16, 17 ).trim();
-				atom.altLoc = sharedStrings.share( atom.altLoc );
 
 				atom.compound = line.substring(17, 20 ).trim();
-				atom.compound = sharedStrings.share( atom.compound );
 
 				atom.chain_id = line.substring(21, 22 ).trim();
-									// see below to see how this gets modified
 
 				if(treatModelsAsSubunits)
 				{
 					atom.chain_id = atom.chain_id + "$$$" + modelCount;
 				}
 
-				atom.chain_id = sharedStrings.share( atom.chain_id );
-				//							System.out.println(modelCount);
+				atom.authorChain_id = atom.chain_id;
+				// Make sure waters don't have the same chain id as the macromolecules,
+				// since they are expected to be in a separate chain, i.e. for ProteinWorkshop
+				// Add a space to enforce uniqueness
+				if (atom.compound.equals("HOH")) {
+					atom.chain_id += " ";
+				}
 				
 				String newResidueIdRaw = line.substring(22, 28 ).trim();
 					//**JB expanded to read 6 chars to account for non-integer residue ids. (Was 4 chars).
@@ -474,78 +438,9 @@ public class PdbStructureLoader
 						//  If there are any spaces between the letters and the number, etc.,
 						// I want an exception thrown so I know.
 
-				final int newResidueIdIntSimple = Integer.parseInt(temp);
-				int newResidueIdInt = -1;
-				int increment = Math.abs(newResidueIdIntSimple - previousResidueIdIntSimple);
-				if ((increment == 0 && !previousResidueIdRaw.equals(newResidueIdRaw)))
-					increment = 1;
-						// if this isn't a simple number, need to check the string as well.
-
-				if (previousResidueIdInt == Integer.MIN_VALUE)
-				{
-					newResidueIdInt = newResidueIdIntSimple;
-					increment = 1;	// flag to make sure this chain/residue id pair is recorded.
-				}
-				
-				else
-					newResidueIdInt = previousResidueIdInt + increment;
-
-				if (isHetAtom)
-									// het atoms are explicitly non-protein chains, in the
-									// current vernacular.  Break them out into pseudo chains.
-				{
-					if (atom.chain_id == null || atom.chain_id.equals(""))
-					{						
-						if (breakoutByResId)
-						{
-							if (atom.compound.equals("HOH"))
-								atom.chain_id = "HOH";
-							
-							else
-							{
-								if (increment > 0) currentPseudoChainId++;
-								atom.chain_id = "_" + currentPseudoChainId;
-							}
-						}
-						
-						else atom.chain_id = "_";
-					}
-
-					else if (pdbChainIds.contains(atom.chain_id))
-								// uh-oh - 'embedded' (hetatoms defined same chain id as a protein.)
-								// break out embedded chains, regardless
-					{
-						atom.chain_id += '\'';
-								// signify new chain with a prime
-
-						if (!pdbChainIds.contains(atom.chain_id))
-							increment = 1;						
-							// make sure the new id is added to the pdbChainIds
-							// (just use increment as a flag, not an operation...)
-					}
-					
-					nonProteinChainIds.add(atom.chain_id);
-				}
-
-				if (increment > 0)
-				{			
-					if (atom.chain_id.equals("HOH"))
-						pdbChainIds.add("");
-					else
-						pdbChainIds.add(atom.chain_id);
-										
-					ndbChainIds.add(atom.chain_id);
-					
-					pdbResidueIds.add(newResidueIdRaw);
-					ndbResidueIds.add(new Integer(newResidueIdInt));
-				}
-
-				previousResidueIdInt = newResidueIdInt;
-				previousResidueIdIntSimple = newResidueIdIntSimple;
-				previousResidueIdRaw = newResidueIdRaw;
-
-				atom.residue_id = newResidueIdInt;
-
+				atom.residue_id = Integer.parseInt(temp);
+				atom.authorResidue_id = atom.residue_id;
+	
 				atom.coordinate = new double[3];
 				atom.coordinate[0] = Double.parseDouble(line.substring(30, 38 ).trim());
 				atom.coordinate[1] = Double.parseDouble(line.substring(38, 46 ).trim());
@@ -682,23 +577,12 @@ public class PdbStructureLoader
             }
 		};
 
-		sharedStrings.clear( );
-		sharedStrings = null;
-
-		this.converter = new PdbToNdbConverter();
-		this.converter.append(pdbChainIds, ndbChainIds, pdbResidueIds, ndbResidueIds);
-		
 		// Progress is done.
 		Status.progress( 100, null );
 
 		return structure;
 	}
 
-
-	public PdbToNdbConverter getIDConverter() {
-		return this.converter;
-	}
-	
 	private boolean shouldRecordMoreModels(final int modelCount)
 	{
 		return treatModelsAsSubunits || modelCount < 2;
@@ -709,16 +593,6 @@ public class PdbStructureLoader
 	 * @return
 	 */
     public Structure getStructure() { return structure; }
-
-	/**
-	 * Not implemented. NPRIDS are chain ids comprised of HETATM records
-	 */
-	public Set<String> getNonProteinChainIds()
-	{
-		return nonProteinChainIds;
-	}
-	
-
 
 	public boolean hasUnitCell() {
 		return false;
