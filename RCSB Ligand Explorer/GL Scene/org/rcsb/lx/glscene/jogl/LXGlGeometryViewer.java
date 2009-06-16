@@ -74,7 +74,6 @@ import org.rcsb.mbt.model.attributes.LineStyle;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
-import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.vf.controllers.scene.ViewMovementThread;
@@ -94,7 +93,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 
 	private int numberTimesDisplayed = -1;
 	public int getNumberTimesDisplayed() { return numberTimesDisplayed; }
-	
+
 	public LXGlGeometryViewer()
 	{
 		this.do_glFinishInShaders = true;
@@ -118,7 +117,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 	public void display(final GLAutoDrawable drawable)
 	{
 		final LXModel model = LigandExplorer.sgetModel();
-		
+
 		final GL gl = drawable.getGL();
 
 		// clear and bail if there's nothing to render.
@@ -134,7 +133,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 
 
 		super.display(drawable);
-/* **/
+		/* **/
 		try
 		{
 			if(this.numberTimesDisplayed < 2)
@@ -143,24 +142,24 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 			else if(this.numberTimesDisplayed == 0)
 				this.requestRepaint();	// make sure it reaches the above logic
 		}
-		
+
 		catch (final Exception e)
 		{
 			e.printStackTrace();
 			System.err.flush();
-	
+
 			this.screenshotFailed = true;
 		}
-/* **/
+		/* **/
 	}
-	
+
 	@Override
 	public void mouseClicked(final MouseEvent e)
 	{
 		super.mouseClicked(e);
 		this.reportClickToDialog();
 	}
-	
+
 	private void reportClickToDialog()
 	{
 		final IPickInfoReceiver dialog = LigandExplorer.sgetActiveFrame().getDisplayDialog();
@@ -172,101 +171,51 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 				if (this.lastComponentMouseWasOver.getStructureComponentType() == ComponentType.ATOM) {
 					final Atom a = (Atom) this.lastComponentMouseWasOver;
 
-					final PdbToNdbConverter converter = a.structure.getStructureMap()
-							.getPdbToNdbConverter();
-
-					String chainId;
-					String resId;
-					final Object[] pdbIds = converter.getPdbIds(a.chain_id,
-							new Integer(a.residue_id));
-					if (pdbIds == null) {
-						chainId = a.chain_id;
-						resId = a.residue_id + "";
-					} else {
-						chainId = (String) pdbIds[0];
-						resId = (String) pdbIds[1];
-					}
-
+					String chainId = a.authorChain_id;
+					String resId = String.valueOf(a.authorResidue_id);
 					point = a.coordinate;
 					description = "Atom: "
-							+ (chainId == null ? "" : chainId + "/") + resId
-							+ "/" + a.number;
+						+ (chainId == null ? "" : chainId + "/") + resId
+						+ "/" + a.number;
 				} else if (this.lastComponentMouseWasOver
 						.getStructureComponentType() == ComponentType.BOND) {
 					final Bond b = (Bond) this.lastComponentMouseWasOver;
 					final Atom a1 = b.getAtom(0);
 					final Atom a2 = b.getAtom(1);
 
-					final PdbToNdbConverter converter = a1.structure
-							.getStructureMap().getPdbToNdbConverter();
+					String chainId1 = a1.authorChain_id;
+					String resId1 = String.valueOf(a1.authorResidue_id);
 
-					String chainId1;
-					String resId1;
-					Object[] pdbIds = converter.getPdbIds(a1.chain_id,
-							new Integer(a1.residue_id));
-					if (pdbIds == null) {
-						chainId1 = a1.chain_id;
-						resId1 = a1.residue_id + "";
-					} else {
-						chainId1 = (String) pdbIds[0];
-						resId1 = (String) pdbIds[1];
-					}
-
-					String chainId2;
-					String resId2;
-					pdbIds = converter.getPdbIds(a2.chain_id, new Integer(
-							a2.residue_id));
-					if (pdbIds == null) {
-						chainId2 = a2.chain_id;
-						resId2 = a2.residue_id + "";
-					} else {
-						chainId2 = (String) pdbIds[0];
-						resId2 = (String) pdbIds[1];
-					}
+					String chainId2 = a2.authorChain_id;
+					String resId2 = String.valueOf(a2.authorResidue_id);
 
 					point = new double[] {
 							(a1.coordinate[0] + a2.coordinate[0]) / 2,
 							(a1.coordinate[1] + a2.coordinate[1]) / 2,
 							(a1.coordinate[2] + a2.coordinate[2]) / 2 };
 					description = "Bond: between atom "
-							+ (chainId1 == null ? "" : chainId1 + "/") + resId1
-							+ "/" + a1.number + " and atom "
-							+ (chainId2 == null ? "" : chainId2 + "/") + resId2
-							+ "/" + a2.number;
+						+ (chainId1 == null ? "" : chainId1 + "/") + resId1
+						+ "/" + a1.number + " and atom "
+						+ (chainId2 == null ? "" : chainId2 + "/") + resId2
+						+ "/" + a2.number;
 				} 
-				
+
 				else if (this.lastComponentMouseWasOver
 						.getStructureComponentType() == ComponentType.RESIDUE)
 				{
 					final Residue r = (Residue) this.lastComponentMouseWasOver;
 					Atom a = r.getAlphaAtom();
 
-					final PdbToNdbConverter converter = a.structure.getStructureMap()
-							.getPdbToNdbConverter();
-
-					String chainId;
-					String resId;
-					final Object[] pdbIds = converter.getPdbIds(a.chain_id,
-							new Integer(a.residue_id));
-					if (pdbIds == null)
-					{
-						chainId = a.chain_id;
-						resId = a.residue_id + "";
-					}
-					
-					else
-					{
-						chainId = (String) pdbIds[0];
-						resId = (String) pdbIds[1];
-					}
+					String chainId = a.authorChain_id;
+					String resId = String.valueOf(a.authorResidue_id);
 
 					if (a == null)
 						a = r.getAtom(r.getAtomCount() / 2);
 
 					point = a.coordinate;
 					description = "Residue: "
-							+ (chainId == null ? "" : chainId + "/") + resId
-							+ "/" + r.getCompoundCode();
+						+ (chainId == null ? "" : chainId + "/") + resId
+						+ "/" + r.getCompoundCode();
 				}
 			}
 
@@ -295,11 +244,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 
 		final double v3d[] = { 0.0f, 0.0f, 0.0f };
 		final double v3d2[] = { 0.0f, 0.0f, 0.0f };
-		// final double v3d3[] = { 0.0f, 0.0f, 0.0f };
-		// final double r4d[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		// final double r4d2[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-		// if (this.lastComponentMouseWasOver != null) {
 		Structure struc = null;
 		LXModel model = LigandExplorer.sgetModel();
 		if (this.lastComponentMouseWasOver == null)
@@ -463,7 +408,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 			v3d[1] = sn.viewCenter[1] - sn.viewEye[1];
 			v3d[2] = sn.viewCenter[2] - sn.viewEye[2];
 
-//			final double length = Algebra.vectorLength(v3d); // Get
+			//			final double length = Algebra.vectorLength(v3d); // Get
 			// length
 			// before
 			// normalize!
@@ -507,7 +452,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 			v3d2[0] = sn.viewCenter[0] - sn.viewEye[0];
 			v3d2[1] = sn.viewCenter[1] - sn.viewEye[1];
 			v3d2[2] = sn.viewCenter[2] - sn.viewEye[2];
-//			final double length = Algebra.vectorLength(v3d2); // Get
+			//			final double length = Algebra.vectorLength(v3d2); // Get
 			// length
 			// before
 			// norm!
@@ -546,7 +491,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		this.requestRepaint();
 		// }
 	}
-	
+
 	/**
 	 * mouseMoved method.
 	 */
@@ -556,7 +501,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		this.mouseLocationInPanel = e.getPoint();
 		super.mouseMoved(e);
 	}
-	
+
 	/**
 	 * Get the scenebounds and recalculate the view
 	 * 
@@ -569,33 +514,33 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		if (repaint)
 			requestRepaint();
 	}
-	
+
 	@Override
 	public void structureAdded(final Structure str)
 	{
 		final StructureMap structureMap = str.getStructureMap();
 		final StructureStyles structureStyles = structureMap
-				.getStructureStyles();
+		.getStructureStyles();
 		final JoglSceneNode sn = (JoglSceneNode)structureMap.getUData();
 
 		final ChainGeometry defaultChainGeometry = (ChainGeometry) GlGeometryViewer.defaultGeometry
-				.get(ComponentType.CHAIN);
+		.get(ComponentType.CHAIN);
 		final AtomGeometry defaultAtomGeometry = (AtomGeometry) GlGeometryViewer.defaultGeometry
-				.get(ComponentType.ATOM);
+		.get(ComponentType.ATOM);
 		final BondGeometry defaultBondGeometry = (BondGeometry) GlGeometryViewer.defaultGeometry
-				.get(ComponentType.BOND);
+		.get(ComponentType.BOND);
 
 		final ChainStyle defaultChainStyle = (ChainStyle) structureStyles
-				.getDefaultStyle(ComponentType.CHAIN);
+		.getDefaultStyle(ComponentType.CHAIN);
 		final AtomStyle defaultAtomStyle = (AtomStyle) structureStyles
-				.getDefaultStyle(ComponentType.ATOM);
+		.getDefaultStyle(ComponentType.ATOM);
 		final BondStyle defaultBondStyle = (BondStyle) structureStyles
-				.getDefaultStyle(ComponentType.BOND);
+		.getDefaultStyle(ComponentType.BOND);
 
 		str.getStructureMap().getStructureStyles()
-				.removeStructureStylesEventListener(this);
+		.removeStructureStylesEventListener(this);
 		str.getStructureMap().getStructureStyles()
-				.addStructureStylesEventListener(this);
+		.addStructureStylesEventListener(this);
 
 		defaultChainGeometry.setRibbonForm(RibbonForm.RIBBON_SIMPLE_LINE);
 		defaultChainGeometry.setRibbonsAreSmoothed(true);
@@ -631,14 +576,14 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 
 		final Vector<Atom> atoms = new Vector<Atom>();
 		final int ligCount = structureMap.getLigandCount();
-		
+
 		for (int i = 0; i < ligCount; i++)
 		{
 			final Residue r = structureMap.getLigandResidue(i);
 			atoms.addAll(r.getAtoms());
 			structureStyles.setSelected(r, true);
 		}
-		
+
 		final Vector<Bond> bonds = structureMap.getBonds(atoms);
 
 		final int bondCount = bonds.size();
@@ -686,38 +631,38 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 	{
 		super.clearStructure();
 	}
-	
+
 	@Override
 	public void handleUpdateEvent(UpdateEvent evt)
 	{
 		boolean transitory = (evt instanceof LXUpdateEvent)?
-			transitory = ((LXUpdateEvent)evt).transitory : false;
-		
-		switch(evt.action)
-		{
-		case CLEAR_ALL:
-			clearStructure(transitory);
-			break;
-			
-		case EXTENDED:
-			switch(((LXUpdateEvent)evt).lxAction)
-			{
-				case INTERACTIONS_CHANGED:
-					requestRepaint();
+				transitory = ((LXUpdateEvent)evt).transitory : false;
+
+				switch(evt.action)
+				{
+				case CLEAR_ALL:
+					clearStructure(transitory);
 					break;
-					
+
+				case EXTENDED:
+					switch(((LXUpdateEvent)evt).lxAction)
+					{
+					case INTERACTIONS_CHANGED:
+						requestRepaint();
+						break;
+
+					default:
+						super.handleUpdateEvent(evt);
+					break;
+					}
+					break;
+
 				default:
 					super.handleUpdateEvent(evt);
-					break;
-			}
-			break;
-
-		default:
-			super.handleUpdateEvent(evt);
-			break;
-		}
+				break;
+				}
 	}
-	
+
 
 	// added for protein-ligand interactions
 	public void ligandView(final Structure structure)
@@ -785,7 +730,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 				maxX = Math.max(atom_j.coordinate[0], maxX);
 				maxY = Math.max(atom_j.coordinate[1], maxY);
 				maxZ = Math.max(atom_j.coordinate[2], maxZ);
-	
+
 				minX = Math.min(atom_j.coordinate[0], minX);
 				minY = Math.min(atom_j.coordinate[1], minY);
 				minZ = Math.min(atom_j.coordinate[2], minZ);
@@ -806,31 +751,11 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 
 	public String getResidueName(final Atom atom)
 	{
-		final PdbToNdbConverter converter = atom.structure.getStructureMap()
-				.getPdbToNdbConverter();
-		final Object[] tmp = converter.getPdbIds(atom.chain_id, new Integer(
-				atom.residue_id));
-		String name = "";
-		if (tmp == null) {
-			// use ndb ids
-			name = atom.chain_id;
-			if (name.length() > 0) {
-				name += " " + atom.residue_id;
-			} else {
-				name = atom.residue_id + "";
-			}
+		String name = atom.authorChain_id;
+		if (name.length() > 0) {
+			name += " " + atom.authorResidue_id;
 		} else {
-			// use pdb ids
-			if (tmp[0] != null) {
-				name = (String) tmp[0];
-			}
-			if (tmp[1] != null) {
-				if (name.length() > 0) {
-					name += " " + tmp[1];
-				} else {
-					name = (String) tmp[1];
-				}
-			}
+			name = String.valueOf(atom.authorResidue_id);
 		}
 
 		if (name.length() > 0) {
@@ -899,14 +824,8 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 
 		if (showLabel)
 		{
-			Object[] tmp = sm.getPdbToNdbConverter().getPdbIds(r.getChainId(), new Integer(r.getResidueId()));
-			if(tmp == null) {
-				node.lxCreateAndAddLabel(r, r.getChainId() + ":"
-					+ r.getCompoundCode() + r.getResidueId(), Constants.yellow);
-			} else {
-				node.lxCreateAndAddLabel(r, (String)tmp[0] + ":"
-						+ r.getCompoundCode() + (String)tmp[1], Constants.yellow);
-			}
+			node.lxCreateAndAddLabel(r, r.getAuthorChainId() + ":"
+					+ r.getCompoundCode() + r.getAuthorResidueId(), Constants.yellow);
 		}
 
 		sm.getStructureStyles().setSelected(r, true);
@@ -955,28 +874,8 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 			final PrintWriter interactionsOut) {
 
 		if (interactionsOut != null) {
-			final PdbToNdbConverter converter = structure.getStructureMap()
-					.getPdbToNdbConverter();
-			Object[] tmp = converter.getPdbIds(a.chain_id, new Integer(
-					a.residue_id));
-			String chainId = null, resId = null, chainId2 = null, resId2 = null;
-			if (tmp == null) {
-				chainId = a.chain_id;
-				resId = a.residue_id + "";
-			} else {
-				chainId = (String) tmp[0];
-				resId = (String) tmp[1];
-			}
-			tmp = converter.getPdbIds(b.chain_id, new Integer(b.residue_id));
-			if (tmp == null) {
-				chainId2 = b.chain_id;
-				resId2 = b.residue_id + "";
-			} else {
-				chainId2 = (String) tmp[0];
-				resId2 = (String) tmp[1];
-			}
-			interactionsOut.println(chainId + ":" + resId + ":" + a.compound
-					+ ":" + a.name + "\t" + chainId2 + ":" + resId2 + ":"
+			interactionsOut.println(a.authorChain_id + ":" + a.authorResidue_id + ":" + a.compound
+					+ ":" + a.name + "\t" + b.authorChain_id + ":" + b.authorResidue_id + ":"
 					+ b.compound + ":" + b.name + "\t" + distString + "\t"
 					+ interactionType);
 			return;
@@ -989,7 +888,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		final InteractionGeometry lg = new InteractionGeometry();
 		final LineStyle ls = new LineStyle();
 		ls.lineStyle = LineStyle.DASHED;
-		
+
 		final DisplayListRenderable renderable = new DisplayListRenderable(ia, ls, lg);
 
 		lg.setForm(ls.lineStyle);
@@ -1033,8 +932,8 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		final LXSceneNode node = (LXSceneNode)structure.getStructureMap().getUData();
 
 		final Residue r = structure.getStructureMap().getResidue(atom);
-		final String label = structure.getStructureMap().getChain(atom).getChainId()
-				+ ":" + r.getCompoundCode() + r.getResidueId();
+		final String label = structure.getStructureMap().getChain(atom).getAuthorChainId()
+		+ ":" + r.getCompoundCode() + r.getAuthorResidueId();
 		float[] colors = new float[3];
 		node.lxCreateAndAddLabel(r, label, InteractionConstants.hydrogenBondColor.getRGBColorComponents(colors));
 	}
