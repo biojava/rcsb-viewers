@@ -57,7 +57,6 @@ package org.rcsb.vf.controllers.app;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import javax.swing.JOptionPane;
 
 public class BBBrowserLauncher {
 

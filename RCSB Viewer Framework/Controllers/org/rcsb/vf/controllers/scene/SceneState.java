@@ -75,7 +75,6 @@ import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
-import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.AtomColorByBFactor;
@@ -998,10 +997,10 @@ public class SceneState
 	protected void setStyleInfo(final Document doc, final Element styles) {
 		StructureModel model = AppBase.sgetModel();
 		final JoglSceneNode node = (JoglSceneNode)model.getStructures().get(0).getStructureMap().getUData();
-		final GlGeometryViewer glViewer = VFAppBase.sgetGlGeometryViewer();
+//		final GlGeometryViewer glViewer = VFAppBase.sgetGlGeometryViewer();
 		final Structure struc = model.getStructures().get(0);
 		final StructureMap sm = struc.getStructureMap();
-		final StructureStyles ss = sm.getStructureStyles();
+//		final StructureStyles ss = sm.getStructureStyles();
 		
 		final AtomStyleMap atomStyleMap = new AtomStyleMap();
 		final ResidueStyleMap residueStyleMap = new ResidueStyleMap();
@@ -1244,6 +1243,7 @@ public class SceneState
 					else if (isResidue)
 					{
 						final Residue r = sm.getResidue(j);
+//						System.out.println("SceneState: visible residue: " + r.getCompoundCode());
 						visibleResidues.put(r, exists);
 					}
 				}
@@ -1351,7 +1351,7 @@ public class SceneState
 	protected void enactStyles() {
 		StructureModel model = AppBase.sgetModel();
 		final JoglSceneNode node = (JoglSceneNode)model.getStructures().get(0).getStructureMap().getUData();
-		final GlGeometryViewer viewer = VFAppBase.sgetGlGeometryViewer();
+//		final GlGeometryViewer viewer = VFAppBase.sgetGlGeometryViewer();
 		final Structure struc = model.getStructures().get(0);
 		final StructureMap sm = struc.getStructureMap();
 		final StructureStyles ss = sm.getStructureStyles(); 
@@ -1363,7 +1363,7 @@ public class SceneState
 			return;
 		}
 		
-		final HashMap dirtyRenderables = new HashMap();
+//		final HashMap dirtyRenderables = new HashMap();
 		
 		// reset residue coloring...
 		final int chainCount = sm.getChainCount();
@@ -1845,7 +1845,6 @@ public class SceneState
 	{	
 		try {
 			final NodeList viewpoints = document.getElementsByTagName("Viewpoint");
-			final NodeList fogs = document.getElementsByTagName("Fog");
 			
 			if(viewpoints != null && viewpoints.getLength() != 0 /* && fogs != null && fogs.getLength() != 0 */)
 			{

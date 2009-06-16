@@ -58,7 +58,6 @@ import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.doc.DocController;
 import org.rcsb.uiApp.ui.dialogs.ImageFileManager;
 import org.rcsb.vf.controllers.app.VFAppBase;
-import org.rcsb.vf.controllers.scene.SceneController;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 
 

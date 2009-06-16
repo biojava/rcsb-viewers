@@ -45,7 +45,6 @@
  */ 
 package org.rcsb.vf.controllers.scene;
 
-import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.vf.controllers.app.VFAppBase;
 
 public class ViewMovementThread extends Thread
