@@ -47,12 +47,12 @@ package org.rcsb.vf.ui;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
-import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.doc.LoadThread;
 import org.rcsb.uiApp.ui.mainframe.DocumentFrameBase;
 import org.rcsb.vf.controllers.app.VFAppBase;
@@ -136,6 +136,12 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 		loader.run();
 	}
 	
+	public void loadURL(String[] pdbIds)
+	{
+		LoadThread loader = new LoadThread(pdbIds);
+		loader.run();
+	}
+
 	@Override
 	public void initialize(boolean showFrame)
 	{
