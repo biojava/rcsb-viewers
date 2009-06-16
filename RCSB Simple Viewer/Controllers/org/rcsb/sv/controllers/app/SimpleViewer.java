@@ -121,5 +121,10 @@ public class SimpleViewer extends VFAppBase
 	
 		if (structureUrlParam != null)
 			((VFDocumentFrameBase)activeFrame).loadURL(structureUrlParam);
+		
+		String structureIdList = this.properties.getProperty("structure_id_list");
+
+		if (structureIdList != null)
+			((VFDocumentFrameBase)activeFrame).loadURL(structureIdList.split(","));
 	}
 }
