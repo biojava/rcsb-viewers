@@ -102,7 +102,7 @@ public class KSStructureXMLHandler extends StructureXMLHandler
 
 	protected List<EntityDescriptor> entityDescriptors = new ArrayList<EntityDescriptor>();
 	
-	protected class XAnnotatedAtom extends XAtom implements IAtomAnnotator
+	protected class XAnnotatedAtom extends Atom implements IAtomAnnotator
 	{
 		private String annotation = "";
 		private String entity_id = "";		
@@ -121,7 +121,7 @@ public class KSStructureXMLHandler extends StructureXMLHandler
 	}
 	
 	@Override
-	protected XAtom createXAtom() { return new XAnnotatedAtom(); }
+	protected Atom createXAtom() { return new XAnnotatedAtom(); }
 	
 	@Override
 	protected Atom createFinalAtom(Atom src) { return new AnnotatedAtom(src); }
@@ -133,7 +133,6 @@ public class KSStructureXMLHandler extends StructureXMLHandler
 		startElementRunnables.put(xmlPrefix + "audit_author", createXMLRunner__audit_author__Start());
 		startElementRunnables.put(xmlPrefix + "entityCategory", createXMLRunnable__entityCategory__Start());
 		startElementRunnables.put(xmlPrefix + "entity", createXMLRunnable__entity__Start());
-	//	startElementRunnables.put(xmlPrefix + "structCategory", createXMLRunnable__struct__Start());
 		endElementAtomRunnables.put(xmlPrefix + "label_entity_id", createXMLRunnable__label_entity_id__End());
 	}
 
