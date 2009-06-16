@@ -54,7 +54,6 @@ import javax.media.opengl.glu.GLU;
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.*;
-import org.rcsb.vf.glscene.surfaces.Surface;
 
 import com.sun.opengl.util.GLUT;
 

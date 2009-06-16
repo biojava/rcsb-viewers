@@ -45,15 +45,12 @@
  */ 
 package org.rcsb.vf.glscene.jogl;
 
-// package org.rcsb.mbt.viewers.GlStructureViewer;
-
 
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.attributes.*;
-import org.rcsb.vf.glscene.SecondaryStructureBuilder.CrossSectionStyle;
 import org.rcsb.vf.glscene.SecondaryStructureBuilder.SsGeometry;
 import org.rcsb.vf.glscene.SecondaryStructureBuilder.CrossSectionStyle.CrossSectionType;
 import org.rcsb.vf.glscene.SecondaryStructureBuilder.SsGeometry.ConformationShape;
@@ -69,18 +66,10 @@ import com.sun.opengl.util.GLUT;
  *
  * Please complete these missing tags
  * @author	John L. Moreland
- * @copyright	UCSD
- * @see
  */
 public class ChainGeometry
 	extends DisplayListGeometry
 {
-	private final Interpolator interpolator =
-		new Interpolator( Interpolator.HERMITE );
-	
-	/**
-	 * TODO: These should be enums.
-	 */
 	public enum RibbonForm
 	{
 		RIBBON_SIMPLE_LINE ("Simple Line"),
@@ -169,7 +158,6 @@ public class ChainGeometry
 	        int coilSmoothingSteps = -1;
 	        
 	        CrossSectionType helixCsType = null;
-	        //int helixCsType = CrossSectionType.RECTANGULAR_RIBBON;
 	        CrossSectionType strandCsType = null;
 	        CrossSectionType turnCsType = null;
 	        CrossSectionType coilCsType = null;

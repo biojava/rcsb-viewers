@@ -52,11 +52,6 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUquadric;
 
-import javax.vecmath.AxisAngle4d;
-import javax.vecmath.Matrix3d;
-import javax.vecmath.Quat4d;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3d;
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.attributes.*;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;

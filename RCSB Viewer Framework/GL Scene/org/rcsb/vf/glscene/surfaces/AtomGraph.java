@@ -46,7 +46,6 @@
 package org.rcsb.vf.glscene.surfaces;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Vector;
 
 import org.rcsb.mbt.model.Atom;

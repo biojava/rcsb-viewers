@@ -52,10 +52,8 @@ import java.nio.IntBuffer;
 import java.util.Stack;
 
 import javax.media.opengl.GL;
-import javax.media.opengl.glu.GLU;
 
 import com.sun.opengl.util.BufferUtil;
-import com.sun.opengl.util.GLUT;
 
 public class GlslProgram {
 	public static boolean supportsShaderPrograms = false;

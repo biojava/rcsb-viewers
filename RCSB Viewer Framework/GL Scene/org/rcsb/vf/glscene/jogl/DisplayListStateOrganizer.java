@@ -51,7 +51,6 @@ import java.util.Vector;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
-import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
 import com.sun.opengl.util.GLUT;

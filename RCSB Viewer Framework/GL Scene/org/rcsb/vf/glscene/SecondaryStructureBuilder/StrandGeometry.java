@@ -106,8 +106,6 @@ public class StrandGeometry extends SsGeometry {
 		super(sc);
 		
 		this.csType = CrossSectionType.RECTANGULAR_RIBBON;
-		// csType = CrossSectionStyle.DOUBLE_FACE;
-		// polygonStyle = PolygonAttributes.POLYGON_FILL;
 		this.uniformColor = true;
 		this.segments = 6;
 		this.userData = "StrandGeometry";
@@ -158,8 +156,6 @@ public class StrandGeometry extends SsGeometry {
 
 		// Holders for tangent vectors at the ends of a segment.
 		//
-		final Vec3f vec1 = new Vec3f();
-		final Vec3f vec2 = new Vec3f();
 
 		// Other working space
 		//
@@ -168,7 +164,6 @@ public class StrandGeometry extends SsGeometry {
 		FrenetTrihedron firstTrihedron = null;
 		FrenetTrihedron secondTrihedron = null;
 		Vector3f norm1 = new Vector3f();
-		Vector3f norm2 = new Vector3f();
 		Vector3f tan1 = new Vector3f();
 		Vector3f tan2 = new Vector3f();
 		final Vector3f origin = new Vector3f();
@@ -178,7 +173,6 @@ public class StrandGeometry extends SsGeometry {
 		tan1 = this.tangents[0];
 		tan2 = this.tangents[1];
 		norm1 = this.normals[0];
-		norm2 = this.normals[1];
 
 		tan1.normalize();
 		tan2.normalize();
@@ -204,10 +198,8 @@ public class StrandGeometry extends SsGeometry {
 			norm1 = this.normals[i + 1];
 			if (i >= this.coords.length - 2) {
 				tan2 = tan1;
-				norm2 = norm1;
 			} else {
 				tan2 = this.tangents[i + 2];
-				norm2 = this.normals[i + 2];
 			}
 
 			tan1.normalize();
@@ -594,7 +586,6 @@ public class StrandGeometry extends SsGeometry {
 		Vector3f tmp = null;
 		Vector3f tmp1 = null;
 		Vector3f v0 = null;
-		final Vector3f zero = new Vector3f(0.0f, 0.0f, 0.0f);
 
 		if (coords.length == 2) {
 			// In an ideal world this would not happen.

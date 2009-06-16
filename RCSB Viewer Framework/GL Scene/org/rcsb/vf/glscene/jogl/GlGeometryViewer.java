@@ -90,7 +90,6 @@ import org.rcsb.mbt.model.Fragment;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
-import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.StructureModel.StructureList;
@@ -103,7 +102,6 @@ import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.util.DebugState;
 import org.rcsb.mbt.model.util.ExternReferences;
-import org.rcsb.mbt.model.util.PdbToNdbConverter;
 import org.rcsb.mbt.model.util.Status;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
@@ -129,8 +127,8 @@ import com.sun.opengl.util.ImageUtil;
  * @see
  */
 public class GlGeometryViewer extends JPanel implements GLEventListener,
-		MouseListener, MouseMotionListener, IUpdateListener,
-		WindowListener, IStructureStylesEventListener {
+MouseListener, MouseMotionListener, IUpdateListener,
+WindowListener, IStructureStylesEventListener {
 	/**
 	 * 
 	 */
@@ -140,14 +138,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	public GLCanvas glCanvas = null;
 
 	private GLCapabilities glCapabilities = null;
-	
-	protected boolean do_glFinishInShaders = false;
 
-//	public void setVisible(boolean vis) {
-//		System.err.flush();
-//	}
-	
-	// private Animator animator = null;
+	protected boolean do_glFinishInShaders = false;
 
 	private final GLUT glut = new GLUT();
 
@@ -203,14 +195,14 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 	public static final float[] DEFAULT_DIFFUSE_COLOR = black;
 
-/* **
+	/* **
 	// Frame rate and other drawing statistics
 	private long lastTime = System.currentTimeMillis();
 
 	private int frameCount = 0;
 
 	private double fps = 0.0f;
-* **/
+	 * **/
 
 	private boolean isScreenshotRequested = false;
 
@@ -240,8 +232,6 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 	protected VirtualSphere2 virtualSphere = new VirtualSphere2(150, 150, 150);
 
-	// public static Hashtable sharedLabelDisplayLists = new Hashtable( );
-
 	public float backgroundColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 	// -----------------------------------------------------------------------------
@@ -253,7 +243,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	public static int shaderProgram = 0;
 
 	public static int currentProgram = 0;
-	
+
 	public double[] viewEye = { Double.NaN, Double.NaN, Double.NaN };
 
 	public double[] viewCenter = { Double.NaN, Double.NaN, Double.NaN };
@@ -261,11 +251,10 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	public double[] viewUp = { Double.NaN, Double.NaN, Double.NaN };
 
 	public double[] rotationCenter = { Double.NaN, Double.NaN, Double.NaN };
-	
+
 	public double[][] bounds = null;
-	
-//	private PrintStream debugOut = null;
-	
+
+
 	/**
 	 * Move the camera to the specified eye point and orient the view toward the
 	 * specified 3D center point with a given up vector. This provides complete
@@ -277,8 +266,6 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		this.viewEye[0] = eye[0];
 		this.viewEye[1] = eye[1];
 		this.viewEye[2] = eye[2];
-
-//		final double zoomDistance = Algebra.distance(this.viewCenter, center);
 
 		// Set the new view center point.
 		this.viewCenter[0] = center[0];
@@ -294,12 +281,6 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		this.viewUp[0] = up[0];
 		this.viewUp[1] = up[1];
 		this.viewUp[2] = up[2];
-
-		// double sign = viewCenter[0] + viewCenter[1] + viewCenter[2] <
-		// center[0] + center[1] + center[2] ? -1 : 1;
-		// zoomDistance *= sign;
-		// fogStart += zoomDistance;
-		// fogEnd += zoomDistance;
 
 		requestRepaint();
 	}
@@ -517,7 +498,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	public GlGeometryViewer() {
 		super(new BorderLayout());
 		super.setBackground(Color.black);
-		
+
 		atomGeometry = new AtomGeometry();
 		// atomGeometry.setForm( Geometry.FORM_LINES ); // JLM DEBUG
 		defaultGeometry.put(ComponentType.ATOM, atomGeometry);
@@ -532,7 +513,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		defaultGeometry.put(ComponentType.CHAIN, chainGeometry);
 
 		VFAppBase.sgetSceneController().setDefaultGeometry(defaultGeometry);
-		
+
 		// Set up a GL Canvas
 		this.glCapabilities = new GLCapabilities();
 		// glCapabilities.setAccumBlueBits(16);
@@ -550,15 +531,15 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				super.setVisible(true);
 				super.addNotify();
 			}
-			
+
 			@Override
 			public void removeNotify() {
 				super.setVisible(false);
 			}
 		};/*
-															 * GLDrawableFactory.getFactory()
-															 * .createExternalGLDrawable().createGLCanvas(glCapabilities);
-															 */
+		 * GLDrawableFactory.getFactory()
+		 * .createExternalGLDrawable().createGLCanvas(glCapabilities);
+		 */
 		// ** this wrapper panel is used to bypass a current Jogl (I think) bug.
 		// If not used, the glCanvas causes the JSplitPane to resize strangely.
 		// Not sure why the bug occurs or why this fixes it.
@@ -602,15 +583,15 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				}
 			}
 		}
-		
+
 		currentProgram = 0;
 		vertexShader = 0;
 		fragmentShader = 0;
 		shaderProgram = 0;
-		
+
 		this.backBufferContainsPickData = false;
 	}
-	
+
 	// -----------------------------------------------------------------------------
 
 	//
@@ -651,10 +632,10 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		if (DebugState.isDebug())
 			drawable.setGL(new DebugGL(drawable.getGL()));
 
-//		 drawable.setGL(new TraceGL(drawable.getGL(), debugOut));
+		//		 drawable.setGL(new TraceGL(drawable.getGL(), debugOut));
 
 		//
-//		 Set up JOGL (OpenGL)
+		//		 Set up JOGL (OpenGL)
 		//
 
 		final GL gl = drawable.getGL();
@@ -799,9 +780,9 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 			if (this.needsPick && !this.isScreenshotRequested)
 				this.drawOrPick(gl, this.glu, this.glut, drawable, true, true, true);
-							// needs to be called twice in the case of a pick event. (?)
+			// needs to be called twice in the case of a pick event. (?)
 
-			
+
 			else
 			{ // draw
 
@@ -817,31 +798,31 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 					for (int jitter = 0; jitter < sceneController.getDebugSettings().JITTER_ARRAY.length; jitter++) {
 						JoglUtils.accPerspective(
-										gl,
-										this.glu,
-										this.glut,
-										50f,
-										1.0 / this.aspect,
-										zNear,
-										zFar,
-										0,
-										0,
-										sceneController.getDebugSettings().blurFactor
-												* sceneController.getDebugSettings().JITTER_ARRAY[jitter][0],
-										sceneController.getDebugSettings().blurFactor
-												* sceneController.getDebugSettings().JITTER_ARRAY[jitter][1],
-										5f);
-						
+								gl,
+								this.glu,
+								this.glut,
+								50f,
+								1.0 / this.aspect,
+								zNear,
+								zFar,
+								0,
+								0,
+								sceneController.getDebugSettings().blurFactor
+								* sceneController.getDebugSettings().JITTER_ARRAY[jitter][0],
+								sceneController.getDebugSettings().blurFactor
+								* sceneController.getDebugSettings().JITTER_ARRAY[jitter][1],
+								5f);
+
 						this.drawOrPick(gl, this.glu, this.glut, drawable,
 								false, false, false);
 						// gl.glFlush();
 						gl.glAccum(GL.GL_ACCUM, 1f / sceneController
-										.getDebugSettings().JITTER_ARRAY.length);
+								.getDebugSettings().JITTER_ARRAY.length);
 						gl.glFlush();
 					}
 					gl.glAccum(GL.GL_RETURN, 1);
 				}
-				
+
 				else
 				{
 					if (this.needsRepaint || (!this.needsPick && !this.needsRepaint))
@@ -861,9 +842,9 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 			this.screenshotFailed = true;
 		}
-		
-//		debugOut.println("***End of display()...\n\n");
-//		debugOut.flush();
+
+		//		debugOut.println("***End of display()...\n\n");
+		//		debugOut.flush();
 	}
 
 	public void drawOrPick(final GL gl, final GLU glu, final GLUT glut,
@@ -883,8 +864,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			final BufferedImage image = new BufferedImage(this.screenshotWidth,
 					this.screenshotHeight, bufImgType);
 			final ByteBuffer imageBuffer = ByteBuffer
-					.wrap(((DataBufferByte) image.getRaster().getDataBuffer())
-							.getData());
+			.wrap(((DataBufferByte) image.getRaster().getDataBuffer())
+					.getData());
 
 			final TileRenderer tr = new TileRenderer();
 			if (this.tileHeight > 0 && this.tileWidth > 0) {
@@ -901,13 +882,11 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			{
 				tr.beginTile(gl);
 
-				gl.glFlush(); // TODO
+				gl.glFlush();
 				this.drawScene(gl, glu, glut, false, canClearModelviewMatrix,
 						null, null, false);
-				gl.glFlush(); // TODO
+				gl.glFlush();
 			} while (tr.endTile(gl));
-
-			// this.verifyByteBuffer(imageBuffer);
 
 			ImageUtil.flipImageVertically(image);
 
@@ -922,7 +901,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			System.gc();
 			System.gc();
 		}
-		
+
 		else
 		{
 			Point mouseLocationInPanel = null;
@@ -935,11 +914,11 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				mousePickEvent = new MouseEvent((Component) this.pickMouseEvent
 						.getSource(), this.pickMouseEvent.getID(),
 						this.pickMouseEvent.getWhen(), this.pickMouseEvent
-								.getModifiers(), this.pickMouseEvent.getX(),
+						.getModifiers(), this.pickMouseEvent.getX(),
 						this.pickMouseEvent.getY(), this.pickMouseEvent
-								.getClickCount(), this.pickMouseEvent
-								.isPopupTrigger(), this.pickMouseEvent
-								.getButton());
+						.getClickCount(), this.pickMouseEvent
+						.isPopupTrigger(), this.pickMouseEvent
+						.getButton());
 			}
 
 			this.drawScene(gl, glu, glut, canModifyProjectionMatrix,
@@ -957,29 +936,9 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			final MouseEvent mousePickEvent, final Point mouseLocationInPanel,
 			boolean isPick)
 	{
-		// if(isPick) {
-		// System.err.print("P");
-		// } else {
-		// System.err.print("D");
-		// }
-		//		
-		// if(this.backBufferContainsPickData) {
-		// System.err.print("-");
-		// } else {
-		// System.err.print("+");
-		// }
 
 		synchronized (this.renderablesToDestroy)
 		{
-			/*
-			 * debug info. int renderablesToDestroySize =
-			 * this.renderablesToDestroy.size(); if(renderablesToDestroySize >
-			 * 0) { synchronized(this.renderables) {
-			 * System.err.println("...destroying " + renderablesToDestroySize + "
-			 * renderables. " + this.renderables.size() + " renderables still to
-			 * be displayed."); } }
-			 */
-
 			for (DisplayListRenderable renderable : renderablesToDestroy)
 				renderable.destroy(gl, glu, glut);
 
@@ -988,14 +947,6 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 		synchronized (this.simpleDisplayListsToDestroy)
 		{
-			/*
-			 * debug info. int renderablesToDestroySize =
-			 * this.renderablesToDestroy.size(); if(renderablesToDestroySize >
-			 * 0) { synchronized(this.renderables) {
-			 * System.err.println("...destroying " + renderablesToDestroySize + "
-			 * renderables. " + this.renderables.size() + " renderables still to
-			 * be displayed."); } }
-			 */
 			for (Integer list : simpleDisplayListsToDestroy)
 				gl.glDeleteLists(list.intValue(), 1);
 
@@ -1010,7 +961,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			x2D = mousePickEvent.getX();
 			y2D = mousePickEvent.getY();
 		}
-		
+
 		else if (mouseLocationInPanel != null)
 		{
 			x2D = mouseLocationInPanel.x;
@@ -1030,17 +981,9 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				gl.glLoadIdentity();
 			}
 
-			//
-			// Is this the start of a pick traversal?
-			//
-
-			// gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);
-			// gl.glEnable(GL.GL_LINE_SMOOTH);
-
 			if (isPick)
 			{
 				gl.glDisable(GL.GL_LIGHTING);
-				// gl.glDisable(GL.GL_FOG);
 				gl.glShadeModel(GL.GL_FLAT);
 
 				if (this.supportsShaderPrograms && currentProgram != 0
@@ -1049,9 +992,9 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 					gl.glUseProgram(0);
 					currentProgram = 0;
 				}
-				
+
 			}
-			
+
 			else
 			{
 				this.backBufferContainsPickData = false;
@@ -1059,7 +1002,6 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				gl.glEnable(GL.GL_LIGHTING);
 				gl.glShadeModel(GL.GL_SMOOTH);
 
-				// if(isFogEnabled) gl.glEnable(GL.GL_FOG);
 				if (this.supportsShaderPrograms)
 				{
 					boolean successful = true;
@@ -1101,8 +1043,6 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				glu.gluPerspective(fovy, 1.0 / this.aspect,
 						zNear, zFar);
 
-			// gl.glFrustum( left, right, bottom, top, zNear, zFar );
-
 			//
 			// Set up the camera transform.
 			//
@@ -1117,10 +1057,10 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			gl.glMatrixMode(GL.GL_MODELVIEW);
 			if (canClearModelviewMatrix)
 				gl.glLoadIdentity();
-			
+
 			// Position the headlight relative to the viewpoint.
 			gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, this.lightPosition, 0);
-			
+
 
 			// Set the viewpoint.
 			// This is necessary for the simple viewer and protein workshop viewers' manipulation.
@@ -1128,9 +1068,9 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			//
 			if (!ExternReferences.isLigandExplorer())
 				glu.gluLookAt(this.viewEye[0], this.viewEye[1], this.viewEye[2],
-					this.viewCenter[0], this.viewCenter[1], this.viewCenter[2],
-					this.viewUp[0], this.viewUp[1], this.viewUp[2]);
-			
+						this.viewCenter[0], this.viewCenter[1], this.viewCenter[2],
+						this.viewUp[0], this.viewUp[1], this.viewUp[2]);
+
 			StructureList structures = AppBase.sgetModel().getStructures();
 			for (Structure structure : structures)
 			{
@@ -1144,7 +1084,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 					if (DebugState.isDebug())
 						e.printStackTrace();
 				}
-				
+
 				gl.glPopMatrix();
 
 				// pick cycles do not need to finish, and paints get
@@ -1155,47 +1095,39 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				// gl.glFlush();
 			}
 		}
-				
+
 		try
 		{
 			if (isPick)
 			{
 				StructureComponent newComponent = null;
 				boolean picked = false;
-				int bufferCheck;
 
 				if (this.rgbaBuffer == null)
 					this.rgbaBuffer = BufferUtil.newByteBuffer(4);
 
-/* **
-				for (bufferCheck = 0; bufferCheck < 2  && !picked; bufferCheck++)
+				if (this.alphaBits == 0)
 				{
-					gl.glReadBuffer(bufferCheck == 0? GL.GL_FRONT : GL.GL_BACK);
-* **/
-					
-					if (this.alphaBits == 0)
-					{
-						gl.glReadPixels(x2D, this.viewport[3] - y2D, 1, 1, GL.GL_RGB,
-								GL.GL_UNSIGNED_BYTE, this.rgbaBuffer);
-						this.tempColor.set(this.rgbaBuffer.get(0), this.rgbaBuffer.get(1),
-								this.rgbaBuffer.get(2), (byte) 0);
-					}
-					
-					else
-					{
-						gl.glReadPixels(x2D, this.viewport[3] - y2D, 1, 1, GL.GL_RGBA,
-								GL.GL_UNSIGNED_BYTE, this.rgbaBuffer);
-						this.tempColor.set(this.rgbaBuffer.get(0), this.rgbaBuffer.get(1),
-								this.rgbaBuffer.get(2), this.rgbaBuffer.get(3));
-					}
-					
-					picked = tempColor.color[0] + tempColor.color[1] + tempColor.color[2] != 0;
-//			}
-				
+					gl.glReadPixels(x2D, this.viewport[3] - y2D, 1, 1, GL.GL_RGB,
+							GL.GL_UNSIGNED_BYTE, this.rgbaBuffer);
+					this.tempColor.set(this.rgbaBuffer.get(0), this.rgbaBuffer.get(1),
+							this.rgbaBuffer.get(2), (byte) 0);
+				}
+
+				else
+				{
+					gl.glReadPixels(x2D, this.viewport[3] - y2D, 1, 1, GL.GL_RGBA,
+							GL.GL_UNSIGNED_BYTE, this.rgbaBuffer);
+					this.tempColor.set(this.rgbaBuffer.get(0), this.rgbaBuffer.get(1),
+							this.rgbaBuffer.get(2), this.rgbaBuffer.get(3));
+				}
+
+				picked = tempColor.color[0] + tempColor.color[1] + tempColor.color[2] != 0;
+
 				if (picked)
 				{
 					final DisplayLists.UniqueColorMapValue value = DisplayLists.getDisplayLists(this.tempColor);
-					
+
 					if (value == null)
 						Status.output(Status.LEVEL_REMARK, " "); // clear the
 						// status
@@ -1206,21 +1138,20 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 						newComponent = r;
 						this.reportAtComponent(r);
 					}
-					
+
 					else
 					{
 						newComponent = value.lists.structureComponent;
 						this.reportAtComponent(value.lists.structureComponent);
 					}
-//				}
 
 
-				this.lastComponentMouseWasOver = newComponent;
-				this.backBufferContainsPickData = true;
+					this.lastComponentMouseWasOver = newComponent;
+					this.backBufferContainsPickData = true;
 				}
 			}
 		}
-		
+
 		catch (final Exception e)
 		{
 			if (DebugState.isDebug())
@@ -1230,7 +1161,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			}
 		}
 
-/* ** DEBUGGING - Compute and output frames per second
+		/* ** DEBUGGING - Compute and output frames per second
 		//
 		// Compute frames per second.
 		//
@@ -1248,7 +1179,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		// }
 		// System.out.println("Extrusion vertex count: " +
 		// Extrusion.VERTEX_COUNT);
-* **/
+		 * **/
 	}
 
 	// private boolean resizeFinished = false;
@@ -1258,71 +1189,20 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 		if (scType == ComponentType.ATOM) {
 			final Atom atom = (Atom) structureComponent;
-
-			final Object[] pdbIds = atom.structure.getStructureMap()
-					.getPdbToNdbConverter().getPdbIds(atom.chain_id,
-							new Integer(atom.residue_id));
-			if (pdbIds != null) {
-				final String pdbChainId = (String) pdbIds[0];
-				final String pdbResidueId = (String) pdbIds[1];
-
-				Status.output(Status.LEVEL_REMARK, "Atom: " + atom.name
-						+ ", residue " + pdbResidueId + ", compound "
-						+ atom.compound + ", chain " + pdbChainId);
-			} else {
-				Status
-						.output(
-								Status.LEVEL_REMARK,
-								"Atom: "
-										+ atom.name
-										+ ", compound "
-										+ atom.compound
-										+ ". Could not determine the pdb residue or chain ids. Ndb chain id: "
-										+ atom.chain_id + ", ndb residue id: "
-										+ atom.residue_id);
-			}
+			Status.output(Status.LEVEL_REMARK, "Atom: " + atom.name
+					+ ", residue " + atom.authorResidue_id + ", compound "
+					+ atom.compound + ", chain " + atom.authorChain_id);
 		} else if (scType == ComponentType.BOND) {
 			final Bond bond = (Bond) structureComponent;
 
 			final Atom a1 = bond.getAtom(0);
 			final Atom a2 = bond.getAtom(1);
 
-			final PdbToNdbConverter converter = a1.structure.getStructureMap()
-					.getPdbToNdbConverter();
-			Object[] tmp = converter.getPdbIds(a1.chain_id, new Integer(
-					a1.residue_id));
-			final Object[] tmp2 = converter.getPdbIds(a2.chain_id, new Integer(
-					a2.residue_id));
-			if (tmp != null && tmp2 != null) {
-				final String a1ChainId = (String) tmp[0];
-				final String a1ResidueId = (String) tmp[1];
-				tmp = converter.getPdbIds(a2.chain_id, new Integer(
-						a2.residue_id));
-				final String a2ChainId = (String) tmp2[0];
-				final String a2ResidueId = (String) tmp2[1];
+			Status.output(Status.LEVEL_REMARK, "Covalent bond. Atom 1: "
+					+ a1.name + ", residue " + a1.authorResidue_id + ", chain "
+					+ a1.authorChain_id + "; Atom 2: " + a2.name + ", residue "
+					+ a2.authorResidue_id + ", chain " + a2.authorChain_id);
 
-				Status.output(Status.LEVEL_REMARK, "Covalent bond. Atom 1: "
-						+ a1.name + ", residue " + a1ResidueId + ", chain "
-						+ a1ChainId + "; Atom 2: " + a2.name + ", residue "
-						+ a2ResidueId + ", chain " + a2ChainId);
-			} else {
-				Status
-						.output(
-								Status.LEVEL_REMARK,
-								"Covalent bond. Atom 1: "
-										+ a1.name
-										+ ", residue* "
-										+ a1.residue_id
-										+ ", chain* "
-										+ a1.chain_id
-										+ "; Atom 2: "
-										+ a2.name
-										+ ", residue* "
-										+ a2.residue_id
-										+ ", chain* "
-										+ a2.chain_id
-										+ ". * Could not determine Pdb IDs. Ndb IDs shown instead.");
-			}
 		} else if (scType == ComponentType.RESIDUE) {
 			final Residue r = (Residue) structureComponent;
 			final Fragment f = r.getFragment();
@@ -1338,92 +1218,32 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				conformationType = "Turn";
 			}
 
-			final Object[] tmp = f.structure.getStructureMap()
-					.getPdbToNdbConverter().getPdbIds(r.getChainId(),
-							new Integer(r.getResidueId()));
-			if (tmp != null) {
-				final String pdbChainId = (String) tmp[0];
-				final String pdbResidueId = (String) tmp[1];
+			Status.output(Status.LEVEL_REMARK, "Residue " + r.getAuthorResidueId()
+					+ ", from chain " + r.getAuthorChainId() + "; "
+					+ conformationType + " conformation; "
+					+ r.getCompoundCode() + " compound.");
 
-				Status.output(Status.LEVEL_REMARK, "Residue " + pdbResidueId
-						+ ", from chain " + pdbChainId + "; "
-						+ conformationType + " conformation; "
-						+ r.getCompoundCode() + " compound.");
-			} else {
-				Status
-						.output(
-								Status.LEVEL_REMARK,
-								"Residue* "
-										+ r.getResidueId()
-										+ ", from chain* "
-										+ r.getChainId()
-										+ "; "
-										+ conformationType
-										+ " conformation; "
-										+ r.getCompoundCode()
-										+ " compound. * Could not determine Pdb IDs. Ndb IDs shown instead.");
-			}
 		} else if (scType == ComponentType.FRAGMENT) {
 			final Fragment f = (Fragment) structureComponent;
 
 			// remove all but the local name for the secondary structure class.
 			ComponentType conformation = f.getConformationType();
 
-			final String ndbChainId = f.getChain().getChainId();
-			final int startNdbResidueId = f.getResidue(0).getResidueId();
-			final int endNdbResidueId = f.getResidue(f.getResidueCount() - 1)
-					.getResidueId();
+			final String startPdbChainId = f.getResidue(0).getAuthorChainId();
+			final String startPdbResidueId = String.valueOf(f.getResidue(0).getAuthorResidueId());
+			final String endPdbResidueId = String.valueOf(f.getResidue(f.getResidueCount() - 1)
+					.getAuthorResidueId());
 
-			final PdbToNdbConverter converter = f.structure.getStructureMap()
-					.getPdbToNdbConverter();
-			final Object[] tmp = converter.getPdbIds(ndbChainId, new Integer(
-					startNdbResidueId));
-			final Object[] tmp2 = converter.getPdbIds(ndbChainId, new Integer(
-					endNdbResidueId));
+			Status.output(Status.LEVEL_REMARK, conformation
+					+ " fragment: chain " + startPdbChainId
+					+ ", from residue " + startPdbResidueId
+					+ " to residue " + endPdbResidueId);
 
-			if (tmp != null && tmp2 != null) {
-				final String startPdbChainId = (String) tmp[0];
-				final String startPdbResidueId = (String) tmp[1];
-				final String endPdbResidueId = (String) tmp2[1];
-
-				Status.output(Status.LEVEL_REMARK, conformation
-						+ " fragment: chain " + startPdbChainId
-						+ ", from residue " + startPdbResidueId
-						+ " to residue " + endPdbResidueId);
-			} else {
-				Status
-						.output(
-								Status.LEVEL_REMARK,
-								conformation
-										+ " fragment: chain* "
-										+ f.getChain().getChainId()
-										+ ", from residue* "
-										+ startNdbResidueId
-										+ " to residue* "
-										+ endNdbResidueId
-										+ ". * Could not determine Pdb IDs. Ndb IDs shown instead.");
-			}
-
-			// structureMap.getStructureStyles().setResidueColor(res, yellow);
 		} else if (scType == ComponentType.CHAIN) {
 			final Chain c = (Chain) structureComponent;
 
-			// remove all but the local name for the secondary structure class.
-			final String pdbChainId = c.structure.getStructureMap()
-					.getPdbToNdbConverter().getFirstPdbChainId(c.getChainId());
-			if (pdbChainId != null) {
-				Status.output(Status.LEVEL_REMARK, "Chain " + pdbChainId
-						+ " backbone");
-			} else {
-				Status
-						.output(
-								Status.LEVEL_REMARK,
-								"Chain* "
-										+ c.getChainId()
-										+ " backbone. * Could not determine Pdb ID. Ndb ID shown instead.");
-			}
-
-			// structureMap.getStructureStyles().setResidueColor(res, yellow);
+			Status.output(Status.LEVEL_REMARK, "Chain " + c.getAuthorChainId()
+					+ " backbone");
 		}
 	}
 
@@ -1436,10 +1256,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		// the new display's driver may not support shaders. Not likely, but
 		// possible.		
 		checkSetShaderSupport();
-		this.invalidateAllGeometry();
-
-		// refresh the pick information
-		
+		this.invalidateAllGeometry();	
 	}
 
 	/**
@@ -1450,12 +1267,12 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		final GL gl = drawable.getGL();
 
 		this.supportsShaderPrograms = AppBase.getApp().allowShaders() &&
-			gl.isFunctionAvailable("glCreateShader") &&
-			gl.isFunctionAvailable("glAttachShader") &&
-			gl.isFunctionAvailable("glLinkProgram") &&
-			gl.isFunctionAvailable("glUseProgram");
+		gl.isFunctionAvailable("glCreateShader") &&
+		gl.isFunctionAvailable("glAttachShader") &&
+		gl.isFunctionAvailable("glLinkProgram") &&
+		gl.isFunctionAvailable("glUseProgram");
 	}
-	
+
 	// -----------------------------------------------------------------------------
 
 	//
@@ -1511,7 +1328,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			this.pickMouseEvent = e; // Do a pick
 		}
 	}
-	
+
 	public void mouseClicked(final MouseEvent e)
 	{
 	}
@@ -1523,7 +1340,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	/**
 	 * Control the camera motion.
 	 */
-//	private static final Structure[] oneStructure = new Structure[1];
+	//	private static final Structure[] oneStructure = new Structure[1];
 	public void mouseDragged(final MouseEvent e)
 	{
 		if (!AppBase.sgetModel().hasStructures())
@@ -1535,233 +1352,216 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 		final double v3d[] = { 0.0f, 0.0f, 0.0f };
 		final double v3d2[] = { 0.0f, 0.0f, 0.0f };
-		// final double v3d3[] = { 0.0f, 0.0f, 0.0f };
-		// final double r4d[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		// final double r4d2[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-		// if (this.lastComponentMouseWasOver != null) {
-//		Structure[] strucs = null;
-//		if (this.lastComponentMouseWasOver == null) {
-//			strucs = structures;
-//		} else {
-//			strucs = oneStructure;
-//			oneStructure[0] = this.lastComponentMouseWasOver.structure;
-//		}
-//		for(int i = 0; i < strucs.length; i++) {
-//			final StructureMap sm = strucs[i].getStructureMap();
-	
-			if ((e.getModifiers() & InputEvent.CTRL_MASK) == 0
-					&& (e.getModifiers() & InputEvent.SHIFT_MASK) == 0
-					&& (e.getModifiers() & InputEvent.BUTTON1_MASK) != 0) {
-				// ROTATE
-	
-				// Get a rotation delta using a virtual sphere mapping.
-				final double rotDelta[] = { 0.0f, 1.0f, 0.0f, 0.0f };
-				this.virtualSphere.compute(this.prevMouseX, this.prevMouseY, x, y,
-						rotDelta);
-				/*
-				 * for(int i = 0; i < rotDelta.length; i++) {
-				 * if(Double.isNaN(rotDelta[i])) { System.err.flush(); } }
-				 */
-	
-				// We want to make it look like we're rotating the object
-				// instead
-				// of the camera, so reverse the camera motion direction.
-				rotDelta[0] *= -1.0;
-				rotDelta[3] *= -1.0; // The Z-direction needs to be
-				// flipped...
-	
-				// Before we can apply the virtual sphere rotation to the view,
-				// we have to transform the virtual sphere's fixed/world
-				// coordinate
-				// system rotation vector into the camera/view coordinate
-				// system.
-	
-				// Construct the viewDirection vector.
-				final double viewDirection[] = { this.viewCenter[0] - this.viewEye[0],
-						this.viewCenter[1] - this.viewEye[1],
-						this.viewCenter[2] - this.viewEye[2] };
-				/*
-				 * if (Double.isNaN(viewDirection[0]) ||
-				 * Double.isNaN(viewDirection[1]) || Double.isNaN(viewDirection[2])) {
-				 * System.err.flush(); }
-				 */
-	
-				ArrayLinearAlgebra.normalizeVector(viewDirection);
-				/*
-				 * if (Double.isNaN(viewDirection[0]) ||
-				 * Double.isNaN(viewDirection[1]) || Double.isNaN(viewDirection[2])) {
-				 * System.err.flush(); }
-				 */
-	
-				// Construct the viewRight vector (ie: viewDirection x viewUp).
-				final double viewRight[] = { 1.0f, 0.0f, 0.0f };
-				ArrayLinearAlgebra.crossProduct(viewDirection, this.viewUp, viewRight);
-				/*
-				 * if (Double.isNaN(viewRight[0]) || Double.isNaN(viewRight[1]) ||
-				 * Double.isNaN(viewRight[2])) { System.err.flush(); }
-				 */
-	
-				ArrayLinearAlgebra.normalizeVector(viewRight);
-	
-				/*
-				 * if (Double.isNaN(viewRight[0]) || Double.isNaN(viewRight[1]) ||
-				 * Double.isNaN(viewRight[2])) { System.err.flush(); }
-				 */
-	
-				// Construct the virtual-sphere-to-view rotation matrix
-				// (transpose)
-				final double viewMatrix[] = { viewRight[0], this.viewUp[0],
-						viewDirection[0], 0.0f, viewRight[1], this.viewUp[1],
-						viewDirection[1], 0.0f, viewRight[2], this.viewUp[2],
-						viewDirection[2], 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
-	
-				/*
-				 * for(int i = 0; i < viewMatrix.length; i++) {
-				 * if(Double.isNaN(viewMatrix[i])) { System.err.flush(); } }
-				 */
-	
-				// Transform the virtual sphere axis's coordinate system
-				final double vsAxis[] = { rotDelta[1], rotDelta[2], rotDelta[3] };
-				ArrayLinearAlgebra.matrixRotate(viewMatrix, vsAxis);
-				rotDelta[1] = vsAxis[0];
-				rotDelta[2] = vsAxis[1];
-				rotDelta[3] = vsAxis[2];
-	
-				/*
-				 * for(int i = 0; i < rotDelta.length; i++) {
-				 * if(Double.isNaN(rotDelta[i])) { System.err.flush(); } }
-				 */
-	
-				// NOW we can apply the transformed rotation to the view!
-				// Compute the new viewEye.
-				// Translate to the rotationCenter.
-				this.viewEye[0] -= this.rotationCenter[0];
-				this.viewEye[1] -= this.rotationCenter[1];
-				this.viewEye[2] -= this.rotationCenter[2];
-				ArrayLinearAlgebra.angleAxisRotate(rotDelta, this.viewEye);
-				// Translate back.
-				this.viewEye[0] += this.rotationCenter[0];
-				this.viewEye[1] += this.rotationCenter[1];
-				this.viewEye[2] += this.rotationCenter[2];
-	
-				/*
-				 * for(int i = 0; i < viewEye.length; i++) {
-				 * if(Double.isNaN(viewEye[i])) { System.err.flush(); } }
-				 */
-	
-				// Compute the new viewCenter.
-				// Translate to the rotationCenter.
-				this.viewCenter[0] -= this.rotationCenter[0];
-				this.viewCenter[1] -= this.rotationCenter[1];
-				this.viewCenter[2] -= this.rotationCenter[2];
-				ArrayLinearAlgebra.angleAxisRotate(rotDelta, this.viewCenter);
-				// Translate back.
-				this.viewCenter[0] += this.rotationCenter[0];
-				this.viewCenter[1] += this.rotationCenter[1];
-				this.viewCenter[2] += this.rotationCenter[2];
-	
-				/*
-				 * for(int i = 0; i < viewCenter.length; i++) {
-				 * if(Double.isNaN(viewCenter[i])) { System.err.flush(); } }
-				 */
-	
-				// Compute the new viewUp.
-				// (note that we do not translate to the rotation center first
-				// because viewUp is a direction vector not an absolute vector!)
-				ArrayLinearAlgebra.angleAxisRotate(rotDelta, this.viewUp);
-	
-				/*
-				 * for(int i = 0; i < viewUp.length; i++) {
-				 * if(Double.isNaN(viewUp[i])) { System.err.flush(); } }
-				 */
-	
-				ArrayLinearAlgebra.normalizeVector(this.viewUp);
-	
-				/*
-				 * for(int i = 0; i < viewUp.length; i++) {
-				 * if(Double.isNaN(viewUp[i])) { System.err.flush(); } }
-				 */
-			} else if ((e.getModifiers() & InputEvent.CTRL_MASK) == 0
-					&& (e.getModifiers() & InputEvent.SHIFT_MASK) != 0
-					|| (e.getModifiers() & InputEvent.BUTTON2_MASK) != 0) {
-				// DOLLY IN/OUT
-	
-				// Compute normalized direction vector from viewEye to
-				// viewCenter.
-	
-				v3d[0] = this.viewCenter[0] - this.viewEye[0];
-				v3d[1] = this.viewCenter[1] - this.viewEye[1];
-				v3d[2] = this.viewCenter[2] - this.viewEye[2];
-	
-				ArrayLinearAlgebra.normalizeVector(v3d);
-	
-				// Compute a deltaZ that provides a nice motion speed,
-				// then multiply the direction vector by deltaZ.
-	
-				double deltaZ = 200.0 * ((double) (y - this.prevMouseY) / (double) size.height);
-				if (deltaZ < -100.0) {
-					deltaZ = -100.0f;
-				}
-				if (deltaZ > 100.0) {
-					deltaZ = 100.0f;
-				}
-				v3d[0] *= deltaZ;
-				v3d[1] *= deltaZ;
-				v3d[2] *= deltaZ;
-	
-				// Add the delta vector to viewEye and viewCenter.
-	
-				this.viewEye[0] += v3d[0];
-				this.viewEye[1] += v3d[1];
-				this.viewEye[2] += v3d[2];
-				this.viewCenter[0] += v3d[0];
-				this.viewCenter[1] += v3d[1];
-				this.viewCenter[2] += v3d[2];
-				// final double sign = deltaZ < 0 ? 1 : -1;
-				// final double vectorLength = Algebra.vectorLength(v3d) * sign;
-				// this.fogStart += vectorLength;
-				// this.fogEnd += vectorLength;
-			} else if ((e.getModifiers() & InputEvent.CTRL_MASK) != 0
-					|| (e.getModifiers() & InputEvent.BUTTON3_MASK) != 0) {
-				// TRANSLATE LEFT/RIGHT AND UP/DOWN
-	
-				// Compute a left-right direction vector from the current view
-				// vectors (ie: cross product of viewUp and viewCenter-viewEye).
-	
-				// Compute view direction vector (v3d2).
-				v3d2[0] = this.viewCenter[0] - this.viewEye[0];
-				v3d2[1] = this.viewCenter[1] - this.viewEye[1];
-				v3d2[2] = this.viewCenter[2] - this.viewEye[2];
-				ArrayLinearAlgebra.normalizeVector(v3d2);
-	
-				// Compute left-right direction vector (v3d2 x viewUp).
-				ArrayLinearAlgebra.crossProduct(v3d2, this.viewUp, v3d);
-				ArrayLinearAlgebra.normalizeVector(v3d);
-	
-				// Compute a deltaX and deltaY that provide a nice motion speed,
-				// then multiply the direction vector by the deltas.
-	
-				final double deltaX = 30.0 * ((double) (this.prevMouseX - x) / (double) size.width);
-				final double deltaY = 30.0 * ((double) (y - this.prevMouseY) / (double) size.height);
-	
-				// Add the deltaX portion of the left-right vector
-				// to the deltaY portion of the up-down vector
-				// to get our relative offset vector.
-				final double shiftX = (v3d[0] * deltaX) + (this.viewUp[0] * deltaY);
-				final double shiftY = (v3d[1] * deltaX) + (this.viewUp[1] * deltaY);
-				final double shiftZ = (v3d[2] * deltaX) + (this.viewUp[2] * deltaY);
-	
-				// Add the resulting offsets to viewEye and viewCenter.
-	
-				this.viewEye[0] += shiftX;
-				this.viewEye[1] += shiftY;
-				this.viewEye[2] += shiftZ;
-				this.viewCenter[0] += shiftX;
-				this.viewCenter[1] += shiftY;
-				this.viewCenter[2] += shiftZ;
+		if ((e.getModifiers() & InputEvent.CTRL_MASK) == 0
+				&& (e.getModifiers() & InputEvent.SHIFT_MASK) == 0
+				&& (e.getModifiers() & InputEvent.BUTTON1_MASK) != 0) {
+			// ROTATE
+
+			// Get a rotation delta using a virtual sphere mapping.
+			final double rotDelta[] = { 0.0f, 1.0f, 0.0f, 0.0f };
+			this.virtualSphere.compute(this.prevMouseX, this.prevMouseY, x, y,
+					rotDelta);
+			/*
+			 * for(int i = 0; i < rotDelta.length; i++) {
+			 * if(Double.isNaN(rotDelta[i])) { System.err.flush(); } }
+			 */
+
+			// We want to make it look like we're rotating the object
+			// instead
+			// of the camera, so reverse the camera motion direction.
+			rotDelta[0] *= -1.0;
+			rotDelta[3] *= -1.0; // The Z-direction needs to be
+			// flipped...
+
+			// Before we can apply the virtual sphere rotation to the view,
+			// we have to transform the virtual sphere's fixed/world
+			// coordinate
+			// system rotation vector into the camera/view coordinate
+			// system.
+
+			// Construct the viewDirection vector.
+			final double viewDirection[] = { this.viewCenter[0] - this.viewEye[0],
+					this.viewCenter[1] - this.viewEye[1],
+					this.viewCenter[2] - this.viewEye[2] };
+			/*
+			 * if (Double.isNaN(viewDirection[0]) ||
+			 * Double.isNaN(viewDirection[1]) || Double.isNaN(viewDirection[2])) {
+			 * System.err.flush(); }
+			 */
+
+			ArrayLinearAlgebra.normalizeVector(viewDirection);
+			/*
+			 * if (Double.isNaN(viewDirection[0]) ||
+			 * Double.isNaN(viewDirection[1]) || Double.isNaN(viewDirection[2])) {
+			 * System.err.flush(); }
+			 */
+
+			// Construct the viewRight vector (ie: viewDirection x viewUp).
+			final double viewRight[] = { 1.0f, 0.0f, 0.0f };
+			ArrayLinearAlgebra.crossProduct(viewDirection, this.viewUp, viewRight);
+			/*
+			 * if (Double.isNaN(viewRight[0]) || Double.isNaN(viewRight[1]) ||
+			 * Double.isNaN(viewRight[2])) { System.err.flush(); }
+			 */
+
+			ArrayLinearAlgebra.normalizeVector(viewRight);
+
+			/*
+			 * if (Double.isNaN(viewRight[0]) || Double.isNaN(viewRight[1]) ||
+			 * Double.isNaN(viewRight[2])) { System.err.flush(); }
+			 */
+
+			// Construct the virtual-sphere-to-view rotation matrix
+			// (transpose)
+			final double viewMatrix[] = { viewRight[0], this.viewUp[0],
+					viewDirection[0], 0.0f, viewRight[1], this.viewUp[1],
+					viewDirection[1], 0.0f, viewRight[2], this.viewUp[2],
+					viewDirection[2], 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+
+			/*
+			 * for(int i = 0; i < viewMatrix.length; i++) {
+			 * if(Double.isNaN(viewMatrix[i])) { System.err.flush(); } }
+			 */
+
+			// Transform the virtual sphere axis's coordinate system
+			final double vsAxis[] = { rotDelta[1], rotDelta[2], rotDelta[3] };
+			ArrayLinearAlgebra.matrixRotate(viewMatrix, vsAxis);
+			rotDelta[1] = vsAxis[0];
+			rotDelta[2] = vsAxis[1];
+			rotDelta[3] = vsAxis[2];
+
+			/*
+			 * for(int i = 0; i < rotDelta.length; i++) {
+			 * if(Double.isNaN(rotDelta[i])) { System.err.flush(); } }
+			 */
+
+			// NOW we can apply the transformed rotation to the view!
+			// Compute the new viewEye.
+			// Translate to the rotationCenter.
+			this.viewEye[0] -= this.rotationCenter[0];
+			this.viewEye[1] -= this.rotationCenter[1];
+			this.viewEye[2] -= this.rotationCenter[2];
+			ArrayLinearAlgebra.angleAxisRotate(rotDelta, this.viewEye);
+			// Translate back.
+			this.viewEye[0] += this.rotationCenter[0];
+			this.viewEye[1] += this.rotationCenter[1];
+			this.viewEye[2] += this.rotationCenter[2];
+
+			/*
+			 * for(int i = 0; i < viewEye.length; i++) {
+			 * if(Double.isNaN(viewEye[i])) { System.err.flush(); } }
+			 */
+
+			// Compute the new viewCenter.
+			// Translate to the rotationCenter.
+			this.viewCenter[0] -= this.rotationCenter[0];
+			this.viewCenter[1] -= this.rotationCenter[1];
+			this.viewCenter[2] -= this.rotationCenter[2];
+			ArrayLinearAlgebra.angleAxisRotate(rotDelta, this.viewCenter);
+			// Translate back.
+			this.viewCenter[0] += this.rotationCenter[0];
+			this.viewCenter[1] += this.rotationCenter[1];
+			this.viewCenter[2] += this.rotationCenter[2];
+
+			/*
+			 * for(int i = 0; i < viewCenter.length; i++) {
+			 * if(Double.isNaN(viewCenter[i])) { System.err.flush(); } }
+			 */
+
+			// Compute the new viewUp.
+			// (note that we do not translate to the rotation center first
+			// because viewUp is a direction vector not an absolute vector!)
+			ArrayLinearAlgebra.angleAxisRotate(rotDelta, this.viewUp);
+
+			/*
+			 * for(int i = 0; i < viewUp.length; i++) {
+			 * if(Double.isNaN(viewUp[i])) { System.err.flush(); } }
+			 */
+
+			ArrayLinearAlgebra.normalizeVector(this.viewUp);
+
+			/*
+			 * for(int i = 0; i < viewUp.length; i++) {
+			 * if(Double.isNaN(viewUp[i])) { System.err.flush(); } }
+			 */
+		} else if ((e.getModifiers() & InputEvent.CTRL_MASK) == 0
+				&& (e.getModifiers() & InputEvent.SHIFT_MASK) != 0
+				|| (e.getModifiers() & InputEvent.BUTTON2_MASK) != 0) {
+			// DOLLY IN/OUT
+
+			// Compute normalized direction vector from viewEye to
+			// viewCenter.
+
+			v3d[0] = this.viewCenter[0] - this.viewEye[0];
+			v3d[1] = this.viewCenter[1] - this.viewEye[1];
+			v3d[2] = this.viewCenter[2] - this.viewEye[2];
+
+			ArrayLinearAlgebra.normalizeVector(v3d);
+
+			// Compute a deltaZ that provides a nice motion speed,
+			// then multiply the direction vector by deltaZ.
+
+			double deltaZ = 200.0 * ((double) (y - this.prevMouseY) / (double) size.height);
+			if (deltaZ < -100.0) {
+				deltaZ = -100.0f;
 			}
-//		}
+			if (deltaZ > 100.0) {
+				deltaZ = 100.0f;
+			}
+			v3d[0] *= deltaZ;
+			v3d[1] *= deltaZ;
+			v3d[2] *= deltaZ;
+
+			// Add the delta vector to viewEye and viewCenter.
+
+			this.viewEye[0] += v3d[0];
+			this.viewEye[1] += v3d[1];
+			this.viewEye[2] += v3d[2];
+			this.viewCenter[0] += v3d[0];
+			this.viewCenter[1] += v3d[1];
+			this.viewCenter[2] += v3d[2];
+
+		} else if ((e.getModifiers() & InputEvent.CTRL_MASK) != 0
+				|| (e.getModifiers() & InputEvent.BUTTON3_MASK) != 0) {
+			// TRANSLATE LEFT/RIGHT AND UP/DOWN
+
+			// Compute a left-right direction vector from the current view
+			// vectors (ie: cross product of viewUp and viewCenter-viewEye).
+
+			// Compute view direction vector (v3d2).
+			v3d2[0] = this.viewCenter[0] - this.viewEye[0];
+			v3d2[1] = this.viewCenter[1] - this.viewEye[1];
+			v3d2[2] = this.viewCenter[2] - this.viewEye[2];
+			ArrayLinearAlgebra.normalizeVector(v3d2);
+
+			// Compute left-right direction vector (v3d2 x viewUp).
+			ArrayLinearAlgebra.crossProduct(v3d2, this.viewUp, v3d);
+			ArrayLinearAlgebra.normalizeVector(v3d);
+
+			// Compute a deltaX and deltaY that provide a nice motion speed,
+			// then multiply the direction vector by the deltas.
+
+			final double deltaX = 30.0 * ((double) (this.prevMouseX - x) / (double) size.width);
+			final double deltaY = 30.0 * ((double) (y - this.prevMouseY) / (double) size.height);
+
+			// Add the deltaX portion of the left-right vector
+			// to the deltaY portion of the up-down vector
+			// to get our relative offset vector.
+			final double shiftX = (v3d[0] * deltaX) + (this.viewUp[0] * deltaY);
+			final double shiftY = (v3d[1] * deltaX) + (this.viewUp[1] * deltaY);
+			final double shiftZ = (v3d[2] * deltaX) + (this.viewUp[2] * deltaY);
+
+			// Add the resulting offsets to viewEye and viewCenter.
+
+			this.viewEye[0] += shiftX;
+			this.viewEye[1] += shiftY;
+			this.viewEye[2] += shiftZ;
+			this.viewCenter[0] += shiftX;
+			this.viewCenter[1] += shiftY;
+			this.viewCenter[2] += shiftZ;
+		}
+		//		}
 
 		this.prevMouseX = x;
 		this.prevMouseY = y;
@@ -1775,7 +1575,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	 */
 	public void mouseMoved(final MouseEvent e) {
 		this.lastMouseLocationInPanelForIndicatorBubble = this.mouseLocationInPanel = e
-				.getPoint();
+		.getPoint();
 
 		this.requestPick();
 	}
@@ -1841,24 +1641,13 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 			e.printStackTrace();
 			return null;
 		}
-		/*
-		 * Component c = this; Component c_ = null; while(c != null) { c_ = c; c =
-		 * c_.getParent(); } System.out.println(c_.getClass().toString()); if(c_ ==
-		 * this.model.getMainFrame()) { System.out.println("This is the main
-		 * frame..."); }
-		 * 
-		 * Toolkit toolkit = Toolkit.getDefaultToolkit(); GraphicsDevice screen =
-		 * GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-		 * if (toolkit instanceof ComponentFactory) { ComponentFactory peer =
-		 * ((ComponentFactory)toolkit); screen. }
-		 */
 
 		final Point screenLocation = super.getLocationOnScreen();
 
 		final Rectangle rectangle = new Rectangle(screenLocation.x,
 				screenLocation.y, super.getWidth(), super.getHeight());
 		final BufferedImage screenshot = screenRobot
-				.createScreenCapture(rectangle);
+		.createScreenCapture(rectangle);
 
 		// return screenshot;
 		return screenshot;
@@ -1880,7 +1669,6 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		this.screenshot = null;
 	}
 
-	// TODO comment
 	public void requestScreenShot(final int width, final int height) {
 		this.screenshot = null;
 		this.screenshotFailed = false;
@@ -1913,14 +1701,19 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 				// invisible.
 				for (Chain c : sm.getChains())
 				{
+					// TODO PR enable helices for NAs
 					if (c.getResidueCount() > 0
 							&& c.getResidue(0).getClassification() == Residue.Classification.AMINO_ACID) {
+//						if (c.getResidueCount() > 0
+//								&& (c.getResidue(0).getClassification() == Residue.Classification.AMINO_ACID ||
+//										c.getResidue(0).getClassification() == Residue.Classification.NUCLEIC_ACID)) {
+
 
 						ss.setVisible(c, true);
 					} else {
 						ss.setVisible(c, false);
 					}
-						
+
 					for (Fragment f : c.getFragments())
 					{
 						for (Residue r : f.getResidues())
@@ -1939,7 +1732,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 							for (Bond b : sm.getBonds(atoms))
 							{
 								if (r.getClassification() != Residue.Classification.AMINO_ACID &&
-									r.getClassification() != Residue.Classification.WATER ) {
+										r.getClassification() != Residue.Classification.WATER ) {
 									ss.setVisible(b, true);
 								} else {
 									ss.setVisible(b, false);
@@ -1952,7 +1745,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 					this.structureAdded(s);
 				}
 			}
-			
+
 			resetView(forceRecalculation, false);
 		}
 
@@ -1969,7 +1762,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	{
 		structureAdded(str, RibbonForm.RIBBON_TRADITIONAL, true);
 	}
-	
+
 	/**
 	 * Internal response to 'structure added'.  Sets default ribbon form and whether or not to set the
 	 * default atom styles.  Set to 'false' if you want to do your own.
@@ -1982,22 +1775,21 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	{
 		final StructureMap structureMap = str.getStructureMap();
 		final StructureStyles structureStyles = structureMap
-				.getStructureStyles();
+		.getStructureStyles();
 		final JoglSceneNode sn = (JoglSceneNode)structureMap.getUData();
 
 		final ChainGeometry defaultChainGeometry = (ChainGeometry) defaultGeometry.get(ComponentType.CHAIN);
 		final AtomGeometry defaultAtomGeometry = (AtomGeometry) defaultGeometry.get(ComponentType.ATOM);
 		final BondGeometry defaultBondGeometry = (BondGeometry) defaultGeometry.get(ComponentType.BOND);
 
-//		TODO: Fix default chain style (comes up null for the type)
 		final ChainStyle defaultChainStyle = (ChainStyle) structureStyles.getDefaultStyle(ComponentType.CHAIN);
 		final AtomStyle defaultAtomStyle = (AtomStyle) structureStyles.getDefaultStyle(ComponentType.ATOM);
 		final BondStyle defaultBondStyle = (BondStyle) structureStyles.getDefaultStyle(ComponentType.BOND);
 
 		str.getStructureMap().getStructureStyles()
-				.removeStructureStylesEventListener(this);
+		.removeStructureStylesEventListener(this);
 		str.getStructureMap().getStructureStyles()
-				.addStructureStylesEventListener(this);
+		.addStructureStylesEventListener(this);
 
 		defaultChainGeometry.setRibbonForm(ribbonForm);
 		defaultChainGeometry.setRibbonsAreSmoothed(true);
@@ -2048,20 +1840,20 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		}
 
 		if (doAtoms)
-						// atoms will be handled by derived func, if at all.
+			// atoms will be handled by derived func, if at all.
 		{
 			final int atomCount = structureMap.getAtomCount();
 			for (int i = 0; i < atomCount; i++)
 			{
 				final Atom a = structureMap.getAtom(i);
-	
+
 				// set the default style
 				structureStyles.setStyle(a, defaultAtomStyle);
-	
+
 				// ignore invisible atoms...
 				if (!structureStyles.isVisible(a))
 					continue;
-	
+
 				synchronized (sn.renderables)
 				{
 					sn.renderables.put(a, new DisplayListRenderable(a,
@@ -2128,7 +1920,7 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 
 			sn.renderables.clear();
 		}
-		
+
 		/*
 		 * So, this would be better controlled by an invocation flag but, since it's a prescribed
 		 * interface, we have to rely on the application hack.
@@ -2158,8 +1950,8 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		if (this.do_glFinishInShaders)
 			gl.glFinish();
 		else
-		    gl.glFlush();
-		
+			gl.glFlush();
+
 		final IntBuffer buf = BufferUtil.newIntBuffer(1);
 		gl.glGetShaderiv(vertexShader, GL.GL_INFO_LOG_LENGTH, buf);
 		int logLength = buf.get(0);
@@ -2167,12 +1959,12 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		gl.glGetShaderiv(vertexShader, GL.GL_COMPILE_STATUS, buf);
 		final int status = buf.get(0);
 
-/* ** DEBUGGING - output shader information
+		/* ** DEBUGGING - output shader information
 		System.err.println("Vertex shader creation...");
 		System.err.println("\tstatus: " + (status == GL.GL_TRUE));
 		System.err.println("\tlog length: " + logLength + "\n");
 		System.err.println("Log:");
-* **/
+		 * **/
 
 		logLength += 10;
 
@@ -2184,11 +1976,11 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		for (int i = 0; i < length[0]; i++) {
 			s.append((char) bufArray[i]);
 		}
-		
+
 		final String log = s.toString();
-/* ** DEBUGGING - output shader information
+		/* ** DEBUGGING - output shader information
 		System.err.println(log + "\n-------------------\n");
-* **/
+		 * **/
 
 		// if the shader was not created, or if it would be run in software,
 		// bail.
@@ -2208,7 +2000,6 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 	private boolean createFragmentShader(final GL gl, final GLU glu,
 			final GLUT glut) {
 		final String[] lines = this.getReaderLines("per_pixel_f.glsl");
-		// final String[] lines = this.getReaderLines("test_f.glsl");
 		final int[] lengths = this.createLengthArray(lines);
 
 		fragmentShader = gl.glCreateShader(GL.GL_FRAGMENT_SHADER);
@@ -2218,34 +2009,34 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		if (this.do_glFinishInShaders)
 			gl.glFinish();
 		else
-		    gl.glFlush();
-		
+			gl.glFlush();
+
 		final IntBuffer buf = BufferUtil.newIntBuffer(1);
 		gl.glGetShaderiv(fragmentShader, GL.GL_INFO_LOG_LENGTH, buf);
 		int logLength = buf.get(0);
 		buf.rewind();
 		gl.glGetShaderiv(fragmentShader, GL.GL_COMPILE_STATUS, buf);
 		final int status = buf.get(0);
-/* ** DEBUGGING - output fragment shader informaiton
+		/* ** DEBUGGING - output fragment shader informaiton
 		System.err.println("Fragment shader creation...");
 		System.err.println("\tstatus: " + (status == GL.GL_TRUE));
 		System.err.println("\tlog length: " + logLength + "\n");
 		System.err.println("Log:");
-* **/
+		 * **/
 
 		logLength += 10;
 
 		final int[] length = new int[1];
 		final byte[] bufArray = new byte[logLength];
 		gl.glGetShaderInfoLog(fragmentShader, logLength, length, 0,
-						bufArray, 0);
+				bufArray, 0);
 
 		final StringBuffer s = new StringBuffer();
 		for (int i = 0; i < length[0]; i++) {
 			s.append((char) bufArray[i]);
 		}
 		final String log = s.toString();
-// DEBUGGING		System.err.println(log + "\n-------------------\n");
+		// DEBUGGING		System.err.println(log + "\n-------------------\n");
 
 		// if the shader was not created, or if it would be run in software,
 		// bail.
@@ -2273,35 +2064,35 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		if (this.do_glFinishInShaders)
 			gl.glFinish();
 		else
-		    gl.glFlush();
-		
+			gl.glFlush();
+
 		final IntBuffer buf = BufferUtil.newIntBuffer(1);
 		gl.glGetProgramiv(shaderProgram, GL.GL_INFO_LOG_LENGTH, buf);
 		int logLength = buf.get(0);
 		buf.rewind();
 		gl.glGetProgramiv(shaderProgram, GL.GL_LINK_STATUS, buf);
 		final int status = buf.get(0);
-/* ** DEBUGGING - output shader program information
+		/* ** DEBUGGING - output shader program information
 		System.err.println("Shader program creation...");
 		System.err.println("\tstatus: " + (status == GL.GL_TRUE));
 		System.err.println("\tlog length: " + logLength + "\n");
 		System.err.println("Log:");
-* **/
+		 * **/
 
 		logLength += 10;
 
 		final int[] length = new int[1];
 		final byte[] bufArray = new byte[logLength];
 		gl
-				.glGetProgramInfoLog(shaderProgram, logLength, length, 0,
-						bufArray, 0);
+		.glGetProgramInfoLog(shaderProgram, logLength, length, 0,
+				bufArray, 0);
 
 		final StringBuffer s = new StringBuffer();
 		for (int i = 0; i < length[0]; i++) {
 			s.append((char) bufArray[i]);
 		}
 		final String log = s.toString();
-// DEBUGGING		System.err.println(log + "\n-------------------\n");
+		// DEBUGGING		System.err.println(log + "\n-------------------\n");
 
 		// if the shader was not created, or if it would be run in software,
 		// bail.
@@ -2366,11 +2157,11 @@ public class GlGeometryViewer extends JPanel implements GLEventListener,
 		case VIEW_RESET:
 			reset();
 			break;
-			
+
 		case STRUCTURE_ADDED:
 			structureAdded(evt.structure);
 			break;
-			
+
 		case CLEAR_ALL:
 			clearStructure();
 			break;

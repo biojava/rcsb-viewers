@@ -99,18 +99,9 @@ public class HelixGeometry extends SsGeometry {
 
 	// Styles - cross section
 	private float width = 2.6f;
-
 	private float height = 0.80f;
-
 	private int facets = 14;
 
-	// Style - Polygon Mesh
-	// private int polygonStyle;
-
-	// Other parameters
-//	private final float start, end;
-
-	// private Shape3D shape = null;
 	private ConformationShape ssShape = ConformationShape.RIBBON;
 
 	/**
@@ -119,25 +110,16 @@ public class HelixGeometry extends SsGeometry {
 	 */
 	public HelixGeometry(final StructureComponent sc) {
 		super(sc);
-		// helixStyle = CrossSectionType.OBLONG;
-		// csType = CrossSectionType.RECTANGULAR_HelixGeometryType.RIBBON;
-		// helixStyle = CrossSectionType.DOUBLE_FACE;
 		this.csType = CrossSectionType.REGULAR_POLYGON;
-		// polygonStyle = PolygonAttributes.POLYGON_FILL;
 		this.ssShape = ConformationShape.RIBBON;
-		// polygonStyle = PolygonAttributes.POLYGON_LINE;
 		this.uniformColor = false;
 		this.userData = "Helix";
-
 		this.segments = 8;
 		this.facets = 12;
-
 	}
 
 	
 	public DisplayLists generateJoglGeometry(final GL gl, final GLU glu, final GLUT glut) {
-		float time1, time2;
-
 		this.processQualityInfo(this.quality);
 		if (this.ssShape == ConformationShape.CYLINDER) {
 			this.segments = 2;
@@ -235,7 +217,6 @@ public class HelixGeometry extends SsGeometry {
 
 					sampleOrigin.set(sampleCoord.value[0],
 							sampleCoord.value[1], sampleCoord.value[2]);
-					// pathTrihedron[k].setOrigin( sampleOrigin );
 					pathTrihedron[k].setOriginOnly(sampleOrigin);
 
 					pathCoords[k] = new Vector3f(sampleCoord.value[0],
@@ -247,13 +228,8 @@ public class HelixGeometry extends SsGeometry {
 					this.coords[this.coords.length - 1].value[1],
 					this.coords[this.coords.length - 1].value[2]);
 			pathTrihedron[k] = new FrenetTrihedron(secondTrihedron);
-			// scale[k] = new Vector3d( 1.00d, 1.00d, coilScale );
 
 			scale = this.getTrigScale(spinePointCount, this.segments, SsGeometry.coilWidth, this.width);
-			// scale = getTrigScale( spinePointCount, segments, coilWidth,
-			// coilWidth );
-
-			time2 = System.currentTimeMillis();
 		} else if (this.ssShape == ConformationShape.CYLINDER) {
 
 			final Vector3f[] tmpCoord = new Vector3f[this.coords.length];
@@ -347,8 +323,6 @@ public class HelixGeometry extends SsGeometry {
 			this.setPathColor(spinePointCount);
 		}
 
-		time1 = System.currentTimeMillis();
-
 		if (this.ssShape == ConformationShape.RIBBON) {
 			return this.drawFigure(this.csStyle, pathCoords, scale, pathTrihedron,
 					this.pathColorMap, spinePointCount, gl, glu, glut);
@@ -369,46 +343,10 @@ public class HelixGeometry extends SsGeometry {
 			final int pointCount, final GL gl, final GLU glu, final GLUT glut) {
 		final DisplayLists arrayLists = new DisplayLists(this.structureComponent);
 		
-		final float time1 = System.currentTimeMillis();
-		// 
-		// Set an Appearance for the helix.
-		//Material material = new Material();
-		//Color3f color = new Color3f(new Color(1.0f, 1.0f, 0.0f));
-//		Color3f specularColor = new Color3f(new Color(0.7f, 0.7f, 0.7f));
-//		Color3f ambientColor = new Color3f(new Color(0.9f, 0.9f, 0.9f));
-//		Color3f emissiveColor = new Color3f(new Color(0.05f, 0.05f, 0.05f));
-		//material.setSpecularColor(specularColor);
-		//material.setAmbientColor(ambientColor);
-		//material.setEmissiveColor(emissiveColor);
 		arrayLists.specularColor = Constants.chainSpecularColor.color;
-		//arrayLists.ambientColor = ambientColor.color;
-		//arrayLists.diffuseColor = ambientColor.color;
 		arrayLists.emissiveColor = Constants.chainEmissiveColor.color;
 		arrayLists.shininess = Constants.chainHighShininess;
-		//gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, specularColor.color, 0);
-		//gl.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, emissiveColor.color, 0);
-		//gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, ambientColor.color);
-//		highShininess[0] = 128.0f;
-		//gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, shininessTemp, 0);
-		// RenderingAttributes rendering = new RenderingAttributes();
 
-		//Appearance helixApp = new Appearance();
-		//helixApp.setMaterial(material);
-		// helixApp.setRenderingAttributes( rendering );
-		// ColoringAttributes coloring = new ColoringAttributes( color,
-		// ColoringAttributes.NICEST );
-		//PolygonAttributes polygonAtt = new PolygonAttributes();
-		//polygonAtt.setPolygonMode(polygonStyle);
-		//gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_FILL);
-		//polygonAtt.setCullFace(PolygonAttributes.CULL_BACK);
-		//gl.glCullFace(GL.GL_BACK);
-		//helixApp.setPolygonAttributes(polygonAtt);
-
-		//Shape3D helixShape = new Shape3D();
-		//GeometryArray figure = null;
-
-		// boolean rounded = true;
-		//BranchGroup branch = new BranchGroup();
 		final int start = 0; // Keeps track of the starting point of each chain
 						// (Several chains per structure in general).
 		int[] stripVertexCounts = null; // Stores number of vertices in each
@@ -457,8 +395,6 @@ public class HelixGeometry extends SsGeometry {
 			//TODO the ribbon = false value in various functions of SSGeometry should be used instead of this for now.
 			stripVertexCounts = new int[1];
 			stripVertexCounts[0] = pointCount;
-			//helixApp.setLineAttributes(new LineAttributes(3.0f,
-			//		LineAttributes.PATTERN_SOLID, false));
 			break;
 		default:
 			break;
@@ -488,10 +424,6 @@ public class HelixGeometry extends SsGeometry {
 		if(f.getStartResidueIndex() == 0) {
 		}
 		
-//		Object existsObject = new Object();
-//		Object doesntExistObject = new Object();
-//		RangeMap rangeMap = new RangeMap(0, arrayLists.vertexSize - 1, doesntExistObject);
-		
 		int vertexSize = -1;
 		if(this.csType != CrossSectionType.POINT) {
 			vertexSize = 4 * ((cs.length - 1) * (cs[0].getVertexCount() - 1) + cs[0].getVertexCount());
@@ -516,14 +448,7 @@ public class HelixGeometry extends SsGeometry {
 					endIndex = vertexSize - 1;
 				}
 				
-//				for(int i = startIndex + 1; i <= endIndex; i++) {
-//					if(rangeMap.getContiguousValue(i, i) == existsObject) {
-//						System.out.print("");
-//					}
-//				}
-				
 				this.ranges[index] = new Object[] {f.getResidue(index), new int[] {startIndex, endIndex}};
-//				rangeMap.setRange(startIndex, endIndex, existsObject);
 			} else {
 				int startIndex, endIndex;
 				final int halfSpan = this.segments / 2;
@@ -541,7 +466,6 @@ public class HelixGeometry extends SsGeometry {
 				}
 				
 				this.ranges[index] = new Object[] {f.getResidue(index), new int[] {startIndex, endIndex}};
-//				rangeMap.setRange(startIndex, endIndex, existsObject);
 			}
 		}
 		
@@ -551,20 +475,10 @@ public class HelixGeometry extends SsGeometry {
 			figure.draw(arrayLists, gl, glu, glut, this.ranges);
 		} else {
 			arrayLists.disableLighting();
-//			arrayLists.shininess = noShininess;
 			final BackboneLine figure = new BackboneLine(pointCount, stripVertexCounts,
 					coordinates, colorMap);
 			figure.draw(arrayLists, gl, glu, glut, this.ranges);
 		}
-		
-		
-
-		
-//		for(int i = 0; i < arrayLists.vertexSize; i++) {
-//			if(rangeMap.getContiguousValue(i, i) == doesntExistObject) {
-//				System.out.print("");
-//			}
-//		}
 		
 		return arrayLists;
 	}
@@ -578,8 +492,7 @@ public class HelixGeometry extends SsGeometry {
 			return;
 		}
 
-		final int k = (r + l) / 2;
-		// System.err.println( "Left " + l + " Right " + r + " Middle " + k );
+		final int k = (r + l) / 2;;
 		norms[k].add(norms[l], norms[r]);
 		tmp.set(tans[k]);
 		tmp.scale(norms[k].dot(tans[k]));
@@ -602,11 +515,7 @@ public class HelixGeometry extends SsGeometry {
 		final Vector3f v2 = new Vector3f();
 		final Vector3f v = new Vector3f();
 		final Vector3f dv1 = new Vector3f();
-		final Vector3f dv2 = new Vector3f();
-
 		final Vector3f tmpv = new Vector3f();
-		final Vector3f cvec = new Vector3f();
-		final Vector3f rvec = new Vector3f();
 
 		final int len = coords.length - 1;
 
@@ -614,8 +523,6 @@ public class HelixGeometry extends SsGeometry {
 			path[i] = new Vector3f(coords[i].value[0], coords[i].value[1],
 					coords[i].value[2]);
 		}
-
-		// getCylinderAxis( path );
 
 		// Set the end points
 		if ((len >= 4)) {
@@ -661,8 +568,7 @@ public class HelixGeometry extends SsGeometry {
 			System.err.println("Segment too short to handle ");
 		}
 
-		Priestle.smooth(path, steps);
-		// Priestle.smooth( path, 2 );
+		Priestle.smooth(path, steps);;
 
 		// Calculate tangents
 		//
@@ -737,7 +643,6 @@ public class HelixGeometry extends SsGeometry {
 		final Vector3f dv1 = new Vector3f();
 		final Vector3f dv2 = new Vector3f();
 
-		final Vector3f axis = new Vector3f();
 		Vector3f cvec = new Vector3f();
 		Vector3f rvec = new Vector3f();
 
@@ -934,173 +839,6 @@ public class HelixGeometry extends SsGeometry {
 	}
 
 	/**
-	 * Hightlights the portion of SS sorounding residue at index.
-	 */
-	/*public void highlightResidueRegion(int index, float[] color) {
-
-		if (csType != 6) {
-			int verticesPerBase = csStyle.getVertexCount();
-			int startIndex, endIndex;
-			int halfSpan = 2 * segments * (verticesPerBase - 1);
-			int center = 2 * verticesPerBase + 2 * halfSpan * index;
-
-			if (index > 0) {
-				startIndex = center - halfSpan;
-			} else {
-				startIndex = center;
-			}
-			if (index < coords.length - 1) {
-				endIndex = center + halfSpan;
-			} else {
-				endIndex = center;
-			}
-
-			Extrusion geom = (Extrusion) shape.getGeometry();
-			if (!highlighted) {
-				// Needs highlighted
-				//
-				geom.highlight(startIndex, endIndex, color);
-				highlighted = true;
-			} else {
-				// Already highlighted, probably needs to be returned to the
-				// initial color
-				//
-				geom.updateColors(startIndex, endIndex, index * segments);
-				highlighted = false;
-			}
-		} else {
-			int startIndex, endIndex;
-			int halfSpan = segments / 2;
-			int center = index * segments;
-
-			if (index > 0) {
-				startIndex = center - halfSpan;
-			} else {
-				startIndex = center;
-			}
-			if (index < coords.length - 1) {
-				endIndex = center + halfSpan;
-			} else {
-				endIndex = center;
-			}
-
-			BackboneLine geom = (BackboneLine) shape.getGeometry();
-			if (!highlighted) {
-				geom.highlight(startIndex, endIndex, color);
-				highlighted = true;
-			} else {
-				geom.updateColors(startIndex, endIndex);
-				highlighted = false;
-			}
-		}
-	}*/
-
-	/**
-	 * Hightlights the portion of SS sorounding residue at index.
-	 */
-//	public void highlightResidue(int index, float[] color) {
-//
-//		if (csType != 6) {
-//			int verticesPerBase = csStyle.getVertexCount();
-//			int startIndex, endIndex;
-//			int halfSpan = 2 * segments * (verticesPerBase - 1);
-//			int center = 2 * verticesPerBase + 2 * halfSpan * index;
-//
-//			if (index > 0) {
-//				startIndex = center - halfSpan;
-//			} else {
-//				startIndex = center;
-//			}
-//			if (index < coords.length - 1) {
-//				endIndex = center + halfSpan;
-//			} else {
-//				endIndex = center;
-//			}
-//
-//			Extrusion geom = (Extrusion) shape.getGeometry();
-//			geom.highlight(startIndex, endIndex, color);
-//		} else {
-//			int startIndex, endIndex;
-//			int halfSpan = segments / 2;
-//			int center = index * segments;
-//
-//			if (index > 0) {
-//				startIndex = center - halfSpan;
-//			} else {
-//				startIndex = center;
-//			}
-//			if (index < coords.length - 1) {
-//				endIndex = center + halfSpan;
-//			} else {
-//				endIndex = center;
-//			}
-//
-//			BackboneLine geom = (BackboneLine) shape.getGeometry();
-//			geom.highlight(startIndex, endIndex, color);
-//		}
-//	}
-
-	/**
-	 * Resets the vertex color in the geometry shape of this SsGeometry object.
-	 */
-	/*public void resetGeometryColor() {
-		if (csType != 6) {
-			Extrusion geom = (Extrusion) shape.getGeometry();
-			geom.setColors(pathColorMap);
-		} else {
-			BackboneLine geom = (BackboneLine) shape.getGeometry();
-			geom.setColors(pathColorMap);
-		}
-
-		for (int i = 0; i < coords.length; i++) {
-			resetResidueColor(i);
-		}
-	}*/
-
-	/**
-	 * Resets the portion of SS sorounding residue at index.
-	 */
-	/*public void resetResidueColor(int index) {
-		if (csType != 6) {
-			int verticesPerBase = csStyle.getVertexCount();
-			int startIndex, endIndex;
-			int halfSpan = 2 * segments * (verticesPerBase - 1);
-			int center = 2 * verticesPerBase + 2 * halfSpan * index;
-
-			if (index > 0) {
-				startIndex = center - halfSpan;
-			} else {
-				startIndex = center - 2 * verticesPerBase;
-			}
-			if (index < coords.length - 1) {
-				endIndex = center + halfSpan;
-			} else {
-				endIndex = center + 2 * verticesPerBase;
-			}
-			Extrusion geom = (Extrusion) shape.getGeometry();
-			geom.updateColors(startIndex, endIndex, index * segments);
-		} else {
-			int startIndex, endIndex;
-			int halfSpan = segments / 2;
-			int center = index * segments;
-
-			if (index > 0) {
-				startIndex = center - halfSpan;
-			} else {
-				startIndex = center;
-			}
-			if (index < coords.length - 1) {
-				endIndex = center + halfSpan;
-			} else {
-				endIndex = center;
-			}
-
-			BackboneLine geom = (BackboneLine) shape.getGeometry();
-			geom.updateColors(startIndex, endIndex);
-		}
-	}*/
-
-	/**
 	 * Sets the normals along the spine.
 	 */
 	public void setNormals(final Vector3f[] normals) {
@@ -1131,9 +869,6 @@ public class HelixGeometry extends SsGeometry {
 	 * Sets the rendering mode for the polygonal mesh.
 	 * 
 	 */
-	/*public void setPolygonStyle(int style) {
-		polygonStyle = style;
-	}*/
 
 	private void processQualityInfo(final float quality) {
 		final int maxSegments = 10;

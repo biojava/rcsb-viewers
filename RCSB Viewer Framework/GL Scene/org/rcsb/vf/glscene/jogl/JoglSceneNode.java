@@ -55,7 +55,6 @@ import java.util.Vector;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
-import javax.vecmath.Point3d;
 
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
@@ -65,15 +64,12 @@ import org.rcsb.mbt.model.LineSegment;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
-import org.rcsb.mbt.model.StructureComponentRegistry;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms;
 import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.util.DebugState;
-import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.vf.controllers.app.VFAppBase;
-import org.rcsb.vf.glscene.surfaces.Surface;
 
 
 import com.sun.opengl.util.GLUT;

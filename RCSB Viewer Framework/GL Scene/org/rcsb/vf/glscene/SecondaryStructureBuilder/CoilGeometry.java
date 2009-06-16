@@ -122,7 +122,7 @@ public class CoilGeometry extends SsGeometry {
 
 	
 	public DisplayLists generateJoglGeometry(final GL gl, final GLU glu, final GLUT glut) {
-		float time2;
+//		float time2;
 
 		this.processQualityInfo(this.quality);
 
@@ -165,10 +165,10 @@ public class CoilGeometry extends SsGeometry {
 
 		// Holders for tangent vectors at the ends of a segment.
 		//
-		final Vec3f vec1 = new Vec3f();
-		final Vec3f vec2 = new Vec3f();
-		final Vector3f vvec1 = new Vector3f();
-		final Vector3f vvec2 = new Vector3f();
+//		final Vec3f vec1 = new Vec3f();
+//		final Vec3f vec2 = new Vec3f();
+//		final Vector3f vvec1 = new Vector3f();
+//		final Vector3f vvec2 = new Vector3f();
 
 		// Other working space
 		//
@@ -177,8 +177,8 @@ public class CoilGeometry extends SsGeometry {
 		FrenetTrihedron firstTrihedron = null;
 		FrenetTrihedron secondTrihedron = null;
 		Vector3f norm1 = new Vector3f();
-		Vector3f norm2 = new Vector3f();
-		final Vector3f normMean = new Vector3f();
+//		Vector3f norm2 = new Vector3f();
+//		final Vector3f normMean = new Vector3f();
 		final Vector3f tan1 = new Vector3f();
 		Vector3f tan2 = new Vector3f();
 		final Vector3f origin = new Vector3f();
@@ -189,7 +189,7 @@ public class CoilGeometry extends SsGeometry {
 		tan1.set(this.tangents[0]);
 		tan2.set(this.tangents[1]);
 		norm1 = this.normals[0];
-		norm2 = this.normals[1];
+//		norm2 = this.normals[1];
 
 		tan1.normalize();
 		tan2.normalize();
@@ -212,10 +212,10 @@ public class CoilGeometry extends SsGeometry {
 			norm1 = this.normals[i + 1];
 			if (i >= this.coords.length - 2) {
 				tan2 = tan1;
-				norm2 = norm1;
+//				norm2 = norm1;
 			} else {
 				tan2.set(this.tangents[i + 2]);
-				norm2 = this.normals[i + 2];
+//				norm2 = this.normals[i + 2];
 			}
 
 			tan1.normalize();
@@ -249,7 +249,7 @@ public class CoilGeometry extends SsGeometry {
 		// Ended preparing the path coordinates, local refrence frames and
 		// colors.
 
-		time2 = System.currentTimeMillis();
+//		time2 = System.currentTimeMillis();
 
 		if (this.uniformColor) {
 			if (this.ssColor == null) {
@@ -386,7 +386,7 @@ public class CoilGeometry extends SsGeometry {
 			sect.averageNormals();
 
 			cs = new AffineCrossSection[pointCount];
-			final Color3f sideColor = new Color3f(1.0f, 1.0f, 1.0f);
+//			final Color3f sideColor = new Color3f(1.0f, 1.0f, 1.0f);
 			for (int i = 0; i < pointCount; i++) {
 				cs[i] = new AffineCrossSection(sect, triheds[i]);
 				// cs[i].setSideColor( sideColor );
@@ -536,7 +536,7 @@ public class CoilGeometry extends SsGeometry {
 		Vector3f tmp = null;
 		Vector3f tmp1 = null;
 		Vector3f v0 = null;
-		final Vector3f zero = new Vector3f(0.0f, 0.0f, 0.0f);
+//		final Vector3f zero = new Vector3f(0.0f, 0.0f, 0.0f);
 
 		if (coords.length == 2) {
 			// In an ideal world this would not happen.

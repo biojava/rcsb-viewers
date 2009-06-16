@@ -141,7 +141,6 @@ public class SsGeometry extends GeometryEntity {
 		final int coilSmoothingSteps = 2;
 
 		final CrossSectionType helixCsType = CrossSectionType.REGULAR_POLYGON;
-		// int helixCsType = CrossSectionType.RECTANGULAR_RIBBON;
 		final CrossSectionType strandCsType = CrossSectionType.RECTANGULAR_RIBBON;
 		final CrossSectionType turnCsType = CrossSectionType.ROUNDED_TUBE;
 		final CrossSectionType coilCsType = CrossSectionType.ROUNDED_TUBE;
@@ -172,8 +171,7 @@ public class SsGeometry extends GeometryEntity {
 		final float turnQuality = 0.8f;
 		final float strandQuality = 0.8f;
 
-		final CrossSectionType helixCsType = CrossSectionType.REGULAR_POLYGON;
-		// int helixCsType = CrossSectionType.ROUNDED_TUBE;
+		final CrossSectionType helixCsType = CrossSectionType.REGULAR_POLYGON;;
 		final CrossSectionType strandCsType = CrossSectionType.RECTANGULAR_RIBBON;
 		final CrossSectionType turnCsType = CrossSectionType.ROUNDED_TUBE;
 		final CrossSectionType coilCsType = CrossSectionType.ROUNDED_TUBE;
@@ -207,7 +205,6 @@ public class SsGeometry extends GeometryEntity {
 		final float strandQuality = 0.8f;
 
 		final CrossSectionType helixCsType = CrossSectionType.REGULAR_POLYGON;
-		// int helixCsType = CrossSectionType.ROUNDED_TUBE;
 		final CrossSectionType strandCsType = CrossSectionType.RECTANGULAR_RIBBON;
 		final CrossSectionType turnCsType = CrossSectionType.ROUNDED_TUBE;
 		final CrossSectionType coilCsType = CrossSectionType.ROUNDED_TUBE;
@@ -263,19 +260,15 @@ public class SsGeometry extends GeometryEntity {
 		StrandGeometry sGeom = null;
 		HelixGeometry hGeom = null;
 
-		//helixSsShape = 0;
-
 		final float[] diams = new float[2];
 		diams[0] = 1.0f;
 		diams[0] = SsGeometry.coilWidth;
 		diams[1] = 0.2f;
 		final CrossSectionStyle helixCsStyle = new CrossSectionStyle(
 				CrossSectionType.REGULAR_POLYGON, diams);
-		final CrossSectionStyle uniformCsStyle = new CrossSectionStyle(
-				CrossSectionType.RECTANGULAR_RIBBON, diams);
 		helixCsStyle.setVertexCount(10);
 
-		final Vector geometries = new Vector();
+		final Vector<SsGeometry> geometries = new Vector<SsGeometry>();
 
 		Fragment fragment = null;
 		int headResId = 0;
@@ -287,16 +280,12 @@ public class SsGeometry extends GeometryEntity {
 		previousCoord = null;
 		nextCoord = null;
 		lastSS = null;
-		String userInformation = null;
 		
 		for (int fIndex = 0; fIndex < fragmentCount; fIndex++) {
 			manageable = true;
 			fragment = chainItem.getFragment(fIndex);
 			conformationType = fragment.getConformationType();
-			// System.err.println( conformationType + " in chain " +
-			// chainItem.getChainId() + " from " +
-			// fragment.getStartResidueIndex() + " to " +
-			// fragment.getEndResidueIndex() );
+			
 			if (fIndex > 0) {
 				previousConformationType = chainItem
 						.getFragmentType(fIndex - 1);
@@ -335,11 +324,6 @@ public class SsGeometry extends GeometryEntity {
 
 			residueCount = endResidueIndex - startResidueIndex + 1;
 			if (conformationType == ComponentType.UNDEFINED_CONFORMATION) {
-				userInformation = new String("UNDEFINED: chain -> "
-						+ chainItem.getChainId() + "  fragment " + fIndex
-						+ " Residues: " + startResidueIndex + " - "
-						+ endResidueIndex);
-				// System.out.println( userInformation );
 				//
 				// Skip UNDEFINED types
 				//
@@ -371,8 +355,6 @@ public class SsGeometry extends GeometryEntity {
 				}
 				if ((trailingResidueIndex > endResidueIndex)
 						&& (nextConformationType != ComponentType.NONE && (!gapFollows))
-				// && (nextConformationType !=
-				// ComponentType.COIL)
 				) {
 					residue = chainItem.getResidue(trailingResidueIndex);
 					trailingCaAtom = residue.getAlphaAtom();
@@ -380,23 +362,12 @@ public class SsGeometry extends GeometryEntity {
 					allResidueCount++;
 				}
 
-				// System.err.println(" Coil from " + leadingResidueIndex + " to
-				// " + trailingResidueIndex + " with a start at " +
-				// startResidueIndex + " and an end at " + endResidueIndex + "
-				// allResidueCount " + allResidueCount);
-				// System.err.println(" Gap State " + gapPrecedes + " and " +
-				// gapFollows + " headResId " + headResId + " tailResId " +
-				// tailResId );
-
 				if (allResidueCount < 2) {
 					manageable = false;
 					Status.output(Status.LEVEL_WARNING, "Coil in chain "
 							+ chainItem.getChainId() + "  from "
 							+ startResidueIndex + "  to  " + endResidueIndex
 							+ "  too short, can not handle ");
-					// throw new FragmentTooShortException( conformationType + "
-					// " + startResidueIndex + " " + endResidueIndex + " too
-					// short, can not handle" );
 				}
 
 				coords = new Vec3f[allResidueCount];
@@ -440,12 +411,6 @@ public class SsGeometry extends GeometryEntity {
 							+ startIndex]);
 				}
 
-				for (int i = 0; i < coords.length; i++) {
-					// System.err.println(" i = " + i + " Color " +
-					// colorMap[i][0] + " " + colorMap[i][1] + " " +
-					// colorMap[i][2] );
-				}
-
 				cGeom.setCoordinates(coords);
 				cGeom.setColorMap(colorMap);
 
@@ -483,16 +448,6 @@ public class SsGeometry extends GeometryEntity {
 
 				allResidueCount = residueCount;
 
-				/*
-				 * if( conformationType == ComponentType.TURN) {
-				 * userInformation = new String( "Turn: chain -> " + chain + "
-				 * fragment " + fIndex + " Residues: " + startResidueIndex + " - " +
-				 * endResidueIndex ); } else { userInformation = new String(
-				 * "Warning: Short (2 Res) Helix reinterpreted as turn: chain -> " +
-				 * chain + " fragment " + fIndex + " Residues: " +
-				 * startResidueIndex + " - " + endResidueIndex ); }
-				 */
-
 				// Extend a turn to include the segments connecting them to the
 				// previous and next SS structures ONLY if the previous and/or
 				// next SS are not a Coil fragment.
@@ -516,7 +471,6 @@ public class SsGeometry extends GeometryEntity {
 					}
 				}
 
-				// System.err.println( " length " + allResidueCount );
 				coords = new Vec3f[allResidueCount];
 				colorMap = new float[allResidueCount][3];
 				if (hasLeading) {
@@ -565,8 +519,6 @@ public class SsGeometry extends GeometryEntity {
 							+ chainItem.getChainId() + "  from "
 							+ startResidueIndex + "  to  " + endResidueIndex
 							+ " too short, can not handle ");
-					// throw new FragmentTooShortException( conformationType + "
-					// too short, can not handle" );
 				}
 
 				tGeom.setColorMap(colorMap);
@@ -590,9 +542,6 @@ public class SsGeometry extends GeometryEntity {
 					geometries.add(tGeom);
 				}
 			} else if (conformationType == ComponentType.STRAND) {
-				//if(true)
-				//continue;
-				
 				startIndex = 0;
 				hasTrailing = false;
 				manageable = true;
@@ -600,12 +549,7 @@ public class SsGeometry extends GeometryEntity {
 				sGeom.setPriestleSteps(strandSmoothingSteps);
 				sGeom.setQuality(strandQuality);
 				sGeom.setUserData(fragment);
-				// sGeom.setStyle(
-				// org.rcsb.mbt.viewers.StructureViewerImpl.Strand.STYLE_SINGLE_FACE
-				// );
-				// sGeom.setCrossSectionStyle( uniformCsStyle );
 				sGeom.setRoundedShape(false);
-				// sGeom.setDrawArrow( false );
 				if (!ribbon) {
 					sGeom.setCrossSectionType(CrossSectionType.POINT);
 				} else {
@@ -629,8 +573,6 @@ public class SsGeometry extends GeometryEntity {
 							+ chainItem.getChainId() + "  from "
 							+ startResidueIndex + "  to  " + endResidueIndex
 							+ "  too short, can not handle ");
-					// throw new FragmentTooShortException( conformationType + "
-					// too short, can not handle" );
 				}
 
 				coords = new Vec3f[allResidueCount];
@@ -670,8 +612,6 @@ public class SsGeometry extends GeometryEntity {
 							continue;
 						}
 					} catch (final ArrayIndexOutOfBoundsException e) {
-						// System.err.println( "Strand: Next to First can not be
-						// handled " );
 						manageable = false;
 					}
 					lastSS.setNextCaCoord(nextCoord);
@@ -684,8 +624,6 @@ public class SsGeometry extends GeometryEntity {
 				try {
 					previousCoord = sGeom.getPreviousToLastCa();
 				} catch (final ArrayIndexOutOfBoundsException e) {
-					// System.err.println( "Strand: Previous to last can not be
-					// handled " );
 					manageable = false;
 				}
 				if (manageable) {
@@ -693,9 +631,6 @@ public class SsGeometry extends GeometryEntity {
 					geometries.add(sGeom);
 				}
 			} else if (conformationType == ComponentType.HELIX) {
-				//if(true)
-				//continue;
-				
 				hGeom = new org.rcsb.vf.glscene.SecondaryStructureBuilder.HelixGeometry(fragment);
 				hGeom.setPriestleSteps(helixSmoothingSteps);
 				startIndex = 0;
@@ -703,8 +638,6 @@ public class SsGeometry extends GeometryEntity {
 				hGeom.setQuality(helixQuality);
 				hGeom.setUserData(fragment);
 				hGeom.setSsShape(helixSsShape);
-				// hGeom.setCrossSectionStyle( uniformCsStyle );
-				// hGeom.setCrossSectionStyle( helixCsStyle );
 				if (!ribbon) {
 					hGeom.setCrossSectionType(CrossSectionType.POINT);
 				} else {
@@ -721,10 +654,6 @@ public class SsGeometry extends GeometryEntity {
 					hasTrailing = true;
 					allResidueCount++;
 				}
-				// System.err.println(" Helix from " + startResidueIndex + " to
-				// " + trailingResidueIndex + " with a start at " +
-				// startResidueIndex + " and an end at " + endResidueIndex + "
-				// allResidueCount " + allResidueCount);
 
 				if (allResidueCount < 3) {
 					manageable = false;
@@ -732,16 +661,12 @@ public class SsGeometry extends GeometryEntity {
 							+ chainItem.getChainId() + "  from "
 							+ startResidueIndex + "  to  " + endResidueIndex
 							+ "  too short, can not handle ");
-					// throw new FragmentTooShortException( conformationType + "
-					// too short, can not handle" );
 				}
 
 				coords = new Vec3f[allResidueCount];
 				colorMap = new float[allResidueCount][3];
 				for (int i = 0; i < residueCount; i++) {
 					residue = chainItem.getResidue(startResidueIndex + i);
-					// System.err.println( "Residue: " + i + " Residue index " +
-					// startResidueIndex );
 					caAtom = residue.getAlphaAtom();
 					if (caAtom == null) {
 						System.err.println("No Ca atom returned for residue "
@@ -750,8 +675,6 @@ public class SsGeometry extends GeometryEntity {
 					coords[i] = new Vec3f((float) caAtom.coordinate[0],
 							(float) caAtom.coordinate[1],
 							(float) caAtom.coordinate[2]);
-					// styles.getResidueColor( chainItem.getResidue( startIndex
-					// + i ), colorMap[i] );
 					final ChainStyle chainStyle = (ChainStyle) styles
 							.getStyle(chainItem);
 					chainStyle.getResidueColor(residue, colorMap[i]);
@@ -795,7 +718,7 @@ public class SsGeometry extends GeometryEntity {
 			}
 		}
 
-		final Iterator geomIterator = geometries.iterator();
+		final Iterator<SsGeometry> geomIterator = geometries.iterator();
 		GeometryEntity entity = null;
 		while (geomIterator.hasNext()) {
 			entity = (GeometryEntity) geomIterator.next();
@@ -803,7 +726,7 @@ public class SsGeometry extends GeometryEntity {
 			// all these GeometryEntries have Fragments backing them.
 			final Fragment f = (Fragment)entity.structureComponent;
 			final Chain chain = f.getChain();
-			final Iterator it = chain.getFragments().iterator();
+			final Iterator<Fragment> it = chain.getFragments().iterator();
 			int fragmentIndex = -1;
 			for(int i = 0; it.hasNext(); i++) {
 				final Fragment f_ = (Fragment)it.next();
@@ -874,8 +797,6 @@ public class SsGeometry extends GeometryEntity {
 		}
 		// Apply Priestle smoothing
 		Priestle.smooth(this.coords, this.getPriestleSteps());
-		// Priestle.smooth( this.coords, 2 );
-		// CaPreprocess.smooth( this.coords, 5 );
 	}
 
 	/**
@@ -966,10 +887,7 @@ public class SsGeometry extends GeometryEntity {
 	public void setColorMap(final float[][] color) {
 		if (this.colorMap == null) {
 			this.colorMap = color;
-			/*
-			 * colorMap = new float[color.length][3]; for( int i = 0; i <
-			 * color.length; i++ ) { this.colorMap[i] = color[i]; }
-			 */
+
 		} else {
 			final int len = color.length;
 			if (this.colorMap.length != color.length) {
@@ -1103,16 +1021,13 @@ public class SsGeometry extends GeometryEntity {
 		for (int i = 0; i < this.coords.length - 1; i++) {
 			l++;
 			this.pathColorMap[l] = nodeColor;
-			// pathColorMap[l] = {1.0f, 0.0f, 0.0f};
 			for (int j = 1; j < this.segments; j++) {
 				l++;
-				// pathColorMap[l] = colorMap[i];
 				this.pathColorMap[l] = intColor;
 			}
 		}
 		l++;
 		this.pathColorMap[l] = nodeColor;
-		// pathColorMap[l] = {1.0f, 0.0f, 0.0f};
 	}
 
 	/**
