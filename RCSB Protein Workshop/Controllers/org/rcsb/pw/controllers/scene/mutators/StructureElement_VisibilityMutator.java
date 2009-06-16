@@ -203,7 +203,10 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
 				// special case, since a PDB chain can consist of several MBT chains of various chemical types.
 				// iterate until the first protein chain is found.
 					for (Chain mbtChain : xc.getMbtChains())
-						if(mbtChain.getClassification() == Residue.Classification.AMINO_ACID)
+						// TODO pr try adding nucleic acids here
+//						if(mbtChain.getClassification() == Residue.Classification.AMINO_ACID)
+							if(mbtChain.getClassification() == Residue.Classification.AMINO_ACID ||
+									mbtChain.getClassification() == Residue.Classification.NUCLEIC_ACID	)
 							return ss.isVisible(mbtChain.getResidue(0)) ||
 								   (mbtChain.getResidueCount() > 1 && ss.isVisible(mbtChain.getResidue(1)));
 				}
@@ -217,7 +220,10 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
 				final StructureStyles ss = sm.getStructureStyles();
 				
 				for (Chain mbtChain : sm.getChains())
-					if (mbtChain.getClassification() == Residue.Classification.AMINO_ACID) {
+					// TODO pr try adding nucleic acids here
+//					if (mbtChain.getClassification() == Residue.Classification.AMINO_ACID) {
+						if (mbtChain.getClassification() == Residue.Classification.AMINO_ACID ||
+								mbtChain.getClassification() == Residue.Classification.NUCLEIC_ACID) {
 						return ss.isVisible(mbtChain.getResidue(0)) ||
 							   (mbtChain.getResidueCount() > 1 && ss.isVisible(mbtChain.getResidue(1)));
 				}

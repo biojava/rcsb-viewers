@@ -124,16 +124,21 @@ public class ProteinWorkshop extends VFAppBase
 													  ProteinWorkshop.class.getResource("images/icon_128_PW.png"));
 		
 		super.initialize(isApplication);
-	
-		final String structureUrlParam = this.properties.getProperty("structure_url");
 		
 		activeFrame.initialize(true);
 
 		final StructureModel model = sgetModel();
 		
 		MutatorBase.setActivationType(MutatorBase.ActivationType.ATOMS_AND_BONDS);
+		
+		String structureUrlParam = this.properties.getProperty("structure_url");
 
 		if (structureUrlParam != null)
 			((VFDocumentFrameBase)activeFrame).loadURL(structureUrlParam);
+		
+		String structureIdList = this.properties.getProperty("structure_id_list");
+
+		if (structureIdList != null)
+			((VFDocumentFrameBase)activeFrame).loadURL(structureIdList.split(","));
 	}
 }

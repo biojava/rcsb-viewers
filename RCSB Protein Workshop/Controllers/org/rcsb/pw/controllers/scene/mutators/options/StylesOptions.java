@@ -47,7 +47,6 @@ package org.rcsb.pw.controllers.scene.mutators.options;
 
 import org.rcsb.mbt.model.attributes.AtomRadiusByScaledCpk;
 import org.rcsb.mbt.model.attributes.IAtomRadius;
-import org.rcsb.vf.glscene.jogl.ChainGeometry;
 import org.rcsb.vf.glscene.jogl.Geometry;
 import org.rcsb.vf.glscene.jogl.ChainGeometry.RibbonForm;
 
