@@ -106,7 +106,7 @@ public class LinesOptionsPanel extends JPanel implements IUpdateListener, Action
         super(null, false);
         super.setLayout(new FullWidthBoxLayout());
         super.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("3)  Change the tool's options, if necessary."),
+                BorderFactory.createTitledBorder("3)  Choose line options, then click on two atoms or residues."),
                 BorderFactory.createEmptyBorder(-1,1,1,1)));
 
     	this.changeColorButton = new JButton("Change Color");
@@ -120,10 +120,10 @@ public class LinesOptionsPanel extends JPanel implements IUpdateListener, Action
     	
     	this.showDistancesCheck = new JCheckBox("Display distances");
 
-    	this.firstPointLabel = new JLabel( "1st Point:  ");
+    	this.firstPointLabel = new JLabel( "1st Atom/Residue:  ");
     	this.firstPointText = new JTextField();
     	this.firstLabelPanel = new CustomLabelPanel(this.firstPointLabel, this.firstPointText);
-    	this.secondPointLabel = new JLabel("2nd Point: ");
+    	this.secondPointLabel = new JLabel("2nd Atom/Residue: ");
     	this.secondPointText = new JTextField();
     	this.secondLabelPanel = new CustomLabelPanel(this.secondPointLabel, this.secondPointText);
 
@@ -166,7 +166,7 @@ public class LinesOptionsPanel extends JPanel implements IUpdateListener, Action
     }
 
     public void reset() {
-    	this.solidLineRadio.doClick();
+    	this.dashLineRadio.doClick();
     	if(!this.showDistancesCheck.isSelected()) {
     		this.showDistancesCheck.doClick();
     	}
@@ -269,7 +269,7 @@ public class LinesOptionsPanel extends JPanel implements IUpdateListener, Action
 		} else if(arg0.getSource() == this.clearLineButton) {
 			// This button's doing nothing right now
 		} else if(arg0.getSource() == this.clearAllButton) {
-			final Iterator it = mutEnum.getLinesMutator().lines.iterator();
+			final Iterator<LineSegment> it = mutEnum.getLinesMutator().lines.iterator();
 			Structure struc = null;
 			while (it.hasNext()) {
 				final LineSegment line = (LineSegment)it.next();
