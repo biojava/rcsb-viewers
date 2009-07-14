@@ -46,6 +46,7 @@
 package org.rcsb.pw.controllers.scene.mutators;
 
 import java.awt.Color;
+import java.util.Arrays;
 import java.util.Vector;
 
 import org.rcsb.mbt.model.Atom;
@@ -134,6 +135,7 @@ public class LinesMutator extends MutatorBase
 		final StructureMap sm = AppBase.sgetModel().getStructures().get(0).getStructureMap();
 		sm.getStructureStyles().setStyle(line, style);
 		System.arraycopy(this.getOptions().getColor(), 0, style.getColor(), 0, style.getColor().length);
+		line.setStructure(sm.getStructure());
 		((JoglSceneNode)sm.getUData()).addRenderable(new DisplayListRenderable( line, style, geometry ));
 
 		lines.add(line);
