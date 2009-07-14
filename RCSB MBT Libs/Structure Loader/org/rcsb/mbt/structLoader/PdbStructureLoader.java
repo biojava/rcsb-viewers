@@ -188,12 +188,12 @@ public class PdbStructureLoader
 	/**
 	 * Returns true if the loader is capable of loading the structure,
 	 * or false otherwise. This enables higher-level code to be able
-	 * to build a context sensative menu of only the loaders that can
+	 * to build a context sensitive menu of only the loaders that can
 	 * load a given structure name.
 	 */
 	public boolean canLoad( final String name)
 	{
-		if ( name.indexOf( ".pdb" ) < 0 ) {
+		if (! (name.contains(".pdb")  || name.contains(".ent"))) {
 			return false;
 		}
 
