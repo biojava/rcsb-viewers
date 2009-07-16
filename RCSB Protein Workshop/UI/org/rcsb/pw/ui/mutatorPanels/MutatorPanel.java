@@ -59,6 +59,7 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
+import org.rcsb.pw.controllers.app.ProteinWorkshop.PWAppModuleFactory;
 import org.rcsb.pw.controllers.scene.mutators.MutatorEnum;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
@@ -175,7 +176,13 @@ public class MutatorPanel extends JPanel implements IUpdateListener
         super.add(this.stylesButton);
         super.add(this.reCenterButton);
 //        super.add(this.selectionButton);
-        super.add(this.linesButton);
+ 
+        // Show lines button only for asymmetic units. For biological unit
+        // we can't perform distance measurements since we don't have the atomic
+        // coordinates of the symmetry related parts.
+		if (ProteinWorkshop.sgetSceneController().showAsymmetricUnitOnly()) {
+           super.add(this.linesButton);
+        }
         
         this.visibilityButton.addActionListener(new MutatorButtonListener(MutatorEnum.Id.VISIBILITY_MUTATOR));
         this.colorChangeButton.addActionListener(new MutatorButtonListener(MutatorEnum.Id.COLORING_MUTATOR));
