@@ -56,6 +56,7 @@ import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
@@ -680,9 +681,20 @@ public class LigandSideBar extends JPanel
 					
 					if (residue.getCompoundCode().startsWith(initialLigand))
 					{
-						if (paths == null)
-							paths = new TreePath[chainNode.getChildCount()];
-						paths[lx] = new TreePath(residueNode.getPath());
+						// The following code generates an exception in the swing libs 
+						// (see bug PDBWW-1917 PDB ID 1OLN, ligand XBB), most likely because
+						// the path has null entries, i.e. for the case above.
+//						if (paths == null) {
+//							paths = new TreePath[chainNode.getChildCount()];
+//						}
+//						paths[lx] = new TreePath(residueNode.getPath());
+						
+						// Since we are only selecting a single entry, there is no need to pass in an array with
+						// null entries.
+						if (paths == null) {
+							paths = new TreePath[1];
+						}
+						paths[0] = new TreePath(residueNode.getPath());
 					}
 				}
 			}
