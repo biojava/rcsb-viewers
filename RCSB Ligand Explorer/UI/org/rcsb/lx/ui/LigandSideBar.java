@@ -679,7 +679,8 @@ public class LigandSideBar extends JPanel
 					DefaultMutableTreeNode residueNode = (DefaultMutableTreeNode)chainNode.getChildAt(lx);
 					Residue residue = (Residue)residueNode.getUserObject();
 					
-					if (residue.getCompoundCode().startsWith(initialLigand))
+//					if (residue.getCompoundCode().startsWith(initialLigand))
+					if (isInitialLigandResidue(residue, initialLigand))
 					{
 						// The following code generates an exception in the swing libs 
 						// (see bug PDBWW-1917 PDB ID 1OLN, ligand XBB), most likely because
@@ -693,8 +694,11 @@ public class LigandSideBar extends JPanel
 						// null entries.
 						if (paths == null) {
 							paths = new TreePath[1];
+							paths[0] = new TreePath(residueNode.getPath());
+						} else {
+							break;
 						}
-						paths[0] = new TreePath(residueNode.getPath());
+						
 					}
 				}
 			}
@@ -716,5 +720,32 @@ public class LigandSideBar extends JPanel
 			// set the first residue in the first chain as selected
 			// (jeez, this is a lot of work to do something this simple, I might add...)
 		}
+	}
+	
+	/**
+	 * Returns true if ligand specified by either 3-letter ligand id (i.e. HEM) or
+	 * chain/residue number (i.e. A156) matches the passed in residue.
+	 * @param residue
+	 * @param initialLigand Specification of ligand to be highlighted in Ligand Explorer upon startup
+	 * @return
+	 */
+	private boolean isInitialLigandResidue(Residue residue, String initialLigand) {
+		if (residue.getCompoundCode().equals(initialLigand)) {
+			return true;
+		}
+			
+		String chainId = initialLigand.substring(0,1);
+		int residueNumber;
+		
+		try {
+		    residueNumber = Integer.parseInt(initialLigand.substring(1));
+		} catch (NumberFormatException e) {
+			return false;
+		}
+		if (residue.getAuthorChainId().equalsIgnoreCase(chainId) &&
+				residue.getAuthorResidueId() == residueNumber) {
+			return true;
+		}
+		return false;
 	}
 }
