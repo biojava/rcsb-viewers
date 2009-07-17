@@ -56,7 +56,6 @@ import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
@@ -679,7 +678,6 @@ public class LigandSideBar extends JPanel
 					DefaultMutableTreeNode residueNode = (DefaultMutableTreeNode)chainNode.getChildAt(lx);
 					Residue residue = (Residue)residueNode.getUserObject();
 					
-//					if (residue.getCompoundCode().startsWith(initialLigand))
 					if (isInitialLigandResidue(residue, initialLigand))
 					{
 						// The following code generates an exception in the swing libs 
