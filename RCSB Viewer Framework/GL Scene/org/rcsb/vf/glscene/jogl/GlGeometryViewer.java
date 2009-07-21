@@ -1695,20 +1695,11 @@ WindowListener, IStructureStylesEventListener {
 				sn.clearRenderables();
 				sn.clearLabels();
 
-				// set all non-protein atoms/bonds visible, but all protein
-				// atoms/bonds invisible.
-				// set all protein chains visible, and all non-protein chains
-				// invisible.
 				for (Chain c : sm.getChains())
 				{
-					// TODO PR enable helices for NAs
-					if (c.getResidueCount() > 0
-							&& c.getResidue(0).getClassification() == Residue.Classification.AMINO_ACID) {
-//						if (c.getResidueCount() > 0
-//								&& (c.getResidue(0).getClassification() == Residue.Classification.AMINO_ACID ||
-//										c.getResidue(0).getClassification() == Residue.Classification.NUCLEIC_ACID)) {
-
-
+						if (c.getResidueCount() > 0
+								&& (c.getResidue(0).getClassification() == Residue.Classification.AMINO_ACID ||
+										c.getResidue(0).getClassification() == Residue.Classification.NUCLEIC_ACID)) {
 						ss.setVisible(c, true);
 					} else {
 						ss.setVisible(c, false);
@@ -1721,8 +1712,9 @@ WindowListener, IStructureStylesEventListener {
 							Vector<Atom> atoms = r.getAtoms();
 							for (Atom a : atoms)
 							{
-								if (r.getClassification() != Residue.Classification.AMINO_ACID
-										&& !r.getCompoundCode().equals("HOH")) {
+									if (r.getClassification() != Residue.Classification.AMINO_ACID &&
+											r.getClassification() != Residue.Classification.NUCLEIC_ACID
+											&& !r.getCompoundCode().equals("HOH")) {
 									ss.setVisible(a, true);
 								} else {
 									ss.setVisible(a, false);
@@ -1731,8 +1723,10 @@ WindowListener, IStructureStylesEventListener {
 
 							for (Bond b : sm.getBonds(atoms))
 							{
-								if (r.getClassification() != Residue.Classification.AMINO_ACID &&
-										r.getClassification() != Residue.Classification.WATER ) {
+									if (r.getClassification() != Residue.Classification.AMINO_ACID &&
+											r.getClassification() != Residue.Classification.NUCLEIC_ACID &&
+											r.getClassification() != Residue.Classification.WATER ) {
+											
 									ss.setVisible(b, true);
 								} else {
 									ss.setVisible(b, false);
