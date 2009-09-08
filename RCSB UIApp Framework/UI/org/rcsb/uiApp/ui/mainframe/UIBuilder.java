@@ -129,7 +129,7 @@ public class UIBuilder implements Runnable
 								}
 							});
 
-							dialog.setDialogTitle("Select a coordinate file...");
+							dialog.setDialogTitle("Select one or more coordinate file(s) ...");
 							dialog.setDialogType(JFileChooser.OPEN_DIALOG);
 							dialog.setFileHidingEnabled(true);
 							dialog.setMultiSelectionEnabled(true);
@@ -154,6 +154,7 @@ public class UIBuilder implements Runnable
 											JOptionPane.INFORMATION_MESSAGE);
 
 							String[] pdbIds = pdbId.split(",");
+						
 							for (int i = 0; i < pdbIds.length; i++) {
 								pdbIds[i] = pdbIds[i].trim();
 								if (pdbIds[i].length() != 4) {
