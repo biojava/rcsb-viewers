@@ -61,7 +61,6 @@ import javax.swing.filechooser.FileFilter;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.doc.LoadThread;
 import org.rcsb.mbt.model.util.Status;
-import org.rcsb.uiApp.ui.FileLocs;
 
 /**
  * This is a swing runnable - it is invoked to build the ActiveFrame UI at the appropriate
@@ -150,26 +149,22 @@ public class UIBuilder implements Runnable
 						{
 							String pdbId = JOptionPane.showInputDialog(
 											AppBase.sgetActiveFrame(),
-											"Please enter a PDB ID (4 characters):",
+											"Please enter one or more PDB ID(s) separated by commas:",
 											"Open a structure...",
 											JOptionPane.INFORMATION_MESSAGE);
 
-							if (pdbId != null)
-								pdbId = pdbId.trim();
-
-							if (pdbId != null && pdbId.length() != 0)
-							{
-								if (pdbId.length() == 4)
-								{
-									final String url = FileLocs.pdbFileBase + pdbId + FileLocs.pdbFileExtension;
-									LoadThread loadIt = new LoadThread(url, pdbId);										
-									loadIt.start();
-								}
-								
-								else
+							String[] pdbIds = pdbId.split(",");
+							for (int i = 0; i < pdbIds.length; i++) {
+								pdbIds[i] = pdbIds[i].trim();
+								if (pdbIds[i].length() != 4) {
 									Status.output(Status.LEVEL_ERROR,
-													"The PDB ID you entered was not valid.");
+									"The PDB ID you entered was not valid: " + pdbIds[i]);
+									return;
+								}
 							}
+							LoadThread loadIt = new LoadThread(pdbIds);
+							loadIt.start();
+
 						}
 
 					});
