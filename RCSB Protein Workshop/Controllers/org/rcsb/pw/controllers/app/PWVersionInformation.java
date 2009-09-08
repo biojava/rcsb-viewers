@@ -49,5 +49,5 @@ import org.rcsb.uiApp.controllers.app.VersionInformation;
 
 public class PWVersionInformation extends VersionInformation
 {
-	public static String version() { return "3.5"; }
+	public static String version() { return "3.6"; }
 }
