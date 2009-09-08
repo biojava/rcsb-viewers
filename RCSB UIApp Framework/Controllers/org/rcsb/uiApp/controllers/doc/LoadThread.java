@@ -80,17 +80,19 @@ public class LoadThread extends Thread
 	
 	/**
 	 * This is what comes from the 'file open' dialog.  Note that we turn the absolute file
-	 * paths into a concatenated list of strings, like above, and then extract the pdb id
-	 * from the first file name
+	 * paths and pdbids into a concatenated list of strings.
 	 * @param files
 	 */
 	public LoadThread(File files[])
 	{
-		_url = files[0].getAbsolutePath();
-		for (int ixFile = 1; ixFile < files.length; ixFile++)
-			_url += ',' + files[0].getAbsolutePath();
-		_pdbid = files[0].getName().substring(0,files[0].getName().indexOf('.'));
-						// extract the id from the file specification
+		_url = "";
+		_pdbid = "";
+		for (File file: files) {
+			_url += file.getAbsolutePath() + ",";
+			_pdbid += file.getName().substring(0,file.getName().indexOf('.')) + ", ";
+		}
+		_url = _url.substring(0, _url.length()-1); // remove last comma
+	    _pdbid = _pdbid.substring(0, _pdbid.length()-2);
 	}
 	
 	/**
@@ -100,11 +102,13 @@ public class LoadThread extends Thread
 	public LoadThread(String[] pdbIds)
 	{
 		_url = "";
+		_pdbid = "";
 	    for (String id: pdbIds) {
 	    	_url += "http://www.pdb.org/pdb/files/" + id + ".xml.gz" + ",";
+	    	_pdbid += id + ", ";
 	    }
-	    _url = _url.substring(0, _url.length()); // remove last comma
-		_pdbid = pdbIds[0];
+	    _url = _url.substring(0, _url.length()-1); // remove last comma
+	    _pdbid = _pdbid.substring(0, _pdbid.length()-2);
 	}
 	
 	public LoadThread(String url, String pdbid)
@@ -114,8 +118,9 @@ public class LoadThread extends Thread
 	{
 		ProgressPanelController.StartProgress();
 		AppBase.sgetDocController().loadStructure(_url, _pdbid);
+
 		if (AppBase.sgetModel().hasStructures())
-			AppBase.sgetActiveFrame().setTitle(AppBase.sgetModel().getStructures().get(0).getStructureMap().getPdbId());
+			AppBase.sgetActiveFrame().setTitle(_pdbid);
 		ProgressPanelController.EndProgress();
 		if (!AppBase.sgetModel().hasStructures())
 			JOptionPane.showMessageDialog(null, "Structure not found: " + _pdbid + "\nPlease check file/url specification and try again.", "Error", JOptionPane.ERROR_MESSAGE); 
