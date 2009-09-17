@@ -1769,7 +1769,7 @@ public class DerivedInformation
 		boolean isNucleicAcid = false;
 
 		for (Residue r: residues) {
-			if (! r.getChainId().equals(startChainId) || residues.indexOf(r) == residues.size()) {
+			if (! r.getChainId().equals(startChainId) || residues.indexOf(r) == residues.size()-1) {
 				if (start != -1 && end != -1) {
 					Chain chain = this.structureMap.getChain(startChainId);
 					chain.setFragmentRange(start, end, ComponentType.STRAND);
