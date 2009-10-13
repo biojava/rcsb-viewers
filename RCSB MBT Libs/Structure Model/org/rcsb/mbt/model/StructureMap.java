@@ -466,14 +466,23 @@ public class StructureMap
 
 		for (Chain chain : chains)
 		{		
+			chain.trimToSize();
 			for (Residue residue : chain.getResidues())
 			{
+				// TODO try trimming size of residues to handle large CA only structures
+				residue.trimToSize();
 				residues.add( residue );
 				atomCount = residue.getAtomCount( );
 				for (Atom atom : residue.getAtoms())
 					atoms.add( atom );
 			}
 		}
+		atoms.trimToSize();
+		bonds.trimToSize();
+		residues.trimToSize();
+		ligands.trimToSize();
+		chains.trimToSize();
+		fragments.trimToSize();
 	}
 
 	/**
