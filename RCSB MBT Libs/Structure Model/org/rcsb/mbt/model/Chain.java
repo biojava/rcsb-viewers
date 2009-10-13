@@ -665,5 +665,9 @@ public class Chain
 	{
 		return getAuthorChainId();
 	}
+	
+	public void trimToSize() {
+		residues.trimToSize();
+	}
 }
 
