@@ -636,5 +636,8 @@ public class Residue
 		return ExternReferences.getModifiedResidueName(this);
 	}
 
+	public void trimToSize() {
+		atoms.trimToSize();
+	}
 }
 
