@@ -188,7 +188,7 @@ public class SVDocumentFrame extends VFDocumentFrameBase
 					{
 						int option = JOptionPane.showOptionDialog(
 										/*  progress, */ null,
-										"Please be aware that the ability to manipulate large molecules is dependant on hardware configuration.\nThe MBT SimpleViewer documentation at www.pdb.org contains more information on this topic.",
+										"Please be aware that the ability to manipulate large molecules is dependent on hardware configuration.",
 										"Title", JOptionPane.YES_NO_OPTION,
 										JOptionPane.WARNING_MESSAGE, null,
 										new String[] { "Continue", "Exit" },
