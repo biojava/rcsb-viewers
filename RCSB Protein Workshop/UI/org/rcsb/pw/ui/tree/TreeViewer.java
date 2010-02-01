@@ -72,6 +72,7 @@ import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.Residue.Classification;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
@@ -267,6 +268,13 @@ TreeSelectionListener, IStructureStylesEventListener, MouseListener
 
 					componentText = residue.getAuthorResidueId() + " "
 					+ residue.getCompoundCode();
+					
+					
+					// add chain id for ligands
+					if (residue.getClassification() == Classification.LIGAND ||
+							residue.getClassification() == Classification.WATER	) {
+						componentText = residue.getChainId() + " " + componentText;
+					}
 
 					imageIcon = this.residueIcon;
 
