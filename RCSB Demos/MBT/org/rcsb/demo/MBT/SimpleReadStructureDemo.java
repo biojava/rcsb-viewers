@@ -349,6 +349,7 @@ public class SimpleReadStructureDemo
 				{
 					Output.lineOut("Atom Name : " + atom.name);
 					Output.lineOut("Element : " + atom.element);
+					Output.lineOut("Compound Id: " + atom.compound);
 					Output.lineOut("Partial Charge : " + atom.partialCharge);
 					Output.lineOut("Occupancy : " + atom.occupancy);
 					Output.lineOut("");
