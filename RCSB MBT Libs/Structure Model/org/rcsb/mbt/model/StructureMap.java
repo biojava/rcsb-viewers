@@ -2175,9 +2175,10 @@ public class StructureMap
 			
 			// Add multicomponent modified residues to the nonProteinResidue list to make them
 			// more prominent to the user. Note, these residues are also listed with the protein chains.
-			if (ChemicalComponentInfo.isMultiComponentModifiedResidue(r.getCompoundCode())) {
-				nonProteinResidues.add(r);
-			}
+			// TODO PR listing the same component in multiple places may cause confusion; leaving it out for now.
+			// if (ChemicalComponentInfo.isMultiComponentModifiedResidue(r.getCompoundCode())) {
+			//	nonProteinResidues.add(r);
+			// }
 
 			Vector<Residue> residues = byPdbId.get(pdbChainId);
 			if(residues == null) {
