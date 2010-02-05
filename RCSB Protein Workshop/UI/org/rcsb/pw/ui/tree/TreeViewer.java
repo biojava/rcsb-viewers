@@ -50,6 +50,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -65,18 +66,17 @@ import javax.swing.tree.TreeSelectionModel;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
-import org.rcsb.mbt.model.Fragment;
-import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.ExternChain;
+import org.rcsb.mbt.model.Fragment;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.Residue.Classification;
+import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
-import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
@@ -266,15 +266,9 @@ TreeSelectionListener, IStructureStylesEventListener, MouseListener
 				} else if (type == ComponentType.RESIDUE) {
 					final Residue residue = (Residue) value;
 
-					componentText = residue.getAuthorResidueId() + " "
+					componentText = residue.getChainId() + " " 
+					+ residue.getAuthorResidueId() + " "
 					+ residue.getCompoundCode();
-					
-					
-					// add chain id for ligands
-					if (residue.getClassification() == Classification.LIGAND ||
-							residue.getClassification() == Classification.WATER	) {
-						componentText = residue.getChainId() + " " + componentText;
-					}
 
 					imageIcon = this.residueIcon;
 

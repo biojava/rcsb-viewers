@@ -67,7 +67,7 @@ import org.rcsb.lx.model.ComparablePdbResidueId;
 import org.rcsb.lx.model.InteractionMap;
 import org.rcsb.lx.model.LXModel;
 import org.rcsb.mbt.model.Residue;
-import org.rcsb.mbt.model.util.AminoAcidInfo;
+import org.rcsb.mbt.model.util.ChemicalComponentInfo;
 
 
 public class ContactMap_ContactingResiduesPane extends JPanel
@@ -242,10 +242,11 @@ public class ContactMap_ContactingResiduesPane extends JPanel
 				
 				// draw the compound code
 				buf.setFont(ResidueFontInfo.contactsResidueFont);
-				String residueLetter = AminoAcidInfo.getLetterFromCode(range.residue.getCompoundCode());
-				if(residueLetter == null) {
-					residueLetter = "*";
-				}
+//				String residueLetter = AminoAcidInfo.getLetterFromCode(range.residue.getCompoundCode());
+				String residueLetter = ChemicalComponentInfo.getLetterFromCode(range.residue.getCompoundCode());
+//				if(residueLetter == null) {
+//					residueLetter = "*";
+//				}
 				buf.drawString(residueLetter, range.startX, curY);
 				
 				String pdbResId = String.valueOf(range.residue.getAuthorResidueId());

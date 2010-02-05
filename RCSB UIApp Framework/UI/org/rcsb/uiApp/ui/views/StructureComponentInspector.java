@@ -457,7 +457,7 @@ public class StructureComponentInspector
 					label.setText( "Compound:" );
 					label = (JLabel) this.table.getValueAt( row, 1 );
 					final String compoundCode = residue.getCompoundCode( );
-					label.setText( compoundCode + " (" + AminoAcidInfo.getNameFromCode( compoundCode ) + ")" );
+					label.setText( compoundCode + " (" + ChemicalComponentInfo.getNameFromCode( compoundCode ) + ")" );
 					row++;
 
 					label = (JLabel) this.table.getValueAt( row, 0 );

@@ -77,7 +77,7 @@ import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
 import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.attributes.StructureStyles;
-import org.rcsb.mbt.model.util.AminoAcidInfo;
+import org.rcsb.mbt.model.util.ChemicalComponentInfo;
 import org.rcsb.mbt.model.util.Status;
 import org.rcsb.vf.glscene.jogl.AtomGeometry;
 import org.rcsb.vf.glscene.jogl.BondGeometry;
@@ -316,25 +316,29 @@ public class FullSequencePanel extends SequencePanelBase {
 				style.getResidueColor(r, color);
 				buf.setColor(new Color(color[0], color[1], color[2]));
 
-				String symbol = null;
+//				String symbol = null;
 			
-				switch (r.getClassification()) {
-				case AMINO_ACID:
-					symbol = AminoAcidInfo.getLetterFromCode(r.getCompoundCode());
-					break;
-				case NUCLEIC_ACID:
-					symbol = r.getCompoundCode();
-					// shorten two letter DNA code, i.e. DT -> T
-					if (symbol.length() == 2 && symbol.startsWith("D")) {
-						symbol = symbol.substring(1);
-					} else if (symbol.length() > 2) {
-						symbol = "X";
-					}
-					break;
-				}
-				if (symbol == null) {
-					symbol = "*";
-				}
+//				System.out.println("FullSequencePanel: " + r.getCompoundCode() + ": " + r.getClassification());
+//				switch (r.getClassification()) {
+//				case AMINO_ACID:
+////					symbol = AminoAcidInfo.getLetterFromCode(r.getCompoundCode());
+//					symbol = ChemicalComponentInfo.getLetterFromCode(r.getCompoundCode());
+//					break;
+//				case NUCLEIC_ACID:
+//					symbol = ChemicalComponentInfo.getLetterFromCode(r.getCompoundCode());
+//					// shorten two letter DNA code, i.e. DT -> T
+//					if (symbol.length() == 2 && symbol.startsWith("D")) {
+//						symbol = symbol.substring(1);
+//					} else if (symbol.length() > 2) {
+//						symbol = "X";
+//					}
+//					break;
+//				}
+				
+				String symbol = ChemicalComponentInfo.getLetterFromCode(r.getCompoundCode());
+	//			if (symbol == null) {
+	//				symbol = "*";
+	//			}
 
 				buf.drawString(symbol, curX, curY);
 

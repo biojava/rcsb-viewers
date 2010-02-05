@@ -206,16 +206,16 @@ public class StructureStyles
 			}
 		}
 
-		// TODO pr new: don't show DNA/RNA atoms anymore, we show ribbon instead
-		// ATOMS (show ligand and DNA/RNA atoms, but not water)
 		final int residueCount = structureMap.getResidueCount();
 		for (int r = 0; r < residueCount; r++) {
 			final Residue residue = structureMap.getResidue(r);
-			if (residue.getClassification() == Residue.Classification.AMINO_ACID ||
-					residue.getClassification()== Residue.Classification.NUCLEIC_ACID ||
-				residue.getClassification() == Residue.Classification.WATER	)
-				continue;
 
+			boolean multiComponentResidue = ChemicalComponentInfo.isMultiComponentModifiedResidue(residue.getCompoundCode());
+			
+			// Set default visibility 
+			if ( !(residue.getClassification().equals(Residue.Classification.LIGAND) || multiComponentResidue))  {
+				continue;
+			}
 			final int atomCount = residue.getAtomCount();
 			String lastAtomName = "x_X_x";
 			for (int a = 0; a < atomCount; a++) {

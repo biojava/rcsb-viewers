@@ -429,7 +429,7 @@ public class StructureMap
 			Residue residue = this.residueByChainKeyId.get( chainKeyId );
 			if ( residue == null )
 			{
-				residue = new Residue( );
+				residue = new Residue(atom.compound);
 				residue.setStructure( this.structure );
 
 				chain.addResidue( residue );
@@ -437,24 +437,14 @@ public class StructureMap
 			}
 
 			assert(residue != null);
-			residue.addAtom( atom );
+			residue.addAtom(atom);
 
-			// TODO pr try adding modified aa here
-//			if (residue.getClassification() == Residue.Classification.LIGAND &&
-//					chain.getClassification() != Residue.Classification.LIGAND)
-//				chain.addModifiedResidue(residue);
-			if ((residue.getClassification() == Residue.Classification.LIGAND &&
-					chain.getClassification() != Residue.Classification.LIGAND) ||
-					AminoAcidInfo.isNonStandardAminoAcid(residue.getCompoundCode()))
+			// Nonstandard amino acids are listed in Ligand Explorer, other applications
+			// currently don't use the modified residue list.
+			if (ChemicalComponentInfo.isNonstandardAminoAcid(residue.getCompoundCode()) ||
+					ChemicalComponentInfo.isNonstandardNucleicAcid(residue.getCompoundCode())) {
 				chain.addModifiedResidue(residue);
-			
-			// this means a residue came up unclassified (and got classified
-			// as a ligand.)  But the whole chain is *not* a ligand.
-			//
-			// We're calling this a 'modified residue' at the moment,
-			// and we store that in the chain in a list.
-			//
-			// 31-Dec-08 - rickb
+			}
 
 			// Need to add the chain to our master list LAST
 			// so that it has a valid chain id (that needs a residue and an atom)!
@@ -478,11 +468,9 @@ public class StructureMap
 			}
 		}
 		atoms.trimToSize();
-		bonds.trimToSize();
 		residues.trimToSize();
 		ligands.trimToSize();
 		chains.trimToSize();
-		fragments.trimToSize();
 	}
 
 	/**
@@ -567,6 +555,7 @@ public class StructureMap
 				this.fragments.add( fragment );
 			}
 		}
+		fragments.trimToSize();
 	}
 
 
@@ -1028,9 +1017,11 @@ public class StructureMap
 	 */
 	protected void extractLigands( )
 	{
-		for ( Residue residue : residues)
-			if ( residue.getClassification() == Residue.Classification.LIGAND )
+		for ( Residue residue : residues) {
+			if ( residue.getClassification() == Residue.Classification.LIGAND ) {
 				ligands.add( residue );
+			}
+		}
 	}
 
 	/**
@@ -1678,6 +1669,7 @@ public class StructureMap
 		{
 			this.addBonds( BondFactory.generateCovalentBonds( this.atoms ) );
 		}
+		bonds.trimToSize();
 	}
 
 
@@ -2069,7 +2061,7 @@ public class StructureMap
 	/*
 	 * Walk and print the primary StructureMap tree.
 	 */
-	protected void print( )
+	public void print( )
 	{
 		System.err.println( "StructureMap.print: BEGIN" );
 		final int chainCount = this.getChainCount( );
@@ -2169,6 +2161,7 @@ public class StructureMap
 
 		for(int i = this.getResidueCount() - 1; i >= 0; i--) {
 			final Residue r = this.getResidue(i);
+			
 			final String pdbChainId = r.getChainId();
 
 			if (r.getClassification() == Residue.Classification.WATER) {
@@ -2177,6 +2170,13 @@ public class StructureMap
 			} else if (r.getClassification() == Residue.Classification.LIGAND) {
 				nonProteinResidues.add(r);
 				continue;
+			}
+			
+			
+			// Add multicomponent modified residues to the nonProteinResidue list to make them
+			// more prominent to the user. Note, these residues are also listed with the protein chains.
+			if (ChemicalComponentInfo.isMultiComponentModifiedResidue(r.getCompoundCode())) {
+				nonProteinResidues.add(r);
 			}
 
 			Vector<Residue> residues = byPdbId.get(pdbChainId);
@@ -2192,7 +2192,13 @@ public class StructureMap
 
 		final Comparator<Residue> residueComparator = new Comparator<Residue>() {
 			public int compare(Residue r1, Residue r2) {
-				return (r1.getResidueId() - r2.getResidueId());
+				// first compare chain id
+				int delta = r1.getChainId().compareTo(r2.getChainId());
+				// if chain ids are the same, use residue number
+				if (delta == 0) {
+					delta = r1.getResidueId() - r2.getResidueId();
+				}
+				return delta;
 			}
 		};
 

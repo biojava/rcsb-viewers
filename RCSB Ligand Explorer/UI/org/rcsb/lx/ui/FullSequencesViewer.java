@@ -60,12 +60,12 @@ import javax.swing.ScrollPaneConstants;
 
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.controllers.update.LXUpdateEvent;
-import org.rcsb.mbt.model.Residue;
-import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.ExternChain;
+import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.util.DebugState;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;

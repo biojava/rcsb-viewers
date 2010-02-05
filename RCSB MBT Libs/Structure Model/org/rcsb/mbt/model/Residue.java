@@ -46,10 +46,12 @@
 package org.rcsb.mbt.model;
 
 
-import java.util.*;
+import java.util.Vector;
 
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
-import org.rcsb.mbt.model.util.*;
+import org.rcsb.mbt.model.util.ChemicalComponentInfo;
+import org.rcsb.mbt.model.util.ChemicalComponentType;
+import org.rcsb.mbt.model.util.ExternReferences;
 
 
 /**
@@ -59,14 +61,15 @@ import org.rcsb.mbt.model.util.*;
  *  perfectly fine to be empty when it is used only for sequence information.
  *  <P>
  *  @author	John L. Moreland
+ *  @author	Peter Rose (revised)
  *  @see	org.rcsb.mbt.model.StructureComponent
  *  @see	org.rcsb.mbt.model.Structure
  *  @see	org.rcsb.mbt.model.StructureComponentIterator
  *  @see	org.rcsb.mbt.model.util.AminoAcidInfo
  */
 public class Residue
-	extends StructureComponent
-	implements java.lang.Cloneable
+extends StructureComponent
+implements java.lang.Cloneable
 {
 	public enum Classification { AMINO_ACID, NUCLEIC_ACID, LIGAND, WATER }
 
@@ -134,7 +137,7 @@ public class Residue
 	/**
 	 *  Copy all of the field values from the parameter object into "this".
 	 */
-	
+
 	@Override
 	public void copy( final StructureComponent structureComponent )
 	{
@@ -148,10 +151,10 @@ public class Residue
 	/**
 	 *  Clone this object.
 	 */
-	
+
 	@Override
 	public Object clone( )
-		throws CloneNotSupportedException
+	throws CloneNotSupportedException
 	{
 		return super.clone( );
 	}
@@ -163,7 +166,7 @@ public class Residue
 	 *  This name is used by the StructureComponentRegistry class to enable
 	 *  dynamic registration and discovery of new StructureComponent
 	 *  sub-classes/types. The name is also used to create a unique integer
-	 *  indentifier for each type in order to make run-time type comparisons
+	 *  Identifier for each type in order to make run-time type comparisons
 	 *  fast.
 	 */
 	public static String getClassName()
@@ -177,7 +180,7 @@ public class Residue
 	/**
 	 *  This method returns the fully qualified name of this class.
 	 */
-	
+
 	@Override
 	public ComponentType getStructureComponentType( )
 	{
@@ -214,7 +217,7 @@ public class Residue
 	{
 		return classification;
 	}
-	
+
 	/**
 	 * From the chain information, we've determined that the residue is
 	 * really part of a ligand.  Reclassify it as such.
@@ -227,47 +230,30 @@ public class Residue
 	}
 
 	/**
-	 * Set the classification, one of:
-	 * <ul>
-	 * <li>AMINO_ACID</li>
-	 * <li>NUCLEIC_ACID</li>
-	 * <li>LIGAND</li>
-	 * <li>WATER</li>
+	 * Sets the classification of the residue based on the 3-letter compound code of an atom
+	 * @param atom 
 	 */
-	public void setClassification( final Atom atom )
+	public void setClassification(Atom atom)
 	{
-		if (atom == null)
-		{
-			compoundCode = "UNK";
+		ChemicalComponentType type = ChemicalComponentInfo.getChemicalComponentType(atom.compound);
+
+		if (type.isPeptide()) {
+			classification = Classification.AMINO_ACID;
+		} else if (type.isNucleotide() ) {
+			classification = Classification.NUCLEIC_ACID;	
+		} else if (type.isWater()) {
+			classification = Classification.WATER;
+		} else {
 			classification = Classification.LIGAND;
 		}
-		
-		else
-		{
-			compoundCode = atom.compound; 
-		   
-			if ( compoundCode.equals("HOH"))
-				classification = Classification.WATER;
-			
-			// ACE often appears as an n-terminal cap of proteins, treat it as an Amino Acid, 
-			// or else the protein chain is reclassified as a ligand.
-		    else if ( compoundCode.equals("ACE") ) {
-					classification = Classification.AMINO_ACID;
-				classification = Classification.AMINO_ACID;
-			}
-			
-			// TODO should this be ||
-//			else if ( AminoAcidInfo.getNameFromCode( compoundCode ) != null && AminoAcidInfo.isNonStandardAminoAcid(compoundCode) )
-//				classification = Classification.AMINO_ACID;
-			else if ( AminoAcidInfo.getNameFromCode( compoundCode ) != null || AminoAcidInfo.isNonStandardAminoAcid(compoundCode) )
-				classification = Classification.AMINO_ACID;
-			
-			else if ( NucleicAcidInfo.isNucleotide( compoundCode ) )
-				classification = Classification.NUCLEIC_ACID;
-			
-			else
-				classification = Classification.LIGAND;
-		}
+	}
+
+	/**
+	 * Sets the classification of this residue
+	 * @param classification classification of residue
+	 */
+	public void setClassifiction(Classification classification) {
+		this.classification = classification;
 	}
 
 	/**
@@ -480,11 +466,11 @@ public class Residue
 		}
 		if ( alphaAtomIndex < 0 ) {
 			return getAtom(0);
-							// This is from the kiosk viewer version of residue.  It seems like
-							// a harmless enough change I've gone ahead and put it in
-							// the base code.  Eyes up.
-							//
-							// 05-Jun-08 - rickb
+			// This is from the kiosk viewer version of residue.  It seems like
+			// a harmless enough change I've gone ahead and put it in
+			// the base code.  Eyes up.
+			//
+			// 05-Jun-08 - rickb
 		}
 		if ( alphaAtomIndex >= atoms.size() ) {
 			return null;
@@ -527,7 +513,7 @@ public class Residue
 	{
 		// AminoAcid aminoAcid = AminoAcids.getByCode( compoundCode );
 		// return aminoAcid.getHydrophobicity( );
-		return AminoAcidInfo.getHydrophobicityFromCode( compoundCode );
+		return ChemicalComponentInfo.getHydrophobicityFromCode(compoundCode);
 	}
 
 	/**
@@ -538,8 +524,8 @@ public class Residue
 	{
 		if ( type == null ) {
 			throw new IllegalArgumentException( "null type" );
-		// JLM DEBUG: We should throw an exception if the type is not one of
-		// Conformation subclass type, or, Conformation.TYPE_UNDEFINED.
+			// JLM DEBUG: We should throw an exception if the type is not one of
+			// Conformation subclass type, or, Conformation.TYPE_UNDEFINED.
 		}
 
 		conformationType = type;
@@ -569,7 +555,7 @@ public class Residue
 		}
 		return atom.chain_id;
 	}
-	
+
 	/**
 	 * Get the author assigned chain id (as it is assigned in the first Atom record).
 	 * Return null if there are no atom records.
@@ -601,7 +587,7 @@ public class Residue
 		}
 		return atom.residue_id;
 	}
-	
+
 	/**
 	 * Get the author assigned residue id (as it is assigned in the first Atom record).
 	 * Return -1 if there are no atom records.
@@ -617,7 +603,7 @@ public class Residue
 		}
 		return atom.authorResidue_id;
 	}
-	
+
 	/**
 	 * Apps may need to embellish the residue name with further information
 	 * (Ligand Explorer does this).

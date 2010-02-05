@@ -135,19 +135,11 @@ public class DerivedInformation
 		Residue residue = null;
 		for (int i = 0; i < resCount; i++) {
 			residue = this.structureMap.getResidue(i);
-			// TODO pr try including non-standard aa's
-//		   if (residue.getClassification() == Residue.Classification.AMINO_ACID ||
-//				   AminoAcidInfo.isNonStandardAminoAcid(residue.getCompoundCode())) { // Is
-																				// aa
-			   
+
 			if (residue.getClassification() == Residue.Classification.AMINO_ACID) { // Is
 																				// aa
 				aaCount++;
 				this.ssFlags[i] = ' ';
-				// TODO pr try setting beta sheet structure for nucleic acids - has no effect ??
-//			} else if (residue.getClassification() == Residue.Classification.NUCLEIC_ACID) { 
-//				aaCount++;
-//				this.ssFlags[i] = ' ';
 			} else {
 				this.ssFlags[i] = '-'; // Non aa
 			}
