@@ -20,7 +20,7 @@
   		  classpathref="${info.classpath}">
   		<arg>COMPONENT_FILE</arg>
   	</java>
-    <java classname="org.rcsb.ex.tools.FindAllNucleicAcidCompoundNames"
+    <java classname="org.rcsb.ex.tools.ChemicalComponentTypesCreator"
   		  classpathref="${info.classpath}">
     	<arg>COMPONENT_FILE</arg>
     </java>
