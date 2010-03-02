@@ -266,7 +266,7 @@ TreeSelectionListener, IStructureStylesEventListener, MouseListener
 				} else if (type == ComponentType.RESIDUE) {
 					final Residue residue = (Residue) value;
 
-					componentText = residue.getChainId() + " " 
+					componentText = residue.getAuthorChainId() + " " 
 					+ residue.getAuthorResidueId() + " "
 					+ residue.getCompoundCode();
 
