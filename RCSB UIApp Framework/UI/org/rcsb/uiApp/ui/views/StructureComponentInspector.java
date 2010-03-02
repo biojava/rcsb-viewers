@@ -444,7 +444,7 @@ public class StructureComponentInspector
 					label = (JLabel) this.table.getValueAt( row, 0 );
 					label.setText( "Chain ID:" );
 					label = (JLabel) this.table.getValueAt( row, 1 );
-					label.setText( residue.getChainId() );
+					label.setText( residue.getAuthorChainId() );
 					row++;
 
 					label = (JLabel) this.table.getValueAt( row, 0 );
@@ -508,7 +508,7 @@ public class StructureComponentInspector
 					label = (JLabel) this.table.getValueAt( row, 0 );
 					label.setText( "Chain ID:" );
 					label = (JLabel) this.table.getValueAt( row, 1 );
-					label.setText( chain.getChainId() );
+					label.setText( chain.getAuthorChainId() );
 					row++;
 
 					label = (JLabel) this.table.getValueAt( row, 0 );
@@ -539,7 +539,7 @@ public class StructureComponentInspector
 					label = (JLabel) this.table.getValueAt( row, 0 );
 					label.setText( "Chain ID:" );
 					label = (JLabel) this.table.getValueAt( row, 1 );
-					label.setText( chain.getChainId() );
+					label.setText( chain.getAuthorChainId() );
 					row++;
 
 					label = (JLabel) this.table.getValueAt( row, 0 );
