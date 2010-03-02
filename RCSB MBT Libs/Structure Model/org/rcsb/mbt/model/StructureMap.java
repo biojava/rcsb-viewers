@@ -2161,8 +2161,8 @@ public class StructureMap
 
 		for(int i = this.getResidueCount() - 1; i >= 0; i--) {
 			final Residue r = this.getResidue(i);
-			
-			final String pdbChainId = r.getChainId();
+
+			final String pdbChainId = r.getAuthorChainId();
 
 			if (r.getClassification() == Residue.Classification.WATER) {
 				waterResidues.add(r); 
@@ -2194,7 +2194,7 @@ public class StructureMap
 		final Comparator<Residue> residueComparator = new Comparator<Residue>() {
 			public int compare(Residue r1, Residue r2) {
 				// first compare chain id
-				int delta = r1.getChainId().compareTo(r2.getChainId());
+				int delta = r1.getAuthorChainId().compareTo(r2.getAuthorChainId());
 				// if chain ids are the same, use residue number
 				if (delta == 0) {
 					delta = r1.getResidueId() - r2.getResidueId();
@@ -2206,12 +2206,17 @@ public class StructureMap
 		for (String pdbId : byPdbId.keySet())
 		{
 			Vector<Residue> residues = byPdbId.get(pdbId);
+			Collections.sort(residues, residueComparator);
 			if (pdbId != null && pdbId.length() != 0)
 			{ 
-				Collections.sort(residues, residueComparator);
 				residues.trimToSize();
 
-				ExternChain c = ExternChain.createBasicChain(pdbId, residues);               
+				// set author chain id for display purposes
+				String chainId = "";
+				if (residues.size() > 0) {
+                    chainId = residues.get(0).getAuthorChainId();
+				}
+				ExternChain c = ExternChain.createBasicChain(chainId, residues);               
 				this.pdbTopLevelElements.add(c);
 			}
 
