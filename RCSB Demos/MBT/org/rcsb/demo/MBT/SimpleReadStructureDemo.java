@@ -267,7 +267,7 @@ public class SimpleReadStructureDemo
 	{
 //		boolean isNonProteinChain = auxChainId != null || chain.isNonProteinChain();
 
-		String chainId = (auxChainId != null)? auxChainId : chain.getChainId();
+		String chainId = (auxChainId != null)? auxChainId : chain.getAuthorChainId();
 //		if (isNonProteinChain)
 //			Output.lineOut("Pseudo (Non-Protein) Chain Id : " + chainId);
 //
