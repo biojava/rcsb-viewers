@@ -194,6 +194,15 @@ public class Chain
 		if ( residues == null || residues.size() == 0)
 			return null;
 		
+		// single residues in a chain are classified as ligands.
+		if (getResidueCount() == 1) {
+			if (residues.get(0).getClassification() == Residue.Classification.WATER) {
+				return Residue.Classification.WATER;
+			} else {
+				return Residue.Classification.LIGAND;
+			}
+		}
+		
 		if (chainClassification == null)
 		{	
 			// Classify the chain based upon how many residues of each type exist.
@@ -238,13 +247,20 @@ public class Chain
 	 */
 	public void reClassifyAsLigand()
 	{
-		for (Residue residue : residues)
-			if (residue.getClassification() == Residue.Classification.LIGAND)
-				return;
-							// shortcut - we're presuming if one is correct,
-							// they're all correct.
-			else
-				residue.reClassifyAsLigand();
+		// classify chains with one residue as a ligand
+		if (residues.size() == 1) {
+			residues.get(0).reClassifyAsLigand();
+		} else {
+			for (Residue residue : residues) {
+				if (residue.getClassification() == Residue.Classification.LIGAND) {
+					return;
+					// shortcut - we're presuming if one is correct,
+					// they're all correct.
+				} else {
+					residue.reClassifyAsLigand();
+				}
+			}
+		}
 	}
 
 	/**
