@@ -108,7 +108,7 @@ public class InteractionCalculator
 			if (chain.getClassification() == Residue.Classification.AMINO_ACID ||
 					chain.getClassification() == Residue.Classification.NUCLEIC_ACID)
 				proteinAtoms.addAll(chain.getAtoms());
-
+		
 		final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry
 				.get(ComponentType.ATOM);
 		final AtomStyle as = (AtomStyle) structure.getStructureMap()
@@ -125,8 +125,12 @@ public class InteractionCalculator
 
 			final Atom atom_i = ligandAtoms.get(i);
 
-			// should this loop start at 0 ?? -pr
-			for (int j = i + 1; j < proteinAtoms.size(); j++) {
+			// -PR
+			// The following loop seemed to start at the wrong index
+            //	for (int j = i + 1; j < proteinAtoms.size(); j++) {
+			// changed it to: 
+			
+				for (int j = 0; j < proteinAtoms.size(); j++) {
 				final Atom atom_j = proteinAtoms.get(j);
 
 				if (hbondflag) {
