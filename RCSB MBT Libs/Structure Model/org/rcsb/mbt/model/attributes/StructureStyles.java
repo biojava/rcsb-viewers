@@ -206,6 +206,7 @@ public class StructureStyles
 			}
 		}
 
+		
 		final int residueCount = structureMap.getResidueCount();
 		for (int r = 0; r < residueCount; r++) {
 			final Residue residue = structureMap.getResidue(r);
@@ -227,6 +228,21 @@ public class StructureStyles
 				lastAtomName = atom.name;
 			}
 		}
+		
+		// Handle chains with a single residue as a ligand and make them visible
+		for (Chain c: structureMap.getChains()) {
+			if (c.getResidueCount() == 1) {
+				Residue r = c.getResidue(0);
+				String lastAtomName = "x_X_x";
+				for (Atom atom: r.getAtoms()) {
+					// Handle multiple atom occupancy
+					if (!atom.name.equals(lastAtomName)) {
+						this.setVisible(atom, true);
+					}
+					lastAtomName = atom.name;
+				}
+			}
+		}
 
 		// BONDS (show bonds with two visible atoms)
 		final int bondCount = structureMap.getBondCount();
@@ -241,6 +257,11 @@ public class StructureStyles
 		final int chainCount = structureMap.getChainCount();
 		for (int c = 0; c < chainCount; c++) {
 			final Chain chain = structureMap.getChain(c);
+			// don't show chains with a single residue
+			if (chain.getResidueCount() == 1) {
+				continue;
+			}
+			
 			if (chain.getClassification() == Residue.Classification.LIGAND) {
 				continue;
 			}
