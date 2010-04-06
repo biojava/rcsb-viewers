@@ -406,8 +406,6 @@ public class StructureMap
 			final Atom atom = (Atom) this.structure.getStructureComponentByIndex(
 					ComponentType.ATOM, i );
 
-			String chainKeyId = atom.chain_id + atom.residue_id;
-
 			if (DebugState.isDebug())
 				assert(atom.chain_id.length() > 0);
 			// with new structure loader paradigm, this should never happen
@@ -424,7 +422,8 @@ public class StructureMap
 			}
 
 			assert(chain != null);
-			chainKeyId = atom.chain_id + atom.residue_id;
+			
+			String chainKeyId = atom.chain_id + atom.residue_id;
 
 			Residue residue = this.residueByChainKeyId.get( chainKeyId );
 			if ( residue == null )
@@ -1020,6 +1019,10 @@ public class StructureMap
 		for ( Residue residue : residues) {
 			if ( residue.getClassification() == Residue.Classification.LIGAND ) {
 				ligands.add( residue );
+			}
+			// tread single residue chains as ligands
+			if (this.getChain(residue.getChainId()).getResidueCount() == 1) {
+				ligands.add(residue);
 			}
 		}
 	}
@@ -2170,6 +2173,10 @@ public class StructureMap
 			} else if (r.getClassification() == Residue.Classification.LIGAND) {
 				nonProteinResidues.add(r);
 				continue;
+				// handle chains with one residue as a non-protein residue residue
+			} else if (this.getChain(r.getChainId()).getResidueCount() == 1) {
+				nonProteinResidues.add(r);
+				continue;
 			}
 			
 			
@@ -2216,6 +2223,7 @@ public class StructureMap
 				if (residues.size() > 0) {
                     chainId = residues.get(0).getAuthorChainId();
 				}
+				
 				ExternChain c = ExternChain.createBasicChain(chainId, residues);               
 				this.pdbTopLevelElements.add(c);
 			}
