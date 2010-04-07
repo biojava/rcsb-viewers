@@ -603,6 +603,22 @@ implements java.lang.Cloneable
 		}
 		return atom.authorResidue_id;
 	}
+	
+	/**
+	 * Get the insertion code (as it is assigned in the first Atom record).
+	 * Return "" if there are no atom records.
+	 */
+	public String getInsertionCode( )
+	{
+		if ( atoms == null ) {
+			return "";
+		}
+		final Atom atom = atoms.elementAt( 0 );
+		if ( atom == null ) {
+			return "";
+		}
+		return atom.insertionCode;
+	}
 
 	/**
 	 * Apps may need to embellish the residue name with further information
