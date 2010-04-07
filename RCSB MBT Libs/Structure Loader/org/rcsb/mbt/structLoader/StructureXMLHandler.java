@@ -337,6 +337,8 @@ public class StructureXMLHandler extends DefaultHandler implements
 				createXMLRunnable__label_seq_id__End());
 		endElementAtomRunnables.put(xmlPrefix + "auth_seq_id",
 				createXMLRunnable__auth_seq_id__End());
+		endElementAtomRunnables.put(xmlPrefix + "pdbx_PDB_ins_code",
+				createXMLRunnable__pdbx_PDB_ins_code__End());
 		endElementAtomRunnables.put(xmlPrefix + "Cartn_x",
 				createXMLRunnable__Cartn_x__End());
 		endElementAtomRunnables.put(xmlPrefix + "Cartn_y",
@@ -993,6 +995,21 @@ public class StructureXMLHandler extends DefaultHandler implements
 		return new XMLRunnable__auth_seq_id__End();
 	}
 
+	protected class XMLRunnable__pdbx_PDB_ins_code__End extends XMLRunnable {
+		public void run() {
+			String insertionCode = buf.trim();
+			if (insertionCode.equals("?")) {
+				curAtom.insertionCode = "";
+			} else {
+				curAtom.insertionCode = insertionCode;
+			}
+		}
+	}
+
+	protected XMLRunnable__pdbx_PDB_ins_code__End createXMLRunnable__pdbx_PDB_ins_code__End() {
+		return new XMLRunnable__pdbx_PDB_ins_code__End();
+	}
+	
 	protected class XMLRunnable__Cartn_x__End extends XMLRunnable {
 		public void run() {
 				curAtom.coordinate[0] = Double.parseDouble(buf.trim());
