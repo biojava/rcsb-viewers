@@ -207,6 +207,12 @@ public class Atom
 	public int authorResidue_id = -1; // _atom_site.author_seq_id
 
 	/**
+	 *  Insertion Code.
+	 *  For example, "A", "B", "C", etc.
+	 */
+	public String insertionCode = ""; // _atom_site.pdbx_PDB_ins_code
+
+	/**
 	 *  The x,y,z coordinate in angstroms.
 	 *  For example, (21.023, 30.128, 12.340).
 	 */
