@@ -279,6 +279,8 @@ public class FullSequencePanel extends SequencePanelBase {
 
 		// draw the ranges
 		int maxRow = 0;
+		String curResId = "";
+		
 		for (Integer row : rangesByRow.keySet()) {
 			if (row > maxRow)
 				maxRow = row;
@@ -315,31 +317,8 @@ public class FullSequencePanel extends SequencePanelBase {
 
 				style.getResidueColor(r, color);
 				buf.setColor(new Color(color[0], color[1], color[2]));
-
-//				String symbol = null;
-			
-//				System.out.println("FullSequencePanel: " + r.getCompoundCode() + ": " + r.getClassification());
-//				switch (r.getClassification()) {
-//				case AMINO_ACID:
-////					symbol = AminoAcidInfo.getLetterFromCode(r.getCompoundCode());
-//					symbol = ChemicalComponentInfo.getLetterFromCode(r.getCompoundCode());
-//					break;
-//				case NUCLEIC_ACID:
-//					symbol = ChemicalComponentInfo.getLetterFromCode(r.getCompoundCode());
-//					// shorten two letter DNA code, i.e. DT -> T
-//					if (symbol.length() == 2 && symbol.startsWith("D")) {
-//						symbol = symbol.substring(1);
-//					} else if (symbol.length() > 2) {
-//						symbol = "X";
-//					}
-//					break;
-//				}
 				
 				String symbol = ChemicalComponentInfo.getLetterFromCode(r.getCompoundCode());
-	//			if (symbol == null) {
-	//				symbol = "*";
-	//			}
-
 				buf.drawString(symbol, curX, curY);
 
 				buf.setColor(Color.white);
@@ -349,11 +328,19 @@ public class FullSequencePanel extends SequencePanelBase {
 					if (first
 							|| (r.getAuthorResidueId() % 10 == 0 && curX > lastCharEndX)) {
 						String resId = String.valueOf(r.getAuthorResidueId());
-						buf.drawString(resId, curX, curY
+//						System.out.println("FullSequencePanel: resId: " + resId + " insertion code: " + r., curX: " + curX + ", lastCharEndX: " + lastCharEndX);
+						String label = "";
+						if (resId.equals(curResId)) {
+							label = r.getInsertionCode();
+						} else {
+							label = resId;
+						}
+						buf.drawString(label, curX, curY
 								+ (int) letterBounds.getHeight() + rulerWidth);
 						lastCharEndX = curX
-								+ (resId.length()
+								+ (label.length()
 										* (int) letterBounds.getWidth() + 1);
+						curResId = resId;
 					}
 
 					int tickX = curX + letterCenterX;
