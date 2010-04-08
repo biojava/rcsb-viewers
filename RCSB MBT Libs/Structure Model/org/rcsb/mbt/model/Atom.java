@@ -104,6 +104,7 @@ public class Atom
 		this.authorChain_id = atom.authorChain_id;
 		this.residue_id    = atom.residue_id;
 		this.authorResidue_id    = atom.authorResidue_id;
+		this.insertionCode = atom.insertionCode;
 		this.coordinate[0] = atom.coordinate[0];
 		this.coordinate[1] = atom.coordinate[1];
 		this.coordinate[2] = atom.coordinate[2];
