@@ -267,7 +267,7 @@ TreeSelectionListener, IStructureStylesEventListener, MouseListener
 					final Residue residue = (Residue) value;
 
 					componentText = residue.getAuthorChainId() + " " 
-					+ residue.getAuthorResidueId() + " "
+					+ residue.getAuthorResidueId() + residue.getInsertionCode() + " "
 					+ residue.getCompoundCode();
 
 					imageIcon = this.residueIcon;
