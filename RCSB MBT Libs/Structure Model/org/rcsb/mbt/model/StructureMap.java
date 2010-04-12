@@ -423,7 +423,7 @@ public class StructureMap
 
 			assert(chain != null);
 			
-			String chainKeyId = atom.chain_id + atom.residue_id;
+			String chainKeyId = atom.chain_id + atom.residue_id + atom.insertionCode;
 
 			Residue residue = this.residueByChainKeyId.get( chainKeyId );
 			if ( residue == null )
@@ -624,7 +624,7 @@ public class StructureMap
 			}
 			final Chain chain = this.chainById.get( chain_id );
 
-			final String res = chain_id + conformation.start_residue;
+			final String res = chain_id + conformation.start_residue + conformation.start_insertionCode;
 			final Residue startResidue = this.residueByChainKeyId.get( res );
 			if ( startResidue == null ) {
 				continue;
@@ -662,7 +662,7 @@ public class StructureMap
 			}
 			final Chain chain = this.chainById.get( chain_id );
 
-			final String res = chain_id + conformation.start_residue;
+			final String res = chain_id + conformation.start_residue + conformation.start_insertionCode;
 			final Residue startResidue = this.residueByChainKeyId.get( res );
 			if ( startResidue == null ) {
 				continue;
@@ -700,7 +700,7 @@ public class StructureMap
 			}
 			final Chain chain = this.chainById.get( chain_id );
 
-			final String res = chain_id + conformation.start_residue;
+			final String res = chain_id + conformation.start_residue + conformation.start_insertionCode;
 			final Residue startResidue = this.residueByChainKeyId.get( res );
 			if ( startResidue == null ) {
 				continue;
@@ -738,7 +738,7 @@ public class StructureMap
 			}
 			final Chain chain = this.chainById.get( chain_id );
 
-			final String res = chain_id + conformation.start_residue;
+			final String res = chain_id + conformation.start_residue + conformation.start_insertionCode;
 			final Residue startResidue = this.residueByChainKeyId.get( res );
 			if ( startResidue == null ) {
 				continue;
@@ -1006,7 +1006,8 @@ public class StructureMap
 
 			this.residues.add( residue );
 			chain.addResidue( residue );
-			final String chainAndResidueId = chain_id + r;
+			
+			final String chainAndResidueId = chain_id + residue.getResidueId() + residue.getInsertionCode();
 			this.residueByChainKeyId.put( chainAndResidueId, residue );
 		}
 	}
@@ -1182,7 +1183,9 @@ public class StructureMap
 				final int chainCompare = atom.chain_id.compareTo( atom2.chain_id );
 				if ( chainCompare == 0 )
 				{
-					if ( atom.residue_id == atom2.residue_id )
+					// TODO pr 20100409 add insertion code
+//					if ( atom.residue_id == atom2.residue_id )
+					if ( (atom.residue_id + atom.insertionCode).equals(atom2.residue_id + atom2.insertionCode) )
 					{
 						// Since we currently don't have an atom number,
 						// do a linear search of the residue
@@ -1197,7 +1200,12 @@ public class StructureMap
 						break;
 						// return mid;
 					}
+					// TODO pr 20100409 add insertion code
 					else if ( atom.residue_id < atom2.residue_id )
+					{
+						high = mid - 1;
+					}
+					else if (atom.residue_id == atom2.residue_id && (atom.insertionCode.compareTo(atom2.insertionCode) < 0)) 
 					{
 						high = mid - 1;
 					}
@@ -1246,32 +1254,10 @@ public class StructureMap
 			return null;
 		}
 
-		final String chainAndResidue = atom.chain_id + atom.residue_id;
+		final String chainAndResidue = atom.chain_id + atom.residue_id + atom.insertionCode;
 
 		return this.residueByChainKeyId.get( chainAndResidue );
 	}
-
-
-	/**
-	 *  Get the Residue object for the given chain id and residue id pair.
-	 *  <P>
-	 */
-	public Residue getResidue( final String chainId, final int residueId )
-	{
-		if ( chainId == null ) {
-			throw new NullPointerException( "null chainId" );
-		}
-		if ( residueId < 0 ) {
-			throw new IllegalArgumentException( "negative residueId" );
-		}
-		if ( residueId >= this.getResidueCount() ) {
-			throw new IllegalArgumentException( "residueId out of bounds" );
-		}
-
-		final String chainAndResidue = chainId + residueId;
-		return this.residueByChainKeyId.get( chainAndResidue );
-	}
-
 
 	/**
 	 *  Get the Chain object to which this Atom belongs.
@@ -1761,15 +1747,21 @@ public class StructureMap
 				{
 					final int residueId = residue.getResidueId( );
 					final int residueId2 = residue2.getResidueId( );
-					if ( residueId == residueId2 )
+
+					if ( (residueId+residue.getInsertionCode()).equals(residueId2+residue2.getInsertionCode()))
 					{
 						if ( residue == residue2 ) {
 							return mid;
 						} else {
-							break; // Give up and do an exhastive linear search
+							break; // Give up and do an exhaustive linear search
 						}
 					}
+
 					else if ( residueId < residueId2 )
+					{
+						high = mid - 1;
+					}
+					else if (residueId == residueId2 && (residue.getInsertionCode().compareTo(residue2.getInsertionCode()) < 0)) 
 					{
 						high = mid - 1;
 					}
@@ -2173,7 +2165,7 @@ public class StructureMap
 			} else if (r.getClassification() == Residue.Classification.LIGAND) {
 				nonProteinResidues.add(r);
 				continue;
-				// handle chains with one residue as a non-protein residue residue
+				// handle chains with one residue as a non-protein residue
 			} else if (this.getChain(r.getChainId()).getResidueCount() == 1) {
 				nonProteinResidues.add(r);
 				continue;
@@ -2202,9 +2194,13 @@ public class StructureMap
 			public int compare(Residue r1, Residue r2) {
 				// first compare chain id
 				int delta = r1.getAuthorChainId().compareTo(r2.getAuthorChainId());
-				// if chain ids are the same, use residue number
+
 				if (delta == 0) {
 					delta = r1.getResidueId() - r2.getResidueId();
+				}
+				// if chain ids are the same, use residue number
+				if (delta == 0) {
+					delta = r1.getInsertionCode().compareTo(r2.getInsertionCode());
 				}
 				return delta;
 			}
