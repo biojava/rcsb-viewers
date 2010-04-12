@@ -420,26 +420,29 @@ public class PdbStructureLoader
 				{
 					atom.chain_id = atom.chain_id + "$$$" + modelCount;
 				}
-
+				
 				atom.authorChain_id = atom.chain_id;
-				// Make sure waters don't have the same chain id as the macromolecules,
+				
+				// Split het atoms into separate chains so they can be displayed as ligands.
+				// Note, ligands and water are included in the protein chain that is closed to the ligand or water.
+				// However, for MBT these entities must be in a different chain for visualization purposes.
+				// For display purposes the original "authorChain_id" is used.
+				
+				if (isHetAtom) {
+					atom.chain_id += " ";
+				}
+				// Make sure waters don't have the same chain id as the macromolecules or ligands,
 				// since they are expected to be in a separate chain, i.e. for ProteinWorkshop
 				// Add a space to enforce uniqueness
 				if (atom.compound.equals("HOH")) {
 					atom.chain_id += " ";
 				}
 				
-				String newResidueIdRaw = line.substring(22, 28 ).trim();
-					//**JB expanded to read 6 chars to account for non-integer residue ids. (Was 4 chars).
-				String temp = newResidueIdRaw;
-				while(Character.isLetter(temp.charAt(temp.length() - 1)))
-					temp = temp.substring(0, temp.length() - 1);
-						//**JB don't remove anything but the last letters.
-						//  If there are any spaces between the letters and the number, etc.,
-						// I want an exception thrown so I know.
-
+				String temp = line.substring(22, 26).trim();
 				atom.residue_id = Integer.parseInt(temp);
 				atom.authorResidue_id = atom.residue_id;
+			
+				atom.insertionCode = line.substring(26, 27).trim();
 	
 				atom.coordinate = new double[3];
 				atom.coordinate[0] = Double.parseDouble(line.substring(30, 38 ).trim());
