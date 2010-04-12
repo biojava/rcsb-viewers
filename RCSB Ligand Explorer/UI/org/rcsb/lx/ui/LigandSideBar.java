@@ -56,6 +56,8 @@ import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
@@ -362,6 +364,13 @@ public class LigandSideBar extends JPanel
 		else
 		{
 			this.ligandList = this.getLigandList(model.getStructures().get(0));
+			
+			final Comparator<Chain> chainComparator = new Comparator<Chain>() {
+				public int compare(Chain c1, Chain c2) {
+					return c1.getAuthorChainId().compareTo(c2.getAuthorChainId());
+				}
+			};
+			Collections.sort(ligandList, chainComparator);
 
 			this.setLayout(null);
 
@@ -380,10 +389,17 @@ public class LigandSideBar extends JPanel
 				ligandJList.setRootVisible(false);
 				ligandJList.setShowsRootHandles(true);
 
+				String chainId = "";
+				DefaultMutableTreeNode chainNode = null;
+				
 				for (Chain chain : ligandList)
 				{
-					DefaultMutableTreeNode chainNode = new DefaultMutableTreeNode(chain);
-					root.add(chainNode);
+					// create new node only if chain id is different from previous chain id
+					if (! chain.getAuthorChainId().equals(chainId)) {
+						chainNode = new DefaultMutableTreeNode(chain);
+						root.add(chainNode);
+						chainId = chain.getAuthorChainId();
+					}
 					if (chain.getClassification() == Residue.Classification.LIGAND)
 						for (Residue residue : chain.getResidues())
 							chainNode.add(new DefaultMutableTreeNode(residue));
@@ -655,6 +671,7 @@ public class LigandSideBar extends JPanel
 					chain.hasModifiedResidues())
 				ligandList.add(chain);
 
+		
 		return ligandList;
 	}
 
