@@ -75,9 +75,11 @@ public abstract class Conformation
 		this.start_compound = conformation.start_compound;
 		this.start_chain    = conformation.start_chain;
 		this.start_residue  = conformation.start_residue;
+		this.start_insertionCode = conformation.start_insertionCode;
 		this.end_compound   = conformation.end_compound;
 		this.end_chain      = conformation.end_chain;
 		this.end_residue    = conformation.end_residue;
+		this.end_insertionCode = conformation.end_insertionCode;
 	}
 
 	/**
@@ -133,6 +135,12 @@ public abstract class Conformation
 	 *  For example, 22, 27, etc.
 	 */
 	public int start_residue = -1;
+	
+	/**
+	 *  This value corresponds to the Atom.insertionCode value.
+	 *  For example, A, B, etc.
+	 */
+	public String start_insertionCode = "";
 
 	/**
 	 *  For example, "ALA", "GLU", "LYS", etc.
@@ -150,5 +158,11 @@ public abstract class Conformation
 	 *  For example, 27, 137, etc.
 	 */
 	public int end_residue = -1;
+	
+	/**
+	 *  This value corresponds to the end Atom.insertionCode value.
+	 *  For example, A, B, etc.
+	 */
+	public String end_insertionCode = "";
 }
 
