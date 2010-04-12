@@ -445,7 +445,8 @@ public class SimpleReadStructureDemo
 		for (Residue residue : residues)
 		{	
 			output.lineOut("Res - Id: " + residue.getResidueId() + "/" + 
-					residue.getAuthorChainId() 
+					residue.getAuthorChainId() +
+					residue.getInsertionCode()
 					//   conv.getResidueNdbId(residue, "(NONE)") 
 					+ ", " +
 					"CmpCd: " + residue.getCompoundCode() + ", " +
