@@ -246,6 +246,7 @@ implements java.lang.Cloneable
 		} else {
 			classification = Classification.LIGAND;
 		}
+		
 	}
 
 	/**
