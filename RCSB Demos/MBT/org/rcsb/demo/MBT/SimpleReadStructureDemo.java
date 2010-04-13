@@ -337,6 +337,7 @@ public class SimpleReadStructureDemo
 			// let's ignore waters
 
 			Output.lineOut("Residue Id : " + residue.getResidueId());
+			Output.lineOut("Insertion Code : " + residue.getInsertionCode());
 			Output.lineOut("Compound Code : " + residue.getCompoundCode());
 			Output.lineOut("Hydrophobicity : " + residue.getHydrophobicity());
 			Output.lineOut("Num Atoms : " + residue.getAtomCount());
@@ -350,6 +351,7 @@ public class SimpleReadStructureDemo
 					Output.lineOut("Atom Name : " + atom.name);
 					Output.lineOut("Element : " + atom.element);
 					Output.lineOut("Compound Id: " + atom.compound);
+					Output.lineOut("Insertion Code: " + atom.insertionCode);
 					Output.lineOut("Partial Charge : " + atom.partialCharge);
 					Output.lineOut("Occupancy : " + atom.occupancy);
 					Output.lineOut("");
