@@ -1189,19 +1189,38 @@ WindowListener, IStructureStylesEventListener {
 
 		if (scType == ComponentType.ATOM) {
 			final Atom atom = (Atom) structureComponent;
+			
+			String insertionCode = "";
+			if (! atom.insertionCode.isEmpty()) {
+				insertionCode = " Insertion code: " + atom.insertionCode;
+			}
 			Status.output(Status.LEVEL_REMARK, "Atom: " + atom.name
-					+ ", residue " + atom.authorResidue_id + ", compound "
-					+ atom.compound + ", chain " + atom.authorChain_id);
+					+ " Residue " + atom.compound + " " + atom.authorResidue_id 
+					+ insertionCode 
+					+ " Chain " + atom.authorChain_id);
 		} else if (scType == ComponentType.BOND) {
 			final Bond bond = (Bond) structureComponent;
 
 			final Atom a1 = bond.getAtom(0);
 			final Atom a2 = bond.getAtom(1);
+			
+			String insertionCode1 = "";
+			if (! a1.insertionCode.isEmpty()) {
+				insertionCode1 = " Insertion code: " + a1.insertionCode;
+			}
+			String insertionCode2 = "";
+			if (! a2.insertionCode.isEmpty()) {
+				insertionCode2 = " Insertion code: " + a2.insertionCode;
+			}
 
-			Status.output(Status.LEVEL_REMARK, "Covalent bond. Atom 1: "
-					+ a1.name + ", residue " + a1.authorResidue_id + ", chain "
-					+ a1.authorChain_id + "; Atom 2: " + a2.name + ", residue "
-					+ a2.authorResidue_id + ", chain " + a2.authorChain_id);
+			Status.output(Status.LEVEL_REMARK, "Covalent bond. Atom 1: " + a1.name 
+					+ " Residue: " + a1.compound + " " + a1.authorResidue_id 
+					+ insertionCode1
+					+ " Chain: " + a1.authorChain_id 
+					+ " - Atom 2: " + a2.name 
+					+ " Residue: " + a2.compound + " " + a2.authorResidue_id 
+					+ insertionCode2
+					+ " Chain: " + a2.authorChain_id);
 
 		} else if (scType == ComponentType.RESIDUE) {
 			final Residue r = (Residue) structureComponent;
@@ -1218,10 +1237,17 @@ WindowListener, IStructureStylesEventListener {
 				conformationType = "Turn";
 			}
 
-			Status.output(Status.LEVEL_REMARK, "Residue " + r.getAuthorResidueId()
-					+ ", from chain " + r.getAuthorChainId() + "; "
-					+ conformationType + " conformation; "
-					+ r.getCompoundCode() + " compound.");
+			String insertionCode = "";
+			if (! r.getInsertionCode().isEmpty()) {
+				insertionCode = " Insertion code: " + r.getInsertionCode();
+			}
+			
+			Status.output(Status.LEVEL_REMARK, "Residue: " + r.getCompoundCode() + " "
+						+ r.getAuthorResidueId()
+						+ insertionCode
+						+ " Chain: " + r.getAuthorChainId()
+						+ " Conformation: "
+						+ conformationType);
 
 		} else if (scType == ComponentType.FRAGMENT) {
 			final Fragment f = (Fragment) structureComponent;
@@ -1235,14 +1261,14 @@ WindowListener, IStructureStylesEventListener {
 					.getAuthorResidueId());
 
 			Status.output(Status.LEVEL_REMARK, conformation
-					+ " fragment: chain " + startPdbChainId
-					+ ", from residue " + startPdbResidueId
+					+ " Fragment: chain " + startPdbChainId
+					+ " from residue " + startPdbResidueId
 					+ " to residue " + endPdbResidueId);
 
 		} else if (scType == ComponentType.CHAIN) {
 			final Chain c = (Chain) structureComponent;
 
-			Status.output(Status.LEVEL_REMARK, "Chain " + c.getAuthorChainId()
+			Status.output(Status.LEVEL_REMARK, "Chain: " + c.getAuthorChainId()
 					+ " backbone");
 		}
 	}
