@@ -346,6 +346,17 @@ public class FullSequencePanel extends SequencePanelBase {
 					int tickX = curX + letterCenterX;
 					buf.drawLine(tickX, lineY, tickX, lineY + rulerWidth);
 					first = false;
+				} 
+				
+				// TODO -pr print insertion codes
+				
+				else if (! r.getInsertionCode().isEmpty() && curX > lastCharEndX) {
+					String label = r.getInsertionCode();
+					buf.drawString(label, curX, curY
+					+ (int) letterBounds.getHeight() + rulerWidth);
+					lastCharEndX = curX
+							+ (label.length()
+									* (int) letterBounds.getWidth() + 1);
 				}
 				buf.drawLine(curX, lineY, curX + (int) letterBounds.getWidth(),
 						lineY);
@@ -465,8 +476,13 @@ class SequenceMouseMotionListener extends MouseMotionAdapter {
 		final Chain c = r.getFragment().getChain();
 		final String chainId = c.getAuthorChainId();
 		final String residueId = String.valueOf(r.getAuthorResidueId());
-		Status.output(Status.LEVEL_REMARK, "Mouse at residue " + residueId
-				+ ", on chain " + chainId + "; a " + r.getCompoundCode()
-				+ " compound");
+		
+		String insertionCode = "";
+		if (! r.getInsertionCode().isEmpty()) {
+			insertionCode = " Insertion code: " + r.getInsertionCode();
+		}
+		Status.output(Status.LEVEL_REMARK, "Residue: " + r.getCompoundCode()+ " " + residueId
+				+ insertionCode
+				+ " Chain: " + chainId);
 	}
 }
