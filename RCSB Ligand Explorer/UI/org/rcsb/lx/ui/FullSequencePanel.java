@@ -348,9 +348,8 @@ public class FullSequencePanel extends SequencePanelBase {
 					first = false;
 				} 
 				
-				// TODO -pr print insertion codes
-				
-				else if (! r.getInsertionCode().isEmpty() && curX > lastCharEndX) {
+//				else if (! r.getInsertionCode().isEmpty() && curX > lastCharEndX) { // this use Java 1.6 isEmpty method
+				else if (r.getInsertionCode().length() > 0 && curX > lastCharEndX) {
 					String label = r.getInsertionCode();
 					buf.drawString(label, curX, curY
 					+ (int) letterBounds.getHeight() + rulerWidth);
