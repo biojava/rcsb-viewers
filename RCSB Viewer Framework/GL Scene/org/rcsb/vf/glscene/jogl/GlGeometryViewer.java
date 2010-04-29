@@ -110,6 +110,9 @@ import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.controllers.scene.SceneController;
 import org.rcsb.vf.glscene.jogl.ChainGeometry.RibbonForm;
 import org.rcsb.vf.glscene.jogl.tiles.TileRenderer;
+import org.rcsb.vf.glscene.surfaces.Surface;
+import org.rcsb.vf.glscene.surfaces.SurfaceGeometry;
+import org.rcsb.vf.glscene.surfaces.SurfaceStyle;
 
 
 
@@ -229,6 +232,9 @@ WindowListener, IStructureStylesEventListener {
 	public static BondGeometry bondGeometry = null;
 
 	public static ChainGeometry chainGeometry = null;
+	
+	// TODO -pr 20100425
+	public static SurfaceGeometry surfaceGeometry = null;
 
 	protected VirtualSphere2 virtualSphere = new VirtualSphere2(150, 150, 150);
 
@@ -511,6 +517,11 @@ WindowListener, IStructureStylesEventListener {
 		chainGeometry.setForm(Geometry.FORM_THICK); // JLM
 		// DEBUG
 		defaultGeometry.put(ComponentType.CHAIN, chainGeometry);
+		
+		// TODO -pr 20100425
+		surfaceGeometry = new SurfaceGeometry();
+		// atomGeometry.setForm( Geometry.FORM_LINES ); // JLM DEBUG
+		defaultGeometry.put(ComponentType.SURFACE, surfaceGeometry);
 
 		VFAppBase.sgetSceneController().setDefaultGeometry(defaultGeometry);
 
@@ -1191,7 +1202,8 @@ WindowListener, IStructureStylesEventListener {
 			final Atom atom = (Atom) structureComponent;
 			
 			String insertionCode = "";
-			if (! atom.insertionCode.isEmpty()) {
+//			if (! atom.insertionCode.isEmpty()) { // this is a Java 1.6 method
+			if (atom.insertionCode.length() > 0) {
 				insertionCode = " Insertion code: " + atom.insertionCode;
 			}
 			Status.output(Status.LEVEL_REMARK, "Atom: " + atom.name
@@ -1205,11 +1217,13 @@ WindowListener, IStructureStylesEventListener {
 			final Atom a2 = bond.getAtom(1);
 			
 			String insertionCode1 = "";
-			if (! a1.insertionCode.isEmpty()) {
+//			if (! a1.insertionCode.isEmpty()) { // this is a Java 1.6 method
+			if (a1.insertionCode.length() > 0) {
 				insertionCode1 = " Insertion code: " + a1.insertionCode;
 			}
 			String insertionCode2 = "";
-			if (! a2.insertionCode.isEmpty()) {
+//			if (! a2.insertionCode.isEmpty()) { // this is a Java 1.6 method
+			if (a2.insertionCode.length() > 0) {
 				insertionCode2 = " Insertion code: " + a2.insertionCode;
 			}
 
@@ -1801,10 +1815,23 @@ WindowListener, IStructureStylesEventListener {
 		final ChainGeometry defaultChainGeometry = (ChainGeometry) defaultGeometry.get(ComponentType.CHAIN);
 		final AtomGeometry defaultAtomGeometry = (AtomGeometry) defaultGeometry.get(ComponentType.ATOM);
 		final BondGeometry defaultBondGeometry = (BondGeometry) defaultGeometry.get(ComponentType.BOND);
+		// TODO -pr 20104025
+		final SurfaceGeometry defaultSurfaceGeometry = (SurfaceGeometry) defaultGeometry.get(ComponentType.SURFACE);
+		
+		
 
 		final ChainStyle defaultChainStyle = (ChainStyle) structureStyles.getDefaultStyle(ComponentType.CHAIN);
 		final AtomStyle defaultAtomStyle = (AtomStyle) structureStyles.getDefaultStyle(ComponentType.ATOM);
 		final BondStyle defaultBondStyle = (BondStyle) structureStyles.getDefaultStyle(ComponentType.BOND);
+		
+		// TODO -pr 20100425
+//		final SurfaceStyle defaultSurfaceStyle = (SurfaceStyle) structureStyles.getDefaultStyle(ComponentType.SURFACE);
+//		Vector atm = new Vector(0);
+//		Surface s = new Surface(atm, str);
+//		synchronized (sn.renderables) {
+//			sn.renderables.put(s, new DisplayListRenderable(s,
+//					defaultChainStyle, defaultSurfaceGeometry));
+//		}
 
 		str.getStructureMap().getStructureStyles()
 		.removeStructureStylesEventListener(this);
