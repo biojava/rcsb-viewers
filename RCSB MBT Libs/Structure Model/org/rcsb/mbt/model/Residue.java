@@ -237,6 +237,14 @@ implements java.lang.Cloneable
 	{
 		ChemicalComponentType type = ChemicalComponentInfo.getChemicalComponentType(atom.compound);
 
+		if (atom.nonpolymer != null && atom.nonpolymer) {
+			if (type.isWater()) {
+				classification = Classification.WATER;
+			} else {
+				classification = Classification.LIGAND;
+			}
+			return;
+		}
 		if (type.isPeptide()) {
 			classification = Classification.AMINO_ACID;
 		} else if (type.isNucleotide() ) {
