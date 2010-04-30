@@ -442,7 +442,9 @@ public class StructureMap
 			// currently don't use the modified residue list.
 			if (ChemicalComponentInfo.isNonstandardAminoAcid(residue.getCompoundCode()) ||
 					ChemicalComponentInfo.isNonstandardNucleicAcid(residue.getCompoundCode())) {
-				chain.addModifiedResidue(residue);
+				
+				// TODO PDBWW-3123: don't display mod res in LX
+//				chain.addModifiedResidue(residue);
 			}
 
 			// Need to add the chain to our master list LAST
