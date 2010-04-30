@@ -250,5 +250,11 @@ public class Atom
 	 *  For example, "0.3", "1.1", etc.
 	 */
 	public float partialCharge = 0.0f; // _atom_site.???
+	
+	/**
+	 *  Non-polymer indicator. Atom is part of a residue that
+	 *  is not in a polymer, i.e. a ligand atom
+	 */
+	public boolean nonpolymer = false;
 }
 
