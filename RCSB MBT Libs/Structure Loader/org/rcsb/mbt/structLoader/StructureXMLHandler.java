@@ -1088,12 +1088,13 @@ public class StructureXMLHandler extends DefaultHandler implements
 	
 	/** 
 	 * Heterogen residues (ligands, waters, etc.) don't have a label_seq_id.
-	 * Assign the auth_seq_id as a placeholder.
+	 * Assign the auth_seq_id as a placeholder and assign it as a non-polymer atom.
 	 */
 	private void assignMissingResidueIds() {
 		for (Atom atom: atomVector) {
 			if (atom.residue_id == Integer.MIN_VALUE) {
 				atom.residue_id = atom.authorResidue_id;
+				atom.nonpolymer = true;
 			}
 		}
 	}
