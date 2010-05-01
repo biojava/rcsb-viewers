@@ -1252,7 +1252,8 @@ WindowListener, IStructureStylesEventListener {
 			}
 
 			String insertionCode = "";
-			if (! r.getInsertionCode().isEmpty()) {
+//			if (! r.getInsertionCode().isEmpty()) { // this is Java 6 code
+			if (r.getInsertionCode().length() > 0) {
 				insertionCode = " Insertion code: " + r.getInsertionCode();
 			}
 			
