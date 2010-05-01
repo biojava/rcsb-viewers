@@ -477,7 +477,8 @@ class SequenceMouseMotionListener extends MouseMotionAdapter {
 		final String residueId = String.valueOf(r.getAuthorResidueId());
 		
 		String insertionCode = "";
-		if (! r.getInsertionCode().isEmpty()) {
+//		if (! r.getInsertionCode().isEmpty()) { // this is Java 6
+			if (r.getInsertionCode().length() > 0) {
 			insertionCode = " Insertion code: " + r.getInsertionCode();
 		}
 		Status.output(Status.LEVEL_REMARK, "Residue: " + r.getCompoundCode()+ " " + residueId
