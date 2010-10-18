@@ -59,21 +59,21 @@ import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Structure;
+import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.sv.controllers.app.SVVersionInformation;
 import org.rcsb.sv.controllers.app.SimpleViewer;
 import org.rcsb.uiApp.controllers.app.AppBase;
-import org.rcsb.uiApp.ui.mainframe.UIBuilder;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
+import org.rcsb.vf.ui.VFUIBuilder;
 
 
 
 public class SVDocumentFrame extends VFDocumentFrameBase
 {
-	public class SimpleViewerUIBuilder extends UIBuilder
+	public class SimpleViewerUIBuilder extends VFUIBuilder
 	{
 		@Override
 		public void run()
