@@ -47,6 +47,7 @@ package org.rcsb.vf.controllers.doc;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.SwingUtilities;
 
@@ -56,7 +57,8 @@ import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
 import org.rcsb.mbt.model.util.Status;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.doc.DocController;
-import org.rcsb.uiApp.ui.dialogs.ImageFileManager;
+import org.rcsb.uiApp.ui.dialogs.ImageFileChooser;
+import org.rcsb.uiApp.ui.dialogs.ImageFileSaver;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 
@@ -200,14 +202,14 @@ public class VFDocController extends DocController
 			private class SaverRunnable implements Runnable {
 				private int width;
 				private int height;
+				private int dpi;
 				private File file;
-				private ImageFileManager manager;
 				
-				public SaverRunnable(int width, int height, File file, ImageFileManager manager) {
+				public SaverRunnable(int width, int height, int dpi, File file) {
 					this.width = width;
 					this.height = height;
+					this.dpi = dpi;
 					this.file = file;
-					this.manager = manager;
 				}
 				
 				public void run() {
@@ -223,18 +225,20 @@ public class VFDocController extends DocController
 							BufferedImage screenshot = null;
 							while (screenshot == null && !viewer.hasScreenshotFailed()) {
 								try {
-									Thread
-											.sleep(ImageSaverThread.DURATION_BETWEEN_SCREENSHOT_CHECKS_IN_MILLISECONDS);
+									Thread.sleep(ImageSaverThread.DURATION_BETWEEN_SCREENSHOT_CHECKS_IN_MILLISECONDS);
 								} catch (final InterruptedException e) {
 								}
-
 								screenshot = viewer.getScreenshot();
 							}
 
 							if (screenshot != null) {
-								manager.save(screenshot, file);
+								try {
+									ImageFileSaver.save(screenshot, dpi, file);
+								} catch (IOException e) {
+									Status.output(Status.LEVEL_REMARK, "Error saving the image file.");
+								}
 								viewer.clearScreenshot();
-								Status.output(Status.LEVEL_REMARK, "Image saved.");
+								Status.output(Status.LEVEL_REMARK, "Image saved as " + file.getAbsoluteFile());
 							} else {
 								Status.output(Status.LEVEL_REMARK, "Error saving the image.");
 							}
@@ -255,17 +259,18 @@ public class VFDocController extends DocController
 				int height = viewer.getHeight();
 
 				// Ask the user for file name, image file format, and image size.
-				final ImageFileManager imageFileManager = new ImageFileManager(
+				final ImageFileChooser imageFileManager = new ImageFileChooser(
 						AppBase.sgetActiveFrame());
 				final File file = imageFileManager.save(width, height);
 				if (file == null)
 				{
 					return; // User canceled the save.
 				}
-				width = imageFileManager.getSaveWidth();
-				height = imageFileManager.getSaveHeight();
+				width = imageFileManager.getImageWidth();
+				height = imageFileManager.getImageHeight();
+				int dpi = imageFileManager.getDpi();
 
-				SaverRunnable run = new SaverRunnable(width, height, file, imageFileManager);
+				SaverRunnable run = new SaverRunnable(width, height, dpi, file);
 				SwingUtilities.invokeLater(run);
 			}
 		}
