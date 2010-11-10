@@ -62,7 +62,6 @@ import org.rcsb.vf.glscene.jogl.DisplayLists;
 
 import com.sun.opengl.util.GLUT;
 
-import java.util.*;
 
 
 public class SurfaceGeometry
@@ -79,7 +78,7 @@ public class SurfaceGeometry
 	 */
 	public SurfaceGeometry( )
 	{
-		System.out.println("Creating new SurfaceGeometry");
+//		System.out.println("Creating new SurfaceGeometry");
 	}
 	
 	public DisplayLists[] getDisplayLists(final StructureComponent structureComponent, final Style style, final GL gl, final GLU glu, final GLUT glut) {
