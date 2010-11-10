@@ -53,8 +53,6 @@ import javax.vecmath.Color4f;
 import javax.vecmath.Point3f;
 
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
-import org.rcsb.mbt.surfaceLoader.EmvReader;
-import org.rcsb.mbt.surfaceLoader.PlyReader;
 
 
 
@@ -70,21 +68,21 @@ public class Surface extends StructureComponent {
 		this.atoms = atoms;
 		
 		// trial implementation, read sample surface from file
-		PlyReader reader = new PlyReader();
+//		PlyReader reader = new PlyReader();
 //		EmvReader reader = new EmvReader();
-		try {
-			reader.readPly("C:/RCSBViewerTrunk/RCSB MBT Libs/test-input/PlyReaderTest/2ptn.ply");
+//		try {
+//			reader.readPly("C:/RCSBViewerTrunk/RCSB MBT Libs/test-input/PlyReaderTest/2ptn.ply");
 //			reader.readEmv("C:/RCSBViewerTrunk/RCSB MBT Libs/test-input/EmvReaderTest/emd_5127-i2.8-t50000.emv");
-		} catch (FileNotFoundException e) {
+//		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		vertices = reader.getVertices();
-		colors = reader.getVertexColors();
-		faces = reader.getFaces();
+//			e.printStackTrace();
+//		}
+//		vertices = reader.getVertices();
+//		colors = reader.getVertexColors();
+////		faces = reader.getFaces();
 		
 		Color4f defaultColor = new Color4f(0.1f, 0.8f, 1.0f, 0.0f);
 		for (int i = 0; i < colors.length; i++) {
