@@ -77,7 +77,7 @@ public class CreditsPanel extends JPanel implements ActionListener, ClipboardOwn
 	private static final long serialVersionUID = 4624398343284115661L;
 
 	public String citation = 
-				"J.L. Moreland, A.Gramada, O.V. Buzko, Q. Zhang and P.E. Bourne 2005 The Molecular Biology Toolkit (mbt): A Modular Platform for Developing Molecular Visualization Applications. BMCBioinformatics, 6:21";
+				"J.L. Moreland, A.Gramada, O.V. Buzko, Q. Zhang and P.E. Bourne 2005 The Molecular Biology Toolkit (mbt): A Modular Platform for Developing Molecular Visualization Applications. BMC Bioinformatics, 6:21";
 	
 	public String html = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">" +
 						 "<html>" +
@@ -85,8 +85,9 @@ public class CreditsPanel extends JPanel implements ActionListener, ClipboardOwn
 								"<title> Title </title>" +
 							"</head>" +
 							"<body>" +
-								"Online documentation: [<a href=\"http://www.pdb.org/robohelp/viewers/proteinworkshop.htm\">here</a>]<br>" +
-								"Flash tutorial: [<a href=\"http://www.pdb.org/pdb/tutorials/viewers/pw.swf\">here</a>]" +
+							    "<a href=\"http://www.pdb.org/pdb/staticHelp.do?p=help/viewers/proteinWorkshop_viewer.html\">Protein Workshop Tutorial</a><br>" +
+//								"Online documentation: [<a href=\"http://www.pdb.org/robohelp/viewers/proteinworkshop.htm\">here</a>]<br>" +
+//								"Flash tutorial: [<a href=\"http://www.pdb.org/pdb/tutorials/viewers/pw.swf\">here</a>]" +
 								"<p>Scientific Lead: <u>Dr. Peter Rose, Dr. Phil Bourne</u></p>" +
 								"<p>Original implementation: John Beaver, with contributions from Philipp Steeger, based on a specification provided by Phil Bourne and using the molecular biology toolkit (MBT).</p>" +
 								"<p>Version 3 re-architect: Garrick Berger</p>" +
