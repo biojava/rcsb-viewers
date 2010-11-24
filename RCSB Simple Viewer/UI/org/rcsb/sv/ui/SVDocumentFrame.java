@@ -50,13 +50,21 @@ package org.rcsb.sv.ui;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Event;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.prefs.Preferences;
 
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import org.rcsb.mbt.model.Structure;
@@ -64,6 +72,7 @@ import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.sv.controllers.app.SVVersionInformation;
 import org.rcsb.sv.controllers.app.SimpleViewer;
 import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.vf.controllers.app.BBBrowserLauncher;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
@@ -111,6 +120,42 @@ public class SVDocumentFrame extends VFDocumentFrameBase
 				addWindowListener(closer);
 			}
 
+			// add help menu
+			final String helpURL = "http://www.pdb.org/pdb/staticHelp.do?p=help/viewers/simpleViewer_viewer.html";
+			final JMenu helpMenu = new JMenu("Help");
+			final JMenuItem helpItem = new JMenuItem("Help");
+			final ActionListener helpListener =
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent actionEvent)
+					{
+						Thread runner = new Thread()
+						{
+							@Override
+							public void run()
+							{
+								String address = helpURL;
+								try
+								{
+									BBBrowserLauncher.openURL(address);
+								}
+								
+								catch (IOException e)
+								{
+//									displayErrorMessage("Unable to open help site.");
+								}
+							}
+						};
+						runner.start();
+					}
+				};
+			
+			helpItem.addActionListener(helpListener);
+			helpItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H,
+					Event.CTRL_MASK));
+			helpMenu.add(helpItem);
+			menuBar.add(helpMenu);	
+			
 			//
 			// progress update 0.85, "transferring structure"
 			//
