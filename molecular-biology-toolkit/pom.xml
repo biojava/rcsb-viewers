@@ -23,12 +23,5 @@
 			<artifactId>xercesImpl</artifactId>
 			<version>2.4.0</version>
 		</dependency>
-		<dependency>
-			<groupId>org.rcsb</groupId>
-			<artifactId>molecular-biology-toolkit</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
 	</dependencies>
 </project>
