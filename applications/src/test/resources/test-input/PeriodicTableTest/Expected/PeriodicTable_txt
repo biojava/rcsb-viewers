@@ -1,0 +1,828 @@
+Dumping Periodic Table:
+
+    1: H (Hydrogen)
+      Atomic Weight: 1.00794
+      Group        : 1 (-)
+      Block        : s-block
+      Color        : R = 1.0,  G = 1.0,  B = 1.0
+      VDW Radius   : 1.2
+
+    2: He (Helium)
+      Atomic Weight: 4.002602
+      Group        : 18 (Noble gas)
+      Block        : p-block
+      Color        : R = 0.87,  G = 1.0,  B = 1.0
+      VDW Radius   : 1.4
+
+    3: Li (Lithium)
+      Atomic Weight: 6.941
+      Group        : 1 (Alkali metal)
+      Block        : s-block
+      Color        : R = 0.81,  G = 0.48,  B = 1.0
+      VDW Radius   : 1.82
+
+    4: Be (Beryllium)
+      Atomic Weight: 9.012182
+      Group        : 2 (Alkaline earth metal)
+      Block        : s-block
+      Color        : R = 0.78,  G = 1.0,  B = 0.0
+      VDW Radius   : 2.0
+
+    5: B (Boron)
+      Atomic Weight: 10.811
+      Group        : 13 (-)
+      Block        : p-block
+      Color        : R = 1.0,  G = 0.71,  B = 0.71
+      VDW Radius   : 2.0
+
+    6: C (Carbon)
+      Atomic Weight: 12.0107
+      Group        : 14 (-)
+      Block        : p-block
+      Color        : R = 0.0,  G = 1.0,  B = 0.0
+      VDW Radius   : 1.7
+
+    7: N (Nitrogen)
+      Atomic Weight: 14.0067
+      Group        : 15 (Pnictogen)
+      Block        : p-block
+      Color        : R = 0.0,  G = 0.0,  B = 1.0
+      VDW Radius   : 1.55
+
+    8: O (Oxygen)
+      Atomic Weight: 15.9994
+      Group        : 16 (Chalcogen)
+      Block        : p-block
+      Color        : R = 1.0,  G = 0.0,  B = 0.0
+      VDW Radius   : 1.52
+
+    9: F (Fluorine)
+      Atomic Weight: 18.9984032
+      Group        : 17 (Halogen)
+      Block        : p-block
+      Color        : R = 0.71,  G = 1.0,  B = 1.0
+      VDW Radius   : 1.47
+
+    10: Ne (Neon)
+      Atomic Weight: 20.1797
+      Group        : 18 (Noble gas)
+      Block        : p-block
+      Color        : R = 0.67,  G = 0.91,  B = 0.97
+      VDW Radius   : 1.54
+
+    11: Na (Sodium)
+      Atomic Weight: 22.98977
+      Group        : 1 (Alkali metal)
+      Block        : s-block
+      Color        : R = 0.67,  G = 0.35,  B = 0.97
+      VDW Radius   : 2.27
+
+    12: Mg (Magnesium)
+      Atomic Weight: 24.305
+      Group        : 2 (Alkaline earth metal)
+      Block        : s-block
+      Color        : R = 0.55,  G = 1.0,  B = 0.0
+      VDW Radius   : 1.73
+
+    13: Al (Aluminum)
+      Atomic Weight: 26.981538
+      Group        : 13 (-)
+      Block        : p-block
+      Color        : R = 0.84,  G = 0.65,  B = 0.65
+      VDW Radius   : 2.0
+
+    14: Si (Silicon)
+      Atomic Weight: 28.0855
+      Group        : 14 (-)
+      Block        : p-block
+      Color        : R = 0.52,  G = 0.61,  B = 0.61
+      VDW Radius   : 2.1
+
+    15: P (Phosphorus)
+      Atomic Weight: 30.973761
+      Group        : 15 (Pnictogen)
+      Block        : p-block
+      Color        : R = 1.0,  G = 0.52,  B = 0.0
+      VDW Radius   : 1.8
+
+    16: S (Sulfur)
+      Atomic Weight: 32.065
+      Group        : 16 (Chalcogen)
+      Block        : p-block
+      Color        : R = 1.0,  G = 0.81,  B = 0.19
+      VDW Radius   : 1.8
+
+    17: Cl (Chlorine)
+      Atomic Weight: 35.453
+      Group        : 17 (Halogen)
+      Block        : p-block
+      Color        : R = 0.13,  G = 0.97,  B = 0.13
+      VDW Radius   : 1.75
+
+    18: Ar (Argon)
+      Atomic Weight: 39.948
+      Group        : 18 (Noble gas)
+      Block        : p-block
+      Color        : R = 0.51,  G = 0.84,  B = 0.91
+      VDW Radius   : 1.88
+
+    19: K (Potassium)
+      Atomic Weight: 39.0983
+      Group        : 1 (Alkali metal)
+      Block        : s-block
+      Color        : R = 0.55,  G = 0.26,  B = 0.84
+      VDW Radius   : 2.75
+
+    20: Ca (Calcium)
+      Atomic Weight: 40.078
+      Group        : 2 (Alkaline earth metal)
+      Block        : s-block
+      Color        : R = 0.22,  G = 1.0,  B = 0.0
+      VDW Radius   : 2.0
+
+    21: Sc (Scandium)
+      Atomic Weight: 44.95591
+      Group        : 3 (-)
+      Block        : d-block
+      Color        : R = 0.88,  G = 0.88,  B = 0.88
+      VDW Radius   : 1.0
+
+    22: Ti (Titanium)
+      Atomic Weight: 47.867
+      Group        : 4 (-)
+      Block        : d-block
+      Color        : R = 0.75,  G = 0.75,  B = 0.75
+      VDW Radius   : 1.0
+
+    23: V (Vanadium)
+      Atomic Weight: 50.9415
+      Group        : 5 (-)
+      Block        : d-block
+      Color        : R = 0.63,  G = 0.63,  B = 0.66
+      VDW Radius   : 1.0
+
+    24: Cr (Chromium)
+      Atomic Weight: 51.9961
+      Group        : 6 (-)
+      Block        : d-block
+      Color        : R = 0.53,  G = 0.6,  B = 0.75
+      VDW Radius   : 1.0
+
+    25: Mn (Manganese)
+      Atomic Weight: 54.938049
+      Group        : 7 (-)
+      Block        : d-block
+      Color        : R = 0.6,  G = 0.47,  B = 0.75
+      VDW Radius   : 1.0
+
+    26: Fe (Iron)
+      Atomic Weight: 55.845
+      Group        : 8 (-)
+      Block        : d-block
+      Color        : R = 0.52,  G = 0.48,  B = 0.78
+      VDW Radius   : 1.0
+
+    27: Co (Cobalt)
+      Atomic Weight: 58.9332
+      Group        : 9 (-)
+      Block        : d-block
+      Color        : R = 0.44,  G = 0.47,  B = 0.75
+      VDW Radius   : 1.0
+
+    28: Ni (Nickel)
+      Atomic Weight: 58.6934
+      Group        : 10 (-)
+      Block        : d-block
+      Color        : R = 0.34,  G = 0.47,  B = 0.75
+      VDW Radius   : 1.63
+
+    29: Cu (Copper)
+      Atomic Weight: 63.546
+      Group        : 11 (Coinage metal)
+      Block        : d-block
+      Color        : R = 0.97,  G = 0.47,  B = 0.37
+      VDW Radius   : 1.4
+
+    30: Zn (Zinc)
+      Atomic Weight: 65.409
+      Group        : 12 (-)
+      Block        : d-block
+      Color        : R = 0.47,  G = 0.5,  B = 0.66
+      VDW Radius   : 1.39
+
+    31: Ga (Gallium)
+      Atomic Weight: 69.723
+      Group        : 13 (-)
+      Block        : p-block
+      Color        : R = 0.75,  G = 0.56,  B = 0.56
+      VDW Radius   : 1.87
+
+    32: Ge (Germanium)
+      Atomic Weight: 72.64
+      Group        : 14 (-)
+      Block        : p-block
+      Color        : R = 0.37,  G = 0.56,  B = 0.56
+      VDW Radius   : 1.0
+
+    33: As (Arsenic)
+      Atomic Weight: 74.9216
+      Group        : 15 (Pnictogen)
+      Block        : p-block
+      Color        : R = 0.72,  G = 0.5,  B = 0.88
+      VDW Radius   : 1.85
+
+    34: Se (Selenium)
+      Atomic Weight: 78.96
+      Group        : 16 (Chalcogen)
+      Block        : p-block
+      Color        : R = 0.97,  G = 0.63,  B = 0.0
+      VDW Radius   : 1.9
+
+    35: Br (Bromine)
+      Atomic Weight: 79.904
+      Group        : 17 (Halogen)
+      Block        : p-block
+      Color        : R = 0.63,  G = 0.16,  B = 0.16
+      VDW Radius   : 1.85
+
+    36: Kr (Krypton)
+      Atomic Weight: 83.798
+      Group        : 18 (Noble gas)
+      Block        : p-block
+      Color        : R = 0.35,  G = 0.72,  B = 0.82
+      VDW Radius   : 2.02
+
+    37: Rb (Rubidium)
+      Atomic Weight: 85.4678
+      Group        : 1 (Alkali metal)
+      Block        : s-block
+      Color        : R = 0.44,  G = 0.16,  B = 0.69
+      VDW Radius   : 1.0
+
+    38: Sr (Strontium)
+      Atomic Weight: 87.62
+      Group        : 2 (Alkaline earth metal)
+      Block        : s-block
+      Color        : R = 0.0,  G = 0.97,  B = 0.0
+      VDW Radius   : 1.0
+
+    39: Y (Yttrium)
+      Atomic Weight: 88.90585
+      Group        : 3 (-)
+      Block        : d-block
+      Color        : R = 0.56,  G = 0.97,  B = 0.97
+      VDW Radius   : 1.0
+
+    40: Zr (Zirconium)
+      Atomic Weight: 91.224
+      Group        : 4 (-)
+      Block        : d-block
+      Color        : R = 0.56,  G = 0.88,  B = 0.88
+      VDW Radius   : 1.0
+
+    41: Nb (Niobium)
+      Atomic Weight: 92.90638
+      Group        : 5 (-)
+      Block        : d-block
+      Color        : R = 0.44,  G = 0.75,  B = 0.78
+      VDW Radius   : 1.0
+
+    42: Mo (Molybdenum)
+      Atomic Weight: 95.94
+      Group        : 6 (-)
+      Block        : d-block
+      Color        : R = 0.31,  G = 0.69,  B = 0.69
+      VDW Radius   : 1.0
+
+    43: Tc (Technetium)
+      Atomic Weight: 98.0
+      Group        : 7 (-)
+      Block        : d-block
+      Color        : R = 0.22,  G = 0.6,  B = 0.66
+      VDW Radius   : 1.0
+
+    44: Ru (Ruthenium)
+      Atomic Weight: 101.07
+      Group        : 8 (Precious metal)
+      Block        : d-block
+      Color        : R = 0.12,  G = 0.53,  B = 0.56
+      VDW Radius   : 1.0
+
+    45: Rh (Rhodium)
+      Atomic Weight: 102.9055
+      Group        : 9 (Precious metal)
+      Block        : d-block
+      Color        : R = 0.03,  G = 0.47,  B = 0.53
+      VDW Radius   : 1.0
+
+    46: Pd (Palladium)
+      Atomic Weight: 106.42
+      Group        : 10 (Precious metal)
+      Block        : d-block
+      Color        : R = 0.0,  G = 0.4,  B = 0.5
+      VDW Radius   : 1.63
+
+    47: Ag (Silver)
+      Atomic Weight: 107.8682
+      Group        : 11 (Coinage metal)
+      Block        : d-block
+      Color        : R = 0.6,  G = 0.75,  B = 0.97
+      VDW Radius   : 1.72
+
+    48: Cd (Cadmium)
+      Atomic Weight: 112.411
+      Group        : 12 (-)
+      Block        : d-block
+      Color        : R = 0.97,  G = 0.85,  B = 0.56
+      VDW Radius   : 1.58
+
+    49: In (Indium)
+      Atomic Weight: 114.818
+      Group        : 13 (-)
+      Block        : p-block
+      Color        : R = 0.67,  G = 0.44,  B = 0.44
+      VDW Radius   : 1.93
+
+    50: Sn (Tin)
+      Atomic Weight: 118.71
+      Group        : 14 (-)
+      Block        : p-block
+      Color        : R = 0.38,  G = 0.5,  B = 0.5
+      VDW Radius   : 2.17
+
+    51: Sb (Antimony)
+      Atomic Weight: 121.76
+      Group        : 15 (Pnictogen)
+      Block        : p-block
+      Color        : R = 0.6,  G = 0.38,  B = 0.69
+      VDW Radius   : 1.0
+
+    52: Te (Tellurium)
+      Atomic Weight: 127.6
+      Group        : 16 (Chalcogen)
+      Block        : p-block
+      Color        : R = 0.82,  G = 0.47,  B = 0.0
+      VDW Radius   : 2.06
+
+    53: I (Iodine)
+      Atomic Weight: 126.90447
+      Group        : 17 (Halogen)
+      Block        : p-block
+      Color        : R = 0.58,  G = 0.0,  B = 0.58
+      VDW Radius   : 1.98
+
+    54: Xe (Xenon)
+      Atomic Weight: 131.293
+      Group        : 18 (Noble gas)
+      Block        : p-block
+      Color        : R = 0.25,  G = 0.6,  B = 0.69
+      VDW Radius   : 2.16
+
+    55: Cs (Cesium)
+      Atomic Weight: 132.90545
+      Group        : 1 (Alkali metal)
+      Block        : s-block
+      Color        : R = 0.31,  G = 0.1,  B = 0.53
+      VDW Radius   : 1.0
+
+    56: Ba (Barium)
+      Atomic Weight: 137.327
+      Group        : 2 (Alkaline earth metal)
+      Block        : s-block
+      Color        : R = 0.0,  G = 0.78,  B = 0.0
+      VDW Radius   : 1.0
+
+    57: La (Lanthanum)
+      Atomic Weight: 138.9055
+      Group        : -1 (Lanthanoid)
+      Block        : f-block
+      Color        : R = 0.44,  G = 0.85,  B = 0.97
+      VDW Radius   : 1.0
+
+    58: Ce (Cerium)
+      Atomic Weight: 140.116
+      Group        : -1 (Lanthanoid)
+      Block        : f-block
+      Color        : R = 0.97,  G = 0.97,  B = 0.78
+      VDW Radius   : 1.0
+
+    59: Pr (Praseodymium)
+      Atomic Weight: 140.90765
+      Group        : -1 (Lanthanoid)
+      Block        : f-block
+      Color        : R = 0.85,  G = 0.97,  B = 0.78
+      VDW Radius   : 1.0
+
+    60: Nd (Neodymium)
+      Atomic Weight: 144.24
+      Group        : -1 (Lanthanoid)
+      Block        : f-block
+      Color        : R = 0.75,  G = 0.97,  B = 0.78
+      VDW Radius   : 1.0
+
+    61: Pm (Promethium)
+      Atomic Weight: 145.0
+      Group        : -1 (Lanthanoid)
+      Block        : f-block
+      Color        : R = 0.63,  G = 0.97,  B = 0.78
+      VDW Radius   : 1.0
+
+    62: Sm (Samarium)
+      Atomic Weight: 150.36
+      Group        : -1 (Lanthanoid)
+      Block        : f-block
+      Color        : R = 0.56,  G = 0.97,  B = 0.78
+      VDW Radius   : 1.0
+
+    63: Eu (Europium)
+      Atomic Weight: 151.964
+      Group        : -1 (Lanthanoid)
+      Block        : f-block
+      Color        : R = 0.38,  G = 0.97,  B = 0.78
+      VDW Radius   : 1.0
+
+    64: Gd (Gadolinium)
+      Atomic Weight: 157.25
+      Group        : -1 (Lanthanoid)
+      Block        : f-block
+      Color        : R = 0.25,  G = 0.97,  B = 0.78
+      VDW Radius   : 1.0
+
+    65: Tb (Terbium)
+      Atomic Weight: 158.92534
+      Group        : -1 (Lanthanoid)
+      Block        : f-block
+      Color        : R = 0.19,  G = 0.97,  B = 0.78
+      VDW Radius   : 1.0
+
+    66: Dy (Dysprosium)
+      Atomic Weight: 162.5
+      Group        : -1 (Lanthanoid)
+      Block        : f-block
+      Color        : R = 0.09,  G = 0.97,  B = 0.69
+      VDW Radius   : 1.0
+
+    67: Ho (Holmium)
+      Atomic Weight: 164.93032
+      Group        : -1 (Lanthanoid)
+      Block        : f-block
+      Color        : R = 0.0,  G = 0.97,  B = 0.6
+      VDW Radius   : 1.0
+
+    68: Er (Erbium)
+      Atomic Weight: 167.259
+      Group        : -1 (Lanthanoid)
+      Block        : f-block
+      Color        : R = 0.0,  G = 0.88,  B = 0.44
+      VDW Radius   : 1.0
+
+    69: Tm (Thulium)
+      Atomic Weight: 168.93421
+      Group        : -1 (Lanthanoid)
+      Block        : f-block
+      Color        : R = 0.0,  G = 0.82,  B = 0.31
+      VDW Radius   : 1.0
+
+    70: Yb (Ytterbium)
+      Atomic Weight: 173.04
+      Group        : -1 (Lanthanoid)
+      Block        : f-block
+      Color        : R = 0.0,  G = 0.75,  B = 0.22
+      VDW Radius   : 1.0
+
+    71: Lu (Lutetium)
+      Atomic Weight: 174.967
+      Group        : 3 (-)
+      Block        : d-block
+      Color        : R = 0.0,  G = 0.66,  B = 0.13
+      VDW Radius   : 1.0
+
+    72: Hf (Hafnium)
+      Atomic Weight: 178.49
+      Group        : 4 (-)
+      Block        : d-block
+      Color        : R = 0.28,  G = 0.75,  B = 0.97
+      VDW Radius   : 1.0
+
+    73: Ta (Tantalum)
+      Atomic Weight: 180.9479
+      Group        : 5 (-)
+      Block        : d-block
+      Color        : R = 0.28,  G = 0.63,  B = 0.97
+      VDW Radius   : 1.0
+
+    74: W (Tungsten)
+      Atomic Weight: 183.84
+      Group        : 6 (-)
+      Block        : d-block
+      Color        : R = 0.13,  G = 0.56,  B = 0.82
+      VDW Radius   : 1.0
+
+    75: Re (Rhenium)
+      Atomic Weight: 186.207
+      Group        : 7 (-)
+      Block        : d-block
+      Color        : R = 0.13,  G = 0.47,  B = 0.66
+      VDW Radius   : 1.0
+
+    76: Os (Osmium)
+      Atomic Weight: 190.23
+      Group        : 8 (Precious metal)
+      Block        : d-block
+      Color        : R = 0.13,  G = 0.41,  B = 0.56
+      VDW Radius   : 1.0
+
+    77: Ir (Iridium)
+      Atomic Weight: 192.217
+      Group        : 9 (Precious metal)
+      Block        : d-block
+      Color        : R = 0.09,  G = 0.31,  B = 0.5
+      VDW Radius   : 1.0
+
+    78: Pt (Platinum)
+      Atomic Weight: 195.078
+      Group        : 10 (Precious metal)
+      Block        : d-block
+      Color        : R = 0.09,  G = 0.35,  B = 0.56
+      VDW Radius   : 1.72
+
+    79: Au (Gold)
+      Atomic Weight: 196.96655
+      Group        : 11 (Coinage metal)
+      Block        : d-block
+      Color        : R = 0.97,  G = 0.82,  B = 0.13
+      VDW Radius   : 1.66
+
+    80: Hg (Mercury)
+      Atomic Weight: 200.59
+      Group        : 12 (-)
+      Block        : d-block
+      Color        : R = 0.69,  G = 0.69,  B = 0.76
+      VDW Radius   : 1.0
+
+    81: Tl (Thallium)
+      Atomic Weight: 204.3833
+      Group        : 13 (-)
+      Block        : p-block
+      Color        : R = 0.63,  G = 0.31,  B = 0.28
+      VDW Radius   : 1.0
+
+    82: Pb (Lead)
+      Atomic Weight: 207.2
+      Group        : 14 (-)
+      Block        : p-block
+      Color        : R = 0.31,  G = 0.35,  B = 0.38
+      VDW Radius   : 1.0
+
+    83: Bi (Bismuth)
+      Atomic Weight: 208.98038
+      Group        : 15 (Pnictogen)
+      Block        : p-block
+      Color        : R = 0.6,  G = 0.28,  B = 0.69
+      VDW Radius   : 1.0
+
+    84: Po (Polonium)
+      Atomic Weight: 209.0
+      Group        : 16 (Chalcogen)
+      Block        : p-block
+      Color        : R = 0.66,  G = 0.35,  B = 0.0
+      VDW Radius   : 1.0
+
+    85: At (Astatine)
+      Atomic Weight: 210.0
+      Group        : 17 (Halogen)
+      Block        : p-block
+      Color        : R = 0.44,  G = 0.28,  B = 0.25
+      VDW Radius   : 1.0
+
+    86: Rn (Radon)
+      Atomic Weight: 222.0
+      Group        : 18 (Noble Gas)
+      Block        : p-block
+      Color        : R = 0.25,  G = 0.5,  B = 0.56
+      VDW Radius   : 1.0
+
+    87: Fr (Francium)
+      Atomic Weight: 223.0
+      Group        : 1 (Alkali Metal)
+      Block        : s-block
+      Color        : R = 0.25,  G = 0.0,  B = 0.38
+      VDW Radius   : 1.0
+
+    88: Ra (Radium)
+      Atomic Weight: 226.0
+      Group        : 2 (Alkaline Earth Metal)
+      Block        : s-block
+      Color        : R = 0.0,  G = 0.47,  B = 0.0
+      VDW Radius   : 1.0
+
+    89: Ac (Actinium)
+      Atomic Weight: 227.0
+      Group        : -1 (Actinoid)
+      Block        : f-block
+      Color        : R = 0.44,  G = 0.66,  B = 0.97
+      VDW Radius   : 1.0
+
+    90: Th (Thorium)
+      Atomic Weight: 232.0381
+      Group        : -1 (Actinoid)
+      Block        : f-block
+      Color        : R = 0.0,  G = 0.72,  B = 0.97
+      VDW Radius   : 1.0
+
+    91: Pa (Protactinium)
+      Atomic Weight: 231.03588
+      Group        : -1 (Actinoid)
+      Block        : f-block
+      Color        : R = 0.0,  G = 0.63,  B = 0.97
+      VDW Radius   : 1.0
+
+    92: U (Uranium)
+      Atomic Weight: 238.02891
+      Group        : -1 (Actinoid)
+      Block        : f-block
+      Color        : R = 0.0,  G = 0.56,  B = 0.97
+      VDW Radius   : 1.0
+
+    93: Np (Neptunium)
+      Atomic Weight: 237.0
+      Group        : -1 (Actinoid)
+      Block        : f-block
+      Color        : R = 0.0,  G = 0.5,  B = 0.94
+      VDW Radius   : 1.0
+
+    94: Pu (Plutonium)
+      Atomic Weight: 244.0
+      Group        : -1 (Actdinoid)
+      Block        : f-block
+      Color        : R = 0.0,  G = 0.41,  B = 0.94
+      VDW Radius   : 1.0
+
+    95: Am (Americium)
+      Atomic Weight: 243.0
+      Group        : -1 (Actinoid)
+      Block        : f-block
+      Color        : R = 0.31,  G = 0.34,  B = 0.94
+      VDW Radius   : 1.0
+
+    96: Cm (Curium)
+      Atomic Weight: 247.0
+      Group        : -1 (Actinoid)
+      Block        : f-block
+      Color        : R = 0.47,  G = 0.35,  B = 0.88
+      VDW Radius   : 1.0
+
+    97: Bk (Berkelium)
+      Atomic Weight: 247.0
+      Group        : -1 (Actinoid)
+      Block        : f-block
+      Color        : R = 0.53,  G = 0.28,  B = 0.88
+      VDW Radius   : 1.0
+
+    98: Cf (Californium)
+      Atomic Weight: 251.0
+      Group        : -1 (Actinoid)
+      Block        : f-block
+      Color        : R = 0.63,  G = 0.19,  B = 0.82
+      VDW Radius   : 1.0
+
+    99: Es (Einsteinium)
+      Atomic Weight: 252.0
+      Group        : -1 (Actinoid)
+      Block        : f-block
+      Color        : R = 0.69,  G = 0.09,  B = 0.82
+      VDW Radius   : 1.0
+
+    100: Fm (Fermium)
+      Atomic Weight: 257.0
+      Group        : -1 (Actinoid)
+      Block        : f-block
+      Color        : R = 0.69,  G = 0.09,  B = 0.72
+      VDW Radius   : 1.0
+
+    101: Md (Mendelevium)
+      Atomic Weight: 258.0
+      Group        : -1 (Actinoid)
+      Block        : f-block
+      Color        : R = 0.69,  G = 0.03,  B = 0.63
+      VDW Radius   : 1.0
+
+    102: No (Nobelium)
+      Atomic Weight: 259.0
+      Group        : -1 (Actinoid)
+      Block        : f-block
+      Color        : R = 0.72,  G = 0.03,  B = 0.5
+      VDW Radius   : 1.0
+
+    103: Lr (Lawrencium)
+      Atomic Weight: 262.0
+      Group        : 3 (-)
+      Block        : d-block
+      Color        : R = 0.78,  G = 0.0,  B = 0.38
+      VDW Radius   : 1.0
+
+    104: Rf (Rutherfordium)
+      Atomic Weight: 261.0
+      Group        : 4 (-)
+      Block        : d-block
+      Color        : R = 0.7,  G = 0.7,  B = 0.7
+      VDW Radius   : 1.0
+
+    105: Db (Dubnium)
+      Atomic Weight: 262.0
+      Group        : 5 (-)
+      Block        : d-block
+      Color        : R = 0.7,  G = 0.7,  B = 0.7
+      VDW Radius   : 1.0
+
+    106: Sg (Seaborgium)
+      Atomic Weight: 266.0
+      Group        : 6 (-)
+      Block        : d-block
+      Color        : R = 0.7,  G = 0.7,  B = 0.7
+      VDW Radius   : 1.0
+
+    107: Bh (Bohrium)
+      Atomic Weight: 264.0
+      Group        : 7 (-)
+      Block        : d-block
+      Color        : R = 0.7,  G = 0.7,  B = 0.7
+      VDW Radius   : 1.0
+
+    108: Hs (Hassium)
+      Atomic Weight: 269.0
+      Group        : 8 (-)
+      Block        : d-block
+      Color        : R = 0.7,  G = 0.7,  B = 0.7
+      VDW Radius   : 1.0
+
+    109: Mt (Meitnerium)
+      Atomic Weight: 268.0
+      Group        : 9 (-)
+      Block        : d-block
+      Color        : R = 0.7,  G = 0.7,  B = 0.7
+      VDW Radius   : 1.0
+
+    110: Ds (Darmstadtium)
+      Atomic Weight: 271.0
+      Group        : 10 (-)
+      Block        : d-block
+      Color        : R = 0.7,  G = 0.7,  B = 0.7
+      VDW Radius   : 1.0
+
+    111: Uuu (Unununium)
+      Atomic Weight: 272.0
+      Group        : 11 (-)
+      Block        : d-block
+      Color        : R = 0.7,  G = 0.7,  B = 0.7
+      VDW Radius   : 1.0
+
+    112: Uub (Ununbium)
+      Atomic Weight: 285.0
+      Group        : 12 (-)
+      Block        : d-block
+      Color        : R = 0.7,  G = 0.7,  B = 0.7
+      VDW Radius   : 1.0
+
+    113: Uut (Ununtrium)
+      Atomic Weight: 0.0
+      Group        : 0 (-)
+      Block        : p-block
+      Color        : R = 0.7,  G = 0.7,  B = 0.7
+      VDW Radius   : 1.0
+
+    114: Uuq (Ununquadium)
+      Atomic Weight: 289.0
+      Group        : 14 (-)
+      Block        : p-block
+      Color        : R = 0.7,  G = 0.7,  B = 0.7
+      VDW Radius   : 1.0
+
+    115: Uup (Ununpentium)
+      Atomic Weight: 0.0
+      Group        : 0 (-)
+      Block        : p-block
+      Color        : R = 0.7,  G = 0.7,  B = 0.7
+      VDW Radius   : 1.0
+
+    116: Uuh (Ununhexium)
+      Atomic Weight: 292.0
+      Group        : 16 (Chalcogen)
+      Block        : p-block
+      Color        : R = 0.7,  G = 0.7,  B = 0.7
+      VDW Radius   : 1.0
+
+    117: Uus (Ununseptium)
+      Atomic Weight: 0.0
+      Group        : 0 (-)
+      Block        : p-block
+      Color        : R = 0.7,  G = 0.7,  B = 0.7
+      VDW Radius   : 1.0
+
+    118: Uuo (Ununoctium)
+      Atomic Weight: 0.0
+      Group        : 0 (-)
+      Block        : p-block
+      Color        : R = 0.7,  G = 0.7,  B = 0.7
+      VDW Radius   : 1.0
+
