@@ -4,6 +4,7 @@
 	<groupId>org.rcsb</groupId>
 	<artifactId>Viewers</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
 	<name>rcsbviewers</name>
 	<description>The RCSB PDB 3D viewers as a maven project.</description>
 	<repositories>
@@ -126,6 +127,11 @@
 			</activation>
 		</profile>
 	</profiles>
+	<modules>
+		<module>molecular-biology-toolkit</module>
+		<module>applications</module>
+		<module>framework</module>
+	</modules>
 
 
 </project>
