@@ -9,8 +9,18 @@
 	<groupId>org.rcsb</groupId>
 	<artifactId>molecular-biology-toolkit</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>pom</packaging>
 	<name>molecular-biology-toolkit</name>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.1</version>
+			</plugin>
+			
+		</plugins>
+	</build>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -24,4 +34,8 @@
 			<version>2.4.0</version>
 		</dependency>
 	</dependencies>
+
+
+
+
 </project>
