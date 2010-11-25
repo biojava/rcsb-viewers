@@ -33,9 +33,6 @@
 			<artifactId>xercesImpl</artifactId>
 			<version>2.4.0</version>
 		</dependency>
+		
 	</dependencies>
-
-
-
-
 </project>
