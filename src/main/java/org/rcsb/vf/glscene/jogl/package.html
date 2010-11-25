@@ -1,0 +1,27 @@
+<html>
+<head>
+<title>RCSB Viewer Framework - GLScene</title>
+</head>
+<body>
+<p>
+This package is where most of the graphics geometry and the GL-specific implementation resides.</p>
+<p>
+It could likely be split into non-GL-specific geometry, and GL-specific geometry packages.</p>
+<p>
+Some important classes are highlighted below:</p>
+
+<h3>&ltcomponent-type&gtGeometry Classes</h3>
+<p>
+These correspond to the renderable model component-type classes - Atom, Bonds and Chain in particular.
+Actual rendering is performed in these classes.  Note that on first pass, the geometry is defined and
+compiled into a display list.  On subsequent passes, only the display list is invoked, if it exists.</p>
+<h3>@{linkplain GlGeometryViewer}</h3>
+<p>
+Intercepts redraw requests and performs rendering - either for visualization or picking.</p>
+<p>
+<h3>{@linkplain JoglSceneNode}</h3>
+<p>
+Really should be renamed 'Scene' - contains the definition of the scene, and is carried directly in the
+{@linkplain org.rcsb.mbt.model.StructureMap} class.
+</body>
+</html>

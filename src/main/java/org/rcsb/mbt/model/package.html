@@ -1,0 +1,42 @@
+<HTML>
+
+<HEAD>
+</HEAD>
+
+<BODY>
+<p>
+This is the model description package.  Salient classes here are:
+<ol>
+<dl>
+<dt>{@linkplain org.rcsb.mbt.model.StructureComponent}</dt>
+<dd>
+Base class for all of the structure components that make up a structure &mdash; atoms, bonds,
+helices, coils, etc.</dd>
+<dd>
+There is a class derived from StructureComponent for each of the structure component types.</dd>
+<dt>{@linkplain org.rcsb.mbt.model.StructureComponentRegistry}</dt>
+<dd>
+Contains enumerations for each of the structure component types.
+<blockquote style="color:red">
+Note: These are currently strings per a JDK 1.0 implementation - expect them to change to enums, in the future.
+</blockquote>
+</dd>
+<dt>{@linkplain org.rcsb.mbt.model.Structure}</dt>
+<dd>
+<img src="doc-files/Structure.jpg" /><br/>
+Class that serves as a container for all of the components.  This is pretty much
+a dumb container - it doesn't know about relations of the things it contains.  That's reserved
+for the 'StructureMap' class (see next.)</dd>
+<dt>{@linkplain org.rcsb.mbt.model.StructureMap}</dt>
+<dd>
+<img src="doc-files/StructureMap.jpg" /><br/>
+This is a partner class contained by the 'Structure' class that describes all
+of the relationships of the contained components.  This also contains the sub-scene information
+for viewers.</dd>
+<dt>{@linkplain org.rcsb.mbt.model.StructureModel}</dt>
+<dd>Consists fundamentally of a list of structures.  It also has mechanisms to trigger notifications
+when a structure changes.</dd>
+</dl>
+</BODY>
+
+</HTML>
