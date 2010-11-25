@@ -59,9 +59,6 @@ import javax.imageio.stream.ImageOutputStream;
 
 import org.w3c.dom.Element;
 
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGEncodeParam;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import com.sun.imageio.plugins.jpeg.JPEGImageWriter;
 import com.sun.media.jai.codec.ImageCodec;
 import com.sun.media.jai.codec.ImageEncoder;
@@ -122,32 +119,7 @@ public final class ImageFileSaver {
 		}
 	}
 	
-    /**
-	 * Saves images as a JPEG file at the specified resolution. This is an alternative implementation
-	 * that is currently not being used. It does not set metadata.
-	 * 
-	 * @param image image to be saved
-	 * @param dpi resolution in dots per inch
-	 * @param file filename name of the JPEG file
-     * @throws IOException
-     */
-	private static void saveJPEGAlternative(final BufferedImage image, final int dpi, final String filename) throws IOException
-	{
-		// Get an output stream for the file
-		final FileOutputStream fout = new FileOutputStream( new File(filename) );
-
-		JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(fout);
-		JPEGEncodeParam param = encoder.getDefaultJPEGEncodeParam(image);
-		
-		// set DPI
-		param.setDensityUnit(JPEGEncodeParam.DENSITY_UNIT_DOTS_INCH);
-		param.setXDensity(dpi);
-		param.setYDensity(dpi);
-		
-		encoder.encode(image, param);
-
-		fout.close();
-	}
+ 
 	
 	/**
 	 * Saves image as a JPEG file at the specified resolution.
