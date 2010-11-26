@@ -10,7 +10,7 @@
 	<artifactId>molecular-biology-toolkit</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>molecular-biology-toolkit</name>
-
+	<packaging>jar</packaging>
 	<build>
 		<plugins>
 			<plugin>

@@ -10,7 +10,7 @@
 	<artifactId>applications</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>applications</name>
-
+	<packaging>jar</packaging>
 	<build>
 		<plugins>
 			<plugin>
