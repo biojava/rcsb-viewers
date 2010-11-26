@@ -51,14 +51,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import junit.framework.TestCase;
+
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.util.ChemicalComponentBonds;
 import org.rcsb.mbt.model.util.ChemicalComponentBonds.BondOrder;
-import org.testng.Assert;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
-public class ChemicalComponentBondsTest // implements ITest
+
+public class ChemicalComponentBondsTest extends TestCase
 {
 	private final String datafilePath = "test-input/ChemicalComponentBondsTest";
 	
@@ -180,21 +180,34 @@ public class ChemicalComponentBondsTest // implements ITest
 		return outputInfo;
 	}
 	
-	@DataProvider (name = "get-pair-set")
+	
 	public Object[][] getPairSet()
 	{
 		return atomTestPairRetObj;
 	}
 	
-	@Test(dataProvider = "get-pair-set")
-	public void TestBondTypeLookupForward(String pairIX, AtomTestPair atomTestPair)
-	{
-		Assert.assertEquals(ChemicalComponentBonds.bondType(atomTestPair.atoms[0], atomTestPair.atoms[1]), atomTestPair.expected);
+	public void testMain(){
+		Object[][] data = getPairSet();
+		
+		for ( Object[] d : data){
+			String key = (String) d[0];
+			AtomTestPair value = (AtomTestPair) d[1];
+				
+			testBondTypeLookupForward(key, value);
+			TestBondTypeLookupReverse(key,value);
+			
+		}
+		
 	}
 	
-	@Test(dataProvider = "get-pair-set")
+	public void testBondTypeLookupForward(String pairIX, AtomTestPair atomTestPair)
+	{
+		assertEquals(ChemicalComponentBonds.bondType(atomTestPair.atoms[0], atomTestPair.atoms[1]), atomTestPair.expected);
+	}
+	
+	
 	public void TestBondTypeLookupReverse(String pairIX, AtomTestPair atomTestPair)
 	{
-		Assert.assertEquals(ChemicalComponentBonds.bondType(atomTestPair.atoms[1], atomTestPair.atoms[0]), atomTestPair.expected);
+		assertEquals(ChemicalComponentBonds.bondType(atomTestPair.atoms[1], atomTestPair.atoms[0]), atomTestPair.expected);
 	}
 }

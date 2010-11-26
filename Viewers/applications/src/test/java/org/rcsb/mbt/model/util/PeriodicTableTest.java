@@ -51,24 +51,25 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.zip.GZIPOutputStream;
 
-import org.rcsb.demo.MBT.DumpPeriodicTable;
-import org.rcsb.mbt.model.misc.TestsInputOutputDirs;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import junit.framework.TestCase;
 
-public class PeriodicTableTest
+import org.rcsb.demo.MBT.DumpPeriodicTable;
+import org.rcsb.mbt.model.misc.InputOutputDirsHelper;
+
+
+public class PeriodicTableTest extends TestCase
 {
-	private TestsInputOutputDirs ioDirs;
+	private InputOutputDirsHelper ioDirs;
 	final String testName = "PeriodicTable_txt.gz";
 	
     public PeriodicTableTest() throws IOException
 	{
-		ioDirs = new TestsInputOutputDirs(getClass().getSimpleName(), true);
+		ioDirs = new InputOutputDirsHelper(getClass().getSimpleName(), true);
 		ioDirs.setFileNamesAreMolecules(false);
 	}
 	
-	@Test
-	public void doTest() throws IOException
+	
+	public void testPeriodicTable() throws IOException
 	{
 		String outputPath = ioDirs.getFullOutputTestFileCompareFilePath(testName);
 		
@@ -82,6 +83,6 @@ public class PeriodicTableTest
 		DumpPeriodicTable.doDump(ps);
 		ps.close();
 		System.out.println("PeriodicTableTest: Comparing " + outputPath + " " + testName);
-		Assert.assertTrue(ioDirs.compareOutputToExpected(testName));
+		assertTrue(ioDirs.compareOutputToExpected(testName));
 	}
 }

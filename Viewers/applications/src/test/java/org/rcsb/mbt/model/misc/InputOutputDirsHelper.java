@@ -48,7 +48,7 @@ package org.rcsb.mbt.model.misc;
 import java.io.File;
 import java.io.IOException;
 
-public class TestsInputOutputDirs
+public class InputOutputDirsHelper
 {
 	//static public final String projectDirName = "RCSB MBT Libs";
 	static public final String testInputTopDirName = "test-input";
@@ -66,7 +66,7 @@ public class TestsInputOutputDirs
 	public void setFileNamesAreMolecules(boolean flag) { argIsMoleculeFileName = flag; }
 	private char sepChar = '/';
 
-	public TestsInputOutputDirs(String invocationClassName, boolean doesFileCompares) throws IOException
+	public InputOutputDirsHelper(String invocationClassName, boolean doesFileCompares) throws IOException
 	{
 
 
