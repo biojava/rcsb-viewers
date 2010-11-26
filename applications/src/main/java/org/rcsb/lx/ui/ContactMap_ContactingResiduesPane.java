@@ -83,7 +83,7 @@ public class ContactMap_ContactingResiduesPane extends JPanel
 	public boolean isInitialized = false;	// has this class been initialized yet?
 	
 	private ContactMap parent;
-	public static final String BREAKPOINT_SYMBOL = "…";
+	public static final String BREAKPOINT_SYMBOL = ":";
 	
 	public ContactMap_ContactingResiduesPane(final ContactMap parent) {
 		super(null, false);
