@@ -50,16 +50,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.ImageWriter;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.w3c.dom.Element;
 
-import com.sun.imageio.plugins.jpeg.JPEGImageWriter;
+//import com.sun.imageio.plugins.jpeg.JPEGImageWriter;
 import com.sun.media.jai.codec.ImageCodec;
 import com.sun.media.jai.codec.ImageEncoder;
 import com.sun.media.jai.codec.PNGEncodeParam;
@@ -132,7 +134,7 @@ public final class ImageFileSaver {
 	private static void saveJPEG(final BufferedImage image, final int dpi, final String filename) throws IOException
 	{	
 		// get image writer 
-        JPEGImageWriter imageWriter = (JPEGImageWriter) ImageIO.getImageWritersBySuffix(ImageFileFormat.JPEG.name()).next();
+        ImageWriter imageWriter =  ImageIO.getImageWritersBySuffix(ImageFileFormat.JPEG.name()).next();
         ImageOutputStream ios = ImageIO.createImageOutputStream(new File(filename));
         imageWriter.setOutput(ios);
 
