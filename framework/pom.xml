@@ -10,7 +10,7 @@
 	<artifactId>framework</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>framework</name>
-	
+	<packaging>jar</packaging>
 	<build>
 		<plugins>
 			<plugin>
