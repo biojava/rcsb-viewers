@@ -52,19 +52,18 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.zip.GZIPOutputStream;
 
+import junit.framework.TestCase;
 
-import org.testng.Assert;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
-public class ComprehensiveStructureTest implements FileFilter
+
+public class ComprehensiveStructureTest  extends TestCase implements FileFilter
 {
-	private TestsInputOutputDirs ioDirs;
+	private InputOutputDirsHelper ioDirs;
 
 	
     public ComprehensiveStructureTest() throws IOException
 	{
-		ioDirs = new TestsInputOutputDirs(getClass().getSimpleName(), true);
+		ioDirs = new InputOutputDirsHelper(getClass().getSimpleName(), true);
 	}
     
     public boolean accept(File file)
@@ -72,7 +71,7 @@ public class ComprehensiveStructureTest implements FileFilter
     	return !file.isDirectory();
     }
 	
-	@DataProvider (name = "get-filenames")
+	
 	public Object[][] getInputStructureFileNames()
 	{
 		DirIndex DirIndex = ioDirs.DirIndex;
@@ -86,7 +85,20 @@ public class ComprehensiveStructureTest implements FileFilter
 		return retSet;
 	}
 	
-	@Test (dataProvider="get-filenames" )
+
+	public void testMain(){
+		Object[][] objects  = getInputStructureFileNames();
+		for ( Object[] ioDir : objects){
+			File f = (File)ioDir[0];
+			try {
+				doTest(f);
+			} catch (Exception e){
+				e.printStackTrace();
+				fail(e.getMessage());
+			}
+		}
+	}
+	
 	public void doTest(File inputFile) throws IOException
 	{
 		
@@ -108,6 +120,6 @@ public class ComprehensiveStructureTest implements FileFilter
 		
 		ps.close();
 		
-		Assert.assertTrue(ioDirs.compareOutputToExpected(inputFile.getName()));
+		assertTrue(ioDirs.compareOutputToExpected(inputFile.getName()));
 	}
 }
