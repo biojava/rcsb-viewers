@@ -267,6 +267,7 @@ public class InputOutputDirsHelper
 
 		catch (InterruptedException e)
 		{
+			e.printStackTrace();
 			return false;
 		}
 
