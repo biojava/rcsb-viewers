@@ -81,8 +81,9 @@ public class PeriodicTableTest extends TestCase
 						new FileOutputStream(outputFile)));
 		
 		DumpPeriodicTable.doDump(ps);
+		ps.flush();
 		ps.close();
 		System.out.println("PeriodicTableTest: Comparing " + outputPath + " " + testName);
-		assertTrue(ioDirs.compareOutputToExpected(testName));
+		assertTrue("The two PeriodicTable files are not equal! ", ioDirs.compareOutputToExpected(testName));
 	}
 }
