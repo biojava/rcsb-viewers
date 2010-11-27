@@ -45,8 +45,12 @@
  */ 
 package org.rcsb.mbt.model.misc;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.util.zip.GZIPInputStream;
 
 public class InputOutputDirsHelper
 {
@@ -239,7 +243,7 @@ public class InputOutputDirsHelper
 	{
 		File expectedFile = new File(getFullExpectedCompareFilePath(name));
 		File testOutputFile = new File(getFullOutputTestFileCompareFilePath(name));
-		File diffFile = new File(getFullDiffFilePath(name));
+		//File diffFile = new File(getFullDiffFilePath(name));
 
 		if (!expectedFile.exists() || !testOutputFile.exists()) {
 
@@ -252,36 +256,22 @@ public class InputOutputDirsHelper
 
 		String expectedFileEsc = expectedFile.getAbsolutePath().replaceAll(" ", "\\\\ ");
 		String testOutputFileEsc = testOutputFile.getAbsolutePath().replaceAll(" ", "\\\\ ");
-		String diffFileEsc = diffFile.getAbsolutePath().replaceAll(" ", "\\\\ ");
+		//String diffFileEsc = diffFile.getAbsolutePath().replaceAll(" ", "\\\\ ");
 
-		String execStr[] = {
-				"sh",
-				"-c",
-				"/usr/bin/zdiff " + expectedFileEsc + " " + testOutputFileEsc + " > " + diffFileEsc};
+		String diff = diff(expectedFile,testOutputFile);
 
-		Process proc = Runtime.getRuntime().exec(execStr);
-		try
-		{
-			proc.waitFor();
-		}
-
-		catch (InterruptedException e)
-		{
-			e.printStackTrace();
-			return false;
-		}
-
-		boolean success = diffFile.exists() && diffFile.length() == 0L;
+		//boolean success = diffFile.exists() && diffFile.length() == 0L;
+		boolean success = (diff.length() == 0 );
 
 		if (success) {
-			diffFile.delete();
+			//diffFile.delete();
 			// only fails have non-empty diff files -
 			// don't leave the empties hanging out there.
 		} else {
 			System.err.println("These two files are not equal:");
 			System.err.println("expected: " + expectedFileEsc);
 			System.err.println("tested  : " + testOutputFileEsc);
-			System.err.println("diffs in: " + diffFileEsc );
+			System.err.println("diff: " + diff );
 		}
 		return success;
 
@@ -318,4 +308,61 @@ public class InputOutputDirsHelper
 		return retval;
 		 * **/
 	}
+
+	private String[] readAll(File f) throws IOException{
+		byte[] buffer = new byte[(int) f.length()];
+	    BufferedInputStream buf = null;
+	    try {
+	        buf = new BufferedInputStream(new FileInputStream(f));
+	        //buf.read(buffer);
+	        GZIPInputStream gzip = new GZIPInputStream(buf);
+	        gzip.read(buffer);
+	    } finally {
+	        if (f != null) try { buf.close(); } catch (IOException ignored) { }
+	    }
+	    String s= new String(buffer);
+	    return s.split(String.format("%n"));
+	}
+	
+	private String diff(File f1, File f2) throws IOException{
+		StringWriter writer = new StringWriter();
+		String[] x = readAll(f1);
+		String[] y = readAll(f2);
+		// number of lines of each file
+		int M = x.length;
+		int N = y.length;
+
+		// opt[i][j] = length of LCS of x[i..M] and y[j..N]
+		int[][] opt = new int[M+1][N+1];
+
+		// compute length of LCS and all subproblems via dynamic programming
+		for (int i = M-1; i >= 0; i--) {
+			for (int j = N-1; j >= 0; j--) {
+				if (x[i].equals(y[j]))
+					opt[i][j] = opt[i+1][j+1] + 1;
+				else 
+					opt[i][j] = Math.max(opt[i+1][j], opt[i][j+1]);
+			}
+		}
+
+		// recover LCS itself and print out non-matching lines to standard output
+		int i = 0, j = 0;
+		while(i < M && j < N) {
+			if (x[i].equals(y[j])) {
+				i++;
+				j++;
+			}
+			else if (opt[i+1][j] >= opt[i][j+1]) writer.append("< " + x[i++]+String.format("%n"));
+			else                                 writer.append("> " + y[j++]+String.format("%n"));
+		}
+
+		// dump out one remainder of one string if the other is exhausted
+		while(i < M || j < N) {
+			if      (i == M) writer.append("> " + y[j++]+String.format("%n"));
+			else if (j == N) writer.append("< " + x[i++]+String.format("%n"));
+		}
+		
+		return writer.toString();
+	}
+
 }
