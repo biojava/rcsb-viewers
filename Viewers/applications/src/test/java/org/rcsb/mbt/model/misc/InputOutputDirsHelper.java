@@ -176,7 +176,7 @@ public class InputOutputDirsHelper
 		}
 	}
 
-	
+
 
 	/**
 	 * Takes an input file specification and turns it into an output specification - 
@@ -273,16 +273,16 @@ public class InputOutputDirsHelper
 
 		boolean success = diffFile.exists() && diffFile.length() == 0L;
 
-		if (success)
+		if (success) {
 			diffFile.delete();
-		// only fails have non-empty diff files -
-		// don't leave the empties hanging out there.
-
-		System.err.println("These two files are not equal:");
-		System.err.println("expected: " + expectedFileEsc);
-		System.err.println("tested  : " + testOutputFileEsc);
-		System.err.println("diffs in: " + diffFileEsc );
-		
+			// only fails have non-empty diff files -
+			// don't leave the empties hanging out there.
+		} else {
+			System.err.println("These two files are not equal:");
+			System.err.println("expected: " + expectedFileEsc);
+			System.err.println("tested  : " + testOutputFileEsc);
+			System.err.println("diffs in: " + diffFileEsc );
+		}
 		return success;
 
 		/* **
