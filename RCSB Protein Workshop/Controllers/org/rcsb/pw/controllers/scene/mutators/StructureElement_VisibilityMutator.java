@@ -57,6 +57,7 @@ import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.Style;
@@ -129,6 +130,8 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
 				this.setVisibility((Fragment)next, newVisibility);
 			} else if(next instanceof Structure) {
 				this.setVisibility((Structure)next, newVisibility);
+			} else if(next instanceof Surface) {
+				this.setVisibility((Surface)next, newVisibility);
 			} else {
 				(new Exception(next.getClass().toString())).printStackTrace();
 			}
@@ -137,6 +140,9 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
 		ProteinWorkshop.sgetActiveFrame().getTreeViewer().getTree().repaint();
 	}
 	
+
+
+
 	public boolean isComponentVisible(final Object component) {
 		ActivationType mutatorActivationType = MutatorBase.getActivationType();
         switch(mutatorActivationType)
@@ -225,6 +231,13 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
 				}
 			}
 			//break;
+		case SURFACE:
+			System.out.println("StructureElement_VisibilityMutator: getting surface visibility");
+			final Surface s = (Surface)component;
+			final StructureMap sm = s.getStructure().getStructureMap();
+			final StructureStyles ss = sm.getStructureStyles();
+			return ss.isVisible(s);
+
 		default:
             (new Exception("Invalid option: " + mutatorActivationType)).printStackTrace();  
 		}
@@ -308,6 +321,10 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
             	this.setVisibility(r, newVisibility);
             }
             break;
+            
+        case SURFACE:
+        	break;
+        	
         default:
             (new Exception("Invalid option: " + mutatorActivationType)).printStackTrace();          }
     }
@@ -328,6 +345,10 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
             	this.setVisibility(r, newVisibility);
             }
             break;
+            
+        case SURFACE:
+        	break;
+        	
         default:
             (new Exception("Invalid option: " + mutatorActivationType)).printStackTrace();          }
     }
@@ -362,6 +383,9 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
             sm.getStructureStyles().setVisible(r, newVisibility);
             break;
             
+        case SURFACE:
+        	break;
+            
         default:
             (new Exception("Invalid option: " + mutatorActivationType)).printStackTrace();
         }
@@ -376,6 +400,8 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
         	for (Fragment f : c.getFragments())
         		this.setVisibility(f, newVisibility);
             break;
+        case SURFACE:
+        	break;
         default:
             (new Exception("Invalid option: " + mutatorActivationType)).printStackTrace();
         }
@@ -388,6 +414,8 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
         {
         case ATOMS_AND_BONDS: break;
         case RIBBONS: if (!c.isBasicChain()) return; break;
+        case SURFACE:
+        	break;
         default:
             (new Exception("Invalid option: " + mutatorActivationType)).printStackTrace();            
         }
@@ -406,6 +434,10 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
         	for (Residue r : f.getResidues())
         		this.setVisibility(r, newVisibility);
             break;
+            
+        case SURFACE:
+        	break;
+        	
         default:
             (new Exception("Invalid option: " + mutatorActivationType)).printStackTrace();            
         }
@@ -422,8 +454,30 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
             for (Chain c : sm.getChains())
                 this.setVisibility(c, newVisibility);
             break;
+      
+        case SURFACE:
+        	break;
+        	
         default:
             (new Exception("Invalid option: " + mutatorActivationType)).printStackTrace();            
         }
     }
+    
+    private void setVisibility(final Surface s, final boolean newVisibility)
+    {      
+    	StructureMap sm = s.getStructure().getStructureMap();
+		ActivationType mutatorActivationType = MutatorBase.getActivationType();
+        switch(mutatorActivationType)
+ {
+        case ATOMS_AND_BONDS:
+        case RIBBONS:
+		case SURFACE:
+			sm.getStructureStyles().setVisible(s, newVisibility);
+			break;
+		default:
+			(new Exception("Invalid option: " + mutatorActivationType))
+					.printStackTrace();
+		}
+    }
+    
 }

@@ -48,7 +48,6 @@ package org.rcsb.pw.controllers.scene.mutators;
 import java.awt.Color;
 import java.util.Vector;
 
-import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -58,6 +57,7 @@ import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.AtomColorByRgb;
 import org.rcsb.mbt.model.attributes.AtomStyle;
@@ -66,8 +66,10 @@ import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.attributes.IResidueColor;
 import org.rcsb.mbt.model.attributes.ResidueColorByRgb;
 import org.rcsb.mbt.model.attributes.StructureStyles;
+import org.rcsb.mbt.model.attributes.SurfaceStyle;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.options.ColorOptions;
+import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.controllers.scene.SceneController;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 import org.rcsb.vf.glscene.jogl.DisplayListRenderable;
@@ -128,6 +130,8 @@ public class ColorMutator extends MutatorBase
 					this.changeColor((ExternChain)next);
 				} else if(next instanceof Fragment) {
 					this.changeColor((Fragment)next);
+				} else if(next instanceof Surface) {
+					this.changeColor((Surface)next);
 				} else if(next instanceof Structure) {
 					final Structure s = (Structure)next;
 					this.changeColor(s);
@@ -351,5 +355,20 @@ public class ColorMutator extends MutatorBase
     {
 		for (Chain c : s.getStructureMap().getChains())
 			this.changeColor(c);
+    }
+    
+    private void changeColor(final Surface s) {
+        final StructureMap sm = s.getStructure().getStructureMap();
+        final StructureStyles ss = sm.getStructureStyles();
+        
+        this.options.getCurrentColor().getColorComponents(ColorMutator.colorFl);
+        	
+        final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(s);
+        if(renderable != null) {
+        	final SurfaceStyle style = new SurfaceStyle();
+        	style.setSurfaceColor(s, ColorMutator.colorFl);
+        	ss.setStyle(s, style);
+        	renderable.style = style;
+        }
     }
 }
