@@ -45,76 +45,48 @@
  */ 
 package org.rcsb.mbt.model;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Vector;
-
 import javax.vecmath.Color4f;
-import javax.vecmath.Point3f;
-
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
-
+import org.rcsb.mbt.surface.datastructure.TriangulatedSurface;
 
 
 public class Surface extends StructureComponent {
-	public Vector atoms;
-	private Point3f[] vertices;
+	private Chain chain;
+	private TriangulatedSurface triangulatedSurface;
 	private Color4f[] colors;
-	private int[][] faces;
-	
-	public Surface(final Vector atoms, final Structure structure) {
+
+	public Surface(final Chain chain, final Structure structure) {
 		super();
 		super.structure = structure;
-		this.atoms = atoms;
-		
-		// trial implementation, read sample surface from file
-//		PlyReader reader = new PlyReader();
-//		EmvReader reader = new EmvReader();
-//		try {
-//			reader.readPly("C:/RCSBViewerTrunk/RCSB MBT Libs/test-input/PlyReaderTest/2ptn.ply");
-//			reader.readEmv("C:/RCSBViewerTrunk/RCSB MBT Libs/test-input/EmvReaderTest/emd_5127-i2.8-t50000.emv");
-//		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		vertices = reader.getVertices();
-//		colors = reader.getVertexColors();
-////		faces = reader.getFaces();
-		
-		Color4f defaultColor = new Color4f(0.1f, 0.8f, 1.0f, 0.0f);
-		for (int i = 0; i < colors.length; i++) {
-			colors[i] = defaultColor; // default transparency
-		}
+		this.chain = chain;
 	}
 
-	
 	public void copy(final StructureComponent structureComponent) {
-		final Surface surface = (Surface)structureComponent;
-		this.atoms = surface.atoms;
 		// TODO copy other members
 	}
-
 	
 	public ComponentType getStructureComponentType() {
 		return ComponentType.SURFACE;
 	}
 	
-	public Point3f[] getVertices() {
-		return vertices;
+	public TriangulatedSurface getTriangulatedSurface() {
+		return triangulatedSurface;
+	}
+	
+	public void setTriangulatedSurface(TriangulatedSurface triangulatedSurface) {
+		this.triangulatedSurface = triangulatedSurface;
 	}
 
 	public Color4f[] getColors() {
 		return colors;
 	}
 
-	public int[][] getFaces() {
-		return faces;
-	}
-
 	public void setColors(Color4f[] colors) {
 		this.colors = colors;
 	}
+
+	public String getChainId() {
+		return chain.getChainId();
+	}
+	
 }
