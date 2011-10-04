@@ -69,6 +69,7 @@ public class MutatorBasePanel extends JPanel
     private LabelsOptionsPanel labelsPanel = null;
     private ReCenterOptionsPanel reCenterPanel = null;
     private LinesOptionsPanel linesPanel = null;
+    private SurfacePanel surfacePanel = null;
 //    private SelectionOptionsPanel selectionPanel = null;
     
     private MutatorPanel mutatorPanel = null;
@@ -93,8 +94,13 @@ public class MutatorBasePanel extends JPanel
 			final int fullWidth = parent.getWidth() - insets.left - insets.right - buffer * 2;
 			final int fullHeight = parent.getHeight() - insets.top - insets.bottom - buffer * 2;
 			
+			System.out.println("MutatorBasePanel: fullWidth: " + fullWidth);
 			final Dimension mutatorSize = mutatorPanel.getPreferredSize();
 			final Dimension pickLevelSize = pickLevelPanel.getPreferredSize();
+			final Dimension surfaceSize = surfacePanel.getPreferredSize();
+			System.out.println("MutatorBasePanel: mutatorSize: " + mutatorSize);
+			System.out.println("MutatorBasePanel: pickLevelSize: " + pickLevelSize);
+			System.out.println("MutatorBasePanel: surfaceSize: " + surfaceSize);
 			
 			mutatorPanel.setBounds(curX, curY, fullWidth, mutatorSize.height);
 			curY += mutatorSize.height + buffer;
@@ -107,11 +113,16 @@ public class MutatorBasePanel extends JPanel
 				curY += currentSize.height + buffer;
 			}
 			
-			final int treeHeight = fullHeight - curY;
+			final int treeHeight = fullHeight - curY - surfaceSize.height;
 			tree.setBounds(curX, curY, fullWidth, treeHeight);
 			
-			Container parentParent = parent.getParent();
-			Insets parentParentInsets = parentParent.getInsets();
+			curY = fullHeight - surfaceSize.height;
+			surfacePanel.setBounds(curX, curY, fullWidth, surfaceSize.height);
+//			curY += surfaceSize.height + buffer;
+			
+//			Container parentParent = parent.getParent();
+//			Insets parentParentInsets = parentParent.getInsets();
+
 //			this.maxSize.height = this.minSize.height = curY + buffer + insets.bottom;
 		}
 
@@ -159,13 +170,17 @@ public class MutatorBasePanel extends JPanel
         this.linesPanel = new LinesOptionsPanel();
 //        this.selectionPanel = new SelectionOptionsPanel();
         this.pickLevelPanel = new MutatorActivationPanel();
+        this.surfacePanel = new SurfacePanel();
         
+      
         super.add(this.mutatorPanel);
         super.add(this.pickLevelPanel);
-        
+        super.add(this.surfacePanel);
+  
         this.updateOptionsPanel();
         
         super.add(this.tree);
+     
     }
     
     public void updateOptionsPanel()

@@ -99,6 +99,15 @@ public class MutatorPanel extends JPanel implements IUpdateListener
 			final int maxButtonWidth = Math.max(visSize.width, Math.max(colorSize.width, Math.max(labelingSize.width, Math.max(stylesSize.width, Math.max(linesSize.width, reCenterSize.width )))));
 			final int buttonHeight = visSize.height;
 			
+			System.out.println("MutatorPanel: visSize: " + visSize);
+			System.out.println("MutatorPanel: colorSize: " + colorSize);
+			System.out.println("MutatorPanel: labelingSize: " + labelingSize);
+			System.out.println("MutatorPanel: stylesSize: " + stylesSize);
+			System.out.println("MutatorPanel: linesSize: " + linesSize);
+			System.out.println("MutatorPanel: reCenterSize: " + reCenterSize);
+			System.out.println("MutatorPanel: maxButtonWidth: " + maxButtonWidth);
+			
+			
 			visibilityButton.setBounds(curX, curY, maxButtonWidth, buttonHeight);
 			curY += buttonHeight + buffer;
 			colorChangeButton.setBounds(curX, curY, maxButtonWidth, buttonHeight);
@@ -115,6 +124,8 @@ public class MutatorPanel extends JPanel implements IUpdateListener
 			
 			Container parentParent = parent.getParent();
 			Insets parentParentInsets = parentParent.getInsets();
+			
+			System.out.println("MutatorPanel: parentParentWidth: " + parentParent.getWidth());
 			this.size.width = parentParent.getWidth() - parentParentInsets.left - parentParentInsets.right;
 			this.size.height = curY + insets.bottom;
 		}

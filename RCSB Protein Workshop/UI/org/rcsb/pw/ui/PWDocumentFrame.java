@@ -70,6 +70,7 @@ import org.rcsb.pw.controllers.app.PWVersionInformation;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.PWSceneController;
 import org.rcsb.pw.glscene.jogl.PWGlGeometryViewer;
+import org.rcsb.pw.ui.mutatorPanels.ColorOptionsPanel;
 import org.rcsb.pw.ui.mutatorPanels.LinesOptionsPanel;
 import org.rcsb.pw.ui.mutatorPanels.MutatorBasePanel;
 import org.rcsb.pw.ui.mutatorPanels.StylesOptionsPanel;
@@ -83,6 +84,8 @@ import org.rcsb.vf.ui.VFUIBuilder;
 public class PWDocumentFrame extends VFDocumentFrameBase 
 {
 	private static final long serialVersionUID = -2377835483763485353L;
+//	private static int SIDEBAR_WIDTH = 375;
+	private static int SIDEBAR_WIDTH = 265;
 	@Override
 	public PWGlGeometryViewer getGlGeometryViewer() { return (PWGlGeometryViewer)super.getGlGeometryViewer(); }
 	@Override
@@ -209,7 +212,7 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 					pdbId = split[0];
 					structure.getStructureMap().setPdbId(pdbId);
 					
-					getUpdateController().fireUpdateViewEvent(UpdateEvent.Action.STRUCTURE_ADDED, structure);
+					getUpdateController().fireUpdateViewEvent(UpdateEvent.Action.STRUCTURE_ADDED, structure); // -pr 20100530 this call has no effect, structure is displayed without it
 									// notify listeners there's a new structure in town...
 				}
 			}
@@ -252,7 +255,7 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 
 			horizontalSplitPane.addAncestorListener(PWDocumentFrame.this.new HorizontalSplitPaneListener(PWDocumentFrame.this));
 
-			horizontalSplitPane.setDividerLocation(PWDocumentFrame.this.horizontalSplitPane.getWidth() - 375);
+			horizontalSplitPane.setDividerLocation(PWDocumentFrame.this.horizontalSplitPane.getWidth() - SIDEBAR_WIDTH);
 			curSize = getSize();
 			horizontalBarDistanceFromRight = (int) PWDocumentFrame.this.curSize.getWidth() - horizontalSplitPane.getDividerLocation();
 
@@ -291,6 +294,7 @@ public class PWDocumentFrame extends VFDocumentFrameBase
     }
 
     private MutatorBasePanel mutatorBasePanel = null;
+    private ColorOptionsPanel colorOptionsPanel = null;
     private ColorPreviewerPanel colorPreviewerPanel = null;
     private LinesOptionsPanel linesPanel = null;
 	private StylesOptionsPanel stylesOptionsPanel = null;
@@ -302,6 +306,14 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 
 	public void setMutatorBasePanel(final MutatorBasePanel mutatorBasePanel) {
 		this.mutatorBasePanel = mutatorBasePanel;
+	}
+	
+	public ColorOptionsPanel getColorOptionsPanel() {
+		return this.colorOptionsPanel;
+	}
+
+	public void setColorOptionsPanel(final ColorOptionsPanel colorOptionsPanel) {
+		this.colorOptionsPanel = colorOptionsPanel;
 	}
 	
 	public ColorPreviewerPanel getColorPreviewerPanel() {

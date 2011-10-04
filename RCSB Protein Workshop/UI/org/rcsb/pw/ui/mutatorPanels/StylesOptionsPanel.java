@@ -69,6 +69,8 @@ import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 import org.rcsb.vf.glscene.jogl.Geometry;
 import org.rcsb.vf.glscene.jogl.ChainGeometry.RibbonForm;
 
+import com.sun.xml.internal.bind.v2.TODO;
+
 
 
 public class StylesOptionsPanel extends JPanel implements IUpdateListener
@@ -210,7 +212,7 @@ public class StylesOptionsPanel extends JPanel implements IUpdateListener
         this.setCurrentAreRibbonsSmoothed();
         this.areRibbonsSmoothedBox.addActionListener(new RibbonSmoothingCheckListener());
         
-        this.ribbonFormComboDescriptor = new ComboDescriptorPanel(this.ribbonFormLabel, this.ribbonFormStyles);
+        this.ribbonFormComboDescriptor = new ComboDescriptorPanel(this.ribbonFormLabel, this.ribbonFormStyles);   
         
         super.add(this.ribbonFormComboDescriptor);
         super.add(this.areRibbonsSmoothedBox);
@@ -238,6 +240,9 @@ public class StylesOptionsPanel extends JPanel implements IUpdateListener
     	case RIBBONS:	// ribbons
         	this.ribbonFormComboDescriptor.setVisible(true);
         	this.areRibbonsSmoothedBox.setVisible(true);
+    		break;
+    	case SURFACE:
+    		// to do
     		break;
     	default:
     		(new Exception(activationType + " is an invalid pick level")).printStackTrace();

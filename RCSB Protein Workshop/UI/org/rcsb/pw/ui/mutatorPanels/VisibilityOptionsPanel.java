@@ -75,6 +75,7 @@ public class VisibilityOptionsPanel extends JPanel
 			
 			Container parentParent = parent.getParent();
 			Insets parentParentInsets = parentParent.getInsets();
+			System.out.println("VisibilityOptionsPanel: parent width: " + parentParent.getWidth());
 			this.size.width = parentParent.getWidth() - parentParentInsets.left - parentParentInsets.right;
 			this.size.height = curY + modeSize.height + buffer + insets.bottom;
 		}

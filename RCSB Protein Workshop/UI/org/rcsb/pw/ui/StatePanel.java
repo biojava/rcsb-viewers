@@ -95,7 +95,7 @@ public class StatePanel extends JPanel implements LayoutManager, ActionListener,
 		super(null);
 		super.setLayout(this);
 		super.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Capture and restore colors, camera location, etc."),
+                BorderFactory.createTitledBorder("Capture and restore view"),
                 BorderFactory.createEmptyBorder(-1,1,1,1)));
 		
 		this.stateList.getSelectionModel().addListSelectionListener(this);
@@ -161,26 +161,36 @@ public class StatePanel extends JPanel implements LayoutManager, ActionListener,
 		
 		
 		this.captureCurrentViewerStateButton.setBounds(curX, curY, capturePreferred.width, captureLineHeight);
-		curX += capturePreferred.width + horizontalVisualBuffer;
-		this.titleField.setBounds(curX, curY, super.getWidth() - curX - insets.right, captureLineHeight);
-		curY += captureLineHeight + verticalVisualBuffer;
+//		curX += capturePreferred.width + horizontalVisualBuffer;
+		curY += capturePreferred.height + verticalVisualBuffer;
+		
+		// TODO -pr this makes the panel too wide
+//		this.titleField.setBounds(curX, curY, super.getWidth() - curX - insets.right, captureLineHeight);
+//		curY += captureLineHeight + verticalVisualBuffer;
+		
+		this.titleField.setBounds(curX, curY, capturePreferred.width, titlePreferred.height);
+		curY += titlePreferred.height + verticalVisualBuffer;
 		
 		curX = insets.left;
 		this.loadStateButton.setBounds(curX, curY, loadPreferred.width, loadPreferred.height);
 		curY += loadPreferred.height + verticalVisualBuffer;
 		
-		this.listScroller.setBounds(curX, curY, super.getWidth() - insets.left - insets.right, listHeight);
+//		this.listScroller.setBounds(curX, curY, super.getWidth() - insets.left - insets.right, listHeight);
+		this.listScroller.setBounds(curX, curY, capturePreferred.width, listHeight);
 		curY += listHeight + verticalVisualBuffer;
 		
 		this.removeButton.setBounds(curX, curY, removePreferred.width, removeWriteLineHeight);
-		curX += removePreferred.width + horizontalVisualBuffer;
+//		curX += removePreferred.width + horizontalVisualBuffer;
+		curY += removePreferred.height + + verticalVisualBuffer;
+		
 		this.writeButton.setBounds(curX, curY, writePreferred.width, removeWriteLineHeight);
 		curY += removeWriteLineHeight;
 		
 //		Insets parentInsets = super.getParent().getInsets();
 		
 		this.size.height = curY + insets.bottom;
-		this.size.width = 345;
+//		this.size.width = 345;
+		this.size.width = capturePreferred.width + insets.left + insets.right;
 	}
 
 	public void actionPerformed(final ActionEvent e) {

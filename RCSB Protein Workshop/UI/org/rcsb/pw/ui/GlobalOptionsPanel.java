@@ -76,6 +76,7 @@ public class GlobalOptionsPanel extends JPanel
         super(false);
         super.setLayout(new FullWidthBoxLayout());
         
+
         //this.batchPanel = new BatchModeOptionsPanel(model);
 //        this.loadStructurePanel = new LoadStructurePanel();
         
@@ -87,6 +88,8 @@ public class GlobalOptionsPanel extends JPanel
 //        super.add(this.loadStructurePanel);
         //super.add(this.measureDistanceButton);
         super.add(this.statePanel);
+        
+        System.out.println("GlobalOptionsPanel size: " + this.getWidth());
         
         this.resetButton.addActionListener(new ActionListener()
         {
