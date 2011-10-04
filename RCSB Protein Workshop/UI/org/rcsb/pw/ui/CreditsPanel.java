@@ -125,7 +125,8 @@ public class CreditsPanel extends JPanel implements ActionListener, ClipboardOwn
 				final Dimension copySize = CreditsPanel.this.copyCreditsButton.getPreferredSize();
 				
 //				CreditsPanel.this.area.setPreferredSize(new Dimension(parent.getWidth() - 50, parent.getHeight()));
-				CreditsPanel.this.scroller.setBounds(visualBuffer,visualBuffer,parent.getWidth() - visualBuffer * 2,parent.getHeight() - copySize.height - visualBuffer * 3);
+				
+                CreditsPanel.this.scroller.setBounds(visualBuffer,visualBuffer,parent.getWidth() - visualBuffer * 2,parent.getHeight() - copySize.height - visualBuffer * 3);
 				
 				// put this at the bottom of the screen.
 				CreditsPanel.this.copyCreditsButton.setBounds(parent.getWidth() / 2 - copySize.width / 2, parent.getHeight() - copySize.height - visualBuffer, copySize.width, copySize.height);
