@@ -60,6 +60,7 @@ import javax.swing.filechooser.FileFilter;
 
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.doc.LoadThread;
+import org.rcsb.uiApp.controllers.doc.SurfaceThread;
 import org.rcsb.mbt.model.util.Status;
 
 /**
@@ -78,7 +79,7 @@ public class UIBuilder implements Runnable
 	 */
 
 	protected JMenuBar menuBar;
-	protected JMenu fileMenu;		
+	protected JMenu fileMenu;	
 	protected StatusPanel statusPanel = null;
 	protected int fileMenuPreSeparatorIX;
 	

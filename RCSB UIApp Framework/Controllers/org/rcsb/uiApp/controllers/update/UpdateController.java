@@ -48,6 +48,7 @@ package org.rcsb.uiApp.controllers.update;
 import java.util.Vector;
 
 import org.rcsb.mbt.model.Structure;
+import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.util.DebugState;
 
 
@@ -202,6 +203,13 @@ public class UpdateController
 	public void fireUpdateViewEvent(final UpdateEvent.Action action, final Structure structure)
 	{
 		UpdateEvent evt = new UpdateEvent(action, structure);
+		fireUpdateEvent(evt);
+		evt = null;
+	}
+	
+	public void fireUpdateViewEvent(final UpdateEvent.Action action, final Surface surface)
+	{
+		UpdateEvent evt = new UpdateEvent(action, surface);
 		fireUpdateEvent(evt);
 		evt = null;
 	}

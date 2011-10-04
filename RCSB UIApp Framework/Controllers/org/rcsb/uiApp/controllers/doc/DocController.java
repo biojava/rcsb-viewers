@@ -49,8 +49,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Vector;
+
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
+
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.util.DebugState;
@@ -102,7 +104,9 @@ public class DocController
 
 			AppBase.sgetModel().setStructures(structure);
 		}
+		
 	}
+	
 
 	/**
 	 * Given a url, read the structures and return the structures array.
