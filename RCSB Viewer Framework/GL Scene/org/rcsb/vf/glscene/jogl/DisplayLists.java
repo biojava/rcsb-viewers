@@ -47,9 +47,12 @@ package org.rcsb.vf.glscene.jogl;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Arrays;
 import java.util.TreeMap;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
+import javax.vecmath.Color4b;
+import javax.vecmath.Color4f;
 
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
@@ -58,12 +61,14 @@ import org.rcsb.mbt.model.Fragment;
 import org.rcsb.mbt.model.LineSegment;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.StructureComponent;
+import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
 import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.attributes.LineStyle;
 import org.rcsb.mbt.model.attributes.StructureStyles;
+import org.rcsb.mbt.model.attributes.SurfaceStyle;
 import org.rcsb.mbt.model.util.DebugState;
 import org.rcsb.vf.controllers.app.VFAppBase;
 
@@ -493,7 +498,10 @@ public class DisplayLists
 			DisplayLists.tempColorFloat[3] = 1f;
 			gl.glMaterialfv(GL.GL_FRONT, this.mutableColorType, DisplayLists.tempColorFloat, 0);
 		} else if(sc.getStructureComponentType() == ComponentType.SURFACE) {
-			gl.glColor3fv(Constants.transparentWhite, 0);
+			// TODO -pr 20100501
+			final Surface s = (Surface) sc;
+			final SurfaceStyle style = (SurfaceStyle) ss.getStyle(sc);
+			style.getSurfaceColor(s, DisplayLists.tempColorFloat);
 		} else if (sc instanceof LineSegment) {
 			final LineStyle style = (LineStyle) ss.getStyle(sc);
 			final float[] color = style.getColor();
