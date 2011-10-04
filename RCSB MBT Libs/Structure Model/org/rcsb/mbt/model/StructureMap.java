@@ -229,6 +229,7 @@ public class StructureMap
 	protected TreeMap<String, Vector<Bond>> calculatedBonds = null;
 	protected Set<Bond> bondUniqueness = null;  // Make sure Bond objects are unique.
 	protected Hashtable<Atom, Vector<Bond>> atomToBonds = null;  // Find all Bonds connected to each Atom.
+	protected Vector<Surface> surfaces = null; // All Surfaces for this Structure
 
 	protected UnitCell unitCell = null;
 	protected BiologicUnitTransforms BUTransforms = null;
@@ -240,6 +241,7 @@ public class StructureMap
 	public Vector<Residue> getResidues() { return residues; }
 	public Vector<Atom> getAtoms() { return atoms; }
 	public Vector<Residue> getLigands() { return ligands; }
+	public Vector<Surface> getSurfaces() { return surfaces; }
 
 	public BiologicUnitTransforms addBiologicUnitTransforms()
 	{ BUTransforms = new BiologicUnitTransforms(); return BUTransforms; }
@@ -307,6 +309,9 @@ public class StructureMap
 			print( );
 		}
 
+		// need one default surface list
+		surfaces = new Vector<Surface>();
+		
 		setConverter();
 	}
 
@@ -1893,6 +1898,49 @@ public class StructureMap
 
 		return -1;
 	}
+	
+	public int getSurfaceIndex(Surface surface) {
+		if ( this.surfaces == null ) {
+			return -1;
+		}
+		return surfaces.indexOf(surface);
+	}
+
+	/**
+	 * Return the surface at the given index.
+	 */
+	public Surface getSurface( final int surfaceIndex )
+	{
+		if ( this.surfaces == null ) {
+			return null;
+		}
+		return this.surfaces.elementAt( surfaceIndex );
+	}
+	/**
+	 * Return the surface count extracted from the Structure.
+	 */
+	public int getSurfaceCount( )
+	{
+		return surfaces.size();
+	}
+
+	/**
+	 *  Add a Surface to the StructureMap.
+	 *  <P>
+	 */
+	public void addSurface(Surface surface)
+	{
+		surfaces.add(surface);
+	}
+
+	/**
+	 *  Remove a Surface from the StructureMap.
+	 *  <P>
+	 */
+	public void removeSurface(Surface surface)
+	{
+		surfaces.remove(surface);
+	}
 
 	//
 	// StructureStyles factory.
@@ -1934,6 +1982,7 @@ public class StructureMap
 		case FRAGMENT: return this.fragments.size( );
 		case CHAIN: return this.chains.size( );
 		case BOND: return this.bonds.size( );
+		case SURFACE: return this.surfaces.size( );
 		default: return this.structure.getStructureComponentCount( type );
 		}
 	}
@@ -1952,6 +2001,7 @@ public class StructureMap
 		case FRAGMENT: return this.fragments.elementAt( index );
 		case CHAIN: return this.chains.elementAt( index );
 		case BOND: return this.bonds.elementAt( index );
+		case SURFACE: return this.surfaces.elementAt( index );
 		default: return this.structure.getStructureComponentByIndex( type, index );
 		}
 	}
@@ -2012,6 +2062,12 @@ public class StructureMap
 			parents = new Vector<Object>( );
 			parents.add( structure );
 			break;
+			
+		case SURFACE:
+			parents = new Vector<Object>( );
+			parents.add( structure );
+			break;
+	
 		}
 
 		return parents;
@@ -2044,7 +2100,7 @@ public class StructureMap
 		{
 		case CHAIN:  return ((Chain) sc).getFragments( );
 		case FRAGMENT: return ((Fragment) sc).getResidues( );
-		case RESIDUE: ((Residue) sc).getAtoms( );
+		case RESIDUE: ((Residue) sc).getAtoms( ); // TODO -pr why is there no return statement here??
 		default:
 			return null;
 		}
@@ -2294,5 +2350,6 @@ public class StructureMap
 	public void setUnitCell(final UnitCell unitCell) {
 		this.unitCell = unitCell;
 	}
+
 }
 

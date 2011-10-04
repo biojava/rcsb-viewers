@@ -328,6 +328,8 @@ public class StructureXMLHandler extends DefaultHandler implements
 				createXMLRunnable__label_atom_id__End());
 		endElementAtomRunnables.put(xmlPrefix + "label_comp_id",
 				createXMLRunnable__label_comp_id__End());
+		endElementAtomRunnables.put(xmlPrefix + "label_entity_id",
+				createXMLRunnable__label_entity_id__End());
 		endElementAtomRunnables.put(xmlPrefix + "label_asym_id",
 				createXMLRunnable__label_asym_id__End());
 		endElementAtomRunnables.put(xmlPrefix + "auth_asym_id",
@@ -941,6 +943,16 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected XMLRunnable__label_comp_id__End createXMLRunnable__label_comp_id__End() {
 		return new XMLRunnable__label_comp_id__End();
+	}
+	
+	protected class XMLRunnable__label_entity_id__End extends XMLRunnable {
+		public void run() {
+				curAtom.entity_id = Integer.parseInt(buf.trim());
+		}
+	}
+
+	protected XMLRunnable__label_entity_id__End createXMLRunnable__label_entity_id__End() {
+		return new XMLRunnable__label_entity_id__End();
 	}
 
 	protected class XMLRunnable__label_asym_id__End extends XMLRunnable {

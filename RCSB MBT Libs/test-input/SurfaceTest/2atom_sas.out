@@ -1,0 +1,17 @@
+The specification is: input: 2atom.pdb, triangulation: VCMC, surface: SAS, color: atom, radius:  1.400, scale:  4.000, outname: 2atom_sas
+Load file...
+Initialize...
+actual boxlength  35, box[ 35* 35* 35], scale factor  4.000
+Build solvent-accessible solid
+Build triangulated surface
+Total time 0.046 seconds
+No. vertices 2083, No. triangles 4162
+Total area 169.742 and volume 210.331
+Distinguish inner and outer surfaces
+Calculate cavity number...
+Cavity number is 0
+Calculate cavity area and volume...
+Cavity area 0.000 and volume 0.000
+Calculate inner and outer atoms
+Output 3D model
+Output residue surface area

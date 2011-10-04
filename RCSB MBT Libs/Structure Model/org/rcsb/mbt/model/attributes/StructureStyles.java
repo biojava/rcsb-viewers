@@ -47,11 +47,25 @@ package org.rcsb.mbt.model.attributes;
 
 // MBT
 // Core
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
 
-import org.rcsb.mbt.model.*;
+import javax.print.attribute.standard.MediaSize.NA;
+
+import org.rcsb.mbt.model.Atom;
+import org.rcsb.mbt.model.Bond;
+import org.rcsb.mbt.model.Chain;
+import org.rcsb.mbt.model.Fragment;
+import org.rcsb.mbt.model.Residue;
+import org.rcsb.mbt.model.StructureComponent;
+import org.rcsb.mbt.model.StructureComponentEvent;
+import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
-import org.rcsb.mbt.model.util.*;
+import org.rcsb.mbt.model.util.ChemicalComponentInfo;
+import org.rcsb.mbt.model.util.Status;
 
 /**
  * This class stores and retrieves styles associated with visible
@@ -267,6 +281,11 @@ public class StructureStyles
 			}
 
 			this.setVisible(chain, true);
+		}
+		
+		// SURFACES, by default not visible
+		for (int i = 0; i < structureMap.getSurfaceCount(); i++) {
+			this.setVisible(structureMap.getSurface(i), false);
 		}
 	}
 
@@ -569,6 +588,9 @@ public class StructureStyles
 				if(node.completeChildren == ((Chain)comp).getFragmentCount()) {
 					items.add(comp);
 				}
+				// TODO -pr 20100501
+			} else if(comp.getStructureComponentType() == ComponentType.SURFACE) {
+				items.add(comp);
 			}
 		}
 		
@@ -1378,6 +1400,8 @@ public class StructureStyles
 			} else if (structureComponent.getStructureComponentType() == ComponentType.CHAIN) {
 				final Chain c = (Chain) structureComponent;
 				isSelected = c.getFragmentCount() == node.completeChildren;
+			} else if (structureComponent.getStructureComponentType() == ComponentType.SURFACE) {
+				isSelected = true;
 			}
 		} else if (structureComponent.getStructureComponentType() == ComponentType.ATOM) {
 			final Atom a = (Atom) structureComponent;
@@ -1392,7 +1416,10 @@ public class StructureStyles
 		} else if (structureComponent.getStructureComponentType() == ComponentType.FRAGMENT) {
 			final Fragment f = (Fragment) structureComponent;
 			isSelected = this.isSelected(f.getChain());
-		}
+		} else if (structureComponent.getStructureComponentType() == ComponentType.SURFACE) {
+			final Surface s = (Surface) structureComponent;
+			isSelected = this.isSelected(s);
+		} 
 
 		return isSelected;
 	}
@@ -1434,6 +1461,9 @@ public class StructureStyles
 				final Fragment f = (Fragment) structureComponent;
 				curComp = f.getChain();
 			} else if (structureComponent.getStructureComponentType() == ComponentType.CHAIN) {
+				path.add(new Object());
+				break;
+			} else if (structureComponent.getStructureComponentType() == ComponentType.SURFACE) {
 				path.add(new Object());
 				break;
 			}

@@ -264,6 +264,30 @@ public class Chain
 	}
 
 	/**
+	 * Return the entity ID by asking the first Atom of the first Residue.
+	 * If there are no residues or atoms, 0 is returned.
+	 */
+	public int getEntityId( )
+	{
+		if ( this.residues == null ) {
+			return 0;
+		}
+		final Residue residue = this.getResidue( 0 );
+		if ( residue == null ) {
+			return 0;
+		}
+		final int atomCount = residue.getAtomCount( );
+		if ( atomCount <= 0 ) {
+			return 0;
+		}
+		final Atom atom = residue.getAtom( 0 );
+		if ( atom == null ) {
+			return 0;
+		}
+		return atom.entity_id;
+	}
+	
+	/**
 	 * Return the chain ID by asking the first Atom of the first Residue.
 	 * If there are no residues or atoms, "A" is returned.
 	 */
