@@ -14,6 +14,7 @@
         <file path="/RCSB MBT Libs/.classpath"/>
         <javaElement handleIdentifier="=RCSB MBT Libs/Structure Model"/>
         <javaElement handleIdentifier="=RCSB MBT Libs/Structure Loader"/>
+        <javaElement handleIdentifier="=RCSB MBT Libs/Surface"/>
     </selectedElements>
     <fatjar builder="org.eclipse.jdt.ui.plain_jar_builder" launchConfig=""/>
 </jardesc>
