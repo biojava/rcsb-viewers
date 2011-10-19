@@ -47,21 +47,18 @@ package org.rcsb.pw.ui.mutatorPanels;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Insets;
-import java.awt.LayoutManager2;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -71,128 +68,72 @@ import javax.vecmath.Color4f;
 
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.Surface;
-import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
-import org.rcsb.mbt.model.attributes.StructureStyles;
-import org.rcsb.mbt.model.attributes.SurfaceStyle;
+import org.rcsb.mbt.model.attributes.ColorBrewer;
+import org.rcsb.mbt.model.attributes.SurfaceColorUpdater;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
-import org.rcsb.pw.ui.ColorPreviewerPanel;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.doc.SurfaceThread;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
+import org.rcsb.uiApp.ui.dialogs.ColorChooserDialog;
+import org.rcsb.uiApp.ui.dialogs.ColorPaletteChooserDialog;
 
 
 public class SurfacePanel extends JPanel implements IUpdateListener
 {
-	private int TRANSPARENCY_MIN = 0;
-	private int TRANSPARENCY_MAX = 100;
-	private int TRANSPARENCY_INIT = 0;
-	private Color defaultColor = new Color(0.1f, 0.8f, 1.0f);
+	private static int TRANSPARENCY_MIN = 0;
+	private static int TRANSPARENCY_MAX = 100;
+	private static int TRANSPARENCY_INIT = 0;
+	private static Color DEFAULT_COLOR = new Color(0.1f, 0.8f, 1.0f);
+	private static String[] surfaceOptions = {"Chain", "Chain type", "Single color", "Hydrophobicity"};
 	private static final long serialVersionUID = -7205000642717901355L;
-	private final JLabel colorLabel = new JLabel("Change Color");
-	private final ColorPane colorPanel = new ColorPane(Color.CYAN);
+
+	private final JLabel colorLabel = new JLabel("Color by");
+//	private final ColorPane colorPanel = new ColorPane(Color.CYAN);
+
 	private final JSlider transparencySlider = new JSlider(JSlider.HORIZONTAL,
-            TRANSPARENCY_MIN, TRANSPARENCY_MAX, TRANSPARENCY_INIT);
+			TRANSPARENCY_MIN, TRANSPARENCY_MAX, TRANSPARENCY_INIT);
+	private final JComboBox surfaceColorType = new JComboBox(surfaceOptions);
 
+	public SurfacePanel() {
+		super(false);
+		super.setLayout(new BorderLayout());
+		super.setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createTitledBorder("Surface"),
+				BorderFactory.createEmptyBorder(-1,1,1,1)));
 
-//	private final JLabel colorLabel = new JLabel("Color:");
-//    private final JColorChooser colorPanel =  new JColorChooser(); (too large, open in separate window?)
-	
-	private class CustomLayout implements LayoutManager2 {
-    	private Dimension size = new Dimension(0,0);
-    	
-		public void addLayoutComponent(String name, Component comp) {}
+		transparencySlider.setMajorTickSpacing(50);
+		transparencySlider.setMinorTickSpacing(10);
+		transparencySlider.setPaintTicks(true);
+		//Create the label table
+		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
+		labelTable.put( new Integer( 0 ), new JLabel("Off") );
+		labelTable.put( new Integer( 50 ), new JLabel("Transparent") );
+		labelTable.put( new Integer( 100 ), new JLabel("Opaque") );
+		transparencySlider.setLabelTable( labelTable );
+		transparencySlider.setPaintLabels(true);
+		super.add(transparencySlider, BorderLayout.PAGE_START);
 
-		public void layoutContainer(Container parent) {
-			final int buffer = 3;
-			final Insets insets = parent.getInsets();
-			int curY = insets.top + buffer;
-			int curX = insets.left + buffer;
-			
-			
-			final Dimension transparencySliderSize = transparencySlider.getPreferredSize();
-			System.out.println("SurfacePanel: size: " + transparencySliderSize);
-			transparencySlider.setBounds(curX, curY, transparencySliderSize.width, transparencySliderSize.height);
-			curY += transparencySliderSize.height + buffer;
-			
-			final Dimension colSize = colorLabel.getPreferredSize();
-			colorLabel.setBounds(curX, curY, colSize.width, colSize.height);
-			curY += colSize.height + buffer;
-			
-			Container parentParent = parent.getParent();
-			Insets parentParentInsets = parentParent.getInsets();
-			this.size.width = parentParent.getWidth() - parentParentInsets.left - parentParentInsets.right;
-			this.size.height = curY + insets.bottom;
-		}
+		JPanel firstPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		firstPanel.add(colorLabel);
 
-		public Dimension minimumLayoutSize(Container parent) {
-			return this.size;
-		}
+		super.add(firstPanel, BorderLayout.PAGE_END);
 
-		public Dimension preferredLayoutSize(Container parent) {
-			return this.size;
-		}
+		this.transparencySlider.addChangeListener(new TransparencySliderListener());   
+		this.transparencySlider.setToolTipText("Change transparency of the surface");
 
-		public void removeLayoutComponent(Component comp) {}
+		surfaceColorType.addActionListener(new SurfaceTypeListener());
+		firstPanel.add(surfaceColorType);
 
-		public void addLayoutComponent(Component comp, Object constraints) {}
+		this.reset();
 
-		public float getLayoutAlignmentX(Container target) {
-			return 0;
-		}
+		AppBase.sgetUpdateController().registerListener(this);
+	}
 
-		public float getLayoutAlignmentY(Container target) {
-			return 0;
-		}
+	public void reset() {
+        // can set currently selected color panel here
+	}
 
-		public void invalidateLayout(Container target) {}
-
-		public Dimension maximumLayoutSize(Container target) {
-			return this.size;
-		}
-    }
-	
-    public SurfacePanel() {
-        super(false);
- //       super.setLayout(new CustomLayout());
-        super.setLayout(new BorderLayout());
-        super.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Surface"),
-                BorderFactory.createEmptyBorder(-1,1,1,1)));
-        
-        transparencySlider.setMajorTickSpacing(50);
-        transparencySlider.setMinorTickSpacing(10);
-        transparencySlider.setPaintTicks(true);
-        //Create the label table
-        Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
-        labelTable.put( new Integer( 0 ), new JLabel("Off") );
-        labelTable.put( new Integer( 50 ), new JLabel("Transparent") );
-        labelTable.put( new Integer( 100 ), new JLabel("Opaque") );
-        transparencySlider.setLabelTable( labelTable );
-        transparencySlider.setPaintLabels(true);
-        super.add(transparencySlider, BorderLayout.PAGE_START);
-        
-        JPanel firstPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        firstPanel.add(colorPanel);
-        firstPanel.add(colorLabel);
-        super.add(firstPanel, BorderLayout.PAGE_END);
-   
-        this.colorPanel.addMouseListener(new ColorPanelListener());   
-        this.colorPanel.setToolTipText("Change surface color");
-        
-        
-        this.transparencySlider.addChangeListener(new TransparencySliderListener());   
-        this.transparencySlider.setToolTipText("Change transparency of the surface");
-  
-        this.reset();
-        
-        AppBase.sgetUpdateController().registerListener(this);
-    }
-
-    public void reset() {
-        this.colorPanel.setColor(defaultColor);
-    }
-    
 	/* (non-Javadoc)
 	 * @see edu.sdsc.mbt.views_controller.IViewUpdateListener#handleModelChangedEvent(edu.sdsc.mbt.views_controller.ViewUpdateEvent)
 	 */
@@ -201,87 +142,119 @@ public class SurfacePanel extends JPanel implements IUpdateListener
 		if (evt.action == UpdateEvent.Action.VIEW_RESET)
 			reset();
 	}
-	
-	private class ColorPanelListener implements MouseListener {
 
-		public void mouseClicked(MouseEvent e) {
-			final ColorPane source = (ColorPane)e.getSource();
-	    	Color4f newColor = new Color4f(source.getColor());
-	   
-	    	Structure structure = AppBase.sgetModel().getStructures().get(0);
-	    	if (structure.getStructureMap().getSurfaceCount() == 0) {
-	    		return;
-	    	}
-	    	
-	    	for (Surface s: structure.getStructureMap().getSurfaces()) {
-                System.out.println("rendering surface");
-	    		Color4f[] colors = s.getColors();
-
-	    		if (colors != null && colors.length > 0) {
-	    			// copy current transparency
-	    			float transparency = colors[0].getW();
-	    			newColor.setW(transparency);
-
-	    			for (int i = 0; i < colors.length; i++) {
-	    				colors[i] = newColor;
-	    			}
-
-	    			ProteinWorkshop.sgetGlGeometryViewer().surfaceRemoved(structure);
-	    			ProteinWorkshop.sgetGlGeometryViewer().surfaceAdded(structure);
-	    		}
-	    	}
-		}
-
-		public void mouseEntered(MouseEvent e) {}
-		public void mouseExited(MouseEvent e) {}
-		public void mousePressed(MouseEvent e) {}
-		public void mouseReleased(MouseEvent e) {}
-	}
-	
 	private class TransparencySliderListener implements ChangeListener {
-	    
-		public void stateChanged(ChangeEvent e) {
-	    	JSlider source = (JSlider)e.getSource();
-	        if (!source.getValueIsAdjusting()) {
-	            Structure structure = AppBase.sgetModel().getStructures().get(0);
-	            
-	            // lazy initialization of the surface
-	            boolean newSurface = false;
-	            if (structure.getStructureMap().getSurfaceCount() == 0) {
-	    			SurfaceThread thread = new SurfaceThread();	
-	    			thread.createSurface();
-	    			newSurface = true;
-	            }
-	            
-	            for (Surface s: structure.getStructureMap().getSurfaces()) {
-//	        	Surface s = structure.getStructureMap().getSurface(0);
-	        
-	        	float transparency = ((int)source.getValue()) * 0.01f;
-	        	System.out.println("Setting transparency: " + transparency);
-	        	Color4f[] colors = s.getColors();
-	        	if (colors != null && colors.length > 0) {
-	                float currentTranspacency = colors[0].getW();
 
-	        		if (currentTranspacency > 0.05f && transparency <= 0.05) {
-	        			for (int i = 0; i < colors.length; i++) {
-	        				colors[i].setW(transparency);
-	        			}
-	        			ProteinWorkshop.sgetGlGeometryViewer().surfaceRemoved(structure);
-	        		} else if (newSurface || currentTranspacency <= 0.05f && transparency > 0.05f) { 
-	        			for (int i = 0; i < colors.length; i++) {
-	        				colors[i].setW(transparency);
-	        			}
-	        			ProteinWorkshop.sgetGlGeometryViewer().surfaceAdded(structure);
-	        		} else if (currentTranspacency > 0.05f && transparency > 0.05f) {
-	        			for (int i = 0; i < colors.length; i++) {
-	        				colors[i].setW(transparency);
-	        			}
-	        			ProteinWorkshop.sgetGlGeometryViewer().surfaceRemoved(structure);
-	        			ProteinWorkshop.sgetGlGeometryViewer().surfaceAdded(structure);
-	        		}
-	           	}
-	            }
-	        }
-	    }
+		public void stateChanged(ChangeEvent e) {
+			JSlider source = (JSlider)e.getSource();
+
+			if (!source.getValueIsAdjusting()) {
+				Structure structure = AppBase.sgetModel().getStructures().get(0);
+
+				// lazy initialization of the surface
+				boolean newSurface = false;
+				if (structure.getStructureMap().getSurfaceCount() == 0) {
+					SurfaceThread thread = new SurfaceThread();	
+					thread.createSurface();
+					newSurface = true;
+				}
+
+				for (Surface s: structure.getStructureMap().getSurfaces()) {
+					float transparency = ((int)source.getValue()) * 0.01f;
+					System.out.println("Setting transparency: " + transparency);
+					Color4f[] colors = s.getColors();
+					if (colors != null && colors.length > 0) {
+						float currentTranspacency = colors[0].getW();
+						SurfaceColorUpdater.setSurfaceTransparency(s, transparency);
+
+						if (currentTranspacency > 0.05f && transparency <= 0.05) {
+							ProteinWorkshop.sgetGlGeometryViewer().surfaceRemoved(structure);
+						} else if (newSurface || currentTranspacency <= 0.05f && transparency > 0.05f) { 
+							ProteinWorkshop.sgetGlGeometryViewer().surfaceAdded(structure);
+						} else if (currentTranspacency > 0.05f && transparency > 0.05f) {
+							ProteinWorkshop.sgetGlGeometryViewer().surfaceRemoved(structure);
+							ProteinWorkshop.sgetGlGeometryViewer().surfaceAdded(structure);
+						} 
+					}
+				}
+			}
+		}
+	}
+
+	private class SurfaceTypeListener implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			final JComboBox source = (JComboBox)e.getSource();
+			source.hidePopup();
+			
+			// lazy initialization of the surface
+			Structure structure = AppBase.sgetModel().getStructures().get(0);
+			if (structure.getStructureMap().getSurfaceCount() == 0) {
+				SurfaceThread thread = new SurfaceThread();	
+				thread.createSurface();
+			}
+			
+			Color newColor = null;
+			ColorBrewer newPalette = null;
+			
+			if (source.getSelectedIndex() < 2) {
+				ColorPaletteChooserDialog paletteChooser = new ColorPaletteChooserDialog(AppBase.sgetActiveFrame());
+				paletteChooser.showDialog();
+				if (paletteChooser.wasOKPressed()) {
+					newPalette = paletteChooser.getColorPalette();
+				}
+				if (newPalette == null) {
+					return;
+				}
+			} else if (source.getSelectedIndex() == 2) {
+				ColorChooserDialog colorDialog = new ColorChooserDialog(AppBase.sgetActiveFrame());
+				colorDialog.setColor(DEFAULT_COLOR);
+				colorDialog.showDialog();
+				if(colorDialog.wasOKPressed()) {
+					newColor = colorDialog.getColor();
+				}       
+				if (newColor == null) {
+					return;
+				}
+			}
+
+			int surfaceCount = structure.getStructureMap().getSurfaceCount();
+			if (surfaceCount == 0) {
+				return;
+			}
+			
+			// create a list of unique entity ids
+			List<Integer> entitySet = null;
+			if (source.getSelectedIndex() == 1) {
+				entitySet = new ArrayList<Integer>();
+				for (Surface s: structure.getStructureMap().getSurfaces()) {
+					if (! entitySet.contains(s.getChain().getEntityId())) {
+						entitySet.add(s.getChain().getEntityId());
+					}
+				}
+			}
+
+			int index = 0;
+			for (Surface s: structure.getStructureMap().getSurfaces()) {
+				if (source.getSelectedIndex() == 0) {
+					// color by chain
+					SurfaceColorUpdater.setPaletteColor(s, newPalette, surfaceCount, index);
+					index++;
+				} else if (source.getSelectedIndex() == 1) {
+					// color by chain type (entity id)
+					int entityId = s.getChain().getEntityId();
+					SurfaceColorUpdater.setPaletteColor(s, newPalette, entitySet.size(), entitySet.indexOf(entityId));
+				} else if (source.getSelectedIndex() == 2) {
+					// color by a single color
+					Color4f color = new Color4f(newColor);
+					SurfaceColorUpdater.setSurfaceColor(s, color);
+				} else if (source.getSelectedIndex() == 3) {
+					// color by hydrophobicity
+					SurfaceColorUpdater.setHydrophobicSurfaceColor(s);
+				}
+			}
+			ProteinWorkshop.sgetGlGeometryViewer().surfaceRemoved(structure);
+			ProteinWorkshop.sgetGlGeometryViewer().surfaceAdded(structure);
+		}
 	}
 }
