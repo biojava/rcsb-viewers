@@ -63,8 +63,10 @@ import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.Residue.Classification;
 import org.rcsb.mbt.model.attributes.AtomRadiusRegistry;
+import org.rcsb.mbt.model.attributes.ColorBrewer;
 import org.rcsb.mbt.model.attributes.IAtomRadius;
 import org.rcsb.mbt.model.attributes.InterpolatedColorMap;
+import org.rcsb.mbt.model.attributes.SurfaceColorUpdater;
 import org.rcsb.mbt.surface.EdtMolecularSurface;
 import org.rcsb.mbt.surface.SurfaceCalculator;
 import org.rcsb.mbt.surface.datastructure.Sphere;
@@ -74,30 +76,36 @@ import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.app.ProgressPanelController;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
 
+
 /**
  * Actions create and start this thread to create the requested surface.
  * 
  * @author Peter Rose
  *
  */
-public class SurfaceThread extends Thread
-{
-	private static InterpolatedColorMap map = new InterpolatedColorMap(InterpolatedColorMap.HYDROPHOBICITY_RAMP);
+public class SurfaceThread extends Thread {
+	private static float PROBE_RADIUS = 1.4f;
+	
 	public void createSurface() {
 		IAtomRadius registry = AtomRadiusRegistry.get("By CPK");
-		float probeRadius = 1.4f;
 		
 		Structure structure = AppBase.sgetModel().getStructures().get(0);
 		StructureMap smap = structure.getStructureMap();
 		Vector<Chain> chains = smap.getChains();
-
+		
+		List<Chain> polymerChains = new ArrayList<Chain>();
+		for (Chain c: chains) {
+			if (c.getClassification().equals(Residue.Classification.AMINO_ACID) ||
+					c.getClassification().equals(Residue.Classification.NUCLEIC_ACID)) {
+				polymerChains.add(c);
+			}
+		}
 		
 		long t0 = System.nanoTime();
-		for (Chain c: chains) {
-			List<Atom> atomList = new ArrayList<Atom>();
-			List<Float> hydrophobicity = new ArrayList<Float>();
+		for (Chain c: polymerChains) {
 			List<Sphere> spheres = new ArrayList<Sphere>();
 			Vector<Residue> residues = c.getResidues();
+			
 			// How to deal with non-standard residue in a polymer. If excluded, 
 			// there will be holes in the surface
 			for (Residue r: residues) {
@@ -108,9 +116,7 @@ public class SurfaceThread extends Thread
 						double[] coord = a.coordinate;
 						Point3f location = new Point3f((float)coord[0], (float)coord[1], (float)coord[2]);
 						float radius = registry.getAtomRadius(a);
-						spheres.add(new Sphere(location, radius));
-						atomList.add(a);
-						hydrophobicity.add(r.getHydrophobicity());
+						spheres.add(new Sphere(location, radius, a));
 					}
 				}
 			}
@@ -118,114 +124,48 @@ public class SurfaceThread extends Thread
 			if (spheres.size() == 0) {
 				continue;
 			}
-			//	}
-	//		float resolution = 0.4f - 0.01f* chains.size(); // original
-			float resolution = 0.5f - 0.01f* chains.size() - 0.00005f * spheres.size();
-	//		float resolution = 0.5f - 0.005f* chains.size();
-			resolution = Math.min(resolution, 0.4f);
+
+			// calculate resolution based on size of structure
+	//		float resolution = 0.5f - 0.01f* polymerChains.size() - 0.00005f * spheres.size();
+			float resolution = 0.5f - 0.01f* polymerChains.size() - 0.00005f * spheres.size();
+	
+			// clamp resolution values
+	//		resolution = Math.min(resolution, 0.5f);
 			resolution = Math.max(resolution, 0.1f);
-			System.out.println("resolution: " + resolution + " spheres: " + spheres.size());
+			
+			
+			// calculate molecular surface
 			long t1 = System.nanoTime();
-			SurfaceCalculator s = new EdtMolecularSurface(spheres, probeRadius, resolution);
+			SurfaceCalculator s = new EdtMolecularSurface(spheres, PROBE_RADIUS, resolution);
 			TriangulatedSurface ts = s.getSurface();
+			s = null; // this is a very large object that's not needed anymore
 			long t2 = System.nanoTime();
 			System.out.println("Surface calculation: " + (t2-t1)/1000000 + "ms");
-			List<VertInfo> verts = ts.getVertices();
-			s = null; // this is a very large object that's not needed anymore, try to trigger GC
-	//		System.gc();
+
+			// smooth surface
 			long t3 = System.nanoTime();
-			System.out.println("Surface gc: " + (t3-t2)/1000000 + "ms");
-	//		ts.laplaciansmooth(2);
 			ts.laplaciansmooth(1);
 			long t4 = System.nanoTime();
 			System.out.println("Surface smoothing: " + (t4-t3)/1000000 + "ms");
 			
-
-			// set default color
 			int vertexCount = ts.getVertices().size();
-			System.out.println("# vertices: " + vertexCount + " # atoms: " + atomList.size());
-			Color4f[] colors = new Color4f[vertexCount];
-	//		Color4f defaultColor = new Color4f(0.1f, 0.8f, 1.0f, 0.0f);
-			
-			Color4f defaultColor = getDivergingColorScheme(smap.getSurfaceCount());
-//			Color4f defaultColor = getSequentialColorScheme(c.getEntityId());
-			for (int i = 0; i < vertexCount; i++) {
-				VertInfo v = verts.get(i);
-//				colors[i] = getBFactorColorScheme(atomList.get(v.atomid));
-	//			colors[i] = getHydrophobicityColorScheme(hydrophobicity.get(v.atomid));
-				colors[i] = defaultColor; // default transparency
-			}
+			System.out.println("# vertices: " + vertexCount + " resolution: " + resolution + " spheres: " + spheres.size());
 
 			long t5 = System.nanoTime();
 			System.out.println("Surface total: " + (t5-t0)/1000000 + "ms");
+			
 			Surface surface = new Surface(c, structure);
 			surface.setTriangulatedSurface(ts);
-			surface.setColors(colors);
+			
+			// set default surface color
+			SurfaceColorUpdater.setPaletteColor(surface, ColorBrewer.BrBG, polymerChains.size(), smap.getSurfaceCount());
 
 			smap.addSurface(surface);
 			AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.SURFACE_ADDED, surface); // has no effect
-			AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE); 
+	//		AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE); 
 		}
+		AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE); 
 	} 
-	
-	private Color4f getBFactorColorScheme(Atom atom) {
-		float b = (atom.bfactor -20) / 50f;
-		if (b > 1) {
-			b = 1;
-		}
-		if (b < 0) {
-			b = 0;
-		}
-		return new Color4f(b, 0.0f, 1.0f-b, 1.0f);
-	}
-	
-	private Color4f getHydrophobicityColorScheme(float hydrophobicity) {	
-		float[] colors = new float[3];
-		map.getColor(hydrophobicity, colors);
-		return new Color4f(colors[0], colors[1], colors[2], 1.0f);
-	}
-	
-	/*
-	 * Sequential color scheme, colorblind save
-	 * http://colorbrewer2.org/
-	 * Cynthia A. Brewer, 1994, "Color Use Guidelines for Mapping and Visualization",
-	 * Chapter 7 (pp. 123-147) in Visualization in Modern Cartography, edited by 
-	 * A.M. MacEachren and D.R.F. Taylor, Elsevier Science, Tarrytown, NY. 
-	 */
-	private Color4f getSequentialColorScheme(int index) {
-		Color4f color;
-
-		switch (index % 8) {
-		case 0: color = new Color4f(8/256f, 69/256f, 148/256f, 1.0f); break;
-		case 1: color = new Color4f(33/256f, 113/256f, 181/256f, 1.0f); break;
-		case 2: color = new Color4f(66/256f, 146/256f, 198/256f, 1.0f); break;
-		case 3: color = new Color4f(107/256f, 174/256f, 214/256f, 1.0f); break;
-		case 4: color = new Color4f(158/256f, 202/256f, 225/256f, 1.0f); break;
-		case 5: color = new Color4f(198/256f, 219/256f, 239/256f, 1.0f); break;
-		case 6: color = new Color4f(222/256f, 235/256f, 247/256f, 1.0f); break;
-		default: color = new Color4f(247/256f, 251/256f, 225/256f, 1.0f); break;
-		}
-		return color;
-	}
-	/*
-	 * Diverging color scheme, colorblind save
-	 * http://colorbrewer2.org/
-	 */
-	private Color4f getDivergingColorScheme(int index) {
-		Color4f color;
-
-		switch (index % 8) {
-		case 0: color = new Color4f(1/256f, 102/256f, 94/256f, 1.0f); break;
-		case 1: color = new Color4f(140/256f, 81/256f, 10/256f, 1.0f); break;
-		case 2: color = new Color4f(53/256f, 151/256f, 143/256f, 1.0f); break;
-		case 3: color = new Color4f(191/256f, 129/256f, 45/256f, 1.0f); break;
-		case 4: color = new Color4f(128/256f, 205/256f, 193/256f, 1.0f); break;
-		case 5: color = new Color4f(223/256f, 129/256f, 125/256f, 1.0f); break;
-		case 6: color = new Color4f(199/256f, 234/256f, 229/256f, 1.0f); break;
-		default: color = new Color4f(246/256f, 232/256f, 195/256f, 1.0f); break;
-		}
-		return color;
-	}
 	
 	public void run()
 	{
