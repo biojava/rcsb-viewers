@@ -57,9 +57,6 @@ import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.MutatorEnum;
 import org.rcsb.pw.ui.tree.TreeViewer;
 
-
-
-
 public class MutatorBasePanel extends JPanel
 {
 	private static final long serialVersionUID = 3893750857058349620L;
