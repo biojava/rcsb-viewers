@@ -85,8 +85,8 @@ public class Surface extends StructureComponent {
 		this.colors = colors;
 	}
 
-	public String getChainId() {
-		return chain.getChainId();
+	public Chain getChain() {
+		return chain;
 	}
 	
 }
