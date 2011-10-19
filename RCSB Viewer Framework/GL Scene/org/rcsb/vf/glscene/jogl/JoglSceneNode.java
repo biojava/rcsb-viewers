@@ -503,7 +503,7 @@ public class JoglSceneNode
 							chainId = c.getChainId();
 						}  else if (sc.getStructureComponentType() == ComponentType.SURFACE) {
 							final Surface s = (Surface) sc;
-							chainId = s.getChainId();
+							chainId = s.getChain().getChainId();
 						} 
 
 						// if the chain id is not listed, don't draw this.
