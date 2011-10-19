@@ -11,6 +11,7 @@ package org.rcsb.mbt.surface.datastructure;
  */
 public class VolumePixel {
 	public int atomid;
+	public Object reference;
 	public float distance;
 	public boolean inout;
 	public boolean isbound;
