@@ -139,11 +139,11 @@ public class EdtSolventAccessibleSurfaceTest {
      */
     @Test
     public void testSAS4() {
-        Sphere sphere1 = new Sphere(new Point3f(0, 0, 0), 2.0f);
+        Sphere sphere1 = new Sphere(new Point3f(0, 0, 0), 2.0f, null);
         List<Sphere>patch = new ArrayList<Sphere>();
         patch.add(sphere1);
 
-        Sphere sphere2 = new Sphere(new Point3f(3.0f, 0, 0), 2.0f);
+        Sphere sphere2 = new Sphere(new Point3f(3.0f, 0, 0), 2.0f, null);
         List<Sphere>context = new ArrayList<Sphere>();
         context.add(sphere2);
 

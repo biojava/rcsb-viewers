@@ -27,8 +27,8 @@ public class TwoSphereOverlapTest {
 
     @Before
     public void setUp() {
-        sphere1 = new Sphere(new Point3f(0, 0, 0), 2.0f);
-        sphere2 = new Sphere(new Point3f(0, 0, 0), 1.5f);
+        sphere1 = new Sphere(new Point3f(0, 0, 0), 2.0f, null);
+        sphere2 = new Sphere(new Point3f(0, 0, 0), 1.5f, null);
         probeRadius = 1.5f;
     }
 
