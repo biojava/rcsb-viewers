@@ -1907,8 +1907,6 @@ WindowListener, IStructureStylesEventListener {
 		final StructureMap structureMap = str.getStructureMap();
 		final JoglSceneNode sn = (JoglSceneNode)structureMap.getUData();
 		
-		// SurfaceStyle is not applicable to surfaces, but it is required by DisplayListRenderable,
-		// so we pass in a mock SurfaceStyle
 		final SurfaceStyle defaultSurfaceStyle = new SurfaceStyle();
 
 		final SurfaceGeometry defaultSurfaceGeometry = new SurfaceGeometry();
@@ -1936,7 +1934,7 @@ WindowListener, IStructureStylesEventListener {
 				Entry<StructureComponent, DisplayListRenderable> entry = iter.next();
 				if (entry.getKey() instanceof Surface) {
 					DisplayListRenderable renderable = entry.getValue();
-	//				iter.remove();
+	//				iter.remove(); // don't remove surface, it take too long to recalculate
 					this.renderablesToDestroy.add(renderable);
 					needsRepaint = true;
 				}
