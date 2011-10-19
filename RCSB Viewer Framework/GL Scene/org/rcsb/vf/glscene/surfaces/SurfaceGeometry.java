@@ -70,103 +70,101 @@ import com.sun.opengl.util.GLUT;
 
 
 public class SurfaceGeometry
-	extends DisplayListGeometry
+extends DisplayListGeometry
 {
 	TriangulatedSurface triangulatedSurface = null;
-    Color4f[] colors = null;
+	Color4f[] colors = null;
 
 	/**
 	 *  Construct a new SurfaceGeometry object.
 	 */
 	public SurfaceGeometry( )
 	{
-//		System.out.println("Creating new SurfaceGeometry");
+		//		System.out.println("Creating new SurfaceGeometry");
 	}
-	
+
 	public DisplayLists[] getDisplayLists(final StructureComponent structureComponent, final Style style, final GL gl, final GLU glu, final GLUT glut) {
-		
+
 		final Surface surface = (Surface)structureComponent;
-        colors = surface.getColors();
-        triangulatedSurface = surface.getTriangulatedSurface();
-        
-        final DisplayLists[] lists = new DisplayLists[1];
+		colors = surface.getColors();
+		triangulatedSurface = surface.getTriangulatedSurface();
 
-        lists[0] = new DisplayLists(surface);
-        lists[0].setupLists(1);
+		final DisplayLists[] lists = new DisplayLists[1];
 
-        lists[0].startDefine(0, gl, glu, glut);
+		lists[0] = new DisplayLists(surface);
+		lists[0].setupLists(1);
 
-        // enable color tracking with glColor
-        gl.glPushAttrib(GL.GL_COLOR_MATERIAL);
-        gl.glPushAttrib(GL.GL_BLEND);
-        gl.glEnable(GL.GL_COLOR_MATERIAL);
+		lists[0].startDefine(0, gl, glu, glut);
 
-  //      boolean transparent = colors[0].getW() < 0.95f;
-        boolean transparent = true;
+		// enable color tracking with glColor
+		gl.glPushAttrib(GL.GL_COLOR_MATERIAL);
+		gl.glEnable(GL.GL_COLOR_MATERIAL);
 
-        // draw with transparency
-        if (transparent) {
-        	gl.glEnable(GL.GL_BLEND);
-        	gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
- //       	gl.glDepthMask(false); // not needed, causes ribbon to be on top of transparent surface
-        }
+		// draw with transparency
+		gl.glPushAttrib(GL.GL_BLEND);
+		gl.glEnable(GL.GL_BLEND);
+		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
-        gl.glFrontFace(GL.GL_CCW);
-        drawFaces(gl, GL.GL_TRIANGLES);
- //       drawFaces(gl, GL.GL_POINTS);
+		// draw faces
+		gl.glFrontFace(GL.GL_CCW);
+	//	gl.glPushAttrib(GL.GL_LIGHT_MODEL_TWO_SIDE);
+	//	gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_FALSE);
+		
+		gl.glPointSize(1.5f);
+		drawFaces(gl, GL.GL_TRIANGLES);
+	//	       drawFaces(gl, GL.GL_POINTS);
 
-        if (transparent) {
- //       	gl.glDepthMask(true);
-        	gl.glDisable(GL.GL_BLEND);
-        }
-        gl.glPopAttrib();
-        gl.glPopAttrib();
+		gl.glDisable(GL.GL_BLEND);
+		
+		gl.glPopAttrib();
+		gl.glPopAttrib();
+	//	gl.glPopAttrib();
 
-        lists[0].endDefine(gl, glu, glut);
+		lists[0].endDefine(gl, glu, glut);
 		lists[0].structureComponent = surface;
 
 		lists[0].mutableColorType = GL.GL_AMBIENT_AND_DIFFUSE;	
 		lists[0].specularColor = Constants.chainSpecularColor.color;
 		lists[0].emissiveColor = Constants.chainEmissiveColor.color;
 		lists[0].shininess = Constants.chainHighShininess;
-		
+
 		return lists;
 	}
-	
+
 	private void drawFaces(GL gl, int shadeType) {
-	        gl.glBegin(shadeType);
-	        
-	        List<FaceInfo> faces = triangulatedSurface.getFaces();
-	        List<VertInfo> vertices = triangulatedSurface.getVertices();
-	        
-	        for (FaceInfo face: faces) {
-	            Point3f p0 = vertices.get(face.a).p;
-	            Point3f p1 = vertices.get(face.b).p;
-	            Point3f p2 = vertices.get(face.c).p;
-	            
-	            Vector3f n0 = vertices.get(face.a).normal;
-	            Vector3f n1 = vertices.get(face.b).normal;
-	            Vector3f n2 = vertices.get(face.c).normal;
+		gl.glBegin(shadeType);
 
-	            Color4f c0 = colors[face.a];
-	            Color4f c1 = colors[face.b];
-	            Color4f c2 = colors[face.c];
+		List<FaceInfo> faces = triangulatedSurface.getFaces();
+		List<VertInfo> vertices = triangulatedSurface.getVertices();
 
-	            // draw triangle       
-	            gl.glNormal3f(n0.getX(), n0.getY(), n0.getZ());
-	            gl.glColor4f(c0.getX(), c0.getY(), c0.getZ(), c0.getW());
-	            gl.glVertex3f(p0.getX(), p0.getY(), p0.getZ());
-	            
-	            gl.glNormal3f(n1.getX(), n1.getY(), n1.getZ());
-	            gl.glColor4f(c1.getX(), c1.getY(), c1.getZ(), c1.getW());
-	            gl.glVertex3f(p1.getX(), p1.getY(), p1.getZ());
-	            
-	            gl.glNormal3f(n2.getX(), n2.getY(), n2.getZ());
-	            gl.glColor4f(c2.getX(), c2.getY(), c2.getZ(), c2.getW());
-	            gl.glVertex3f(p2.getX(), p2.getY(), p2.getZ());
-	        }
-	        gl.glEnd();
-	        gl.glFlush();
-	    }
-	
+		for (FaceInfo face: faces) {
+			Point3f p0 = vertices.get(face.a).p;
+			Point3f p1 = vertices.get(face.b).p;
+			Point3f p2 = vertices.get(face.c).p;
+
+			Vector3f n0 = vertices.get(face.a).normal;
+			Vector3f n1 = vertices.get(face.b).normal;
+			Vector3f n2 = vertices.get(face.c).normal;
+
+			Color4f c0 = colors[face.a];
+			Color4f c1 = colors[face.b];
+			Color4f c2 = colors[face.c];
+
+			// draw triangle       
+			gl.glNormal3f(n0.getX(), n0.getY(), n0.getZ());
+			gl.glColor4f(c0.getX(), c0.getY(), c0.getZ(), c0.getW());
+			gl.glVertex3f(p0.getX(), p0.getY(), p0.getZ());
+
+			gl.glNormal3f(n1.getX(), n1.getY(), n1.getZ());
+			gl.glColor4f(c1.getX(), c1.getY(), c1.getZ(), c1.getW());
+			gl.glVertex3f(p1.getX(), p1.getY(), p1.getZ());
+
+			gl.glNormal3f(n2.getX(), n2.getY(), n2.getZ());
+			gl.glColor4f(c2.getX(), c2.getY(), c2.getZ(), c2.getW());
+			gl.glVertex3f(p2.getX(), p2.getY(), p2.getZ());
+		}
+		gl.glEnd();
+		gl.glFlush();
+	}
+
 }
