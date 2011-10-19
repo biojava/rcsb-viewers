@@ -301,6 +301,7 @@ public void fillvoxels(boolean bcolor) // used
 				vp[i][j][k].isbound=false;
 				vp[i][j][k].distance=-1;
 				vp[i][j][k].atomid=-1;
+				vp[i][j][k].reference=null;
 			}
 		}
 	}
@@ -344,6 +345,7 @@ private void fillatom(int indx, boolean bcolor) {
         Point3f cp = new Point3f();
 //	point3d cp;
         Sphere s = spheres.get(indx);
+        Object r = s.getReference();
         Point3f c = s.getLocation();
         cp.x=c.x+ptran.x;
 	cp.y=c.y+ptran.y;
@@ -406,15 +408,16 @@ private void fillatom(int indx, boolean bcolor) {
 									{
 										vp[si][sj][sk].inout=true;
 										vp[si][sj][sk].atomid=indx;
+										vp[si][sj][sk].reference=r;
 									}
 									//no atomic info to each voxel change above line
 								//*
 								    else if(vp[si][sj][sk].inout)
 									{
 										tind=vp[si][sj][sk].atomid;
-                                                                                Sphere t = spheres.get(tind);
-                                                                                Point3f tc = t.getLocation();
-                                                                                cp.x=tc.x+ptran.x;
+                                        Sphere t = spheres.get(tind);
+                                        Point3f tc = t.getLocation();
+                                        cp.x=tc.x+ptran.x;
 										cp.y=tc.y+ptran.y;
 										cp.z=tc.z+ptran.z;
 //										cp.x=proseq[tind].x+ptran.x;
@@ -423,7 +426,7 @@ private void fillatom(int indx, boolean bcolor) {
 										cp.x*=scalefactor;
 										cp.y*=scalefactor;
 										cp.z*=scalefactor;
-                                                                                ox= (int) (cp.x+0.5f)-si;
+                                        ox= (int) (cp.x+0.5f)-si;
 										oy= (int) (cp.y+0.5f)-sj;
 										oz= (int) (cp.z+0.5f)-sk;
 //										ox=int(cp.x+0.5)-si;
@@ -431,6 +434,7 @@ private void fillatom(int indx, boolean bcolor) {
 //										oz=int(cp.z+0.5)-sk;
 										if(mi*mi+mj*mj+mk*mk<ox*ox+oy*oy+oz*oz)
 											vp[si][sj][sk].atomid=indx;
+										    vp[si][sj][sk].reference=r;
 									}
 								//	*/
 								}//k
@@ -3228,6 +3232,7 @@ public void marchingcube(int stype) {
 //        verts[i].atomid=vp[(int)(verts[i].p.x)][(int)(verts[i].p.y)][(int)(verts[i].p.z)].atomid;
         VertInfo vertex = vertices.get(i);
         vertex.atomid = vp[(int)(vertex.p.x)][(int)(vertex.p.y)][(int)(vertex.p.z)].atomid;
+        vertex.reference = vp[(int)(vertex.p.x)][(int)(vertex.p.y)][(int)(vertex.p.z)].reference;
 
 
 //		verts[i].iscont=false;
