@@ -47,6 +47,9 @@ package org.rcsb.pw.controllers.scene.mutators;
 
 import java.util.Vector;
 
+import javax.vecmath.Color4f;
+
+import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
@@ -61,6 +64,7 @@ import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.Style;
+import org.rcsb.mbt.model.attributes.SurfaceColorUpdater;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 import org.rcsb.vf.glscene.jogl.DisplayListGeometry;
@@ -230,13 +234,14 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
 							   (mbtChain.getResidueCount() > 1 && ss.isVisible(mbtChain.getResidue(1)));
 				}
 			}
-			//break;
+			//break; why is this commented out? Also see above?
 		case SURFACE:
-			System.out.println("StructureElement_VisibilityMutator: getting surface visibility");
-			final Surface s = (Surface)component;
-			final StructureMap sm = s.getStructure().getStructureMap();
-			final StructureStyles ss = sm.getStructureStyles();
-			return ss.isVisible(s);
+	//		System.out.println("StructureElement_VisibilityMutator: getting surface visibility");
+	//		final Surface s = (Surface)component;
+	//		final StructureMap sm = s.getStructure().getStructureMap();
+	//		final StructureStyles ss = sm.getStructureStyles();
+	//		return ss.isVisible(s);
+			break;
 
 		default:
             (new Exception("Invalid option: " + mutatorActivationType)).printStackTrace();  
@@ -401,6 +406,17 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
         		this.setVisibility(f, newVisibility);
             break;
         case SURFACE:
+        	System.out.println("StructureElement_VisibilityMutor: toogling surf. transparency: " + c.getChainId());
+        	Structure structure = AppBase.sgetModel().getStructures().get(0);
+
+        	for (Surface s: structure.getStructureMap().getSurfaces()) {
+        		if (s.getChain().getChainId().equals(c.getChainId())) {
+        			SurfaceColorUpdater.setSurfaceTransparencyToggle(s);
+        			System.out.println("toggling transparency for chain: " + c.getChainId());
+        		}	
+        	}
+        	ProteinWorkshop.sgetGlGeometryViewer().surfaceRemoved(structure);
+        	ProteinWorkshop.sgetGlGeometryViewer().surfaceAdded(structure);
         	break;
         default:
             (new Exception("Invalid option: " + mutatorActivationType)).printStackTrace();
