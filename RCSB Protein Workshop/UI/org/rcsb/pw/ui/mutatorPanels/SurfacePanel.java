@@ -72,6 +72,7 @@ import org.rcsb.mbt.model.attributes.ColorBrewer;
 import org.rcsb.mbt.model.attributes.SurfaceColorUpdater;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.uiApp.controllers.doc.LoadThread;
 import org.rcsb.uiApp.controllers.doc.SurfaceThread;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
@@ -81,12 +82,12 @@ import org.rcsb.uiApp.ui.dialogs.ColorPaletteChooserDialog;
 
 public class SurfacePanel extends JPanel implements IUpdateListener
 {
+	private static final long serialVersionUID = -7205000642717901355L;
 	private static int TRANSPARENCY_MIN = 0;
 	private static int TRANSPARENCY_MAX = 100;
 	private static int TRANSPARENCY_INIT = 0;
 	private static Color DEFAULT_COLOR = new Color(0.1f, 0.8f, 1.0f);
 	private static String[] surfaceOptions = {"Chain", "Chain type", "Single color", "Hydrophobicity"};
-	private static final long serialVersionUID = -7205000642717901355L;
 
 	private final JLabel colorLabel = new JLabel("Color by");
 //	private final ColorPane colorPanel = new ColorPane(Color.CYAN);
@@ -132,6 +133,8 @@ public class SurfacePanel extends JPanel implements IUpdateListener
 
 	public void reset() {
         // can set currently selected color panel here
+		transparencySlider.setValue(0);
+	//	surfaceColorType.setSelectedItem(surfaceOptions[0]); this cause an exception
 	}
 
 	/* (non-Javadoc)
@@ -139,7 +142,12 @@ public class SurfacePanel extends JPanel implements IUpdateListener
 	 */
 	public void handleUpdateEvent(UpdateEvent evt)
 	{
+		System.out.println("SurfacePanel: handleUpdateEvent: " + evt.toString());
 		if (evt.action == UpdateEvent.Action.VIEW_RESET)
+			reset();
+		if (evt.action == UpdateEvent.Action.STRUCTURE_REMOVED)
+			reset();
+		if (evt.action == UpdateEvent.Action.STRUCTURE_ADDED)
 			reset();
 	}
 
@@ -155,7 +163,11 @@ public class SurfacePanel extends JPanel implements IUpdateListener
 				boolean newSurface = false;
 				if (structure.getStructureMap().getSurfaceCount() == 0) {
 					SurfaceThread thread = new SurfaceThread();	
+					// can't run this as a thread since transparency needs to be updated
+					// and surfaceRemoved/Added needs to be called.
+					// thread.start();
 					thread.createSurface();
+					
 					newSurface = true;
 				}
 
@@ -191,7 +203,9 @@ public class SurfacePanel extends JPanel implements IUpdateListener
 			Structure structure = AppBase.sgetModel().getStructures().get(0);
 			if (structure.getStructureMap().getSurfaceCount() == 0) {
 				SurfaceThread thread = new SurfaceThread();	
-				thread.createSurface();
+				// can't run this as a thread since color needs to be updated
+				// and surfaceRemoved/Added needs to be called.
+				thread.createSurface();										
 			}
 			
 			Color newColor = null;
