@@ -88,5 +88,8 @@ public class Surface extends StructureComponent {
 	public Chain getChain() {
 		return chain;
 	}
-	
+		
+	public boolean isTransparent() {
+		return colors[0].getW() < 1.0f;
+	}
 }
