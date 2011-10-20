@@ -1910,10 +1910,26 @@ WindowListener, IStructureStylesEventListener {
 		final SurfaceStyle defaultSurfaceStyle = new SurfaceStyle();
 
 		final SurfaceGeometry defaultSurfaceGeometry = new SurfaceGeometry();
+		
+		// add solid surfaces first
 		for (Surface s: structureMap.getSurfaces()) {
-			synchronized (sn.renderables) {
-				sn.renderables.put(s, 
-						new DisplayListRenderable(s,defaultSurfaceStyle, defaultSurfaceGeometry));
+			if (!s.isTransparent()) {
+				System.out.println("Drawing solid surface: " + s.getChain().getChainId());
+				synchronized (sn.renderables) {
+					sn.renderables.put(s, 
+							new DisplayListRenderable(s,defaultSurfaceStyle, defaultSurfaceGeometry));
+				}
+			}
+		}
+		
+		// add transparent surfaces second
+		for (Surface s: structureMap.getSurfaces()) {
+			if (s.isTransparent()) {
+		        System.out.println("Drawing transparent surface: " + s.getChain().getChainId());
+				synchronized (sn.renderables) {
+					sn.renderables.put(s, 
+							new DisplayListRenderable(s,defaultSurfaceStyle, defaultSurfaceGeometry));
+				}
 			}
 		}
 		this.requestRepaint();
@@ -1934,7 +1950,7 @@ WindowListener, IStructureStylesEventListener {
 				Entry<StructureComponent, DisplayListRenderable> entry = iter.next();
 				if (entry.getKey() instanceof Surface) {
 					DisplayListRenderable renderable = entry.getValue();
-	//				iter.remove(); // don't remove surface, it take too long to recalculate
+					iter.remove();
 					this.renderablesToDestroy.add(renderable);
 					needsRepaint = true;
 				}
