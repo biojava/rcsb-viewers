@@ -29,10 +29,16 @@ public final class SurfaceColorUpdater {
 			colors = new Color4f[vertexCount];
 			surface.setColors(colors);
 		}
+		// retain current transparency w
+		float transparency = 1.0f;
+		if (colors[0] != null) {
+			transparency = colors[0].getW();
+		}
 		
 		for (int i = 0; i < vertexCount; i++) {
 			VertInfo v = verts.get(i);
 			colors[i] = getHydrophobicityColorScheme((Atom)v.reference);
+			colors[i].setW(transparency);
 		}
 	}
 	
@@ -48,9 +54,15 @@ public final class SurfaceColorUpdater {
 		}
 		Color4f[] palette = brewer.getColor4fPalette(colorCount);
 		Color4f color = palette[colorIndex];
+		Color4f newColor = (Color4f) color.clone();
 		
+		// retain current transparency w
+		if (colors[0] != null) {
+			newColor.setW(colors[0].getW());
+		}
+
 		for (int i = 0; i < vertexCount; i++) {
-			colors[i] = color;
+			colors[i] = newColor;
 		}
 	}
 	
@@ -65,10 +77,17 @@ public final class SurfaceColorUpdater {
 			colors = null;
 			colors = new Color4f[vertexCount];
 			surface.setColors(colors);
+		} 
+		
+        Color4f newColor = (Color4f) color.clone();
+		
+		// retain current transparency w
+		if (colors[0] != null) {
+			newColor.setW(colors[0].getW());
 		}
 		
 		for (int i = 0; i < vertexCount; i++) {
-			colors[i] = color;
+			colors[i] = newColor;
 		}
 	}
 	
@@ -88,6 +107,34 @@ public final class SurfaceColorUpdater {
 		for (int i = 0; i < vertexCount; i++) {
 			colors[i].setW(transparency);
 		}
+	}
+	
+	public static void setSurfaceTransparencyToggle(Surface surface) {
+		// set color
+		List<VertInfo> verts = surface.getTriangulatedSurface().getVertices();
+		int vertexCount = verts.size();
+		System.out.println("# vertices: " + vertexCount);
+		
+		Color4f[] colors = surface.getColors();
+		if (colors == null || colors.length != vertexCount) {
+			colors = null;
+			colors = new Color4f[vertexCount];
+			surface.setColors(colors);
+		}
+		
+		float transparency = 1.0f;
+		if (colors[0] != null) {
+			transparency = colors[0].getW();
+			if (transparency > 0.4f) {
+				transparency = 0.4f;
+			} else {
+				transparency = 1.0f;
+			}
+			for (int i = 0; i < vertexCount; i++) {
+				colors[i].setW(transparency);
+			}
+		}
+		
 	}
 	
 	private static Color4f getHydrophobicityColorScheme(Atom atom) {
