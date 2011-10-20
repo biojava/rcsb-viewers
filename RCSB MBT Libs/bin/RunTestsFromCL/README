@@ -1,5 +1,0 @@
-RunTestsFromCL
---------------
-This just allows you to run the tests from the commandline.
-
-It is NOT the full suite UnitTest invoker...
