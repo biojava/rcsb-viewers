@@ -154,6 +154,10 @@ public class UIBuilder implements Runnable
 											"Open a structure...",
 											JOptionPane.INFORMATION_MESSAGE);
 
+							if (pdbId == null) {
+								return;
+							}
+							
 							String[] pdbIds = pdbId.split(",");
 						
 							for (int i = 0; i < pdbIds.length; i++) {
