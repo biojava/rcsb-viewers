@@ -48,6 +48,8 @@ package org.rcsb.pw.controllers.scene.mutators;
 import java.awt.Color;
 import java.util.Vector;
 
+import javax.vecmath.Color4f;
+
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -66,9 +68,10 @@ import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.attributes.IResidueColor;
 import org.rcsb.mbt.model.attributes.ResidueColorByRgb;
 import org.rcsb.mbt.model.attributes.StructureStyles;
-import org.rcsb.mbt.model.attributes.SurfaceStyle;
+import org.rcsb.mbt.model.attributes.SurfaceColorUpdater;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.options.ColorOptions;
+import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.controllers.scene.SceneController;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
@@ -130,8 +133,6 @@ public class ColorMutator extends MutatorBase
 					this.changeColor((ExternChain)next);
 				} else if(next instanceof Fragment) {
 					this.changeColor((Fragment)next);
-				} else if(next instanceof Surface) {
-					this.changeColor((Surface)next);
 				} else if(next instanceof Structure) {
 					final Structure s = (Structure)next;
 					this.changeColor(s);
@@ -251,26 +252,6 @@ public class ColorMutator extends MutatorBase
         switch(pickLevel)
         {
        case ATOMS_AND_BONDS:
-        	/*this.options.getCurrentColor().getColorComponents(colorFl);
-            BondColorByRgb bondColor = new BondColorByRgb(colorFl);
-            
-            GlGeometryViewer viewer = Model.getSingleton().getViewer();
-            DisplayListRenderable renderable = viewer.getRenderable(b);
-            if(renderable != null) {
-            	BondStyle oldStyle = (BondStyle)renderable.style;
-            	BondStyle style = new BondStyle();
-                style.setBondColor(bondColor);
-                if(oldStyle != null) {
-	                style.setBondForm(oldStyle.getBondForm());
-	                style.setBondLabel(oldStyle.getBondLabel());
-	                style.setBondRadius(oldStyle.getBondRadius());
-                }
-                ss.setStyle(b, style);
-            	
-            	renderable.style = style;
-//            	renderable.setDirty();
-            }*/
-        	
         	// delegate to atoms...
         	this.changeColor(b.getAtom(0));
         	this.changeColor(b.getAtom(1));
@@ -303,6 +284,7 @@ public class ColorMutator extends MutatorBase
             break;
             
         case RIBBONS:
+        	System.out.println("ColorMutator: change ribbon color: " + sm.getChain(r.getChainId()));
         	final Chain c = sm.getChain(r.getChainId());
             
             final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(c);
@@ -323,6 +305,27 @@ public class ColorMutator extends MutatorBase
                 residueColorByRgb.setColor(r, ColorMutator.colorFl);               
             	renderable.style = style;
             }
+            break;
+        case SURFACE:
+        	System.out.println("ColorMutator: change surface color: " + sm.getChain(r.getChainId()));
+        	Chain cs = sm.getChain(r.getChainId());
+        	DisplayListRenderable srenderable = ((JoglSceneNode)sm.getUData()).getRenderable(cs);
+        	
+        	if(srenderable != null) {
+        		this.options.getCurrentColor().getColorComponents(ColorMutator.colorFl);
+        		Structure structure = AppBase.sgetModel().getStructures().get(0);
+        		
+        		for (Surface s: structure.getStructureMap().getSurfaces()) {
+        			if (s.getChain().getChainId().equals(cs.getChainId())) {
+        				Color4f newColor = new Color4f(ColorMutator.colorFl[0], 
+        						ColorMutator.colorFl[1],
+        						ColorMutator.colorFl[2], 1.0f);
+        				SurfaceColorUpdater.setSurfaceColor(s, newColor);
+        			}	
+        		}
+        		ProteinWorkshop.sgetGlGeometryViewer().surfaceRemoved(structure);
+				ProteinWorkshop.sgetGlGeometryViewer().surfaceAdded(structure);
+        	}
             break;
             
         default:
@@ -357,18 +360,4 @@ public class ColorMutator extends MutatorBase
 			this.changeColor(c);
     }
     
-    private void changeColor(final Surface s) {
-        final StructureMap sm = s.getStructure().getStructureMap();
-        final StructureStyles ss = sm.getStructureStyles();
-        
-        this.options.getCurrentColor().getColorComponents(ColorMutator.colorFl);
-        	
-        final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(s);
-        if(renderable != null) {
-        	final SurfaceStyle style = new SurfaceStyle();
-        	style.setSurfaceColor(s, ColorMutator.colorFl);
-        	ss.setStyle(s, style);
-        	renderable.style = style;
-        }
-    }
 }
