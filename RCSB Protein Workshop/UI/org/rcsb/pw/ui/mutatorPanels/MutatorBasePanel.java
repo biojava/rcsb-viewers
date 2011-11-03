@@ -91,13 +91,9 @@ public class MutatorBasePanel extends JPanel
 			final int fullWidth = parent.getWidth() - insets.left - insets.right - buffer * 2;
 			final int fullHeight = parent.getHeight() - insets.top - insets.bottom - buffer * 2;
 			
-			System.out.println("MutatorBasePanel: fullWidth: " + fullWidth);
 			final Dimension mutatorSize = mutatorPanel.getPreferredSize();
 			final Dimension pickLevelSize = pickLevelPanel.getPreferredSize();
 			final Dimension surfaceSize = surfacePanel.getPreferredSize();
-			System.out.println("MutatorBasePanel: mutatorSize: " + mutatorSize);
-			System.out.println("MutatorBasePanel: pickLevelSize: " + pickLevelSize);
-			System.out.println("MutatorBasePanel: surfaceSize: " + surfaceSize);
 			
 			mutatorPanel.setBounds(curX, curY, fullWidth, mutatorSize.height);
 			curY += mutatorSize.height + buffer;
@@ -115,12 +111,6 @@ public class MutatorBasePanel extends JPanel
 			
 			curY = fullHeight - surfaceSize.height;
 			surfacePanel.setBounds(curX, curY, fullWidth, surfaceSize.height);
-//			curY += surfaceSize.height + buffer;
-			
-//			Container parentParent = parent.getParent();
-//			Insets parentParentInsets = parentParent.getInsets();
-
-//			this.maxSize.height = this.minSize.height = curY + buffer + insets.bottom;
 		}
 
 		public Dimension minimumLayoutSize(Container parent) {

@@ -374,6 +374,7 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
         switch(mutatorActivationType)
         {
         case ATOMS_AND_BONDS:
+        	System.out.println("StructureElement_Visibility: setting atom/bond visibility");
             final Vector<Atom> atoms = r.getAtoms();
             
             for (Atom a : atoms)
@@ -382,6 +383,12 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
             for (Bond b : sm.getBonds(atoms))
             	this.setComponentVisibilitySimple(b, newVisibility);
 
+            // Surfaces need to be redrawn, otherwise newly rendered atoms
+            // will not visible when covered by a transparent surface. Transparent
+            // objects need to be rendered last. To ensure this happens, we 
+            // remove and add the surfaces.
+        	ProteinWorkshop.sgetGlGeometryViewer().surfaceRemoved(r.structure);
+        	ProteinWorkshop.sgetGlGeometryViewer().surfaceAdded(r.structure);
             break;
             
         case RIBBONS:
