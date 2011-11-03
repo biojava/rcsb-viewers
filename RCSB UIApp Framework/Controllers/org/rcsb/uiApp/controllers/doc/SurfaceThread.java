@@ -51,8 +51,6 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
-import javax.vecmath.Color4b;
-import javax.vecmath.Color4f;
 import javax.vecmath.Point3f;
 
 import org.rcsb.mbt.model.Atom;
@@ -65,13 +63,11 @@ import org.rcsb.mbt.model.Residue.Classification;
 import org.rcsb.mbt.model.attributes.AtomRadiusRegistry;
 import org.rcsb.mbt.model.attributes.ColorBrewer;
 import org.rcsb.mbt.model.attributes.IAtomRadius;
-import org.rcsb.mbt.model.attributes.InterpolatedColorMap;
 import org.rcsb.mbt.model.attributes.SurfaceColorUpdater;
 import org.rcsb.mbt.surface.EdtMolecularSurface;
 import org.rcsb.mbt.surface.SurfaceCalculator;
 import org.rcsb.mbt.surface.datastructure.Sphere;
 import org.rcsb.mbt.surface.datastructure.TriangulatedSurface;
-import org.rcsb.mbt.surface.datastructure.VertInfo;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.app.ProgressPanelController;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
@@ -90,24 +86,16 @@ public class SurfaceThread extends Thread {
 		IAtomRadius registry = AtomRadiusRegistry.get("By CPK");
 		
 		Structure structure = AppBase.sgetModel().getStructures().get(0);
-		StructureMap smap = structure.getStructureMap();
-		Vector<Chain> chains = smap.getChains();
-		
-		List<Chain> polymerChains = new ArrayList<Chain>();
-		for (Chain c: chains) {
-			if (c.getClassification().equals(Residue.Classification.AMINO_ACID) ||
-					c.getClassification().equals(Residue.Classification.NUCLEIC_ACID)) {
-				polymerChains.add(c);
-			}
-		}
+		StructureMap smap = structure.getStructureMap();	
+		List<Chain> polymerChains = getPolymerChains();
 		
 		long t0 = System.nanoTime();
 		for (Chain c: polymerChains) {
 			List<Sphere> spheres = new ArrayList<Sphere>();
 			Vector<Residue> residues = c.getResidues();
 			
-			// How to deal with non-standard residue in a polymer. If excluded, 
-			// there will be holes in the surface
+			// How to deal with non-standard residue in a polymer?
+			// Ligand, water, etc. could be part of chain
 			for (Residue r: residues) {
 				if (r.getClassification().equals(Classification.AMINO_ACID) ||
 						r.getClassification().equals(Classification.NUCLEIC_ACID)) {
@@ -130,7 +118,6 @@ public class SurfaceThread extends Thread {
 			float resolution = 0.5f - 0.01f* polymerChains.size() - 0.00005f * spheres.size();
 	
 			// clamp resolution values
-	//		resolution = Math.min(resolution, 0.5f);
 			resolution = Math.max(resolution, 0.1f);
 			
 			
@@ -165,6 +152,24 @@ public class SurfaceThread extends Thread {
 	//		AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE); 
 		}
 		AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE); 
+	}
+
+	/**
+	 * @param chains
+	 * @return
+	 */
+	private List<Chain> getPolymerChains() {
+		Structure structure = AppBase.sgetModel().getStructures().get(0);
+		StructureMap smap = structure.getStructureMap();
+		Vector<Chain> chains = smap.getChains();
+		List<Chain> polymerChains = new ArrayList<Chain>();
+		for (Chain c: chains) {
+			if (c.getClassification().equals(Residue.Classification.AMINO_ACID) ||
+					c.getClassification().equals(Residue.Classification.NUCLEIC_ACID)) {
+				polymerChains.add(c);
+			}
+		}
+		return polymerChains;
 	} 
 	
 	public void run()
