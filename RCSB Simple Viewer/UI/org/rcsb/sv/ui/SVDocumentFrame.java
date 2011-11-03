@@ -69,6 +69,7 @@ import javax.swing.SwingUtilities;
 
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureModel;
+import org.rcsb.mbt.model.util.Status;
 import org.rcsb.sv.controllers.app.SVVersionInformation;
 import org.rcsb.sv.controllers.app.SimpleViewer;
 import org.rcsb.uiApp.controllers.app.AppBase;
@@ -84,6 +85,7 @@ public class SVDocumentFrame extends VFDocumentFrameBase
 {
 	public class SimpleViewerUIBuilder extends VFUIBuilder
 	{
+		private final String helpURL = "http://www.pdb.org/pdb/staticHelp.do?p=help/viewers/simpleViewer_viewer.html";
 		@Override
 		public void run()
 		{
@@ -94,6 +96,40 @@ public class SVDocumentFrame extends VFDocumentFrameBase
 
 			if (!AppBase.backgroundScreenshotOnly)
 			{
+				final JMenu helpMenu = new JMenu("Help");
+				final JMenuItem helpItem = new JMenuItem("Help");
+				final ActionListener helpListener =
+					new ActionListener()
+					{
+						public void actionPerformed(ActionEvent actionEvent)
+						{
+							Thread runner = new Thread()
+							{
+								@Override
+								public void run()
+								{
+									String address = helpURL;
+									try
+									{
+										BBBrowserLauncher.openURL(address);
+									}
+									
+									catch (IOException e)
+									{
+										e.printStackTrace();
+										displayErrorMessage("Unable to open help site.");
+									}
+								}
+							};
+							runner.start();
+						}
+					};
+				
+				helpItem.addActionListener(helpListener);
+				helpItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H,
+						Event.CTRL_MASK));
+				helpMenu.add(helpItem);
+				menuBar.add(helpMenu);	
 				Container viewerFrameContainer = getContentPane();
 				
 				// Create a pane for the structure viewer and the
@@ -207,6 +243,10 @@ public class SVDocumentFrame extends VFDocumentFrameBase
 
 			glViewer.setDoubleBuffered(false);
 		}
+	}
+	
+	public void displayErrorMessage(final String text) {
+		Status.output(Status.LEVEL_ERROR, text);
 	}
 	
 	final static long serialVersionUID = 0x43518477;
