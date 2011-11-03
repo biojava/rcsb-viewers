@@ -7,8 +7,11 @@ package org.rcsb.mbt.surface.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import javax.vecmath.Point3f;
 
 import org.rcsb.mbt.surface.datastructure.FaceInfo;
@@ -26,11 +29,11 @@ public class SurfacePatchCalculator {
     TriangulatedSurface surface;
     Map<Integer, Integer> vertexMap = new HashMap<Integer, Integer>(); // maps original vertex indices to the truncated vertex list
 
-    public SurfacePatchCalculator(TriangulatedSurface surface, int patchSize) {
+    public SurfacePatchCalculator(TriangulatedSurface surface, int patchSize, List<Sphere> patch) {
         this.surface = surface;
         // truncate vertices and faces to the patch site region
         System.out.println("before vertices: " + surface.getVertices().size());
-        truncateVertices(patchSize);
+        truncateVertices(patchSize, patch);
         System.out.println("truncated vertices: " + surface.getVertices().size());
         truncateFaces();
     }
@@ -39,20 +42,27 @@ public class SurfacePatchCalculator {
         return surface;
     }
 
-    private void truncateVertices(int patchSize) {
+    private void truncateVertices(int patchSize, List<Sphere> patch) {
         // truncate vertices array to just the patch spheres
         List<VertInfo> truncatedVertices = new ArrayList<VertInfo>();
         List<VertInfo> vertices = surface.getVertices();
         int vertCount = 0;
 
+        Set<Object> patchObject = new HashSet<Object>(patch.size());
+        for (Sphere s: patch) {
+        	patchObject.add(s.getReference());
+        }
         for (int i = 0; i < vertices.size(); i++) {
             VertInfo v = vertices.get(i);
-            if (v.atomid < patchSize) {
+       //     if (patchObject.contains(v.reference)) {
+           if (v.atomid < patchSize) {
+   //     	   System.out.println("adding vertex");
                 truncatedVertices.add(v);
                 vertexMap.put(i, vertCount);
                 vertCount++;
             }
         }
+        System.out.println("vertex count: "  + vertCount);
 
         surface.setVertices(truncatedVertices);
     }

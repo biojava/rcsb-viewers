@@ -41,7 +41,7 @@ public class EdtVanDerWaalsSurface implements SurfaceCalculator {
         SurfaceCalculator evs = new EdtVanDerWaalsSurface(all, resolution);
         surface = evs.getSurface();
 
-        SurfacePatchCalculator sp = new SurfacePatchCalculator(surface, patch.size());
+        SurfacePatchCalculator sp = new SurfacePatchCalculator(surface, patch.size(), patch);
         surface = sp.getSurfacePatch();
     }
 

@@ -40,7 +40,7 @@ public class EdtSolventAccessibleSurface implements SurfaceCalculator {
         SurfaceCalculator eas = new EdtSolventAccessibleSurface(all, probeRadius, resolution);
         surface = eas.getSurface();
 
-        SurfacePatchCalculator sp = new SurfacePatchCalculator(surface, patch.size());
+        SurfacePatchCalculator sp = new SurfacePatchCalculator(surface, patch.size(), patch);
         surface = sp.getSurfacePatch();
     }
 

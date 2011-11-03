@@ -41,7 +41,7 @@ public class EdtMolecularSurface implements SurfaceCalculator {
         EdtMolecularSurface ems = new EdtMolecularSurface(all, probeRadius, resolution);
         surface = ems.getSurface();
 
-        SurfacePatchCalculator sp = new SurfacePatchCalculator(surface, patch.size());
+        SurfacePatchCalculator sp = new SurfacePatchCalculator(surface, patch.size(), patch);
         surface = sp.getSurfacePatch();
     }
     

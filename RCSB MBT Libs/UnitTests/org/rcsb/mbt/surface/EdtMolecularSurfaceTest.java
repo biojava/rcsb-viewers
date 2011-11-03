@@ -124,7 +124,7 @@ public class EdtMolecularSurfaceTest {
         TriangulatedSurface surface = instance.getSurface();
         surface.computenorm();
 
-        // expected data from original EDTSurf.exe (without smoohing!)
+        // expected data from original EDTSurf.exe (without smoothing!)
         float expArea = 57.850f;
         assertEquals(expArea, surface.getSurfaceArea(), 0.001f);
         assertEquals(684, surface.getVertices().size());
