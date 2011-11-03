@@ -438,7 +438,6 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 
 	public SequenceTabbedPane sequenceViewer = null;
 
-//	private final String helpURL = "http://www.pdb.org/robohelp_f/#molecular_viewers/ligandviewer/user_guide.htm";
 	private final String helpURL = "http://www.pdb.org/pdb/staticHelp.do?p=help/viewers/ligandExplorer_viewer.html";
 
 	/**
