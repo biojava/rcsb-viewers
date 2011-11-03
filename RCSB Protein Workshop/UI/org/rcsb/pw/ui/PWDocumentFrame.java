@@ -47,21 +47,30 @@ package org.rcsb.pw.ui;
 
 
 import java.awt.Dimension;
+import java.awt.Event;
 import java.awt.Toolkit;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
+import org.rcsb.vf.controllers.app.BBBrowserLauncher;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Structure;
@@ -84,6 +93,7 @@ import org.rcsb.vf.ui.VFUIBuilder;
 public class PWDocumentFrame extends VFDocumentFrameBase 
 {
 	private static final long serialVersionUID = -2377835483763485353L;
+	private final String helpURL = "http://www.pdb.org/pdb/staticHelp.do?p=help/viewers/proteinWorkshop_viewer.html";
 //	private static int SIDEBAR_WIDTH = 375;
 	private static int SIDEBAR_WIDTH = 265;
 	@Override
@@ -139,8 +149,44 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 			super.run();
 						// defines the base level UI items
 			
+			
 			if (!ProteinWorkshop.backgroundScreenshotOnly)
 			{
+				final JMenu helpMenu = new JMenu("Help");
+				final JMenuItem helpItem = new JMenuItem("Help");
+				final ActionListener helpListener =
+					new ActionListener()
+					{
+						public void actionPerformed(ActionEvent actionEvent)
+						{
+							Thread runner = new Thread()
+							{
+								@Override
+								public void run()
+								{
+									String address = helpURL;
+									try
+									{
+										BBBrowserLauncher.openURL(address);
+									}
+									
+									catch (IOException e)
+									{
+										e.printStackTrace();
+										displayErrorMessage("Unable to open help site.");
+									}
+								}
+							};
+							runner.start();
+						}
+					};
+				
+				helpItem.addActionListener(helpListener);
+				helpItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H,
+						Event.CTRL_MASK));
+				helpMenu.add(helpItem);
+				menuBar.add(helpMenu);	
+
 				//////////////////////////////////////////////////////////////////////
 				// BEG define PW-Specific UI panels and components
 				//////////////////////////////////////////////////////////////////////
@@ -266,6 +312,10 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 			//////////////////////////////////////////////////////////////////////
 
 		}
+	}
+	
+	public void displayErrorMessage(final String text) {
+		Status.output(Status.LEVEL_ERROR, text);
 	}
 	
 	// Views
