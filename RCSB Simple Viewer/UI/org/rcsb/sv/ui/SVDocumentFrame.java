@@ -96,40 +96,6 @@ public class SVDocumentFrame extends VFDocumentFrameBase
 
 			if (!AppBase.backgroundScreenshotOnly)
 			{
-				final JMenu helpMenu = new JMenu("Help");
-				final JMenuItem helpItem = new JMenuItem("Help");
-				final ActionListener helpListener =
-					new ActionListener()
-					{
-						public void actionPerformed(ActionEvent actionEvent)
-						{
-							Thread runner = new Thread()
-							{
-								@Override
-								public void run()
-								{
-									String address = helpURL;
-									try
-									{
-										BBBrowserLauncher.openURL(address);
-									}
-									
-									catch (IOException e)
-									{
-										e.printStackTrace();
-										displayErrorMessage("Unable to open help site.");
-									}
-								}
-							};
-							runner.start();
-						}
-					};
-				
-				helpItem.addActionListener(helpListener);
-				helpItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H,
-						Event.CTRL_MASK));
-				helpMenu.add(helpItem);
-				menuBar.add(helpMenu);	
 				Container viewerFrameContainer = getContentPane();
 				
 				// Create a pane for the structure viewer and the
@@ -322,7 +288,7 @@ public class SVDocumentFrame extends VFDocumentFrameBase
 	@Override
 	public void setTitle(String title)
 	{
-		super.setTitle("PDB SimpleViewer " + SVVersionInformation.version() + " (powered by the MBT): " + title);
+		super.setTitle("RCSB PDB Simple Viewer " + SVVersionInformation.version() + " (powered by the MBT): " + title);
 	}
 
 }
