@@ -120,7 +120,7 @@ public class KioskViewer extends VFAppBase
 	{
 		appModuleFactory = new KSAppModuleFactory();
 		MutatorBase.setActivationType(MutatorBase.ActivationType.RIBBONS);
-		activeFrame = appModuleFactory.createDocFrame("PDB Kiosk (Powered by the MBT)", null);
+		activeFrame = appModuleFactory.createDocFrame("RCSB PDB Kiosk (Powered by the MBT)", null);
 		((KSDocumentFrame)activeFrame).initialize(true, true);
 	}
 
