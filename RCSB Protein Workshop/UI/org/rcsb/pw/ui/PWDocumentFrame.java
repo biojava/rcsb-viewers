@@ -423,7 +423,7 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 	@Override
 	public void setTitle(String title)
 	{
-		super.setTitle("PDB ProteinWorkshop " + PWVersionInformation.version() +
+		super.setTitle("RCSB PDB Protein Workshop " + PWVersionInformation.version() +
 					   " (powered by the MBT): " + title);
 	}
 

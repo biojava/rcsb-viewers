@@ -120,7 +120,7 @@ public class ProteinWorkshop extends VFAppBase
 	public void initialize(final boolean isApplication, final boolean showFrame)
 	{
 		appModuleFactory = new PWAppModuleFactory();
-		activeFrame = appModuleFactory.createDocFrame("RCSB PDB Protein Workshop (Powered by the MBT)",
+		activeFrame = appModuleFactory.createDocFrame("RCSB PDB Protein Workshop "  + PWVersionInformation.version() + " (powered by the MBT)",
 													  ProteinWorkshop.class.getResource("images/icon_128_PW.png"));
 		
 		super.initialize(isApplication);
