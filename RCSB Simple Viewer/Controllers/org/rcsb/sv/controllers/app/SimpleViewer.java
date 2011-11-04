@@ -110,7 +110,7 @@ public class SimpleViewer extends VFAppBase
 	public void initialize(final boolean isApplication, final boolean showFrame)
 	{
 		appModuleFactory = new SVAppModuleFactory();
-		activeFrame = new SVDocumentFrame("PDB SimpleViewer (Powered by the MBT)",
+		activeFrame = new SVDocumentFrame("RCSB PDB Simple Viewer (Powered by the MBT)",
 										  SimpleViewer.class.getResource("images/icon_128_SV.png"));
 
 		super.initialize(isApplication);
