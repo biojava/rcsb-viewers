@@ -1800,6 +1800,8 @@ WindowListener, IStructureStylesEventListener {
 	 */
 	protected void structureAdded(final Structure str, RibbonForm ribbonForm, boolean doAtoms)
 	{
+		System.out.println("Structure added");
+		
 		final StructureMap structureMap = str.getStructureMap();
 		final StructureStyles structureStyles = structureMap
 		.getStructureStyles();
@@ -1891,9 +1893,9 @@ WindowListener, IStructureStylesEventListener {
 							defaultAtomStyle, defaultAtomGeometry));
 				}
 			}
+			// should this go after the end of the if-statement ??
 			this.requestRepaint();
 		}
-		
 	}
 	
 	/**
@@ -1932,7 +1934,8 @@ WindowListener, IStructureStylesEventListener {
 				}
 			}
 		}
-		this.requestRepaint();
+		// this.requestRepaint(); // doesn't seem to update reliably
+		VFAppBase.sgetGlGeometryViewer().requestRepaint();
 	}
 
 	public void surfaceRemoved(final Structure str) {
@@ -1958,7 +1961,8 @@ WindowListener, IStructureStylesEventListener {
 		}
 		
 		if (needsRepaint) {
-			this.requestRepaint();
+		//	this.requestRepaint(); // doesn't seem to update reliably
+			VFAppBase.sgetGlGeometryViewer().requestRepaint();
 		}
 	}
 	

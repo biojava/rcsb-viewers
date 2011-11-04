@@ -85,7 +85,7 @@ public class JoglSceneNode
 	// displaylist.
 	public class RenderablesMap extends LinkedHashMap<StructureComponent, DisplayListRenderable>
 	{
-		private static final long serialVersionUID = -3286356986071701750L;		
+		private static final long serialVersionUID = -3286356986071701750L;	
 	};
 	public interface RenderablesIt extends Iterator<StructureComponent>{}
 	
