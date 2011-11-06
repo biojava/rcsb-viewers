@@ -96,9 +96,13 @@ public class TriangulatedSurface {
 
     public void laplaciansmooth(int numiter) {
 
-        float scalefactor = 4.0f; // note, this is the original scalefactor from EDTSurf, How should it be set???
+    	// TODO
+ //       float scalefactor = 4.0f; // note, this is the original scalefactor from EDTSurf, How should it be set???
         // coords used here are the actual coordinates, not the scaled coordinates
-        int vertnumber = vertices.size();
+ 
+    	// typically, the scalefactor is around 2. or lower
+    	float scalefactor = 2.0f;
+    	int vertnumber = vertices.size();
         Point3f[] tps = new Point3f[vertnumber];
         for (int i = 0; i < tps.length; i++) {
             tps[i] = new Point3f();
@@ -198,8 +202,6 @@ public class TriangulatedSurface {
 //        int ssign;
         int k;
         double outwt = 0.75 / (scalefactor + 3.5);//area-preserving
-        System.out.println("outwt: " + outwt);
-        System.out.println("vertnumber: " + vertnumber);
         // usually, scalefactor = 4 -> 0.75/(4 + 3.5) = 0.1
         for (k = 0; k < numiter; k++) {
             for (i = 0; i < vertnumber; i++) {

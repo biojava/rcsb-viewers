@@ -73,6 +73,7 @@ public class Chain
 {
 	// The Residue records for the chain.
 	protected Vector<Residue> residues = null;
+	private String entityName = new String("");
 	public Vector<Residue> getResidues() { return residues; }
 	// The residue-to-index hash for the chain.
 	
@@ -287,6 +288,14 @@ public class Chain
 		return atom.entity_id;
 	}
 	
+	public void setEntityName(String entityName) {
+		this.entityName = entityName;
+	}
+
+	protected String getEntityName() {
+		return entityName;
+	}
+
 	/**
 	 * Return the chain ID by asking the first Atom of the first Residue.
 	 * If there are no residues or atoms, "A" is returned.
@@ -414,25 +423,25 @@ public class Chain
 			throw new IllegalArgumentException( "null residue" );
 		}
 
-		if ( false /* TODO: CAN'T ENFORCE MISMATCH residues != null */ ) 
-		{
-			if ( residue.getClassification() != this.getClassification() )
-			{
-				/*
-				System.err.println( "residue = { " +
-					"compoundCode=" + residue.getCompoundCode() + ", " + 
-					"atomCount=" + residue.getAtomCount() + ", " + 
-					"alphaAtomIndex=" + residue.getAlphaAtomIndex() + ", " + 
-					"conformationType=" + residue.getConformationType() +
-					" }"
-				);
-				*/
-				throw new IllegalArgumentException(
-					"classification mismatch: " + residue.getClassification() +
-					" != " + this.getClassification()
-				);
-			}
-		}
+//		if ( false /* TODO: CAN'T ENFORCE MISMATCH residues != null */ ) 
+//		{
+//			if ( residue.getClassification() != this.getClassification() )
+//			{
+//				/*
+//				System.err.println( "residue = { " +
+//					"compoundCode=" + residue.getCompoundCode() + ", " + 
+//					"atomCount=" + residue.getAtomCount() + ", " + 
+//					"alphaAtomIndex=" + residue.getAlphaAtomIndex() + ", " + 
+//					"conformationType=" + residue.getConformationType() +
+//					" }"
+//				);
+//				*/
+//				throw new IllegalArgumentException(
+//					"classification mismatch: " + residue.getClassification() +
+//					" != " + this.getClassification()
+//				);
+//			}
+//		}
 
 		if ( this.residues == null )
 		{

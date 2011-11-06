@@ -18,10 +18,8 @@ public final class SurfaceColorUpdater {
     private SurfaceColorUpdater() {}
 	
 	public static void setHydrophobicSurfaceColor(Surface surface) {
-		// set color
 		List<VertInfo> verts = surface.getTriangulatedSurface().getVertices();
 		int vertexCount = verts.size();
-		System.out.println("# vertices: " + vertexCount);
 		
 		Color4f[] colors = surface.getColors();
 		if (colors == null || colors.length != vertexCount) {
@@ -67,10 +65,8 @@ public final class SurfaceColorUpdater {
 	}
 	
 	public static void setSurfaceColor(Surface surface, Color4f color) {
-		// set color
 		List<VertInfo> verts = surface.getTriangulatedSurface().getVertices();
 		int vertexCount = verts.size();
-		System.out.println("# vertices: " + vertexCount);
 		
 		Color4f[] colors = surface.getColors();
 		if (colors == null || colors.length != vertexCount) {
@@ -92,10 +88,8 @@ public final class SurfaceColorUpdater {
 	}
 	
 	public static void setSurfaceTransparency(Surface surface, float transparency) {
-		// set color
 		List<VertInfo> verts = surface.getTriangulatedSurface().getVertices();
 		int vertexCount = verts.size();
-		System.out.println("# vertices: " + vertexCount);
 		
 		Color4f[] colors = surface.getColors();
 		if (colors == null || colors.length != vertexCount) {
@@ -110,10 +104,8 @@ public final class SurfaceColorUpdater {
 	}
 	
 	public static void setSurfaceTransparencyToggle(Surface surface) {
-		// set color
 		List<VertInfo> verts = surface.getTriangulatedSurface().getVertices();
 		int vertexCount = verts.size();
-		System.out.println("# vertices: " + vertexCount);
 		
 		Color4f[] colors = surface.getColors();
 		if (colors == null || colors.length != vertexCount) {

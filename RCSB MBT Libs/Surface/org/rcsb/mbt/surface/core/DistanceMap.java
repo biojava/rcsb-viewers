@@ -36,7 +36,7 @@ public class DistanceMap {
         this.plength = vp.length;
         this.pwidth = vp[0].length;
         this.pheight = vp[0][0].length;
-        System.out.println("[" + plength + "*" + pwidth + "*" + pheight +"]");
+  //      System.out.println("[" + plength + "*" + pwidth + "*" + pheight +"]");
 
 	int i,j,k;
 //	int positin,positout;
@@ -138,10 +138,6 @@ public class DistanceMap {
 	do {
             fastoneshell(boundpoint, inarray, outarray);
 	//	printf("%d %d %d %d %d\n",positin,allocout,positout,totalsurfacevox,totalinnervox);
-            System.out.println("positin: " + positin);
-            System.out.println("allocout: " + allocout);
-            System.out.println("positout: " + positout);
-            System.out.println("eliminate: " + eliminate);
 		certificate-=eliminate;
 	/*
 		for(i=0;i<positout;i++)

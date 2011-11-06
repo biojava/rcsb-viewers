@@ -89,7 +89,7 @@ public class EdtSurfaceCalculator {
         Point3f pMin = new Point3f();
         Point3f pMax = new Point3f();
         boundbox(pMin, pMax);
-        System.out.println(pMin + " " + pMax);
+ //       System.out.println(pMin + " " + pMax);
         Point3f offset = new Point3f(probeRadius + fmargin, probeRadius + fmargin, probeRadius + fmargin);
 //        pMin.x -= probeRadius + fmargin;
 //        pMin.y -= probeRadius + fmargin;
@@ -104,7 +104,7 @@ public class EdtSurfaceCalculator {
 //    ptran.negate();
         ptran = new Point3f();
         ptran.negate(pMin);
-        System.out.println(ptran.x + " " + ptran.y + " " + ptran.z);
+//        System.out.println(ptran.x + " " + ptran.y + " " + ptran.z);
 //        scalefactor = pMax.x - pMin.x;
 //        if ((pMax.y - pMin.y) > scalefactor) {
 //            scalefactor = pMax.y - pMin.y;
@@ -169,8 +169,8 @@ public class EdtSurfaceCalculator {
 //		pheight=boxlength;
 //	boundingatom(btype);
 //	cutradis=proberadius*scalefactor;
-        System.out.printf("actual boxlength %3d, box[%3d*%3d*%3d], scale factor %6.3f\n",
-                boxlength, plength, pwidth, pheight, scalefactor);
+        System.out.printf("box[%3d *%3d *%3d], scale factor: %6.3f\n",
+                plength, pwidth, pheight, scalefactor);
     }
 
  
@@ -462,7 +462,7 @@ public void buildbounary() {
 	int i,j,k;
 	int ii;
 	boolean flagbound;
-    System.out.println(plength + "," + pheight + "," + pwidth);
+ //   System.out.println(plength + "," + pheight + "," + pwidth);
 	for(i=0;i<plength;i++)
 	{
 		for(j=0;j<pheight;j++)
@@ -3353,7 +3353,7 @@ private void complete() {
     // In EDT surface area calculation the surface area of the raw surface is
     // reported!
 //    surface.laplaciansmooth(1);
-    System.out.println("scalefactor, ptran" + scalefactor + " " + ptran);
+//    System.out.println("scalefactor, ptran" + scalefactor + " " + ptran);
     //
     float sinv = 1.0f/scalefactor;
     for (VertInfo v: vertices) {

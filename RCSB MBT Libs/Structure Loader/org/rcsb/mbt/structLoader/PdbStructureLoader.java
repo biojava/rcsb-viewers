@@ -627,5 +627,10 @@ public class PdbStructureLoader
 		return false;
 	}
 
+	public Map<Integer, String> getEntityNameMap() {
+		// TODO assign entity names
+		return null;
+	}
+
 }
 

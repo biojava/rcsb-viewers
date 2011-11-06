@@ -507,7 +507,7 @@ public enum ColorBrewer {
 		 Color[] colors = new Color[colorCount];
 		 int maxIndex = getMaximumColorCount()-1;
 		 float scale = maxIndex/(float)(colorCount-1);
-		 System.out.println("scale: " + scale);
+	//	 System.out.println("scale: " + scale);
 
 		 for (int i = 0; i < colorCount; i++) {
 			 float value = scale * i;
@@ -522,7 +522,7 @@ public enum ColorBrewer {
 			 } else {
 				 c2 = new Color(hexColors[maxIndex][index]);
 			 }
-			 System.out.println("value: " + value + " index: " + index + " remainder: " + remainder);
+	//		 System.out.println("value: " + value + " index: " + index + " remainder: " + remainder);
 			 int red   = Math.round((1 - remainder) * c1.getRed()    + (remainder) * c2.getRed());
 			 int green = Math.round((1 - remainder) * c1.getGreen()  + (remainder) * c2.getGreen());
 			 int blue  = Math.round((1 - remainder) * c1.getBlue()   + (remainder) * c2.getBlue());

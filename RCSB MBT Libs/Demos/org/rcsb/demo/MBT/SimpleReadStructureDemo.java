@@ -197,7 +197,7 @@ public class SimpleReadStructureDemo
 		if (struct == null)
 			throw new IOException("Error: could not read structure from '" + fileName + "'");
 
-		new StructureMap(struct, null);		
+		new StructureMap(struct, null, null);		
 
 		output = new Output(out);
 

@@ -234,6 +234,7 @@ public class StructureMap
 	protected UnitCell unitCell = null;
 	protected BiologicUnitTransforms BUTransforms = null;
 	protected NonCrystallographicTransforms NCTransforms = null;
+	protected Map<Integer, String> entityNameMap = null;
 
 	public Vector<Bond> getBonds() { return bonds; }
 	public Vector<Chain> getChains() { return chains; }
@@ -290,13 +291,14 @@ public class StructureMap
 	 * a userdata object.
 	 */
 
-	public StructureMap( final Structure structure, final Object udata)
+	public StructureMap( final Structure structure, final Map<Integer, String> entityNameMap, final Object udata)
 	{
 		this.udata = udata;
 		if ( structure == null ) {
 			throw new IllegalArgumentException( "null Structure" );
 		}
 		this.structure = structure;
+		this.entityNameMap = entityNameMap;
 
 		if (!structure.hasStructureMap())
 			structure.setStructureMap(this);
@@ -463,11 +465,21 @@ public class StructureMap
 		for (Chain chain : chains)
 		{		
 			chain.trimToSize();
+			boolean first = true;
 			for (Residue residue : chain.getResidues())
 			{
 				// TODO try trimming size of residues to handle large CA only structures
 				residue.trimToSize();
 				residues.add( residue );
+				// set entity name
+				if (first && entityNameMap != null) {
+					int entityId = residue.getEntityId();
+					String entityName = entityNameMap.get(entityId);
+					if (entityName != null) {
+						chain.setEntityName(entityName);
+					}
+					first = false;
+				}
 				atomCount = residue.getAtomCount( );
 				for (Atom atom : residue.getAtoms())
 					atoms.add( atom );
@@ -2274,11 +2286,14 @@ public class StructureMap
 
 				// set author chain id for display purposes
 				String chainId = "";
+				String entityName = "";
 				if (residues.size() > 0) {
                     chainId = residues.get(0).getAuthorChainId();
+                    int entityId = residues.get(0).getEntityId();
+                    entityName = entityNameMap.get(entityId);
 				}
 				
-				ExternChain c = ExternChain.createBasicChain(chainId, residues);               
+				ExternChain c = ExternChain.createBasicChain(chainId, entityName, residues);               
 				this.pdbTopLevelElements.add(c);
 			}
 
@@ -2349,6 +2364,14 @@ public class StructureMap
 
 	public void setUnitCell(final UnitCell unitCell) {
 		this.unitCell = unitCell;
+	}
+	
+	public void setEntityNameMap(Map<Integer, String> entityNameMap) {
+		this.entityNameMap = entityNameMap;
+	}
+	
+	public Map<Integer, String> getEntityNameMap() {
+		return entityNameMap;
 	}
 
 }
