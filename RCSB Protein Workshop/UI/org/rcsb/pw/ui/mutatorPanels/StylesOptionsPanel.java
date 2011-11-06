@@ -66,10 +66,7 @@ import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
-import org.rcsb.vf.glscene.jogl.Geometry;
 import org.rcsb.vf.glscene.jogl.ChainGeometry.RibbonForm;
-
-import com.sun.xml.internal.bind.v2.TODO;
 
 
 
@@ -93,24 +90,24 @@ public class StylesOptionsPanel extends JPanel implements IUpdateListener
 		}
 	}
 	
-	private final class AtomFormListener implements ActionListener {
-		public void actionPerformed(final ActionEvent e)
-		{
-			final JComboBox source = (JComboBox)e.getSource();
-			MutatorEnum mutEnum = ProteinWorkshop.sgetSceneController().getMutatorEnum();
-			switch(source.getSelectedIndex())
-			{
-			case 0:
-				mutEnum.getStylesMutator().getOptions().setCurrentAtomForm(Geometry.FORM_THICK);
-				break;
-			case 1:
-				mutEnum.getStylesMutator().getOptions().setCurrentAtomForm(Geometry.FORM_POINTS);
-				break;
-			default:
-				(new Exception(source.getSelectedIndex() + " not a valid index")).printStackTrace();
-			}
-		}
-	}
+//	private final class AtomFormListener implements ActionListener {
+//		public void actionPerformed(final ActionEvent e)
+//		{
+//			final JComboBox source = (JComboBox)e.getSource();
+//			MutatorEnum mutEnum = ProteinWorkshop.sgetSceneController().getMutatorEnum();
+//			switch(source.getSelectedIndex())
+//			{
+//			case 0:
+//				mutEnum.getStylesMutator().getOptions().setCurrentAtomForm(Geometry.FORM_THICK);
+//				break;
+//			case 1:
+//				mutEnum.getStylesMutator().getOptions().setCurrentAtomForm(Geometry.FORM_POINTS);
+//				break;
+//			default:
+//				(new Exception(source.getSelectedIndex() + " not a valid index")).printStackTrace();
+//			}
+//		}
+//	}
 	
 	private final class AtomRadiusListener implements ActionListener {
 		public void actionPerformed(final ActionEvent e) {

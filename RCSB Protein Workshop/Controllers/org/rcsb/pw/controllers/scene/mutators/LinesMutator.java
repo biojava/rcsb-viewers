@@ -180,9 +180,9 @@ public class LinesMutator extends MutatorBase
 			else if (scType == ComponentType.RESIDUE)
 			{
 				final Residue r = (Residue) structureComponent;
-				final Fragment f = r.getFragment();
-				ComponentType conformationType = (f.getConformationType().isConformationType())? 
-						f.getConformationType() : ComponentType.UNDEFINED_CONFORMATION;
+//				final Fragment f = r.getFragment();
+//				ComponentType conformationType = (f.getConformationType().isConformationType())? 
+//						f.getConformationType() : ComponentType.UNDEFINED_CONFORMATION;
 
 						message = r.getAuthorChainId() + " " +
 						r.getAuthorResidueId() + " "

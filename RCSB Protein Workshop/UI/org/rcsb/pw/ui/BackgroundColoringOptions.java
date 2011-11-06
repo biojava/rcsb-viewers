@@ -52,7 +52,6 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -61,7 +60,6 @@ import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.uiApp.ui.dialogs.ColorChooserDialog;
-import org.rcsb.uiApp.ui.dialogs.ColorPaletteChooserDialog;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 
@@ -168,8 +166,8 @@ class ChangeFogStartListener implements ChangeListener {
 	}
 	
 	public void stateChanged(final ChangeEvent e) {
-		final JSlider source = (JSlider)e.getSource();
-		final float fogStartValue = source.getValue();
+//		final JSlider source = (JSlider)e.getSource();
+//		final float fogStartValue = source.getValue();
 	}
 
 	public void setRange(final int range) {

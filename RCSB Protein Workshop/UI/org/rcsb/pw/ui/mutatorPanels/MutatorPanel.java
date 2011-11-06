@@ -59,7 +59,6 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
-import org.rcsb.pw.controllers.app.ProteinWorkshop.PWAppModuleFactory;
 import org.rcsb.pw.controllers.scene.mutators.MutatorEnum;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
@@ -99,13 +98,13 @@ public class MutatorPanel extends JPanel implements IUpdateListener
 			final int maxButtonWidth = Math.max(visSize.width, Math.max(colorSize.width, Math.max(labelingSize.width, Math.max(stylesSize.width, Math.max(linesSize.width, reCenterSize.width )))));
 			final int buttonHeight = visSize.height;
 			
-			System.out.println("MutatorPanel: visSize: " + visSize);
-			System.out.println("MutatorPanel: colorSize: " + colorSize);
-			System.out.println("MutatorPanel: labelingSize: " + labelingSize);
-			System.out.println("MutatorPanel: stylesSize: " + stylesSize);
-			System.out.println("MutatorPanel: linesSize: " + linesSize);
-			System.out.println("MutatorPanel: reCenterSize: " + reCenterSize);
-			System.out.println("MutatorPanel: maxButtonWidth: " + maxButtonWidth);
+//			System.out.println("MutatorPanel: visSize: " + visSize);
+//			System.out.println("MutatorPanel: colorSize: " + colorSize);
+//			System.out.println("MutatorPanel: labelingSize: " + labelingSize);
+//			System.out.println("MutatorPanel: stylesSize: " + stylesSize);
+//			System.out.println("MutatorPanel: linesSize: " + linesSize);
+//			System.out.println("MutatorPanel: reCenterSize: " + reCenterSize);
+//			System.out.println("MutatorPanel: maxButtonWidth: " + maxButtonWidth);
 			
 			
 			visibilityButton.setBounds(curX, curY, maxButtonWidth, buttonHeight);
@@ -125,7 +124,6 @@ public class MutatorPanel extends JPanel implements IUpdateListener
 			Container parentParent = parent.getParent();
 			Insets parentParentInsets = parentParent.getInsets();
 			
-			System.out.println("MutatorPanel: parentParentWidth: " + parentParent.getWidth());
 			this.size.width = parentParent.getWidth() - parentParentInsets.left - parentParentInsets.right;
 			this.size.height = curY + insets.bottom;
 		}
@@ -203,11 +201,11 @@ public class MutatorPanel extends JPanel implements IUpdateListener
         this.linesButton.addActionListener(new MutatorButtonListener(MutatorEnum.Id.LINES_MUTATOR));
 //        this.selectionButton.addActionListener(new MutatorButtonListener(MutatorModel.SELECTION_MUTATOR));
         
-        this.visibilityButton.setToolTipText("Show/hide items in the 3d viewer.");
+        this.visibilityButton.setToolTipText("Show/hide items in the 3D viewer.");
         this.colorChangeButton.setToolTipText("Change the color of items.");
         this.labelingButton.setToolTipText("Change the labeling of items.");
         this.stylesButton.setToolTipText("Change the styles of items.");
-        this.reCenterButton.setToolTipText("Cause the 3d scene to re-center on the chosen object.");
+        this.reCenterButton.setToolTipText("Cause the 3D scene to re-center on the chosen object.");
 //        this.selectionButton.setToolTipText("Choose more than one atom/bond/residue to cause batch operations upon.");
         this.linesButton.setToolTipText("Add or remove indicator lines between items");
         

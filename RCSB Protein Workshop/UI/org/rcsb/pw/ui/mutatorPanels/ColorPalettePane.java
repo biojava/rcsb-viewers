@@ -11,9 +11,7 @@ import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.ColorMutator;
 import org.rcsb.pw.controllers.scene.mutators.MutatorEnum;
 import org.rcsb.pw.controllers.scene.mutators.options.ColorOptions;
-import org.rcsb.pw.ui.CommonDialogs;
 import org.rcsb.uiApp.controllers.app.AppBase;
-import org.rcsb.uiApp.ui.dialogs.ColorChooserDialog;
 import org.rcsb.uiApp.ui.dialogs.ColorPaletteChooserDialog;
 
 public class ColorPalettePane extends JPanel {
@@ -37,7 +35,6 @@ public class ColorPalettePane extends JPanel {
 				dialog.show();
 				if(dialog.wasOKPressed()) {
 					source.setColor(dialog.getColor());
-					//source.repaint();
 				}
 			}
 			

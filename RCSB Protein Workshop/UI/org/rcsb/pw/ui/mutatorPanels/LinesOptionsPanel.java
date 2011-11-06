@@ -195,7 +195,6 @@ public class LinesOptionsPanel extends JPanel implements IUpdateListener, Action
 			final BoxLayout layout = new BoxLayout(this, BoxLayout.X_AXIS);
 			super.setLayout(layout);
 			
-//			super.add(button1);
 			super.add(button2);
 		}
 	}
@@ -233,8 +232,6 @@ public class LinesOptionsPanel extends JPanel implements IUpdateListener, Action
 			final BoxLayout layout = new BoxLayout(this, BoxLayout.X_AXIS);
 			super.setLayout(layout);
 			
-			// TODO -pr too wide??
-//			field.setPreferredSize(new Dimension(200, 20));
 			field.setPreferredSize(new Dimension(80, 20));
 			
 			super.add(label);

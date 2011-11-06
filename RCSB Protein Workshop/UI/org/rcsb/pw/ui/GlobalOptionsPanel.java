@@ -89,7 +89,6 @@ public class GlobalOptionsPanel extends JPanel
         //super.add(this.measureDistanceButton);
         super.add(this.statePanel);
         
-        System.out.println("GlobalOptionsPanel size: " + this.getWidth());
         
         this.resetButton.addActionListener(new ActionListener()
         {

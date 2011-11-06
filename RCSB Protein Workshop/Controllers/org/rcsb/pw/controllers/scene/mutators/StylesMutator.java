@@ -54,10 +54,8 @@ import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.Surface;
-
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.StructureStyles;
-import org.rcsb.mbt.model.attributes.SurfaceStyle;
 import org.rcsb.pw.controllers.scene.mutators.options.StylesOptions;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 import org.rcsb.vf.glscene.jogl.AtomGeometry;
@@ -348,22 +346,6 @@ public class StylesMutator extends MutatorBase {
     
     private void changeStyle(final Surface s)
     {
-		final Structure str = s.getStructure();
-		final StructureMap sm = str.getStructureMap();
-		final StructureStyles ss = sm.getStructureStyles();
-		
-    	final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(s);
-    	if(renderable != null)
-    	{
-    		final SurfaceStyle style = (SurfaceStyle)ss.getStyle(s);
-//    		if (this.options.isSurfaceTransparent()) {
-//    			float[] transparentColor = {0.1f, 0.8f, 1.0f, 0.7f};
-//    			style.setSurfaceColor(s, transparentColor);
-//    		} else {
-//    			float[] opaqueColor = {0.1f, 0.8f, 1.0f, 0.7f};
-//    			style.setSurfaceColor(s, opaqueColor);
-//    		}		
-    		renderable.setDirty();
-    	}
+		// TODO
     }
 }

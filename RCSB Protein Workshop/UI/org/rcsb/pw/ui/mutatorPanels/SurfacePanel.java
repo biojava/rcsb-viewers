@@ -142,7 +142,6 @@ public class SurfacePanel extends JPanel implements IUpdateListener
 	}
 	
 	private void addComboBox() {
-		System.out.println("Adding combo");
 		surfaceColorType = new JComboBox(surfaceOptions);
 		surfaceColorType.addActionListener(new SurfaceTypeListener());
 		firstPanel.add(surfaceColorType);
@@ -151,7 +150,6 @@ public class SurfacePanel extends JPanel implements IUpdateListener
 	
 	private void removeComboBox() {
 		if (surfaceColorType != null) {
-			System.out.println("Removing combo");
 		    firstPanel.remove(surfaceColorType);
 		    surfaceColorType = null;    
 		}
@@ -163,7 +161,7 @@ public class SurfacePanel extends JPanel implements IUpdateListener
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider)e.getSource();
 
-			if (!source.getValueIsAdjusting()) {
+			if (!source.getValueIsAdjusting() && AppBase.sgetModel().hasStructures()) {
 				Structure structure = AppBase.sgetModel().getStructures().get(0);
 
 				// lazy initialization of the surface
@@ -180,19 +178,18 @@ public class SurfacePanel extends JPanel implements IUpdateListener
 				float currentTransparency = 1.0f;
 				float transparency = ((int)source.getValue()) * 1.0f/TRANSPARENCY_MAX;
 				for (Surface s: structure.getStructureMap().getSurfaces()) {
-					System.out.println("Setting transparency: " + transparency);
 					Color4f[] colors = s.getColors();
 					if (colors != null && colors.length > 0) {
 						currentTransparency = Math.max(currentTransparency, colors[0].getW());
 						SurfaceColorUpdater.setSurfaceTransparency(s, transparency);
 					}
 				}
-				
+
 				if (currentTransparency > 0.05f && transparency <= 0.05) {
 					ProteinWorkshop.sgetGlGeometryViewer().surfaceRemoved(structure);
 				} else if (newSurface || currentTransparency <= 0.05f && transparency > 0.05f) {
 					if (surfaceColorType == null) {
-					    addComboBox();
+						addComboBox();
 					}
 					ProteinWorkshop.sgetGlGeometryViewer().surfaceAdded(structure);
 				} else if (currentTransparency > 0.05f && transparency > 0.05f) {

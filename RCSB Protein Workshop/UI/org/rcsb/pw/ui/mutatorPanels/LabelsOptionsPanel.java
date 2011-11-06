@@ -98,8 +98,6 @@ public class LabelsOptionsPanel extends JPanel implements IUpdateListener
 			final BoxLayout layout = new BoxLayout(this, BoxLayout.X_AXIS);
 			super.setLayout(layout);
 			
-			// TODO -pr is this panel too wide??
-//			field.setPreferredSize(new Dimension(170,0));
 			field.setPreferredSize(new Dimension(80,0));
 			
 			super.add(button);

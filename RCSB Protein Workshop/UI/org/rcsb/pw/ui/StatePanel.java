@@ -154,19 +154,13 @@ public class StatePanel extends JPanel implements LayoutManager, ActionListener,
 		final int removeWriteLineHeight = Math.max(removePreferred.height, writePreferred.height);
 		final int listHeight = 90;
 		final int verticalVisualBuffer = 3;
-		final int horizontalVisualBuffer = 4;
 		
 		int curX = insets.left;
 		int curY = insets.top;
 		
 		
 		this.captureCurrentViewerStateButton.setBounds(curX, curY, capturePreferred.width, captureLineHeight);
-//		curX += capturePreferred.width + horizontalVisualBuffer;
 		curY += capturePreferred.height + verticalVisualBuffer;
-		
-		// TODO -pr this makes the panel too wide
-//		this.titleField.setBounds(curX, curY, super.getWidth() - curX - insets.right, captureLineHeight);
-//		curY += captureLineHeight + verticalVisualBuffer;
 		
 		this.titleField.setBounds(curX, curY, capturePreferred.width, titlePreferred.height);
 		curY += titlePreferred.height + verticalVisualBuffer;
@@ -175,21 +169,16 @@ public class StatePanel extends JPanel implements LayoutManager, ActionListener,
 		this.loadStateButton.setBounds(curX, curY, loadPreferred.width, loadPreferred.height);
 		curY += loadPreferred.height + verticalVisualBuffer;
 		
-//		this.listScroller.setBounds(curX, curY, super.getWidth() - insets.left - insets.right, listHeight);
 		this.listScroller.setBounds(curX, curY, capturePreferred.width, listHeight);
 		curY += listHeight + verticalVisualBuffer;
 		
 		this.removeButton.setBounds(curX, curY, removePreferred.width, removeWriteLineHeight);
-//		curX += removePreferred.width + horizontalVisualBuffer;
 		curY += removePreferred.height + + verticalVisualBuffer;
 		
 		this.writeButton.setBounds(curX, curY, writePreferred.width, removeWriteLineHeight);
 		curY += removeWriteLineHeight;
 		
-//		Insets parentInsets = super.getParent().getInsets();
-		
 		this.size.height = curY + insets.bottom;
-//		this.size.width = 345;
 		this.size.width = capturePreferred.width + insets.left + insets.right;
 	}
 

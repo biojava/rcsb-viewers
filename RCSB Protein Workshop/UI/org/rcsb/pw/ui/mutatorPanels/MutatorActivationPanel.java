@@ -98,7 +98,6 @@ public class MutatorActivationPanel extends JPanel implements ActionListener, IU
 			surfaceButton.setBounds(curX, curY, surfaceSize.width, surfaceSize.height);
 			curX += surfaceSize.width + buffer;
 			
-			System.out.println("MutatorActivationPanel: width: " + (curX - insets.left - buffer));
 			Container parentParent = parent.getParent();
 			Insets parentParentInsets = parentParent.getInsets();
 			this.size.width = parentParent.getWidth() - parentParentInsets.left - parentParentInsets.right;

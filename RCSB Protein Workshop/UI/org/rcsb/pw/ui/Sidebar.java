@@ -45,16 +45,14 @@
  */ 
 package org.rcsb.pw.ui;
 
-import java.awt.Dimension;
-
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.pw.ui.mutatorPanels.MutatorBasePanel;
+import org.rcsb.vf.controllers.app.VFAppBase;
 
 
 
@@ -106,11 +104,11 @@ public class Sidebar extends JPanel implements ChangeListener
         
         super.add(this.tabs);
         
-        System.out.println("Sidebar: mutatorBasePanel" + mutators.getPreferredSize().width);
-        System.out.println("Sidebar: GlobalOptionsPanel" + tools.getPreferredSize().width);
-        System.out.println("Sidebar: ColoringOptions" + coloring.getPreferredSize().width);
-        System.out.println("Sidebar: CreditsPanel" + credits.getPreferredSize().width);
-        System.out.println("Sidebar: width" + this.getPreferredSize().width);
+//        System.out.println("Sidebar: mutatorBasePanel" + mutators.getPreferredSize().width);
+//        System.out.println("Sidebar: GlobalOptionsPanel" + tools.getPreferredSize().width);
+//        System.out.println("Sidebar: ColoringOptions" + coloring.getPreferredSize().width);
+//        System.out.println("Sidebar: CreditsPanel" + credits.getPreferredSize().width);
+//        System.out.println("Sidebar: width" + this.getPreferredSize().width);
     }
 
 

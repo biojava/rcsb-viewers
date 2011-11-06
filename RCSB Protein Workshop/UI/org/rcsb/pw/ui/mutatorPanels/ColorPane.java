@@ -35,7 +35,6 @@ public class ColorPane extends JPanel {
 				dialog.show();
 				if(dialog.wasOKPressed()) {
 					source.setColor(dialog.getColor());
-					//source.repaint();
 				}
 			}
 			
