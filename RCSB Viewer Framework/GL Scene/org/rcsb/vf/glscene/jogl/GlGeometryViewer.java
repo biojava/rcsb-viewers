@@ -1799,9 +1799,7 @@ WindowListener, IStructureStylesEventListener {
 	 * @param doAtoms - whether or no to do the atom styles.
 	 */
 	protected void structureAdded(final Structure str, RibbonForm ribbonForm, boolean doAtoms)
-	{
-		System.out.println("Structure added");
-		
+	{		
 		final StructureMap structureMap = str.getStructureMap();
 		final StructureStyles structureStyles = structureMap
 		.getStructureStyles();
@@ -1904,8 +1902,6 @@ WindowListener, IStructureStylesEventListener {
 	 */
 	public void surfaceAdded(final Structure str)
 	{
-		System.out.println("GlGeometryViewer: surfaceAdded");
-		
 		final StructureMap structureMap = str.getStructureMap();
 		final JoglSceneNode sn = (JoglSceneNode)structureMap.getUData();
 		
@@ -1916,7 +1912,6 @@ WindowListener, IStructureStylesEventListener {
 		// add solid surfaces first
 		for (Surface s: structureMap.getSurfaces()) {
 			if (!s.isTransparent()) {
-				System.out.println("Drawing solid surface: " + s.getChain().getChainId());
 				synchronized (sn.renderables) {
 					sn.renderables.put(s, 
 							new DisplayListRenderable(s,defaultSurfaceStyle, defaultSurfaceGeometry));
@@ -1927,7 +1922,6 @@ WindowListener, IStructureStylesEventListener {
 		// add transparent surfaces second
 		for (Surface s: structureMap.getSurfaces()) {
 			if (s.isTransparent()) {
-		        System.out.println("Drawing transparent surface: " + s.getChain().getChainId());
 				synchronized (sn.renderables) {
 					sn.renderables.put(s, 
 							new DisplayListRenderable(s,defaultSurfaceStyle, defaultSurfaceGeometry));
@@ -1939,8 +1933,6 @@ WindowListener, IStructureStylesEventListener {
 	}
 
 	public void surfaceRemoved(final Structure str) {
-		System.out.println("GLGeometryViewer: surfaceRemoved");
-		
 		final StructureMap structureMap = str.getStructureMap();
 		JoglSceneNode sn = (JoglSceneNode)structureMap.getUData();
 		
