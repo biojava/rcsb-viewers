@@ -164,7 +164,7 @@ public class SimpleReadStructureDemo
 			System.exit(4);
 		}
 
-		new StructureMap(struct, null);
+		new StructureMap(struct, null, null);
 
 		Output.lineOut("Structure Loaded");
 
