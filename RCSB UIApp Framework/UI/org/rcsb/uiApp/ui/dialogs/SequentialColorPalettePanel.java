@@ -46,7 +46,6 @@ public class SequentialColorPalettePanel extends AbstractColorChooserPanel
 		ButtonGroup boxOfPalettes = new ButtonGroup();
 		Border border = BorderFactory.createEmptyBorder(2,2,2,2);
 
-		System.out.println("Sequential: " + ColorBrewer.getSequentialColorPalettes().length);
 		int count = 0;
 		for (ColorBrewer palette: ColorBrewer.getSequentialColorPalettes()) {
 			JToggleButton button = createPalette(palette, border);
@@ -54,7 +53,6 @@ public class SequentialColorPalettePanel extends AbstractColorChooserPanel
 			add(button);
 			count++;
 		}
-		System.out.println("Seq. added: " + count);
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -64,7 +62,6 @@ public class SequentialColorPalettePanel extends AbstractColorChooserPanel
 		for (ColorBrewer palette: ColorBrewer.getSequentialColorPalettes()) {
 			if (palette.name().equals(command)) {
 				((ColorPanelSelectionModel) model).setColorBrewer(palette);
-				System.out.println("Selected: " + palette.getPaletteDescription());
 				break;
 			}
 		}

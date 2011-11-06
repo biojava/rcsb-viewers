@@ -53,7 +53,6 @@ public class DivergingColorPalettePanel extends AbstractColorChooserPanel
 		for (ColorBrewer palette: ColorBrewer.getDivergingColorPalettes()) {
 			if (palette.name().equals(command)) {
 				((ColorPanelSelectionModel) model).setColorBrewer(palette);
-				System.out.println("Selected: " + palette.getPaletteDescription());
 				break;
 			}
 		}

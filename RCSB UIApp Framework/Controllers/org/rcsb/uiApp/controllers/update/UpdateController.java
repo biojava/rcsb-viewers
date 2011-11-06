@@ -238,6 +238,7 @@ public class UpdateController
 			if (blockedListeners.contains(view)) continue;
 				// ignore blocked listeners
 			
+	//		System.out.println("UpdateController: fireUpdateEvent: " + view);
 			view.handleUpdateEvent(evt);
 				// what!!!  This isn't firing an event!!
 				// this is just an interface call!!!

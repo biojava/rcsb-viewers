@@ -60,10 +60,14 @@ import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.Residue.Classification;
+import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms;
+import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms.BiologicalUnitGenerationMapByChain;
 import org.rcsb.mbt.model.attributes.AtomRadiusRegistry;
 import org.rcsb.mbt.model.attributes.ColorBrewer;
 import org.rcsb.mbt.model.attributes.IAtomRadius;
 import org.rcsb.mbt.model.attributes.SurfaceColorUpdater;
+import org.rcsb.mbt.model.geometry.ModelTransformationList;
+import org.rcsb.mbt.model.util.Status;
 import org.rcsb.mbt.surface.EdtMolecularSurface;
 import org.rcsb.mbt.surface.SurfaceCalculator;
 import org.rcsb.mbt.surface.datastructure.Sphere;
@@ -88,13 +92,19 @@ public class SurfaceThread extends Thread {
 		Structure structure = AppBase.sgetModel().getStructures().get(0);
 		StructureMap smap = structure.getStructureMap();	
 		List<Chain> polymerChains = getPolymerChains();
+		float resolution = calcResolution(polymerChains);	
 		
 		long t0 = System.nanoTime();
+		// create progress bar
+		ProgressPanelController.StartProgress(AppBase.sgetActiveFrame());
+		Status.progress(0, "Creating surfaces");
+		
 		for (Chain c: polymerChains) {
 			List<Sphere> spheres = new ArrayList<Sphere>();
 			Vector<Residue> residues = c.getResidues();
 			
-			// How to deal with non-standard residue in a polymer?
+			// TODO
+			// How to deal with non-standard residues in a polymer?
 			// Ligand, water, etc. could be part of chain
 			for (Residue r: residues) {
 				if (r.getClassification().equals(Classification.AMINO_ACID) ||
@@ -104,43 +114,23 @@ public class SurfaceThread extends Thread {
 						double[] coord = a.coordinate;
 						Point3f location = new Point3f((float)coord[0], (float)coord[1], (float)coord[2]);
 						float radius = registry.getAtomRadius(a);
-						spheres.add(new Sphere(location, radius, a));
+						// enlarge spheres by 10% to avoid that helices touch the surface
+						spheres.add(new Sphere(location, radius *1.1f, a));
 					}
 				}
 			}
 			// should there be a size cutoff? I.e. min 24 residues?
 			if (spheres.size() == 0) {
 				continue;
-			}
-
-			// calculate resolution based on size of structure
-	//		float resolution = 0.5f - 0.01f* polymerChains.size() - 0.00005f * spheres.size();
-			float resolution = 0.5f - 0.01f* polymerChains.size() - 0.00005f * spheres.size();
+			};
 	
-			// clamp resolution values
-			resolution = Math.max(resolution, 0.1f);
-			
-			
 			// calculate molecular surface
-			long t1 = System.nanoTime();
 			SurfaceCalculator s = new EdtMolecularSurface(spheres, PROBE_RADIUS, resolution);
 			TriangulatedSurface ts = s.getSurface();
 			s = null; // this is a very large object that's not needed anymore
-			long t2 = System.nanoTime();
-			System.out.println("Surface calculation: " + (t2-t1)/1000000 + "ms");
 
 			// smooth surface
-			long t3 = System.nanoTime();
 			ts.laplaciansmooth(1);
-			long t4 = System.nanoTime();
-			System.out.println("Surface smoothing: " + (t4-t3)/1000000 + "ms");
-			
-			int vertexCount = ts.getVertices().size();
-			System.out.println("# vertices: " + vertexCount + " resolution: " + resolution + " spheres: " + spheres.size());
-
-			long t5 = System.nanoTime();
-			System.out.println("Surface total: " + (t5-t0)/1000000 + "ms");
-			
 			Surface surface = new Surface(c, structure);
 			surface.setTriangulatedSurface(ts);
 			
@@ -148,9 +138,16 @@ public class SurfaceThread extends Thread {
 			SurfaceColorUpdater.setPaletteColor(surface, ColorBrewer.BrBG, polymerChains.size(), smap.getSurfaceCount());
 
 			smap.addSurface(surface);
+			
+			// update progress bar			count++;
+			Status.progress(((int)(100* smap.getSurfaceCount()/(float)polymerChains.size())), "Creating surfaces");
+			
 			AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.SURFACE_ADDED, surface); // has no effect
 	//		AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE); 
 		}
+		ProgressPanelController.EndProgress();
+		long t5 = System.nanoTime();
+		System.out.println("Surface calculation: " + (t5-t0)/1000000 + " ms");
 		AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE); 
 	}
 
@@ -171,6 +168,66 @@ public class SurfaceThread extends Thread {
 		}
 		return polymerChains;
 	} 
+	
+	private float calcResolution(List<Chain> polymerChains) {		
+		int sphereCount = getSphereCount(polymerChains);
+		int symOps = getSymmetryOperationCount(polymerChains);
+		float resolution = 0.4f - 0.00005f * sphereCount - 0.000005f * sphereCount*symOps;
+		System.out.println("resolution: " + resolution + ", sheres: " + sphereCount + ", symmetry operations: " + symOps);
+		// clamp lowest resolution
+		resolution = Math.max(resolution, 0.1f);
+		return resolution;
+	}
+
+	/**
+	 * @param polymerChains
+	 * @return
+	 */
+	private int getSphereCount(List<Chain> polymerChains) {
+		int sphereCount = 0;
+		for (Chain c: polymerChains) {
+			for (Residue r: c.getResidues()) {
+				if (r.getClassification().equals(Classification.AMINO_ACID) ||
+						r.getClassification().equals(Classification.NUCLEIC_ACID)) {
+					sphereCount++;
+				}
+			}
+		}
+		return sphereCount;
+	}
+	
+	private int getSymmetryOperationCount(List<Chain> polymerChains) {
+		Structure structure = AppBase.sgetModel().getStructures().get(0);
+		
+		// TODO
+		// this creates a dependency on other packages! How can this be avoided?
+		final String showAsymmetricUnitOnly = AppBase.getApp().properties.getProperty("show_asymmetric_unit_only");;
+		if (showAsymmetricUnitOnly != null && showAsymmetricUnitOnly.equals("true")) {
+			return 1;
+		}
+		
+		if ( ! structure.getStructureMap().hasBiologicUnitTransforms()) {
+			return 1;
+		}
+
+		BiologicUnitTransforms t = structure.getStructureMap().getBiologicUnitTransforms();
+		BiologicalUnitGenerationMapByChain map = t.getBiologicalUnitGenerationMatricesByChain();
+		
+		if (map == null) {
+			return 1;
+		}
+		
+		int symOps = 0;
+		
+		for (Chain c: polymerChains) {
+			ModelTransformationList list = map.get(c.getChainId());
+			if (list != null) {
+				symOps += list.size();
+			}
+		}
+
+		return symOps;
+	}
 	
 	public void run()
 	{

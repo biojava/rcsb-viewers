@@ -62,6 +62,7 @@ import org.rcsb.mbt.structLoader.IStructureLoader;
 import org.rcsb.mbt.structLoader.PdbStructureLoader;
 import org.rcsb.mbt.structLoader.XMLStructureLoader;
 import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.uiApp.controllers.update.UpdateEvent;
 
 public class DocController
 {
@@ -95,6 +96,9 @@ public class DocController
 			; // stick up an error message box?
 
 		AppBase.sgetUpdateController().clear();
+
+		AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.STRUCTURE_REMOVED);
+		AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE);
 
 		Structure[] structure = readStructuresFromUrl(url);
 		if (structure != null)
@@ -167,10 +171,8 @@ public class DocController
 
 				else
 					System.out.println("Data set loaded: " + dataset);
-// PR
-//				new StructureMap(structureTmp, AppBase.sgetAppModuleFactory().createStructureMapUserData(),
-//						loader.getNonProteinChainIds());
-				new StructureMap(structureTmp, AppBase.sgetAppModuleFactory().createStructureMapUserData());
+
+				new StructureMap(structureTmp, loader.getEntityNameMap(), AppBase.sgetAppModuleFactory().createStructureMapUserData());
 				finalizeNewStructure(loader, structureTmp);
 
 				if (loader.getUnitCell() != null)
@@ -282,5 +284,6 @@ public class DocController
 			StructureMap.NonCrystallographicTransforms nc = structureMap.addNonCrystallographicTransforms();
 			nc.setNonCrystallographicTranslations(handler.getNonCrystallographicOperations());
 		}
+		
 	}
 }
