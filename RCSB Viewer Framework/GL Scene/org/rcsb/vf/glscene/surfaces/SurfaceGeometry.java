@@ -40,13 +40,10 @@
  * (NINDS), and the National Institute of Diabetes and Digestive
  * and Kidney Diseases (NIDDK).
  *
- * Created on 2007/02/08
+ * Created on 2011/11/08
  *
  */ 
 package org.rcsb.vf.glscene.surfaces;
-
-// package org.rcsb.mbt.viewers.GlStructureViewer;
-
 
 import java.util.List;
 
@@ -68,32 +65,23 @@ import org.rcsb.vf.glscene.jogl.DisplayLists;
 import com.sun.opengl.util.GLUT;
 
 
-
-public class SurfaceGeometry
-extends DisplayListGeometry
-{
-	TriangulatedSurface triangulatedSurface = null;
-	Color4f[] colors = null;
-
-	/**
-	 *  Construct a new SurfaceGeometry object.
-	 */
-	public SurfaceGeometry( )
-	{
-		//		System.out.println("Creating new SurfaceGeometry");
-	}
+/**
+ * Creates a display list for surfaces.
+ * 
+ * @author Peter Rose
+ */
+public class SurfaceGeometry extends DisplayListGeometry {
+	private TriangulatedSurface triangulatedSurface = null;
+	private Color4f[] colors = null;
 
 	public DisplayLists[] getDisplayLists(final StructureComponent structureComponent, final Style style, final GL gl, final GLU glu, final GLUT glut) {
-
 		final Surface surface = (Surface)structureComponent;
 		colors = surface.getColors();
 		triangulatedSurface = surface.getTriangulatedSurface();
 
 		final DisplayLists[] lists = new DisplayLists[1];
-
 		lists[0] = new DisplayLists(surface);
 		lists[0].setupLists(1);
-
 		lists[0].startDefine(0, gl, glu, glut);
 
 		// enable color tracking with glColor
@@ -107,10 +95,8 @@ extends DisplayListGeometry
 
 		// draw faces
 		gl.glFrontFace(GL.GL_CCW);
-	//	gl.glPushAttrib(GL.GL_LIGHT_MODEL_TWO_SIDE);
-	//	gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_FALSE);
 		
-		gl.glPointSize(1.5f);
+	//  	gl.glPointSize(1.5f);
 		drawFaces(gl, GL.GL_TRIANGLES);
 	//	       drawFaces(gl, GL.GL_POINTS);
 
@@ -118,7 +104,6 @@ extends DisplayListGeometry
 		
 		gl.glPopAttrib();
 		gl.glPopAttrib();
-	//	gl.glPopAttrib();
 
 		lists[0].endDefine(gl, glu, glut);
 		lists[0].structureComponent = surface;
@@ -151,17 +136,17 @@ extends DisplayListGeometry
 			Color4f c2 = colors[face.c];
 
 			// draw triangle       
-			gl.glNormal3f(n0.getX(), n0.getY(), n0.getZ());
-			gl.glColor4f(c0.getX(), c0.getY(), c0.getZ(), c0.getW());
-			gl.glVertex3f(p0.getX(), p0.getY(), p0.getZ());
+			gl.glNormal3f(n0.x, n0.y, n0.z);
+			gl.glColor4f(c0.x, c0.y, c0.z, c0.w);
+			gl.glVertex3f(p0.x, p0.y, p0.z);
 
-			gl.glNormal3f(n1.getX(), n1.getY(), n1.getZ());
-			gl.glColor4f(c1.getX(), c1.getY(), c1.getZ(), c1.getW());
-			gl.glVertex3f(p1.getX(), p1.getY(), p1.getZ());
+			gl.glNormal3f(n1.x, n1.y, n1.z);
+			gl.glColor4f(c1.x, c1.y, c1.z, c1.w);
+			gl.glVertex3f(p1.x, p1.y, p1.z);
 
-			gl.glNormal3f(n2.getX(), n2.getY(), n2.getZ());
-			gl.glColor4f(c2.getX(), c2.getY(), c2.getZ(), c2.getW());
-			gl.glVertex3f(p2.getX(), p2.getY(), p2.getZ());
+			gl.glNormal3f(n2.x, n2.y, n2.z);
+			gl.glColor4f(c2.x, c2.y, c2.z, c2.w);
+			gl.glVertex3f(p2.x, p2.y, p2.z);
 		}
 		gl.glEnd();
 		gl.glFlush();
