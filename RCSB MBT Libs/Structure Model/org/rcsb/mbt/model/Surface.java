@@ -90,6 +90,6 @@ public class Surface extends StructureComponent {
 	}
 		
 	public boolean isTransparent() {
-		return colors[0].getW() < 1.0f;
+		return colors[0].w < 1.0f;
 	}
 }
