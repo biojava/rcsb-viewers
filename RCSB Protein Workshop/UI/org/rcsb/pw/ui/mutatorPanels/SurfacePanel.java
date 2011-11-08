@@ -40,7 +40,7 @@
  * (NINDS), and the National Institute of Diabetes and Digestive
  * and Kidney Diseases (NIDDK).
  *
- * Created on 2008/12/22
+ * Created on 2011/11/08
  *
  */ 
 package org.rcsb.pw.ui.mutatorPanels;
@@ -75,7 +75,12 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.uiApp.ui.dialogs.ColorChooserDialog;
 import org.rcsb.uiApp.ui.dialogs.ColorPaletteChooserDialog;
 
-
+/**
+ * Creates a panel to change transparency and color of surfaces.
+ * 
+ * @author Peter Rose
+ *
+ */
 public class SurfacePanel extends JPanel implements IUpdateListener
 {
 	private static final long serialVersionUID = -7205000642717901355L;
@@ -180,7 +185,7 @@ public class SurfacePanel extends JPanel implements IUpdateListener
 				for (Surface s: structure.getStructureMap().getSurfaces()) {
 					Color4f[] colors = s.getColors();
 					if (colors != null && colors.length > 0) {
-						currentTransparency = Math.max(currentTransparency, colors[0].getW());
+						currentTransparency = Math.max(currentTransparency, colors[0].w);
 						SurfaceColorUpdater.setSurfaceTransparency(s, transparency);
 					}
 				}

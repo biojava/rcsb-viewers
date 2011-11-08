@@ -61,6 +61,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
@@ -95,7 +96,7 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 	private static final long serialVersionUID = -2377835483763485353L;
 	private final String helpURL = "http://www.pdb.org/pdb/staticHelp.do?p=help/viewers/proteinWorkshop_viewer.html";
 //	private static int SIDEBAR_WIDTH = 375;
-	private static int SIDEBAR_WIDTH = 265;
+//	private static int SIDEBAR_WIDTH = 265;
 	@Override
 	public PWGlGeometryViewer getGlGeometryViewer() { return (PWGlGeometryViewer)super.getGlGeometryViewer(); }
 	@Override
@@ -299,9 +300,13 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 			if (_showFrame)
 				setVisible(true);
 
+			JLabel sample = new JLabel("   2) Choose what you want the tool to affect.     ");
+				
+			int sWidth = sample.getPreferredSize().width + 40;
+	//		sWidth = SIDEBAR_WIDTH;
 			horizontalSplitPane.addAncestorListener(PWDocumentFrame.this.new HorizontalSplitPaneListener(PWDocumentFrame.this));
 
-			horizontalSplitPane.setDividerLocation(PWDocumentFrame.this.horizontalSplitPane.getWidth() - SIDEBAR_WIDTH);
+			horizontalSplitPane.setDividerLocation(PWDocumentFrame.this.horizontalSplitPane.getWidth() - sWidth);
 			curSize = getSize();
 			horizontalBarDistanceFromRight = (int) PWDocumentFrame.this.curSize.getWidth() - horizontalSplitPane.getDividerLocation();
 

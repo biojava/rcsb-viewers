@@ -145,6 +145,7 @@ public class MutatorActivationPanel extends JPanel implements ActionListener, IU
 		super.add(this.atomsBondsButton);
 		super.add(this.ribbonsButton);
 		super.add(this.surfaceButton);
+		validate();
 		
 		this.atomsBondsButton.addActionListener(this);
 		this.ribbonsButton.addActionListener(this);
