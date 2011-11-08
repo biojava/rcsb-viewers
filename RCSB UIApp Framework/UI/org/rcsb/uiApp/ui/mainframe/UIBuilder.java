@@ -58,10 +58,9 @@ import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 
+import org.rcsb.mbt.model.util.Status;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.doc.LoadThread;
-import org.rcsb.uiApp.controllers.doc.SurfaceThread;
-import org.rcsb.mbt.model.util.Status;
 
 /**
  * This is a swing runnable - it is invoked to build the ActiveFrame UI at the appropriate

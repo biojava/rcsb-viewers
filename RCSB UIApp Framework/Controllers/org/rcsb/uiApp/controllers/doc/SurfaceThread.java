@@ -104,7 +104,6 @@ public class SurfaceThread extends Thread {
 			Vector<Residue> residues = c.getResidues();
 			
 			// TODO How to deal with non-standard residues in a polymer?
-			// Ligand, water, etc. could be part of chain
 			for (Residue r: residues) {
 				if (r.getClassification().equals(Classification.AMINO_ACID) ||
 						r.getClassification().equals(Classification.NUCLEIC_ACID)) {
@@ -169,10 +168,10 @@ public class SurfaceThread extends Thread {
 	} 
 	
 	private float calcResolution(List<Chain> polymerChains) {		
-		int sphereCount = getSphereCount(polymerChains);
+		int residueCount = getResidueCount(polymerChains);
 		int symOps = getSymmetryOperationCount(polymerChains);
-		float resolution = 0.4f - 0.00005f * sphereCount - 0.000005f * sphereCount*symOps;
-		System.out.println("resolution: " + resolution + ", spheres: " + sphereCount + ", symmetry operations: " + symOps);
+		float resolution = 0.4f - 0.00005f * residueCount - 0.000005f * residueCount*symOps;
+		System.out.println("resolution: " + resolution + ", residues: " + residueCount + ", symmetry operations: " + symOps);
 		// clamp lowest resolution
 		resolution = Math.max(resolution, 0.1f);
 		return resolution;
@@ -182,7 +181,7 @@ public class SurfaceThread extends Thread {
 	 * @param polymerChains
 	 * @return
 	 */
-	private int getSphereCount(List<Chain> polymerChains) {
+	private int getResidueCount(List<Chain> polymerChains) {
 		int sphereCount = 0;
 		for (Chain c: polymerChains) {
 			for (Residue r: c.getResidues()) {
