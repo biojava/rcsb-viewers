@@ -40,7 +40,7 @@
  * (NINDS), and the National Institute of Diabetes and Digestive
  * and Kidney Diseases (NIDDK).
  *
- * Created on 2008/12/22
+ * Created on 2011/11/08
  *
  */ 
 package org.rcsb.uiApp.controllers.doc;
@@ -103,8 +103,7 @@ public class SurfaceThread extends Thread {
 			List<Sphere> spheres = new ArrayList<Sphere>();
 			Vector<Residue> residues = c.getResidues();
 			
-			// TODO
-			// How to deal with non-standard residues in a polymer?
+			// TODO How to deal with non-standard residues in a polymer?
 			// Ligand, water, etc. could be part of chain
 			for (Residue r: residues) {
 				if (r.getClassification().equals(Classification.AMINO_ACID) ||
@@ -119,7 +118,7 @@ public class SurfaceThread extends Thread {
 					}
 				}
 			}
-			// should there be a size cutoff? I.e. min 24 residues?
+			// TODO should there be a size cutoff? I.e. min 24 residues?
 			if (spheres.size() == 0) {
 				continue;
 			};
@@ -127,7 +126,7 @@ public class SurfaceThread extends Thread {
 			// calculate molecular surface
 			SurfaceCalculator s = new EdtMolecularSurface(spheres, PROBE_RADIUS, resolution);
 			TriangulatedSurface ts = s.getSurface();
-			s = null; // this is a very large object that's not needed anymore
+			s = null; // this is a very large object that should be garbage collected ASAP
 
 			// smooth surface
 			ts.laplaciansmooth(1);
@@ -139,7 +138,7 @@ public class SurfaceThread extends Thread {
 
 			smap.addSurface(surface);
 			
-			// update progress bar			count++;
+			// update progress bar
 			Status.progress(((int)(100* smap.getSurfaceCount()/(float)polymerChains.size())), "Creating surfaces");
 			
 			AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.SURFACE_ADDED, surface); // has no effect
@@ -173,7 +172,7 @@ public class SurfaceThread extends Thread {
 		int sphereCount = getSphereCount(polymerChains);
 		int symOps = getSymmetryOperationCount(polymerChains);
 		float resolution = 0.4f - 0.00005f * sphereCount - 0.000005f * sphereCount*symOps;
-		System.out.println("resolution: " + resolution + ", sheres: " + sphereCount + ", symmetry operations: " + symOps);
+		System.out.println("resolution: " + resolution + ", spheres: " + sphereCount + ", symmetry operations: " + symOps);
 		// clamp lowest resolution
 		resolution = Math.max(resolution, 0.1f);
 		return resolution;

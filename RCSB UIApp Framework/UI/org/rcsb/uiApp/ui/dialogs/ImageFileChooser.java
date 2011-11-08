@@ -201,6 +201,8 @@ public class ImageFileChooser extends JFileChooser
 		accessoryPanel.add(createImageSettingsPanel());
 		accessoryPanel.add(createPrintSettingsPanel());
 		setAccessory(accessoryPanel);
+		validate();
+		repaint();
 	}
 	
 	private JPanel createImageSettingsPanel() {
