@@ -45,7 +45,6 @@
  */ 
 package org.rcsb.vf.glscene.jogl;
 
-// CORE JAVA
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
