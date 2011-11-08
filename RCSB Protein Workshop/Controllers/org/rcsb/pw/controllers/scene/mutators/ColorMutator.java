@@ -284,7 +284,6 @@ public class ColorMutator extends MutatorBase
             break;
             
         case RIBBONS:
-        	System.out.println("ColorMutator: change ribbon color: " + sm.getChain(r.getChainId()));
         	final Chain c = sm.getChain(r.getChainId());
             
             final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(c);
@@ -307,7 +306,6 @@ public class ColorMutator extends MutatorBase
             }
             break;
         case SURFACE:
-        	System.out.println("ColorMutator: change surface color: " + sm.getChain(r.getChainId()));
         	Chain cs = sm.getChain(r.getChainId());
         	DisplayListRenderable srenderable = ((JoglSceneNode)sm.getUData()).getRenderable(cs);
         	

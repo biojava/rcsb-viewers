@@ -108,7 +108,7 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
 			newVisibility = true;
 			break;
 		case TOGGLE:
-			// be consistant - toggle based on the first selection.
+			// be consistent - toggle based on the first selection.
 			final Object first = mutees.iterator().next();
 			
 			newVisibility = !this.isComponentVisible(first);
