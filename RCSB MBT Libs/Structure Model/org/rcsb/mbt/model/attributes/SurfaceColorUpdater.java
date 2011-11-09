@@ -88,7 +88,7 @@ public final class SurfaceColorUpdater {
 		for (int i = 0; i < vertexCount; i++) {
 			VertInfo v = verts.get(i);
 			colors[i] = getHydrophobicityColorScheme((Atom)v.reference);
-			colors[i].setW(transparency);
+			colors[i].w = transparency;
 		}
 	}
 	
@@ -108,7 +108,7 @@ public final class SurfaceColorUpdater {
 		
 		// retain current transparency w
 		if (colors[0] != null) {
-			newColor.setW(colors[0].w);
+			newColor.w = colors[0].w;
 		}
 
 		for (int i = 0; i < vertexCount; i++) {
@@ -131,7 +131,7 @@ public final class SurfaceColorUpdater {
 		
 		// retain current transparency w
 		if (colors[0] != null) {
-			newColor.setW(colors[0].w);
+			newColor.w = colors[0].w;
 		}
 		
 		for (int i = 0; i < vertexCount; i++) {
@@ -151,7 +151,7 @@ public final class SurfaceColorUpdater {
 		}
 		
 		for (int i = 0; i < vertexCount; i++) {
-			colors[i].setW(transparency);
+			colors[i].w = transparency;
 		}
 	}
 	
