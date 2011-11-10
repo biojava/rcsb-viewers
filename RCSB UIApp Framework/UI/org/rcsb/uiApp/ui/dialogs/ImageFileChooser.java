@@ -243,7 +243,8 @@ public class ImageFileChooser extends JFileChooser
 	
 	private JPanel createPrintSettingsPanel() {
 		final JPanel printSettings = new JPanel( );
-		printSettings.setLayout(new GridLayout(4, 2, 0, 5) );
+//		printSettings.setLayout(new GridLayout(4, 2, 0, 5) );
+		printSettings.setLayout(new GridLayout(6, 2, 0, 10) );
 		JLabel unit = new JLabel("Unit:");
 		unit.setToolTipText("Unit for print dimensions");
 		printSettings.add(new JLabel("Unit:"));
