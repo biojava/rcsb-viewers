@@ -302,7 +302,8 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 
 			JLabel sample = new JLabel("   2) Choose what you want the tool to affect.     ");
 				
-			int sWidth = sample.getPreferredSize().width + 40;
+			int sWidth = sample.getPreferredSize().width + 60;
+	//		System.out.println("PWDocumentFrame: " + sWidth);
 	//		sWidth = SIDEBAR_WIDTH;
 			horizontalSplitPane.addAncestorListener(PWDocumentFrame.this.new HorizontalSplitPaneListener(PWDocumentFrame.this));
 
