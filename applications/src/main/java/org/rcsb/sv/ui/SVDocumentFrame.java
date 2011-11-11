@@ -69,6 +69,7 @@ import javax.swing.SwingUtilities;
 
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureModel;
+import org.rcsb.mbt.model.util.Status;
 import org.rcsb.sv.controllers.app.SVVersionInformation;
 import org.rcsb.sv.controllers.app.SimpleViewer;
 import org.rcsb.uiApp.controllers.app.AppBase;
@@ -84,6 +85,7 @@ public class SVDocumentFrame extends VFDocumentFrameBase
 {
 	public class SimpleViewerUIBuilder extends VFUIBuilder
 	{
+		private final String helpURL = "http://www.pdb.org/pdb/staticHelp.do?p=help/viewers/simpleViewer_viewer.html";
 		@Override
 		public void run()
 		{
@@ -209,6 +211,10 @@ public class SVDocumentFrame extends VFDocumentFrameBase
 		}
 	}
 	
+	public void displayErrorMessage(final String text) {
+		Status.output(Status.LEVEL_ERROR, text);
+	}
+	
 	final static long serialVersionUID = 0x43518477;
 	
 	public SVDocumentFrame(String title, URL iconUrl)
@@ -282,7 +288,7 @@ public class SVDocumentFrame extends VFDocumentFrameBase
 	@Override
 	public void setTitle(String title)
 	{
-		super.setTitle("PDB SimpleViewer " + SVVersionInformation.version() + " (powered by the MBT): " + title);
+		super.setTitle("RCSB PDB Simple Viewer " + SVVersionInformation.version() + " (powered by the MBT): " + title);
 	}
 
 }

@@ -48,6 +48,7 @@ package org.rcsb.uiApp.controllers.update;
 import java.util.Vector;
 
 import org.rcsb.mbt.model.Structure;
+import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.util.DebugState;
 
 
@@ -206,6 +207,13 @@ public class UpdateController
 		evt = null;
 	}
 	
+	public void fireUpdateViewEvent(final UpdateEvent.Action action, final Surface surface)
+	{
+		UpdateEvent evt = new UpdateEvent(action, surface);
+		fireUpdateEvent(evt);
+		evt = null;
+	}
+	
 	public void fireUpdateViewEvent(final UpdateEvent.Action action, final IUpdateListener view)
 	{
 		UpdateEvent evt = new UpdateEvent(action, view);
@@ -230,6 +238,7 @@ public class UpdateController
 			if (blockedListeners.contains(view)) continue;
 				// ignore blocked listeners
 			
+	//		System.out.println("UpdateController: fireUpdateEvent: " + view);
 			view.handleUpdateEvent(evt);
 				// what!!!  This isn't firing an event!!
 				// this is just an interface call!!!

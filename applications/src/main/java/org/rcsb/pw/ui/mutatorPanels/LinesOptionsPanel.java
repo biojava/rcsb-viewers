@@ -106,7 +106,7 @@ public class LinesOptionsPanel extends JPanel implements IUpdateListener, Action
         super(null, false);
         super.setLayout(new FullWidthBoxLayout());
         super.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("3)  Choose line options, then click on two atoms or residues."),
+                BorderFactory.createTitledBorder("3)  Choose options, click on 2 atoms/residues."),
                 BorderFactory.createEmptyBorder(-1,1,1,1)));
 
     	this.changeColorButton = new JButton("Change Color");
@@ -195,7 +195,6 @@ public class LinesOptionsPanel extends JPanel implements IUpdateListener, Action
 			final BoxLayout layout = new BoxLayout(this, BoxLayout.X_AXIS);
 			super.setLayout(layout);
 			
-//			super.add(button1);
 			super.add(button2);
 		}
 	}
@@ -233,7 +232,7 @@ public class LinesOptionsPanel extends JPanel implements IUpdateListener, Action
 			final BoxLayout layout = new BoxLayout(this, BoxLayout.X_AXIS);
 			super.setLayout(layout);
 			
-			field.setPreferredSize(new Dimension(200, 20));
+			field.setPreferredSize(new Dimension(80, 20));
 			
 			super.add(label);
 			super.add(field);

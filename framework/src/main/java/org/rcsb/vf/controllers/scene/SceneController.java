@@ -70,6 +70,7 @@ import org.rcsb.vf.glscene.jogl.DisplayLists;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 import org.rcsb.vf.glscene.jogl.GvPickEvent;
 import org.rcsb.vf.glscene.jogl.GvPickEventListener;
+import org.rcsb.vf.glscene.surfaces.SurfaceGeometry;
 
 
 /**

@@ -229,10 +229,12 @@ public class StructureMap
 	protected TreeMap<String, Vector<Bond>> calculatedBonds = null;
 	protected Set<Bond> bondUniqueness = null;  // Make sure Bond objects are unique.
 	protected Hashtable<Atom, Vector<Bond>> atomToBonds = null;  // Find all Bonds connected to each Atom.
+	protected Vector<Surface> surfaces = null; // All Surfaces for this Structure
 
 	protected UnitCell unitCell = null;
 	protected BiologicUnitTransforms BUTransforms = null;
 	protected NonCrystallographicTransforms NCTransforms = null;
+	protected Map<Integer, String> entityNameMap = null;
 
 	public Vector<Bond> getBonds() { return bonds; }
 	public Vector<Chain> getChains() { return chains; }
@@ -240,6 +242,7 @@ public class StructureMap
 	public Vector<Residue> getResidues() { return residues; }
 	public Vector<Atom> getAtoms() { return atoms; }
 	public Vector<Residue> getLigands() { return ligands; }
+	public Vector<Surface> getSurfaces() { return surfaces; }
 
 	public BiologicUnitTransforms addBiologicUnitTransforms()
 	{ BUTransforms = new BiologicUnitTransforms(); return BUTransforms; }
@@ -288,13 +291,14 @@ public class StructureMap
 	 * a userdata object.
 	 */
 
-	public StructureMap( final Structure structure, final Object udata)
+	public StructureMap( final Structure structure, final Map<Integer, String> entityNameMap, final Object udata)
 	{
 		this.udata = udata;
 		if ( structure == null ) {
 			throw new IllegalArgumentException( "null Structure" );
 		}
 		this.structure = structure;
+		this.entityNameMap = entityNameMap;
 
 		if (!structure.hasStructureMap())
 			structure.setStructureMap(this);
@@ -307,6 +311,9 @@ public class StructureMap
 			print( );
 		}
 
+		// need one default surface list
+		surfaces = new Vector<Surface>();
+		
 		setConverter();
 	}
 
@@ -458,11 +465,21 @@ public class StructureMap
 		for (Chain chain : chains)
 		{		
 			chain.trimToSize();
+			boolean first = true;
 			for (Residue residue : chain.getResidues())
 			{
 				// TODO try trimming size of residues to handle large CA only structures
 				residue.trimToSize();
 				residues.add( residue );
+				// set entity name
+				if (first && entityNameMap != null) {
+					int entityId = residue.getEntityId();
+					String entityName = entityNameMap.get(entityId);
+					if (entityName != null) {
+						chain.setEntityName(entityName);
+					}
+					first = false;
+				}
 				atomCount = residue.getAtomCount( );
 				for (Atom atom : residue.getAtoms())
 					atoms.add( atom );
@@ -1893,6 +1910,49 @@ public class StructureMap
 
 		return -1;
 	}
+	
+	public int getSurfaceIndex(Surface surface) {
+		if ( this.surfaces == null ) {
+			return -1;
+		}
+		return surfaces.indexOf(surface);
+	}
+
+	/**
+	 * Return the surface at the given index.
+	 */
+	public Surface getSurface( final int surfaceIndex )
+	{
+		if ( this.surfaces == null ) {
+			return null;
+		}
+		return this.surfaces.elementAt( surfaceIndex );
+	}
+	/**
+	 * Return the surface count extracted from the Structure.
+	 */
+	public int getSurfaceCount( )
+	{
+		return surfaces.size();
+	}
+
+	/**
+	 *  Add a Surface to the StructureMap.
+	 *  <P>
+	 */
+	public void addSurface(Surface surface)
+	{
+		surfaces.add(surface);
+	}
+
+	/**
+	 *  Remove a Surface from the StructureMap.
+	 *  <P>
+	 */
+	public void removeSurface(Surface surface)
+	{
+		surfaces.remove(surface);
+	}
 
 	//
 	// StructureStyles factory.
@@ -1934,6 +1994,7 @@ public class StructureMap
 		case FRAGMENT: return this.fragments.size( );
 		case CHAIN: return this.chains.size( );
 		case BOND: return this.bonds.size( );
+		case SURFACE: return this.surfaces.size( );
 		default: return this.structure.getStructureComponentCount( type );
 		}
 	}
@@ -1952,6 +2013,7 @@ public class StructureMap
 		case FRAGMENT: return this.fragments.elementAt( index );
 		case CHAIN: return this.chains.elementAt( index );
 		case BOND: return this.bonds.elementAt( index );
+		case SURFACE: return this.surfaces.elementAt( index );
 		default: return this.structure.getStructureComponentByIndex( type, index );
 		}
 	}
@@ -2012,6 +2074,12 @@ public class StructureMap
 			parents = new Vector<Object>( );
 			parents.add( structure );
 			break;
+			
+		case SURFACE:
+			parents = new Vector<Object>( );
+			parents.add( structure );
+			break;
+	
 		}
 
 		return parents;
@@ -2044,7 +2112,7 @@ public class StructureMap
 		{
 		case CHAIN:  return ((Chain) sc).getFragments( );
 		case FRAGMENT: return ((Fragment) sc).getResidues( );
-		case RESIDUE: ((Residue) sc).getAtoms( );
+		case RESIDUE: ((Residue) sc).getAtoms( ); // TODO -pr why is there no return statement here??
 		default:
 			return null;
 		}
@@ -2218,11 +2286,14 @@ public class StructureMap
 
 				// set author chain id for display purposes
 				String chainId = "";
+				String entityName = "";
 				if (residues.size() > 0) {
                     chainId = residues.get(0).getAuthorChainId();
+                    int entityId = residues.get(0).getEntityId();
+                    entityName = entityNameMap.get(entityId);
 				}
 				
-				ExternChain c = ExternChain.createBasicChain(chainId, residues);               
+				ExternChain c = ExternChain.createBasicChain(chainId, entityName, residues);               
 				this.pdbTopLevelElements.add(c);
 			}
 
@@ -2294,5 +2365,14 @@ public class StructureMap
 	public void setUnitCell(final UnitCell unitCell) {
 		this.unitCell = unitCell;
 	}
+	
+	public void setEntityNameMap(Map<Integer, String> entityNameMap) {
+		this.entityNameMap = entityNameMap;
+	}
+	
+	public Map<Integer, String> getEntityNameMap() {
+		return entityNameMap;
+	}
+
 }
 

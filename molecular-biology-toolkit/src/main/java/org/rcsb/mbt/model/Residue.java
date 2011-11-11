@@ -565,6 +565,23 @@ implements java.lang.Cloneable
 		return atom.chain_id;
 	}
 
+	
+	/**
+	 * Get the entity id (as it is assigned in the first Atom record).
+	 * Return zero if there are no atom records.
+	 */
+	public int getEntityId( )
+	{
+		if ( atoms == null ) {
+			return 0;
+		}
+		final Atom atom = atoms.elementAt( 0 );
+		if ( atom == null ) {
+			return 0;
+		}
+		return atom.entity_id;
+	}
+	
 	/**
 	 * Get the author assigned chain id (as it is assigned in the first Atom record).
 	 * Return null if there are no atom records.

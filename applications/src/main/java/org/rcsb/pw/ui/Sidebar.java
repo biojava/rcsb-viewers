@@ -51,8 +51,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.pw.ui.mutatorPanels.MutatorBasePanel;
+import org.rcsb.vf.controllers.app.VFAppBase;
 
 
 
@@ -81,6 +81,8 @@ public class Sidebar extends JPanel implements ChangeListener
         this.tabs = new JTabbedPane();
 //        this.batchPanel = new BatchApplyPanel();
         this.mutators = new MutatorBasePanel();
+        
+
         this.tools = new GlobalOptionsPanel();
         this.coloring = new ColoringOptions();
         this.credits = new CreditsPanel();
@@ -101,6 +103,12 @@ public class Sidebar extends JPanel implements ChangeListener
         this.tabs.addChangeListener(this);
         
         super.add(this.tabs);
+        
+//        System.out.println("Sidebar: mutatorBasePanel" + mutators.getPreferredSize().width);
+//        System.out.println("Sidebar: GlobalOptionsPanel" + tools.getPreferredSize().width);
+//        System.out.println("Sidebar: ColoringOptions" + coloring.getPreferredSize().width);
+//        System.out.println("Sidebar: CreditsPanel" + credits.getPreferredSize().width);
+//        System.out.println("Sidebar: width" + this.getPreferredSize().width);
     }
 
 

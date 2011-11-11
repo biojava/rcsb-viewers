@@ -49,8 +49,10 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.ui.ColorPreviewerPanel;
 import org.rcsb.pw.ui.FullWidthBoxLayout;
+import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 
 
 public class ColorOptionsPanel extends JPanel
@@ -73,5 +75,24 @@ public class ColorOptionsPanel extends JPanel
         
         super.add(this.activeColorLabel);
         super.add(this.activeColorPanel);
+        
+        ProteinWorkshop.sgetActiveFrame().setColorOptionsPanel(this);
+    }
+    
+    public void updateMutatorActivation(final MutatorBase.ActivationType activationType) {
+	
+    	switch(activationType) {
+    	case ATOMS_AND_BONDS:
+    		break;
+    	case RIBBONS:
+    		break;
+    	case SURFACE:
+    		break;
+    	default:
+    		(new Exception(activationType + " is an invalid pick level")).printStackTrace();
+    	}
+    	
+    	super.revalidate();
+    	super.repaint();
     }
 }

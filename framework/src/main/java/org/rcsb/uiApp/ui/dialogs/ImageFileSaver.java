@@ -50,18 +50,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.ImageWriter;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.w3c.dom.Element;
 
-//import com.sun.imageio.plugins.jpeg.JPEGImageWriter;
+import com.sun.image.codec.jpeg.JPEGCodec;
+import com.sun.image.codec.jpeg.JPEGEncodeParam;
+import com.sun.image.codec.jpeg.JPEGImageEncoder;
+import com.sun.imageio.plugins.jpeg.JPEGImageWriter;
 import com.sun.media.jai.codec.ImageCodec;
 import com.sun.media.jai.codec.ImageEncoder;
 import com.sun.media.jai.codec.PNGEncodeParam;
@@ -121,7 +122,32 @@ public final class ImageFileSaver {
 		}
 	}
 	
- 
+    /**
+	 * Saves images as a JPEG file at the specified resolution. This is an alternative implementation
+	 * that is currently not being used. It does not set metadata.
+	 * 
+	 * @param image image to be saved
+	 * @param dpi resolution in dots per inch
+	 * @param file filename name of the JPEG file
+     * @throws IOException
+     */
+	private static void saveJPEGAlternative(final BufferedImage image, final int dpi, final String filename) throws IOException
+	{
+		// Get an output stream for the file
+		final FileOutputStream fout = new FileOutputStream( new File(filename) );
+
+		JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(fout);
+		JPEGEncodeParam param = encoder.getDefaultJPEGEncodeParam(image);
+		
+		// set DPI
+		param.setDensityUnit(JPEGEncodeParam.DENSITY_UNIT_DOTS_INCH);
+		param.setXDensity(dpi);
+		param.setYDensity(dpi);
+		
+		encoder.encode(image, param);
+
+		fout.close();
+	}
 	
 	/**
 	 * Saves image as a JPEG file at the specified resolution.
@@ -134,7 +160,7 @@ public final class ImageFileSaver {
 	private static void saveJPEG(final BufferedImage image, final int dpi, final String filename) throws IOException
 	{	
 		// get image writer 
-        ImageWriter imageWriter =  ImageIO.getImageWritersBySuffix(ImageFileFormat.JPEG.name()).next();
+        JPEGImageWriter imageWriter = (JPEGImageWriter) ImageIO.getImageWritersBySuffix(ImageFileFormat.JPEG.name()).next();
         ImageOutputStream ios = ImageIO.createImageOutputStream(new File(filename));
         imageWriter.setOutput(ios);
 

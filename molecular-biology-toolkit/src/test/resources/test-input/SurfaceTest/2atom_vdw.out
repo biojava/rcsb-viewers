@@ -1,0 +1,18 @@
+omit wrong option
+The specification is: input: 2atom.pdb, triangulation: VCMC, surface: VWS, color: atom, radius:  1.400, scale:  4.000, outname: 2atom
+Load file...
+Initialize...
+actual boxlength  24, box[ 24* 24* 24], scale factor  4.000
+Build van der Waals solid
+Build triangulated surface
+Total time 0.015 seconds
+No. vertices 762, No. triangles 1520
+Total area 62.482 and volume 49.497
+Distinguish inner and outer surfaces
+Calculate cavity number...
+Cavity number is 0
+Calculate cavity area and volume...
+Cavity area 0.000 and volume 0.000
+Calculate inner and outer atoms
+Output 3D model
+Output residue surface area

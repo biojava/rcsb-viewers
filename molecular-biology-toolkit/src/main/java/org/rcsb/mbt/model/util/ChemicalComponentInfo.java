@@ -51,7 +51,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.*;
 
 
@@ -212,14 +211,7 @@ public class ChemicalComponentInfo
 		// read file embedded in jar file
 		Class<ChemicalComponentInfo> myClass = ChemicalComponentInfo.class;
 		try {
-			
-			URL u = myClass.getResource(fileName);
-			if ( u == null) {
-				System.err.println("can't find file " + fileName);
-				Status.output(Status.LEVEL_WARNING, "ChemicalComponentInfo: cannot find: " + fileName);
-				return;
-			}
-			is = u.openStream();
+			is = myClass.getResource(fileName).openStream();
 			
 			if ( is == null ) {
 				Status.output(Status.LEVEL_WARNING, "ChemicalComponentInfo: cannot find: " + fileName);

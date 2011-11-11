@@ -114,6 +114,8 @@ public class LoadThread extends Thread
 	public LoadThread(String url, String pdbid)
 	{ _url = url; _pdbid = pdbid; }
 	
+
+
 	public void run()
 	{
 		ProgressPanelController.StartProgress();
@@ -125,4 +127,5 @@ public class LoadThread extends Thread
 		if (!AppBase.sgetModel().hasStructures())
 			JOptionPane.showMessageDialog(null, "Structure not found: " + _pdbid + "\nPlease check file/url specification and try again.", "Error", JOptionPane.ERROR_MESSAGE); 
 	}
+	
 };

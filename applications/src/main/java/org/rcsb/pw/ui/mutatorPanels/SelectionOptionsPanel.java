@@ -76,8 +76,6 @@ public class SelectionOptionsPanel extends JPanel implements IUpdateListener, Ac
         
         super.add(this.clearButton);
         
-//        this.reset();
-        
         AppBase.sgetUpdateController().registerListener(this);    }
 
     public void reset() {

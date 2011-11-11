@@ -66,7 +66,6 @@ import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
-import org.rcsb.vf.glscene.jogl.Geometry;
 import org.rcsb.vf.glscene.jogl.ChainGeometry.RibbonForm;
 
 
@@ -91,24 +90,24 @@ public class StylesOptionsPanel extends JPanel implements IUpdateListener
 		}
 	}
 	
-	private final class AtomFormListener implements ActionListener {
-		public void actionPerformed(final ActionEvent e)
-		{
-			final JComboBox source = (JComboBox)e.getSource();
-			MutatorEnum mutEnum = ProteinWorkshop.sgetSceneController().getMutatorEnum();
-			switch(source.getSelectedIndex())
-			{
-			case 0:
-				mutEnum.getStylesMutator().getOptions().setCurrentAtomForm(Geometry.FORM_THICK);
-				break;
-			case 1:
-				mutEnum.getStylesMutator().getOptions().setCurrentAtomForm(Geometry.FORM_POINTS);
-				break;
-			default:
-				(new Exception(source.getSelectedIndex() + " not a valid index")).printStackTrace();
-			}
-		}
-	}
+//	private final class AtomFormListener implements ActionListener {
+//		public void actionPerformed(final ActionEvent e)
+//		{
+//			final JComboBox source = (JComboBox)e.getSource();
+//			MutatorEnum mutEnum = ProteinWorkshop.sgetSceneController().getMutatorEnum();
+//			switch(source.getSelectedIndex())
+//			{
+//			case 0:
+//				mutEnum.getStylesMutator().getOptions().setCurrentAtomForm(Geometry.FORM_THICK);
+//				break;
+//			case 1:
+//				mutEnum.getStylesMutator().getOptions().setCurrentAtomForm(Geometry.FORM_POINTS);
+//				break;
+//			default:
+//				(new Exception(source.getSelectedIndex() + " not a valid index")).printStackTrace();
+//			}
+//		}
+//	}
 	
 	private final class AtomRadiusListener implements ActionListener {
 		public void actionPerformed(final ActionEvent e) {
@@ -210,7 +209,7 @@ public class StylesOptionsPanel extends JPanel implements IUpdateListener
         this.setCurrentAreRibbonsSmoothed();
         this.areRibbonsSmoothedBox.addActionListener(new RibbonSmoothingCheckListener());
         
-        this.ribbonFormComboDescriptor = new ComboDescriptorPanel(this.ribbonFormLabel, this.ribbonFormStyles);
+        this.ribbonFormComboDescriptor = new ComboDescriptorPanel(this.ribbonFormLabel, this.ribbonFormStyles);   
         
         super.add(this.ribbonFormComboDescriptor);
         super.add(this.areRibbonsSmoothedBox);
@@ -238,6 +237,9 @@ public class StylesOptionsPanel extends JPanel implements IUpdateListener
     	case RIBBONS:	// ribbons
         	this.ribbonFormComboDescriptor.setVisible(true);
         	this.areRibbonsSmoothedBox.setVisible(true);
+    		break;
+    	case SURFACE:
+    		// to do
     		break;
     	default:
     		(new Exception(activationType + " is an invalid pick level")).printStackTrace();

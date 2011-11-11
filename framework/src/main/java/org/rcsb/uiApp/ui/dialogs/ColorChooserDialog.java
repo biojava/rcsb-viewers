@@ -185,16 +185,11 @@ public class ColorChooserDialog
 			new EmptyBorder( new Insets( 10, 10, 10, 10 ) ) ) );
 		pane.add( this.innerPanel, BorderLayout.CENTER );
 
-
-		// Tabs
-		final JTabbedPane tabs = new JTabbedPane( );
-		this.innerPanel.add( tabs, BorderLayout.CENTER );
-
 		// Colors Tab
 		final JPanel colorsTab = new JPanel( );
 		colorsTab.setBorder( new EmptyBorder( 10, 10, 10, 10 ) );
 		colorsTab.setLayout( new BorderLayout( ) );
-		tabs.addTab( "Color", colorsTab );
+		this.innerPanel.add(colorsTab);
 
 		// Color chooser
 		this.colorChooser = new JColorChooser( );
@@ -231,7 +226,7 @@ public class ColorChooserDialog
 			public void actionPerformed( final ActionEvent e )
 			{
 				ColorChooserDialog.this.okWasPressed = true;
-				ColorChooserDialog.this.hide( );
+				ColorChooserDialog.this.setVisible(false);
 			}
 		} );
 		buttonGridPanel.add( okButton );
@@ -244,7 +239,7 @@ public class ColorChooserDialog
 			{
 				ColorChooserDialog.this.colorChooser.setColor( ColorChooserDialog.this.startingColor );
 				ColorChooserDialog.this.okWasPressed = false;
-				ColorChooserDialog.this.hide( );
+				ColorChooserDialog.this.setVisible(false);
 			}
 		} );
 		buttonGridPanel.add( cancelButton );
@@ -253,9 +248,6 @@ public class ColorChooserDialog
 		this.pack( );
 		this.validate( );
 	}
-
-
-
 
 
 //----------------------------------------------------------------------
@@ -322,10 +314,6 @@ public class ColorChooserDialog
 			this.innerPanel.setBackground( background );
 		}
 	}
-
-
-
-
 
 //----------------------------------------------------------------------
 //  Methods

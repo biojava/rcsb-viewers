@@ -6,9 +6,9 @@
 		<groupId>org.rcsb</groupId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>org.rcsb</groupId>
+	
 	<artifactId>molecular-biology-toolkit</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	
 	<name>molecular-biology-toolkit</name>
 	<packaging>jar</packaging>
 	<build>

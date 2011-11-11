@@ -58,13 +58,14 @@ public class StylesOptions {
 	public static final boolean DEFAULT_IS_BOND_ORDER_SHOWN = true;
 	public static final boolean DEFAULT_RIBBON_SMOOTHING = true;
 	public static final RibbonForm DEFAULT_RIBBON_FORM = RibbonForm.RIBBON_TRADITIONAL;
+	public static final float DEFAULT_SURFACE_TRANSPARENCY = 1.0f;
 	
 	private RibbonForm currentRibbonForm = StylesOptions.DEFAULT_RIBBON_FORM;
 	private IAtomRadius currentAtomRadius = StylesOptions.DEFAULT_ATOM_RADIUS;
 	private int currentAtomForm = StylesOptions.DEFAULT_ATOM_FORM;
-	private boolean isBondOrderShown = StylesOptions.DEFAULT_IS_BOND_ORDER_SHOWN;
-	
+	private boolean isBondOrderShown = StylesOptions.DEFAULT_IS_BOND_ORDER_SHOWN;	
 	private boolean areRibbonsSmoothed = StylesOptions.DEFAULT_RIBBON_SMOOTHING;
+	private float surfaceTransparency = StylesOptions.DEFAULT_SURFACE_TRANSPARENCY;
 	
 
 
@@ -80,7 +81,6 @@ public class StylesOptions {
 		
 		this.currentAtomForm = currentAtomForm;
 	}
-
 
 	public IAtomRadius getCurrentAtomRadius() {
 		return this.currentAtomRadius;
@@ -99,7 +99,6 @@ public class StylesOptions {
 		this.isBondOrderShown = isBondOrderShown;
 	}
 
-
 	public boolean areRibbonsSmoothed() {
 		return this.areRibbonsSmoothed;
 	}
@@ -109,14 +108,21 @@ public class StylesOptions {
 		this.areRibbonsSmoothed = areRibbonsSmoothed;
 	}
 
-
 	public RibbonForm getCurrentRibbonForm() {
 		return this.currentRibbonForm;
 	}
 
-
 	public void setCurrentRibbonForm(final RibbonForm currentRibbonForm)
 	{
 		this.currentRibbonForm = currentRibbonForm;
-	}	
+	}
+	
+	public void setSurfaceTransparency(final float surfaceTransparency) {
+		this.surfaceTransparency = surfaceTransparency;
+	}
+	
+	public float getSurfaceTransparency() {
+		return surfaceTransparency;
+	}
+	
 }
