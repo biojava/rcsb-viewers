@@ -50,6 +50,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Vector;
 
@@ -65,6 +66,7 @@ import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms;
 import org.rcsb.mbt.model.attributes.ChainStyle;
@@ -81,9 +83,9 @@ public class JoglSceneNode
 
 	// value: Integer
 	// displaylist.
-	public class RenderablesMap extends HashMap<StructureComponent, DisplayListRenderable>
+	public class RenderablesMap extends LinkedHashMap<StructureComponent, DisplayListRenderable>
 	{
-		private static final long serialVersionUID = -3286356986071701750L;		
+		private static final long serialVersionUID = -3286356986071701750L;	
 	};
 	public interface RenderablesIt extends Iterator<StructureComponent>{}
 	
@@ -499,10 +501,13 @@ public class JoglSceneNode
 						} else if (sc.getStructureComponentType() == ComponentType.CHAIN) {
 							final Chain c = (Chain) sc;
 							chainId = c.getChainId();
+						}  else if (sc.getStructureComponentType() == ComponentType.SURFACE) {
+							final Surface s = (Surface) sc;
+							chainId = s.getChain().getChainId();
 						} 
 
 						// if the chain id is not listed, don't draw this.
-						if (VFAppBase.sgetSceneController().showAsymmetricUnitOnly() || sc.getStructureComponentType() == ComponentType.SURFACE)
+						if (VFAppBase.sgetSceneController().showAsymmetricUnitOnly())
 						{
 							try {
 								gl.glPushMatrix();

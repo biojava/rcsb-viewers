@@ -248,8 +248,7 @@ public class SlideShow extends Thread
 				System.err.println("Current Directory: " + System.getProperty("user.dir"));
 				System.exit(1);
 		}
-			
-		System.out.println("setting PDBFileDirectory " + fileDirectory);
+				
 		setPDBFileDirectory(fileDirectory);
 	}
 
@@ -304,7 +303,7 @@ public class SlideShow extends Thread
 							isLocal = true;
 						}
 					}
-					
+
 					// {{ if its not local... get it }}
 					if (!isLocal) {
 						String url = "http://www.pdb.org/pdb/files/"

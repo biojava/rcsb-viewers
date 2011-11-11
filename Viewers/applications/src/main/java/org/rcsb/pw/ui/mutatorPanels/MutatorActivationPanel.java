@@ -71,8 +71,9 @@ public class MutatorActivationPanel extends JPanel implements ActionListener, IU
 	 * 
 	 */
 	private static final long serialVersionUID = 6241838181581691219L;
-	private final JRadioButton atomsBondsButton = new JRadioButton("Atoms and Bonds");
+	private final JRadioButton atomsBondsButton = new JRadioButton("Atoms & Bonds");
 	private final JRadioButton ribbonsButton = new JRadioButton("Ribbons");
+	private final JRadioButton surfaceButton = new JRadioButton("Surfaces");
 	private final ButtonGroup group = new ButtonGroup();
 	
 	private class CustomLayout implements LayoutManager2 {
@@ -88,11 +89,14 @@ public class MutatorActivationPanel extends JPanel implements ActionListener, IU
 			
 			final Dimension atomSize = atomsBondsButton.getPreferredSize();
 			final Dimension ribbonsSize = ribbonsButton.getPreferredSize();
+			final Dimension surfaceSize = surfaceButton.getPreferredSize();
 			
 			atomsBondsButton.setBounds(curX, curY, atomSize.width, atomSize.height);
 			curX += atomSize.width + buffer;
 			ribbonsButton.setBounds(curX, curY, ribbonsSize.width, ribbonsSize.height);
 			curX += ribbonsSize.width + buffer;
+			surfaceButton.setBounds(curX, curY, surfaceSize.width, surfaceSize.height);
+			curX += surfaceSize.width + buffer;
 			
 			Container parentParent = parent.getParent();
 			Insets parentParentInsets = parentParent.getInsets();
@@ -136,12 +140,16 @@ public class MutatorActivationPanel extends JPanel implements ActionListener, IU
 
 		this.group.add(this.atomsBondsButton);
 		this.group.add(this.ribbonsButton);
+		this.group.add(this.surfaceButton);
 		
 		super.add(this.atomsBondsButton);
 		super.add(this.ribbonsButton);
+		super.add(this.surfaceButton);
+		validate();
 		
 		this.atomsBondsButton.addActionListener(this);
 		this.ribbonsButton.addActionListener(this);
+		this.surfaceButton.addActionListener(this);
 		
 		AppBase.sgetUpdateController().registerListener(this);
 		this.reset();
@@ -152,10 +160,12 @@ public class MutatorActivationPanel extends JPanel implements ActionListener, IU
 		MutatorBase.setActivationType(
 			(atomsBondsButton.isSelected())? MutatorBase.ActivationType.ATOMS_AND_BONDS :
 			(ribbonsButton.isSelected())? MutatorBase.ActivationType.RIBBONS :
+			(surfaceButton.isSelected())? MutatorBase.ActivationType.SURFACE :
 				MutatorBase.ActivationType.AUTO);
 		
 		ProteinWorkshop.sgetActiveFrame().getTreeViewer().tree.repaint();
 		ProteinWorkshop.sgetActiveFrame().getStylesOptionsPanel().updateMutatorActivation(MutatorBase.getActivationType());
+		ProteinWorkshop.sgetActiveFrame().getColorOptionsPanel().updateMutatorActivation(MutatorBase.getActivationType());
 	}
 
 	public void reset()

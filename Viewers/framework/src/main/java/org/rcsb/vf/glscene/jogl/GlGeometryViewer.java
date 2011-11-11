@@ -45,7 +45,6 @@
  */ 
 package org.rcsb.vf.glscene.jogl;
 
-// CORE JAVA
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -72,7 +71,9 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import javax.media.opengl.DebugGL;
 import javax.media.opengl.GL;
@@ -91,14 +92,16 @@ import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.StructureModel.StructureList;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
 import org.rcsb.mbt.model.attributes.ChainStyle;
+import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
-import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
+import org.rcsb.mbt.model.attributes.SurfaceStyle;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.util.DebugState;
 import org.rcsb.mbt.model.util.ExternReferences;
@@ -110,11 +113,7 @@ import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.controllers.scene.SceneController;
 import org.rcsb.vf.glscene.jogl.ChainGeometry.RibbonForm;
 import org.rcsb.vf.glscene.jogl.tiles.TileRenderer;
-
 import org.rcsb.vf.glscene.surfaces.SurfaceGeometry;
-
-
-
 
 import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.GLUT;
@@ -233,9 +232,6 @@ WindowListener, IStructureStylesEventListener {
 
 	public static ChainGeometry chainGeometry = null;
 	
-	// TODO -pr 20100425
-	public static SurfaceGeometry surfaceGeometry = null;
-
 	protected VirtualSphere2 virtualSphere = new VirtualSphere2(150, 150, 150);
 
 	public float backgroundColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -517,11 +513,6 @@ WindowListener, IStructureStylesEventListener {
 		chainGeometry.setForm(Geometry.FORM_THICK); // JLM
 		// DEBUG
 		defaultGeometry.put(ComponentType.CHAIN, chainGeometry);
-		
-		// TODO -pr 20100425
-		surfaceGeometry = new SurfaceGeometry();
-		// atomGeometry.setForm( Geometry.FORM_LINES ); // JLM DEBUG
-		defaultGeometry.put(ComponentType.SURFACE, surfaceGeometry);
 
 		VFAppBase.sgetSceneController().setDefaultGeometry(defaultGeometry);
 
@@ -1807,7 +1798,7 @@ WindowListener, IStructureStylesEventListener {
 	 * @param doAtoms - whether or no to do the atom styles.
 	 */
 	protected void structureAdded(final Structure str, RibbonForm ribbonForm, boolean doAtoms)
-	{
+	{		
 		final StructureMap structureMap = str.getStructureMap();
 		final StructureStyles structureStyles = structureMap
 		.getStructureStyles();
@@ -1816,8 +1807,6 @@ WindowListener, IStructureStylesEventListener {
 		final ChainGeometry defaultChainGeometry = (ChainGeometry) defaultGeometry.get(ComponentType.CHAIN);
 		final AtomGeometry defaultAtomGeometry = (AtomGeometry) defaultGeometry.get(ComponentType.ATOM);
 		final BondGeometry defaultBondGeometry = (BondGeometry) defaultGeometry.get(ComponentType.BOND);
-		// TODO -pr 20104025
-		final SurfaceGeometry defaultSurfaceGeometry = (SurfaceGeometry) defaultGeometry.get(ComponentType.SURFACE);
 		
 		
 
@@ -1825,14 +1814,7 @@ WindowListener, IStructureStylesEventListener {
 		final AtomStyle defaultAtomStyle = (AtomStyle) structureStyles.getDefaultStyle(ComponentType.ATOM);
 		final BondStyle defaultBondStyle = (BondStyle) structureStyles.getDefaultStyle(ComponentType.BOND);
 		
-		// TODO -pr 20100425
-//		final SurfaceStyle defaultSurfaceStyle = (SurfaceStyle) structureStyles.getDefaultStyle(ComponentType.SURFACE);
-//		Vector atm = new Vector(0);
-//		Surface s = new Surface(atm, str);
-//		synchronized (sn.renderables) {
-//			sn.renderables.put(s, new DisplayListRenderable(s,
-//					defaultChainStyle, defaultSurfaceGeometry));
-//		}
+		
 
 		str.getStructureMap().getStructureStyles()
 		.removeStructureStylesEventListener(this);
@@ -1908,10 +1890,73 @@ WindowListener, IStructureStylesEventListener {
 							defaultAtomStyle, defaultAtomGeometry));
 				}
 			}
+			// should this go after the end of the if-statement ??
 			this.requestRepaint();
 		}
 	}
+	
+	/**
+	 * 
+	 * @param str
+	 */
+	public void surfaceAdded(final Structure str)
+	{
+		final StructureMap structureMap = str.getStructureMap();
+		final JoglSceneNode sn = (JoglSceneNode)structureMap.getUData();
+		
+		final SurfaceStyle defaultSurfaceStyle = new SurfaceStyle();
 
+		final SurfaceGeometry defaultSurfaceGeometry = new SurfaceGeometry();
+		
+		// add solid surfaces first
+		for (Surface s: structureMap.getSurfaces()) {
+			if (!s.isTransparent()) {
+				synchronized (sn.renderables) {
+					sn.renderables.put(s, 
+							new DisplayListRenderable(s,defaultSurfaceStyle, defaultSurfaceGeometry));
+				}
+			}
+		}
+		
+		// add transparent surfaces second
+		for (Surface s: structureMap.getSurfaces()) {
+			if (s.isTransparent()) {
+				synchronized (sn.renderables) {
+					sn.renderables.put(s, 
+							new DisplayListRenderable(s,defaultSurfaceStyle, defaultSurfaceGeometry));
+				}
+			}
+		}
+		// this.requestRepaint(); // doesn't seem to update reliably
+		VFAppBase.sgetGlGeometryViewer().requestRepaint();
+	}
+
+	public void surfaceRemoved(final Structure str) {
+		final StructureMap structureMap = str.getStructureMap();
+		JoglSceneNode sn = (JoglSceneNode)structureMap.getUData();
+		
+		Set<Entry<StructureComponent, DisplayListRenderable>> set = sn.renderables.entrySet();
+		boolean needsRepaint = false;
+		Iterator<Entry<StructureComponent, DisplayListRenderable>> iter = set.iterator();
+	
+		synchronized (sn.renderables) {
+			while (iter.hasNext()) {
+				Entry<StructureComponent, DisplayListRenderable> entry = iter.next();
+				if (entry.getKey() instanceof Surface) {
+					DisplayListRenderable renderable = entry.getValue();
+					iter.remove();
+					this.renderablesToDestroy.add(renderable);
+					needsRepaint = true;
+				}
+			}
+		}
+		
+		if (needsRepaint) {
+		//	this.requestRepaint(); // doesn't seem to update reliably
+			VFAppBase.sgetGlGeometryViewer().requestRepaint();
+		}
+	}
+	
 	public void windowActivated(final WindowEvent e)
 	{
 		requestRepaint();
@@ -1925,13 +1970,15 @@ WindowListener, IStructureStylesEventListener {
 
 	public void windowDeactivated(final WindowEvent e)
 	{
-		requestRepaint();
+	//	requestRepaint();
 	}
 
 	public void windowDeiconified(final WindowEvent e) {
+		requestRepaint();
 	}
 
 	public void windowIconified(final WindowEvent e) {
+	//	requestRepaint();
 	}
 
 	public void windowOpened(final WindowEvent e) {

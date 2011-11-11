@@ -47,17 +47,18 @@ package org.rcsb.mbt.structLoader;
 
 
 import java.io.IOException;
+import java.util.Map;
 
-import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.UnitCell;
+import org.rcsb.mbt.model.geometry.ModelTransformationList;
 
 
 /**
  *  Defines the standard interface for classes which know how to load
  *  Structure objects. While a StructureLoader sub-class can
  *  be instantiated and used directly to load Structure objects, the
- *  StructureFactory class provides a wrapper to enable an application
+ *  StructureFactory class provides a wrapper to enable an application£
  *  to make calls to a single common interface which provides the logic
  *  to determine which loader is capable of loading a given named structure.
  *  <P>
@@ -101,6 +102,13 @@ public interface IStructureLoader
 	 * @return
 	 */
     public abstract Structure getStructure();
+	
+    
+    /**
+	 * get names for entities in the structure.
+	 * @return
+	 */
+    public abstract Map<Integer, String> getEntityNameMap();
 	
 	/**
 	 * Test

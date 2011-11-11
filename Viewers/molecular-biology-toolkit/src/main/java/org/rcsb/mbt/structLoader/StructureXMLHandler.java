@@ -46,17 +46,19 @@ package org.rcsb.mbt.structLoader;
 
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Stack;
 import java.util.Vector;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Vector3f;
-import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
-import org.rcsb.mbt.model.geometry.ModelTransformationList;
+
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.UnitCell;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -134,10 +136,12 @@ public class StructureXMLHandler extends DefaultHandler implements
 		}
 	}
 
-
 	protected Atom curAtom = null; 
 	protected Atom prevAtom = null;
+	protected String currentEntityName = "";
+	protected int currentEntityId = 0;
 	protected Vector<Atom> atomVector = new Vector<Atom>();
+	private Map<Integer, String> entityNameMap = new HashMap<Integer, String>();
 
 	/**
 	 * Parsing flags - some of the end element operations are controlled by
@@ -147,7 +151,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 	 * 
 	 */
 	protected enum eIsParsing {
-		NONE, CELL, ATOM_SITES, ATOM_SITE, DATABASE_PDB_MATRIX, STRUCT_BIOLGEN, STRUCT_ASSEMBLY, NON_CRYSTALLOGRAPHIC_OPERATIONS, LEGACY_BIOLOGIC_UNIT_OPERATIONS
+		NONE, CELL, ATOM_SITES, ATOM_SITE, DATABASE_PDB_MATRIX, ENTITY, STRUCT_BIOLGEN, STRUCT_ASSEMBLY, NON_CRYSTALLOGRAPHIC_OPERATIONS, LEGACY_BIOLOGIC_UNIT_OPERATIONS
 	}
 
 	private Stack<eIsParsing> isParsingStack = new Stack<eIsParsing>();
@@ -198,6 +202,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 	// key : qName , value : Runnable
 	protected HashMap<String, XMLRunnable> startElementRunnables = new HashMap<String, XMLRunnable>(); 
 	protected HashMap<String, XMLRunnable> endElementAtomRunnables = new HashMap<String, XMLRunnable>(); 
+	protected HashMap<String, XMLRunnable> endElementEntityRunnables = new HashMap<String, XMLRunnable>();
 	protected HashMap<String, XMLRunnable> endElementNonCrystallographicRunnables = new HashMap<String, XMLRunnable>(); 
 	protected HashMap<String, XMLRunnable> endElementDatabasePDBMatrixRunnables = new HashMap<String, XMLRunnable>(); 
 	protected HashMap<String, XMLRunnable> endElementAtomSitesRunnables = new HashMap<String, XMLRunnable>(); 
@@ -328,6 +333,8 @@ public class StructureXMLHandler extends DefaultHandler implements
 				createXMLRunnable__label_atom_id__End());
 		endElementAtomRunnables.put(xmlPrefix + "label_comp_id",
 				createXMLRunnable__label_comp_id__End());
+		endElementAtomRunnables.put(xmlPrefix + "label_entity_id",
+				createXMLRunnable__label_entity_id__End());
 		endElementAtomRunnables.put(xmlPrefix + "label_asym_id",
 				createXMLRunnable__label_asym_id__End());
 		endElementAtomRunnables.put(xmlPrefix + "auth_asym_id",
@@ -384,6 +391,16 @@ public class StructureXMLHandler extends DefaultHandler implements
 				createXMLRunnable__fract_transf_matrix32__End());
 		endElementAtomSitesRunnables.put(xmlPrefix + "fract_transf_matrix33",
 				createXMLRunnable__fract_transf_matrix33__End());
+		
+		startElementRunnables.put(xmlPrefix + "entity",
+				createXMLRunnable__entities__Start());
+		
+		endElementEntityRunnables.put(xmlPrefix + "pdbx_description",
+				createXMLRunnable__pdbx_description__End());
+		
+		endElementEntityRunnables.put(xmlPrefix + "entity",
+				createXMLRunnable__entities__End());
+		
 
 	}
 
@@ -394,6 +411,10 @@ public class StructureXMLHandler extends DefaultHandler implements
 	 */
 	public Structure getStructure() {
 		return this.structure;
+	}
+
+	public Map<Integer, String> getEntityNameMap() {
+		return entityNameMap;
 	}
 
 	@Override
@@ -443,6 +464,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	private ModelTransformationMatrix currentBUTransform = null;
 	private ModelTransformationMatrix currentNcsTranslation = null;
+
 	private Matrix3f currentRotationMatrix = null;
 	private Vector3f currentTranslationVector = null;
 
@@ -543,8 +565,12 @@ public class StructureXMLHandler extends DefaultHandler implements
 			case DATABASE_PDB_MATRIX:
 				runnable = endElementDatabasePDBMatrixRunnables.get(qName);
 				break;
-			}
 
+			case ENTITY:
+				runnable = endElementEntityRunnables.get(qName);
+				break;
+			
+		    }
 			if (runnable != null)
 				runnable.run();
 		}
@@ -942,6 +968,16 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected XMLRunnable__label_comp_id__End createXMLRunnable__label_comp_id__End() {
 		return new XMLRunnable__label_comp_id__End();
 	}
+	
+	protected class XMLRunnable__label_entity_id__End extends XMLRunnable {
+		public void run() {
+				curAtom.entity_id = Integer.parseInt(buf.trim());
+		}
+	}
+
+	protected XMLRunnable__label_entity_id__End createXMLRunnable__label_entity_id__End() {
+		return new XMLRunnable__label_entity_id__End();
+	}
 
 	protected class XMLRunnable__label_asym_id__End extends XMLRunnable {
 		public void run() {
@@ -986,11 +1022,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected class XMLRunnable__auth_seq_id__End extends XMLRunnable {
 		public void run() {
-			try {
 			    curAtom.authorResidue_id = Integer.parseInt(buf.trim());
-			} catch (Exception e){
-				System.err.println(e.getMessage() + " can't parse auth_seq_id__End from " + buf.trim());
-			}
 		}
 	}
 
@@ -1088,6 +1120,17 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 			clearParsingFlag(eIsParsing.ATOM_SITE);
 		}
+	}
+	
+	protected class XMLRunnable__pdbx_description__End extends XMLRunnable {
+		public void run() {
+			currentEntityName = buf.trim();
+		}
+
+	}
+
+	protected XMLRunnable__pdbx_description__End createXMLRunnable__pdbx_description__End() {
+		return new XMLRunnable__pdbx_description__End();
 	}
 	
 	/** 
@@ -1235,6 +1278,28 @@ public class StructureXMLHandler extends DefaultHandler implements
 		return new XMLRunnable__fract_transf_matrix33__End();
 	}
 
+	protected XMLRunnable__entities__Start createXMLRunnable__entities__Start() {
+		return new XMLRunnable__entities__Start();
+	}
+	
+	protected class XMLRunnable__entities__Start extends XMLRunnable {
+		public void run() { 
+			currentEntityId++;
+			setParsingFlag(eIsParsing.ENTITY);;
+		}
+	}
+
+	protected class XMLRunnable__entities__End extends XMLRunnable {
+		public void run() {
+			entityNameMap.put(currentEntityId, currentEntityName);
+			clearParsingFlag(eIsParsing.ENTITY);
+		}
+	}
+
+	protected XMLRunnable__entities__End createXMLRunnable__entities__End() {
+		return new XMLRunnable__entities__End();
+	}
+	
 	public boolean canLoad(String name) {
 		return true;
 	}

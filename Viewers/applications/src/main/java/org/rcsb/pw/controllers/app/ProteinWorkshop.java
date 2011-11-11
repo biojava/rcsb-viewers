@@ -48,7 +48,6 @@ package org.rcsb.pw.controllers.app;
 
 import java.net.URL;
 
-import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.pw.controllers.scene.PWSceneController;
 import org.rcsb.pw.glscene.jogl.PWGlGeometryViewer;
 import org.rcsb.pw.ui.PWDocumentFrame;
@@ -120,14 +119,14 @@ public class ProteinWorkshop extends VFAppBase
 	public void initialize(final boolean isApplication, final boolean showFrame)
 	{
 		appModuleFactory = new PWAppModuleFactory();
-		activeFrame = appModuleFactory.createDocFrame("PDB SimpleViewer (Powered by the MBT)",
+		activeFrame = appModuleFactory.createDocFrame("RCSB PDB Protein Workshop "  + PWVersionInformation.version() + " (powered by the MBT)",
 													  ProteinWorkshop.class.getResource("images/icon_128_PW.png"));
 		
 		super.initialize(isApplication);
 		
 		activeFrame.initialize(true);
 
-		final StructureModel model = sgetModel();
+//		final StructureModel model = sgetModel();
 		
 		MutatorBase.setActivationType(MutatorBase.ActivationType.ATOMS_AND_BONDS);
 		

@@ -74,6 +74,7 @@ public class UIAppStructureModel extends org.rcsb.mbt.model.StructureModel
 		super.addStructure(structure);
 
 		UpdateController update = AppBase.sgetUpdateController();
+		System.out.println("UIAppStructureModel: addStructure");
 		update.fireUpdateViewEvent(UpdateEvent.Action.STRUCTURE_ADDED, structure);
 	}
 

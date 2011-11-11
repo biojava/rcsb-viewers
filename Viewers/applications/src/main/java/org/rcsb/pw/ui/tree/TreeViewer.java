@@ -195,8 +195,13 @@ TreeSelectionListener, IStructureStylesEventListener, MouseListener
 			else if (value instanceof ExternChain)
 			{
 				final ExternChain xc = (ExternChain) value;
+				String entityName = xc.getEntityName();
+				String chainSpec = "Chain " + xc.getChainId();
+				if (entityName != null && entityName.length() > 1) {
+					chainSpec = chainSpec + ":" + entityName.toLowerCase();
+				}
 
-				componentText = (xc.isBasicChain())? "Chain " + xc.getChainId() :
+				componentText = (xc.isBasicChain())? chainSpec :
 					(xc.isWaterChain())? "Water molecules" :
 						"Miscellaneous molecules";
 
@@ -354,7 +359,7 @@ TreeSelectionListener, IStructureStylesEventListener, MouseListener
 	{
 		super(null, false);
 		super.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("4)  Choose items from the tree or 3d viewer."),
+				BorderFactory.createTitledBorder("4)  Choose items from the tree or 3D viewer."),
 				BorderFactory.createEmptyBorder(-1, 1, 1, 1)));
 
 		// Create a JTree with default models/nodes

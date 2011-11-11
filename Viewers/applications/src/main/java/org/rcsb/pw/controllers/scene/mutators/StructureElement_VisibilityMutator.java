@@ -47,7 +47,6 @@ package org.rcsb.pw.controllers.scene.mutators;
 
 import java.util.Vector;
 
-import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -57,10 +56,14 @@ import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.Style;
+import org.rcsb.mbt.model.attributes.SurfaceColorUpdater;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
+import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 import org.rcsb.vf.glscene.jogl.DisplayListGeometry;
 import org.rcsb.vf.glscene.jogl.DisplayListRenderable;
@@ -105,7 +108,7 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
 			newVisibility = true;
 			break;
 		case TOGGLE:
-			// be consistant - toggle based on the first selection.
+			// be consistent - toggle based on the first selection.
 			final Object first = mutees.iterator().next();
 			
 			newVisibility = !this.isComponentVisible(first);
@@ -129,6 +132,8 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
 				this.setVisibility((Fragment)next, newVisibility);
 			} else if(next instanceof Structure) {
 				this.setVisibility((Structure)next, newVisibility);
+			} else if(next instanceof Surface) {
+				this.setVisibility((Surface)next, newVisibility);
 			} else {
 				(new Exception(next.getClass().toString())).printStackTrace();
 			}
@@ -137,6 +142,9 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
 		ProteinWorkshop.sgetActiveFrame().getTreeViewer().getTree().repaint();
 	}
 	
+
+
+
 	public boolean isComponentVisible(final Object component) {
 		ActivationType mutatorActivationType = MutatorBase.getActivationType();
         switch(mutatorActivationType)
@@ -225,6 +233,14 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
 				}
 			}
 			//break;
+		case SURFACE:
+	//		System.out.println("StructureElement_VisibilityMutator: getting surface visibility");
+	//		final Surface s = (Surface)component;
+	//		final StructureStyles ss = sm.getStructureStyles();
+	//		return ss.isVisible(s);
+			return true;
+		//	break;
+
 		default:
             (new Exception("Invalid option: " + mutatorActivationType)).printStackTrace();  
 		}
@@ -308,6 +324,12 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
             	this.setVisibility(r, newVisibility);
             }
             break;
+            
+        case SURFACE:
+        	final Chain c = a.structure.getStructureMap().getChain(a);
+            setVisibility(c, newVisibility);
+        	break;
+        	
         default:
             (new Exception("Invalid option: " + mutatorActivationType)).printStackTrace();          }
     }
@@ -328,6 +350,10 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
             	this.setVisibility(r, newVisibility);
             }
             break;
+            
+        case SURFACE:
+        	break;
+        	
         default:
             (new Exception("Invalid option: " + mutatorActivationType)).printStackTrace();          }
     }
@@ -356,11 +382,24 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
             for (Bond b : sm.getBonds(atoms))
             	this.setComponentVisibilitySimple(b, newVisibility);
 
+            // Surfaces need to be redrawn, otherwise newly rendered atoms
+            // will not visible when covered by a transparent surface. Transparent
+            // objects need to be rendered last. To ensure this happens, we 
+            // remove and add the surfaces.
+        	ProteinWorkshop.sgetGlGeometryViewer().surfaceRemoved(r.structure);
+        	ProteinWorkshop.sgetGlGeometryViewer().surfaceAdded(r.structure);
             break;
             
         case RIBBONS:
             sm.getStructureStyles().setVisible(r, newVisibility);
             break;
+            
+        case SURFACE:;
+        	Chain c = sm.getChain(r.getChainId());
+        	if (c != null) {
+        		setVisibility(c, newVisibility);
+        	}
+        	break;
             
         default:
             (new Exception("Invalid option: " + mutatorActivationType)).printStackTrace();
@@ -376,6 +415,17 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
         	for (Fragment f : c.getFragments())
         		this.setVisibility(f, newVisibility);
             break;
+        case SURFACE:
+        	Structure structure = AppBase.sgetModel().getStructures().get(0);
+
+        	for (Surface s: structure.getStructureMap().getSurfaces()) {
+        		if (s.getChain().getChainId().equals(c.getChainId())) {
+        			SurfaceColorUpdater.setSurfaceTransparencyToggle(s);
+        		}	
+        	}
+        	ProteinWorkshop.sgetGlGeometryViewer().surfaceRemoved(structure);
+        	ProteinWorkshop.sgetGlGeometryViewer().surfaceAdded(structure);
+        	break;
         default:
             (new Exception("Invalid option: " + mutatorActivationType)).printStackTrace();
         }
@@ -388,6 +438,8 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
         {
         case ATOMS_AND_BONDS: break;
         case RIBBONS: if (!c.isBasicChain()) return; break;
+        case SURFACE:
+        	break;
         default:
             (new Exception("Invalid option: " + mutatorActivationType)).printStackTrace();            
         }
@@ -406,6 +458,10 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
         	for (Residue r : f.getResidues())
         		this.setVisibility(r, newVisibility);
             break;
+            
+        case SURFACE:
+        	break;
+        	
         default:
             (new Exception("Invalid option: " + mutatorActivationType)).printStackTrace();            
         }
@@ -422,8 +478,37 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
             for (Chain c : sm.getChains())
                 this.setVisibility(c, newVisibility);
             break;
+      
+        case SURFACE:
+        	// delegate to all chains (surfaces are associated with chains)
+        	for (Chain c : sm.getChains())
+                this.setVisibility(c, newVisibility);
+        	break;
+        	
         default:
             (new Exception("Invalid option: " + mutatorActivationType)).printStackTrace();            
         }
     }
+    
+    private void setVisibility(final Surface s, final boolean newVisibility)
+    {      
+		ActivationType mutatorActivationType = MutatorBase.getActivationType();
+        switch(mutatorActivationType)
+        {
+        case ATOMS_AND_BONDS:
+        case RIBBONS:
+		case SURFACE:
+            SurfaceColorUpdater.setSurfaceTransparencyToggle(s);
+			Structure structure = AppBase.sgetModel().getStructures().get(0);
+        	ProteinWorkshop.sgetGlGeometryViewer().surfaceRemoved(structure);
+        	ProteinWorkshop.sgetGlGeometryViewer().surfaceAdded(structure);
+    //  	StructureMap sm = s.getStructure().getStructureMap();
+	//		sm.getStructureStyles().setVisible(s, newVisibility);
+			break;
+		default:
+			(new Exception("Invalid option: " + mutatorActivationType))
+					.printStackTrace();
+		}
+    }
+    
 }

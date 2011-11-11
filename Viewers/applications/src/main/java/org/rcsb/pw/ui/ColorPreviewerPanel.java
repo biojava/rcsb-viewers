@@ -140,7 +140,7 @@ public class ColorPreviewerPanel extends JPanel implements IUpdateListener
         	// note that every attempt is made to disable this functionaliy if the user implicity cancels it, such as by clicking something else.
         	VFAppBase.sgetSceneController().setColorSelectorSampleModeEnabled(true);
             
-            Status.output(Status.LEVEL_REMARK, "Choose an atom, bond, or chain in the 3d viewer or tree to sample its color.");
+            Status.output(Status.LEVEL_REMARK, "Choose an atom, bond, or chain in the 3D viewer or tree to sample its color.");
         }
     }
 	
@@ -161,7 +161,7 @@ public class ColorPreviewerPanel extends JPanel implements IUpdateListener
 		this.sampleButton.addActionListener(new SampleColorAction(this.pane));
 		
 		this.pane.setToolTipText("Click here to change the active color.");
-		this.sampleButton.setToolTipText("Sample a color from the 3d viewer or tree.");
+		this.sampleButton.setToolTipText("Sample a color from the 3D viewer or tree.");
 		
 		super.add(this.pane);
 		super.add(this.sampleButton);
