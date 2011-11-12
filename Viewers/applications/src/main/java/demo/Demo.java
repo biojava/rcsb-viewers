@@ -9,23 +9,27 @@ public class Demo {
 
 	public static void main(String[] args){
 		//showSimpleViewer();
-		showProteinWorkshop();
-		//showLigandExplorer();
+		//showProteinWorkshop();
+		showLigandExplorer();
 		//showKiosk();
 	}
 
 	public static void showSimpleViewer(){
-		final SimpleViewer app = new SimpleViewer(null);
+		String[] args = new String[]{"-structure_url","http://www.rcsb.org:80/pdb/files/1CDG.xml.gz","-unit_id","1","-standalone"};
+		final SimpleViewer app = new SimpleViewer(args);
 		app.initialize(true, true);
 	}
 	
 	public static void showProteinWorkshop(){
-		final ProteinWorkshop app = new ProteinWorkshop(null);	
+		
+		String[] pdbIds = new String[]{"-structure_url","http://www.rcsb.org:80/pdb/files/1CDG.xml.gz","-unit_id","1","-standalone"};
+		final ProteinWorkshop app = new ProteinWorkshop(pdbIds);	
 		app.initialize(true, true);
 	}
 	
 	public static void showLigandExplorer() {
-		final LigandExplorer app = new LigandExplorer(null);		
+		String[] args = new String[]{"-structure_url","http://www.rcsb.org:80/pdb/files/1CDG.xml.gz","-unit_id","1","-standalone"};
+		final LigandExplorer app = new LigandExplorer(args);		
 		app.initialize(true);
 		
 	}
