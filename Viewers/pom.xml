@@ -70,7 +70,8 @@
 			<version>1.1.3</version>
 			<type>jar</type>
 			<scope>compile</scope>
-		</dependency></dependencies>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>
@@ -110,15 +111,34 @@
 			</plugin>
 
 
-
-
-			<!--<plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-jarsigner-plugin</artifactId> 
-				<version>1.2</version> <executions> <execution> <id>sign</id> <goals> <goal>sign</goal> 
-				</goals> </execution> <execution> <id>verify</id> <goals> <goal>verify</goal> 
-				</goals> </execution> </executions> <configuration> <keystore>pdbkeys</keystore> 
-				<alias>RCSB-PDB</alias> <storepass>pdb0922</storepass> <signedjar>${project.build.directory}/signed/${project.build.finalName}.jar</signedjar> 
-				<verify>true</verify> <verbose>true</verbose> <goal>sign</goal> </configuration> 
-				</plugin> -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jarsigner-plugin</artifactId>
+				<version>1.2</version>
+				<executions>
+					<execution>
+						<id>sign</id>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>verify</id>
+						<goals>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<keystore>pdbkeys</keystore>
+					<alias>RCSB-PDB</alias>
+					<storepass>pdb0922</storepass>
+					<signedjar>${project.build.directory}/signed/${project.build.finalName}.jar</signedjar>
+					<verify>true</verify>
+					<verbose>true</verbose>
+					<goal>sign</goal>
+				</configuration>
+			</plugin>
 		</plugins>
 
 
@@ -170,13 +190,14 @@
 					<name>linux</name>
 				</os>
 			</activation>
-			
+
 		</profile>
 	</profiles>
 	<modules>
 		<module>molecular-biology-toolkit</module>
 		<module>applications</module>
 		<module>framework</module>
+		<module>assembly</module>
 	</modules>
 
 
