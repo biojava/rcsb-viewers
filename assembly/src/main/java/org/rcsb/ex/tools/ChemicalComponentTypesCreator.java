@@ -68,7 +68,7 @@ import java.util.zip.GZIPInputStream;
  */
 public class ChemicalComponentTypesCreator {
 	public static final String ftpInputPath = "ftp://ftp.wwpdb.org/pub/pdb/data/monomers/components.cif.gz";
-	public static final String defaultOutputPath = "ChemicalComponentTypes.tsv";
+	public static final String defaultOutputPath = "src/main/resources/ChemicalComponentTypes.tsv";
 
 	public static void main(String[] args)
 	{

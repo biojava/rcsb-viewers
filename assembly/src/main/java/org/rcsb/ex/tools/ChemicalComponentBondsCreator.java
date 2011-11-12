@@ -89,7 +89,7 @@ import org.rcsb.mbt.model.util.DebugState;
 public class ChemicalComponentBondsCreator
 {
 	public static final String ftpInputPath = "ftp://ftp.wwpdb.org/pub/pdb/data/monomers/components.cif.gz";
-	public static final String defaultOutputPath = "ChemicalComponentBonds.dat";
+	public static final String defaultOutputPath = "src/main/resources/ChemicalComponentBonds.dat";
 	
 	public static void main(String[] args)
 	{
