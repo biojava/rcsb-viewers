@@ -6,9 +6,9 @@
 		<groupId>org.rcsb</groupId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>org.rcsb</groupId>
+	
 	<artifactId>applications</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	
 	<name>applications</name>
 	<packaging>jar</packaging>
 	<build>
@@ -37,59 +37,6 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
-		
-		<dependency>
-			<groupId>net.java.dev.jogl</groupId>
-			<artifactId>jogl</artifactId>
-			<version>1.1.1-rc6</version>
-		</dependency>
-	</dependencies>
-	<!-- profiles (with activation per platform) -->
-	<profiles>
-		<profile>
-			<id>dev-windows</id>
-			<properties>
-				<platform>windows</platform>
-			</properties>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-				<os>
-					<family>windows</family>
-				</os>
-			</activation>
-		</profile>
-		<profile>
-			<id>dev-mac</id>
-			<properties>
-				<platform>mac</platform>
-			</properties>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-				<os>
-					<family>mac</family>
-				</os>
-
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>net.java.dev.jogl</groupId>
-					<artifactId>jogl-macosx-universal</artifactId>
-					<version>1.1.1-rc6</version>
-				</dependency>
-			</dependencies>
-		</profile>
-		<profile>
-			<id>dev-linux</id>
-			<properties>
-				<platform>linux</platform>
-			</properties>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-				<os>
-					<name>linux</name>
-				</os>
-			</activation>
-			
-		</profile>
-	</profiles>
+		</dependencies>
+	
 </project>
