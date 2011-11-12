@@ -33,6 +33,11 @@
 			<artifactId>xercesImpl</artifactId>
 			<version>2.4.0</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.rcsb</groupId>
+			<artifactId>colorbrewer</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>

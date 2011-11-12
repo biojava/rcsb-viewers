@@ -63,9 +63,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.vecmath.Color4f;
 
+import org.jcolorbrewer.ColorBrewer;
+import org.jcolorbrewer.ui.ColorPaletteChooserDialog;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.Surface;
-import org.rcsb.mbt.model.attributes.ColorBrewer;
+
 import org.rcsb.mbt.model.attributes.SurfaceColorUpdater;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.uiApp.controllers.app.AppBase;
@@ -73,7 +75,7 @@ import org.rcsb.uiApp.controllers.doc.SurfaceThread;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.uiApp.ui.dialogs.ColorChooserDialog;
-import org.rcsb.uiApp.ui.dialogs.ColorPaletteChooserDialog;
+
 
 /**
  * Creates a panel to change transparency and color of surfaces.

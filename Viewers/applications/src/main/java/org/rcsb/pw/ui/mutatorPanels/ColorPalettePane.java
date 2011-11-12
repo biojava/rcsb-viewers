@@ -7,12 +7,13 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 
+import org.jcolorbrewer.ui.ColorPaletteChooserDialog;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.ColorMutator;
 import org.rcsb.pw.controllers.scene.mutators.MutatorEnum;
 import org.rcsb.pw.controllers.scene.mutators.options.ColorOptions;
 import org.rcsb.uiApp.controllers.app.AppBase;
-import org.rcsb.uiApp.ui.dialogs.ColorPaletteChooserDialog;
+
 
 public class ColorPalettePane extends JPanel {
 	/**
