@@ -58,7 +58,7 @@ import org.rcsb.mbt.model.geometry.ModelTransformationList;
  *  Defines the standard interface for classes which know how to load
  *  Structure objects. While a StructureLoader sub-class can
  *  be instantiated and used directly to load Structure objects, the
- *  StructureFactory class provides a wrapper to enable an application£
+ *  StructureFactory class provides a wrapper to enable an application
  *  to make calls to a single common interface which provides the logic
  *  to determine which loader is capable of loading a given named structure.
  *  <P>
