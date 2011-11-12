@@ -56,6 +56,7 @@ import java.util.List;
  */
 import javax.vecmath.Color4f;
 
+import org.jcolorbrewer.ColorBrewer;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.util.ChemicalComponentInfo;

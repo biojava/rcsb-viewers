@@ -53,6 +53,7 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.vecmath.Point3f;
 
+import org.jcolorbrewer.ColorBrewer;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
@@ -63,7 +64,7 @@ import org.rcsb.mbt.model.Residue.Classification;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms.BiologicalUnitGenerationMapByChain;
 import org.rcsb.mbt.model.attributes.AtomRadiusRegistry;
-import org.rcsb.mbt.model.attributes.ColorBrewer;
+
 import org.rcsb.mbt.model.attributes.IAtomRadius;
 import org.rcsb.mbt.model.attributes.SurfaceColorUpdater;
 import org.rcsb.mbt.model.geometry.ModelTransformationList;

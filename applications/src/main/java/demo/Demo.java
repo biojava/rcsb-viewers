@@ -5,9 +5,13 @@ import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.sv.controllers.app.SimpleViewer;
 
+import fr.iscpif.jogl.JOGLWrapper;
+
 public class Demo {
 
 	public static void main(String[] args){
+		JOGLWrapper.init();
+
 		//showSimpleViewer();
 		showProteinWorkshop();
 		//showLigandExplorer();
