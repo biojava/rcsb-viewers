@@ -53,9 +53,7 @@ import java.io.PrintStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.rcsb.mbt.model.misc.TestsInputOutputDirs.DirIndex;
-import org.testng.Assert;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+
 
 public class ComprehensiveStructureTest 
 {
