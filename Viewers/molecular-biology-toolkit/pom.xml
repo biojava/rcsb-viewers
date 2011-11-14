@@ -6,9 +6,9 @@
 		<groupId>org.rcsb</groupId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	
+
 	<artifactId>molecular-biology-toolkit</artifactId>
-	
+
 	<name>molecular-biology-toolkit</name>
 	<packaging>jar</packaging>
 	<build>
@@ -16,9 +16,36 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.1</version>				
+				<version>2.3.1</version>
 			</plugin>
-			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jarsigner-plugin</artifactId>
+				<version>1.2</version>
+				<executions>
+					<execution>
+						<id>sign</id>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>verify</id>
+						<goals>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<keystore>../pdbkeys</keystore>
+					<alias>RCSB-PDB</alias>
+					<storepass>pdb0922</storepass>
+					<signedjar>${project.build.directory}/signed/${project.build.finalName}.jar</signedjar>
+					<verify>true</verify>
+					<verbose>true</verbose>
+					<goal>sign</goal>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
@@ -28,6 +55,14 @@
 			<version>4.7</version>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>6.1.1</version>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
