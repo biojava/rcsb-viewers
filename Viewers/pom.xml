@@ -24,6 +24,16 @@
 		</repository>
 	</repositories>
 
+	<distributionManagement>
+		<downloadUrl>http://source.rcsb.org/maven/</downloadUrl>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>rcsb-pdb-maven-repo</id>
+			<name>RCSB PDB Maven Repository</name>
+			<url>scp://emmy.rcsb.org/optm/maven/</url>
+			<layout>default</layout>
+		</repository>
+	</distributionManagement>
 
 	<properties>
 		<jdk.version>1.6</jdk.version>
@@ -61,13 +71,8 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<!-- <dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-			<version>6.1.1</version>
-			<scope>test</scope>
-		</dependency>
- -->
+		<!-- <dependency> <groupId>org.testng</groupId> <artifactId>testng</artifactId> 
+			<version>6.1.1</version> <scope>test</scope> </dependency> -->
 
 		<dependency>
 			<groupId>javax.media</groupId>
@@ -120,10 +125,13 @@
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.5</version>
+				<configuration>
+					<forkMode>once</forkMode>
+					<argLine>-Xms512m -Xmx512m</argLine>
+				</configuration>
 			</plugin>
 
 
-			
 
 
 		</plugins>
@@ -143,6 +151,13 @@
 					<family>windows</family>
 				</os>
 			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>net.java.dev.jogl</groupId>
+					<artifactId>jogl-windows-i586</artifactId>
+					<version>1.1.1-rc6</version>
+				</dependency>
+			</dependencies>
 		</profile>
 		<profile>
 			<id>dev-mac</id>
@@ -175,14 +190,19 @@
 					<name>linux</name>
 				</os>
 			</activation>
-
+			<dependencies>
+				<dependency>
+					<groupId>net.java.dev.jogl</groupId>
+					<artifactId>jogl-linux-i586</artifactId>
+					<version>1.1.1-rc6</version>
+				</dependency>
+			</dependencies>
 		</profile>
 	</profiles>
 	<modules>
 		<module>molecular-biology-toolkit</module>
 		<module>applications</module>
-		<module>framework</module>
-		<module>assembly</module>
+		<module>framework</module>		
 		<module>colorbrewer</module>
 	</modules>
 
