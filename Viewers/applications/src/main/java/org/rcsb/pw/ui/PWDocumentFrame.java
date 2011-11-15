@@ -187,6 +187,21 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 						Event.CTRL_MASK));
 				helpMenu.add(helpItem);
 				menuBar.add(helpMenu);	
+				
+				final JMenu viewMenu = new JMenu("View");
+				final JMenuItem refreshItem = new JMenuItem("Refresh");
+				final ActionListener refreshListener =
+					new ActionListener()
+					{
+						public void actionPerformed(ActionEvent actionEvent)
+						{
+							ProteinWorkshop.sgetGlGeometryViewer().requestRepaint();
+						}
+					};
+				
+				refreshItem.addActionListener(refreshListener);
+				viewMenu.add(refreshItem);
+				menuBar.add(viewMenu);	
 
 				//////////////////////////////////////////////////////////////////////
 				// BEG define PW-Specific UI panels and components
