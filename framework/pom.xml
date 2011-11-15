@@ -29,18 +29,17 @@
 							<goal>sign</goal>
 						</goals>
 					</execution>
-					<execution>
+					<!--<execution>
 						<id>verify</id>
 						<goals>
 							<goal>verify</goal>
 						</goals>
 					</execution>
-				</executions>
+				--></executions>
 				<configuration>
 					<keystore>../pdbkeys</keystore>
 					<alias>RCSB-PDB</alias>
-					<storepass>pdb0922</storepass>
-					<signedjar>${project.build.directory}/signed/${project.build.finalName}.jar</signedjar>
+					<storepass>pdb0922</storepass>					
 					<verify>true</verify>
 					<verbose>true</verbose>
 					<goal>sign</goal>
@@ -59,7 +58,7 @@
 				<configuration>
 					<tasks>
 						<echo message="Installing viewer framework file: ${project.build.finalName} in PDB web project " />
-						<copy file="${project.build.directory}/${project.build.finalName}.jar" tofile="${basedir}/../../pdbweb/webapp/Viewers/RCSBViewers/framework.jar"></copy>
+						<copy file="${project.build.directory}/${project.build.finalName}.jar" tofile="${basedir}/../../../pdbweb/webapp/Viewers/RCSBViewers/framework.jar"></copy>
 
 					</tasks>
 				</configuration>

@@ -65,18 +65,22 @@
 							<goal>sign</goal>
 						</goals>
 					</execution>
-					<execution>
+					<!--<execution>
 						<id>verify</id>
 						<goals>
 							<goal>verify</goal>
 						</goals>
 					</execution>
-				</executions>
+				--></executions>
+				
 				<configuration>
+		
+        			  <certs>true</certs>
+        
 					<keystore>../pdbkeys</keystore>
 					<alias>RCSB-PDB</alias>
-					<storepass>pdb0922</storepass>
-					<signedjar>${project.build.directory}/signed/${project.build.finalName}.jar</signedjar>
+					<storepass>pdb0922</storepass>					
+					<!--  <signedjar>${project.build.directory}/signed/${project.build.finalName}.jar</signedjar>-->
 					<verify>true</verify>
 					<verbose>true</verbose>
 					<goal>sign</goal>
@@ -97,7 +101,7 @@
 				<configuration>
 					<tasks>
 						<echo message="Installing MBT file: ${project.build.finalName} in PDB web project " />
-						<copy file="${project.build.directory}/${project.build.finalName}.jar" tofile="${basedir}/../../pdbweb/webapp/Viewers/RCSBViewers/mbt.jar"></copy>
+						<copy file="${project.build.directory}/${project.build.finalName}.jar" tofile="${basedir}/../../../pdbweb/webapp/Viewers/RCSBViewers/mbt.jar"></copy>
 
 					</tasks>
 				</configuration>
@@ -128,11 +132,6 @@
 		<dependency>
 			<groupId>org.rcsb</groupId>
 			<artifactId>colorbrewer</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.rcsb</groupId>
-			<artifactId>assembly</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
