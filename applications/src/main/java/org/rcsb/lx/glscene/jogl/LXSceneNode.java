@@ -673,15 +673,17 @@ public class LXSceneNode extends JoglSceneNode
 								.getFirstAtom().coordinate[i] + line
 								.getSecondAtom().coordinate[i]) / 2;
 					}
-					gl.glTranslated(this.tempMidpoint[0] + LABEL_DISPLACEMENT,
-							this.tempMidpoint[1] - LABEL_DISPLACEMENT,
-							this.tempMidpoint[2] + LABEL_DISPLACEMENT);
-					// constants represent arbitrary displacement to separate
-					// the label from the line.
+					if (! Double.isNaN(tempMidpoint[0])) {
+						gl.glTranslated(this.tempMidpoint[0] + LABEL_DISPLACEMENT,
+								this.tempMidpoint[1] - LABEL_DISPLACEMENT,
+								this.tempMidpoint[2] + LABEL_DISPLACEMENT);
+						// constants represent arbitrary displacement to separate
+						// the label from the line.
 
-					gl.glRasterPos3f(0, 0, 0);
+						gl.glRasterPos3f(0, 0, 0);
 
-					gl.glCallList(list);
+						gl.glCallList(list);
+					}
 				} catch (Exception e)
 				{
 					if (DebugState.isDebug())
