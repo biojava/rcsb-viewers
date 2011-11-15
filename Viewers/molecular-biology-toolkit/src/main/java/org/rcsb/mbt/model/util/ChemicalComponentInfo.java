@@ -63,7 +63,7 @@ import java.util.*;
  */
 public class ChemicalComponentInfo
 {
-	static private final String fileName = "ChemicalComponentTypes.tsv";
+	static private final String fileName = "/ChemicalComponentTypes.tsv";
 
 	// AminoAcid tables.
 	//
