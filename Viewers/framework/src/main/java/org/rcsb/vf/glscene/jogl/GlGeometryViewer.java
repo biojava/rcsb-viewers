@@ -81,6 +81,7 @@ import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
+import javax.media.opengl.TraceGL;
 import javax.media.opengl.glu.GLU;
 import javax.swing.JPanel;
 
@@ -634,7 +635,8 @@ WindowListener, IStructureStylesEventListener {
 		if (DebugState.isDebug())
 			drawable.setGL(new DebugGL(drawable.getGL()));
 
-		//		 drawable.setGL(new TraceGL(drawable.getGL(), debugOut));
+		if (DebugState.isTrace())
+		    drawable.setGL(new TraceGL(drawable.getGL(), System.err));
 
 		//
 		//		 Set up JOGL (OpenGL)
