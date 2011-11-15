@@ -321,6 +321,9 @@ public class DisplayLists
 		try {
 			gl.glPushMatrix();
 
+			if (this.translation != null && Double.isNaN(this.translation[0])) {
+				System.out.println("DisplayLists: translation[0] is NaN");
+			}
 			if (this.translation != null) {
 				gl.glTranslatef(this.translation[0], this.translation[1],
 						this.translation[2]);
@@ -346,7 +349,10 @@ public class DisplayLists
 					// describe the rotation.
 /* **/
 
-				if (preTranslateX != 0.0)
+				if (Double.isNaN(preTranslateX)) {
+					System.err.println("DisplayLists: preTranslateX = NaN!");
+				}
+				if (preTranslateX != 0.0 && ! Double.isNaN(preTranslateX))
 					gl.glTranslated(preTranslateX, 0.0, 0.0);
 						// second, do pretranslation if defined.  Translation is along the x axis,
 						// plus or minus some delta
