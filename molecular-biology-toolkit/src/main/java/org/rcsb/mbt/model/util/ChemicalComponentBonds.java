@@ -172,7 +172,7 @@ public class ChemicalComponentBonds
 	static private class BondsMap extends Hashtable<String, CompoundMap> {}
 			// compound code -> CompoundMap
 	
-	static private BondsMap bonds = load( "ChemicalComponentBonds.dat" );
+	static private BondsMap bonds = load( "/ChemicalComponentBonds.dat" );
 	
 	static private Set<String> compoundsTriedNotFound = null;
 
