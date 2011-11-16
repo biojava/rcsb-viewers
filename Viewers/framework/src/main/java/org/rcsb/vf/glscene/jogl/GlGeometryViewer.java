@@ -1394,12 +1394,21 @@ WindowListener, IStructureStylesEventListener {
 
 			// Get a rotation delta using a virtual sphere mapping.
 			final double rotDelta[] = { 0.0f, 1.0f, 0.0f, 0.0f };
+			
+			// PR this will create an invalid rotDelta
+			if (prevMouseX == x && prevMouseY == y) {
+				System.out.println("GlGeometryViewer: pX:" + prevMouseX + " pY:" + prevMouseY + " x:" + x + " y" + y);
+				return;
+			}
 			this.virtualSphere.compute(this.prevMouseX, this.prevMouseY, x, y,
 					rotDelta);
-			/*
-			 * for(int i = 0; i < rotDelta.length; i++) {
-			 * if(Double.isNaN(rotDelta[i])) { System.err.flush(); } }
-			 */
+			//
+			if(Double.isNaN(rotDelta[0])) {
+				System.out.println("GlGeometryViewer: pX:" + prevMouseX + " pY:" + prevMouseY + " x:" + x + " y" + y);
+			}
+			 for(int i = 0; i < rotDelta.length; i++) {
+			 if(Double.isNaN(rotDelta[i])) { System.err.println("NaN1");System.err.flush(); } }
+			
 
 			// We want to make it look like we're rotating the object
 			// instead
@@ -1418,33 +1427,33 @@ WindowListener, IStructureStylesEventListener {
 			final double viewDirection[] = { this.viewCenter[0] - this.viewEye[0],
 					this.viewCenter[1] - this.viewEye[1],
 					this.viewCenter[2] - this.viewEye[2] };
-			/*
-			 * if (Double.isNaN(viewDirection[0]) ||
-			 * Double.isNaN(viewDirection[1]) || Double.isNaN(viewDirection[2])) {
-			 * System.err.flush(); }
-			 */
+			//
+			 if (Double.isNaN(viewDirection[0]) ||
+			 Double.isNaN(viewDirection[1]) || Double.isNaN(viewDirection[2])) {
+			 System.err.println("NaN2");System.err.flush(); }
+			 
 
 			ArrayLinearAlgebra.normalizeVector(viewDirection);
-			/*
-			 * if (Double.isNaN(viewDirection[0]) ||
-			 * Double.isNaN(viewDirection[1]) || Double.isNaN(viewDirection[2])) {
-			 * System.err.flush(); }
-			 */
+			//
+			  if (Double.isNaN(viewDirection[0]) ||
+			  Double.isNaN(viewDirection[1]) || Double.isNaN(viewDirection[2])) {
+			  System.err.println("NaN3");System.err.flush(); }
+			 
 
 			// Construct the viewRight vector (ie: viewDirection x viewUp).
 			final double viewRight[] = { 1.0f, 0.0f, 0.0f };
 			ArrayLinearAlgebra.crossProduct(viewDirection, this.viewUp, viewRight);
-			/*
-			 * if (Double.isNaN(viewRight[0]) || Double.isNaN(viewRight[1]) ||
-			 * Double.isNaN(viewRight[2])) { System.err.flush(); }
-			 */
+			//
+			  if (Double.isNaN(viewRight[0]) || Double.isNaN(viewRight[1]) ||
+			  Double.isNaN(viewRight[2])) { System.err.println("NaN4");System.err.flush(); }
+			 
 
 			ArrayLinearAlgebra.normalizeVector(viewRight);
 
-			/*
-			 * if (Double.isNaN(viewRight[0]) || Double.isNaN(viewRight[1]) ||
-			 * Double.isNaN(viewRight[2])) { System.err.flush(); }
-			 */
+			//
+			  if (Double.isNaN(viewRight[0]) || Double.isNaN(viewRight[1]) ||
+			  Double.isNaN(viewRight[2])) { System.err.println("NaN5");System.err.flush(); }
+			
 
 			// Construct the virtual-sphere-to-view rotation matrix
 			// (transpose)
@@ -1453,10 +1462,10 @@ WindowListener, IStructureStylesEventListener {
 					viewDirection[1], 0.0f, viewRight[2], this.viewUp[2],
 					viewDirection[2], 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
 
-			/*
-			 * for(int i = 0; i < viewMatrix.length; i++) {
-			 * if(Double.isNaN(viewMatrix[i])) { System.err.flush(); } }
-			 */
+			//
+			  for(int i = 0; i < viewMatrix.length; i++) {
+			  if(Double.isNaN(viewMatrix[i])) { System.err.println("NaN6");System.err.flush(); } }
+			
 
 			// Transform the virtual sphere axis's coordinate system
 			final double vsAxis[] = { rotDelta[1], rotDelta[2], rotDelta[3] };
@@ -1465,10 +1474,10 @@ WindowListener, IStructureStylesEventListener {
 			rotDelta[2] = vsAxis[1];
 			rotDelta[3] = vsAxis[2];
 
-			/*
-			 * for(int i = 0; i < rotDelta.length; i++) {
-			 * if(Double.isNaN(rotDelta[i])) { System.err.flush(); } }
-			 */
+			//
+			 for(int i = 0; i < rotDelta.length; i++) {
+			 if(Double.isNaN(rotDelta[i])) { System.err.println("NaN7");System.err.flush(); } }
+			 
 
 			// NOW we can apply the transformed rotation to the view!
 			// Compute the new viewEye.
@@ -1482,10 +1491,10 @@ WindowListener, IStructureStylesEventListener {
 			this.viewEye[1] += this.rotationCenter[1];
 			this.viewEye[2] += this.rotationCenter[2];
 
-			/*
-			 * for(int i = 0; i < viewEye.length; i++) {
-			 * if(Double.isNaN(viewEye[i])) { System.err.flush(); } }
-			 */
+			//
+			  for(int i = 0; i < viewEye.length; i++) {
+			  if(Double.isNaN(viewEye[i])) { System.err.println("NaN8");System.err.flush(); } }
+			 
 
 			// Compute the new viewCenter.
 			// Translate to the rotationCenter.
@@ -1498,27 +1507,27 @@ WindowListener, IStructureStylesEventListener {
 			this.viewCenter[1] += this.rotationCenter[1];
 			this.viewCenter[2] += this.rotationCenter[2];
 
-			/*
-			 * for(int i = 0; i < viewCenter.length; i++) {
-			 * if(Double.isNaN(viewCenter[i])) { System.err.flush(); } }
-			 */
+			//
+			  for(int i = 0; i < viewCenter.length; i++) {
+			  if(Double.isNaN(viewCenter[i])) { System.err.println("NaN9");System.err.flush(); } }
+			 
 
 			// Compute the new viewUp.
 			// (note that we do not translate to the rotation center first
 			// because viewUp is a direction vector not an absolute vector!)
 			ArrayLinearAlgebra.angleAxisRotate(rotDelta, this.viewUp);
 
-			/*
-			 * for(int i = 0; i < viewUp.length; i++) {
-			 * if(Double.isNaN(viewUp[i])) { System.err.flush(); } }
-			 */
+			//
+			 for(int i = 0; i < viewUp.length; i++) {
+			 if(Double.isNaN(viewUp[i])) { System.err.println("NaN10");System.err.flush(); } }
+			 
 
 			ArrayLinearAlgebra.normalizeVector(this.viewUp);
 
-			/*
-			 * for(int i = 0; i < viewUp.length; i++) {
-			 * if(Double.isNaN(viewUp[i])) { System.err.flush(); } }
-			 */
+			//
+			  for(int i = 0; i < viewUp.length; i++) {
+			  if(Double.isNaN(viewUp[i])) { System.err.println("NaN11");System.err.flush(); } }
+			
 		} else if ((e.getModifiers() & InputEvent.CTRL_MASK) == 0
 				&& (e.getModifiers() & InputEvent.SHIFT_MASK) != 0
 				|| (e.getModifiers() & InputEvent.BUTTON2_MASK) != 0) {

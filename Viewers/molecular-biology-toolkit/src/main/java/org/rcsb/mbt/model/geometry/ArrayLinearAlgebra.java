@@ -618,6 +618,12 @@ public class ArrayLinearAlgebra
 		if ( norm == 0.0 ) {
 			norm = 1.0;
 		}
+		
+		// PR 
+		if (len < 0.00000001) {
+			System.out.println("ArrayLinearAlgebra: len = 0");
+			norm = 1.0;
+		}
 
 		final double a = rotation[0];
 		final double x = rotation[1] * norm;
