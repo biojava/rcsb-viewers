@@ -1397,15 +1397,12 @@ WindowListener, IStructureStylesEventListener {
 			
 			// PR this will create an invalid rotDelta
 			if (prevMouseX == x && prevMouseY == y) {
-				System.out.println("GlGeometryViewer: pX:" + prevMouseX + " pY:" + prevMouseY + " x:" + x + " y" + y);
+//				System.out.println("GlGeometryViewer: pX:" + prevMouseX + " pY:" + prevMouseY + " x:" + x + " y" + y);
 				return;
 			}
 			this.virtualSphere.compute(this.prevMouseX, this.prevMouseY, x, y,
 					rotDelta);
-			//
-			if(Double.isNaN(rotDelta[0])) {
-				System.out.println("GlGeometryViewer: pX:" + prevMouseX + " pY:" + prevMouseY + " x:" + x + " y" + y);
-			}
+			
 			 for(int i = 0; i < rotDelta.length; i++) {
 			 if(Double.isNaN(rotDelta[i])) { System.err.println("NaN1");System.err.flush(); } }
 			

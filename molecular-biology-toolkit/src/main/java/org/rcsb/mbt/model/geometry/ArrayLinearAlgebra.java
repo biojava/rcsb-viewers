@@ -621,7 +621,7 @@ public class ArrayLinearAlgebra
 		
 		// PR 
 		if (len < 0.00000001) {
-			System.out.println("ArrayLinearAlgebra: len = 0");
+//			System.out.println("ArrayLinearAlgebra: len = 0");
 			norm = 1.0;
 		}
 
