@@ -153,6 +153,21 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 			
 			if (!ProteinWorkshop.backgroundScreenshotOnly)
 			{
+				final JMenu viewMenu = new JMenu("View");
+				final JMenuItem refreshItem = new JMenuItem("Refresh");
+				final ActionListener refreshListener =
+					new ActionListener()
+					{
+						public void actionPerformed(ActionEvent actionEvent)
+						{
+							ProteinWorkshop.sgetGlGeometryViewer().requestRepaint();
+						}
+					};
+				
+				refreshItem.addActionListener(refreshListener);
+				viewMenu.add(refreshItem);
+				menuBar.add(viewMenu);	
+				
 				final JMenu helpMenu = new JMenu("Help");
 				final JMenuItem helpItem = new JMenuItem("Help");
 				final ActionListener helpListener =
@@ -186,22 +201,7 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 				helpItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H,
 						Event.CTRL_MASK));
 				helpMenu.add(helpItem);
-				menuBar.add(helpMenu);	
-				
-				final JMenu viewMenu = new JMenu("View");
-				final JMenuItem refreshItem = new JMenuItem("Refresh");
-				final ActionListener refreshListener =
-					new ActionListener()
-					{
-						public void actionPerformed(ActionEvent actionEvent)
-						{
-							ProteinWorkshop.sgetGlGeometryViewer().requestRepaint();
-						}
-					};
-				
-				refreshItem.addActionListener(refreshListener);
-				viewMenu.add(refreshItem);
-				menuBar.add(viewMenu);	
+				menuBar.add(helpMenu);		
 
 				//////////////////////////////////////////////////////////////////////
 				// BEG define PW-Specific UI panels and components
