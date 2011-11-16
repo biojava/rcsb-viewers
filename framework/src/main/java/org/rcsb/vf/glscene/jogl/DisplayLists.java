@@ -358,7 +358,6 @@ public class DisplayLists
 						// plus or minus some delta
 			}
 
-			
 			if (this.scale != null) {
 				// Radius
 				gl.glScalef(this.scale[0], this.scale[1], this.scale[2]);
