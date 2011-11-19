@@ -46,6 +46,7 @@
 package org.rcsb.pw.ui.mutatorPanels;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -63,14 +64,15 @@ public class ColorOptionsPanel extends JPanel
 	    
     public ColorOptionsPanel() {
         super(null, false);
-        super.setLayout(new FullWidthBoxLayout());
+ //       super.setLayout(new FullWidthBoxLayout());
+		super.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         super.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("3)  Change the tool's options, if necessary."),
                 BorderFactory.createEmptyBorder(-1,1,1,1)));
         
         
         // create the interface objects...
-        this.activeColorLabel = new JLabel("Active Color:");
+        this.activeColorLabel = new JLabel("Select Color ");
         this.activeColorPanel = new ColorPreviewerPanel();
         
         super.add(this.activeColorLabel);
