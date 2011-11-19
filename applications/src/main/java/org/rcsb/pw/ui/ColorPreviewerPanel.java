@@ -47,16 +47,11 @@ package org.rcsb.pw.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import org.rcsb.mbt.model.util.Status;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.ColorMutator;
 import org.rcsb.pw.controllers.scene.mutators.MutatorEnum;
@@ -65,7 +60,6 @@ import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.uiApp.ui.dialogs.ColorChooserDialog;
-import org.rcsb.vf.controllers.app.VFAppBase;
 
 
 
@@ -86,7 +80,8 @@ public class ColorPreviewerPanel extends JPanel implements IUpdateListener
 		private static final long serialVersionUID = 2991605107517741310L;
 		public ColorPane() { 
 			super(false);
-			super.setPreferredSize(new Dimension(50,50));
+			// super.setPreferredSize(new Dimension(10,10));
+			super.setSize(new Dimension(12,12));
 			
 			super.addMouseListener(new MouseAdapter() {
 				
@@ -128,24 +123,24 @@ public class ColorPreviewerPanel extends JPanel implements IUpdateListener
 		}
 	}
 	
-    private class SampleColorAction implements ActionListener {
-        ColorPane colorPane = null;
-        
-        public SampleColorAction(final ColorPane pane) {
-            this.colorPane = pane;
-        }
-        
-        public void actionPerformed(final ActionEvent e) {
-        	// cause the next mutation to instead change the color of this panel.
-        	// note that every attempt is made to disable this functionaliy if the user implicity cancels it, such as by clicking something else.
-        	VFAppBase.sgetSceneController().setColorSelectorSampleModeEnabled(true);
-            
-            Status.output(Status.LEVEL_REMARK, "Choose an atom, bond, or chain in the 3D viewer or tree to sample its color.");
-        }
-    }
+//    private class SampleColorAction implements ActionListener {
+//        ColorPane colorPane = null;
+//        
+//        public SampleColorAction(final ColorPane pane) {
+//            this.colorPane = pane;
+//        }
+//        
+//        public void actionPerformed(final ActionEvent e) {
+//        	// cause the next mutation to instead change the color of this panel.
+//        	// note that every attempt is made to disable this functionaliy if the user implicity cancels it, such as by clicking something else.
+//        	VFAppBase.sgetSceneController().setColorSelectorSampleModeEnabled(true);
+//            
+//            Status.output(Status.LEVEL_REMARK, "Choose an atom, bond, or chain in the 3D viewer or tree to sample its color.");
+//        }
+//    }
 	
     public ColorPane pane = null;
-	public JButton sampleButton = null;
+//	public JButton sampleButton = null;
 	
 	public ColorPane getColorPane() {
 		return this.pane;
@@ -153,18 +148,18 @@ public class ColorPreviewerPanel extends JPanel implements IUpdateListener
 	
 	public ColorPreviewerPanel() {
 		super(null, false);
-		super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+	//	super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
 		this.pane = new ColorPane();
-		this.sampleButton = new JButton("Sample");
 		
-		this.sampleButton.addActionListener(new SampleColorAction(this.pane));
-		
-		this.pane.setToolTipText("Click here to change the active color.");
-		this.sampleButton.setToolTipText("Sample a color from the 3D viewer or tree.");
+		// sample action disabled since it has cause too much confusion for users.
+	//	this.sampleButton = new JButton("Sample");
+	//	this.sampleButton.addActionListener(new SampleColorAction(this.pane));
+	//	this.pane.setToolTipText("Click here to change the active color.");
+	//	this.sampleButton.setToolTipText("Sample a color from the 3D viewer or tree.");
 		
 		super.add(this.pane);
-		super.add(this.sampleButton);
+	//	super.add(this.sampleButton);
 		ProteinWorkshop.sgetActiveFrame().setColorPreviewerPanel(this);
 		
 		this.reset();
@@ -173,7 +168,8 @@ public class ColorPreviewerPanel extends JPanel implements IUpdateListener
 	}
 
 	public void reset() {
-		this.pane.setColor(Color.white);
+//		this.pane.setColor(Color.white);
+		this.pane.setColor(new Color(26,204,255));
 	}
 
 	/* (non-Javadoc)
