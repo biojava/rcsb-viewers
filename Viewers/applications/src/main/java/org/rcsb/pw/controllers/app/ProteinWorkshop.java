@@ -112,7 +112,6 @@ public class ProteinWorkshop extends VFAppBase
 	 */
 	public static void main(final String[] args)
 	{
-		JOGLWrapper.init();
 		final ProteinWorkshop app = new ProteinWorkshop(args);	
 		app.initialize(true, true);
 	}
