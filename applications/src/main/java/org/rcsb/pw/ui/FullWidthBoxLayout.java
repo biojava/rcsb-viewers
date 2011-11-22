@@ -115,10 +115,15 @@ public class FullWidthBoxLayout implements LayoutManager {
 	        }
 	        
 	        final int xBuffer = 5;
+
+	        // TODO -pr panel too wide
+//	        for (Component comp : descriptionPanels)
+//	        	comp.setBounds(insets.left + firstColumnMaxWidth + xBuffer,
+//	        				   insets.top, 170, curY - insets.top);
 	        
 	        for (Component comp : descriptionPanels)
 	        	comp.setBounds(insets.left + firstColumnMaxWidth + xBuffer,
-	        				   insets.top, 170, curY - insets.top);
+	        				   insets.top, 120, curY - insets.top);
 	        
 	        curY += insets.bottom;
 	        

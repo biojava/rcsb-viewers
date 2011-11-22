@@ -48,7 +48,8 @@ package org.rcsb.pw.controllers.scene.mutators;
 import java.awt.Color;
 import java.util.Vector;
 
-import org.rcsb.vf.controllers.app.VFAppBase;
+import javax.vecmath.Color4f;
+
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
@@ -58,6 +59,7 @@ import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.AtomColorByRgb;
 import org.rcsb.mbt.model.attributes.AtomStyle;
@@ -66,8 +68,11 @@ import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.attributes.IResidueColor;
 import org.rcsb.mbt.model.attributes.ResidueColorByRgb;
 import org.rcsb.mbt.model.attributes.StructureStyles;
+import org.rcsb.mbt.model.attributes.SurfaceColorUpdater;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.options.ColorOptions;
+import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.controllers.scene.SceneController;
 import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 import org.rcsb.vf.glscene.jogl.DisplayListRenderable;
@@ -247,26 +252,6 @@ public class ColorMutator extends MutatorBase
         switch(pickLevel)
         {
        case ATOMS_AND_BONDS:
-        	/*this.options.getCurrentColor().getColorComponents(colorFl);
-            BondColorByRgb bondColor = new BondColorByRgb(colorFl);
-            
-            GlGeometryViewer viewer = Model.getSingleton().getViewer();
-            DisplayListRenderable renderable = viewer.getRenderable(b);
-            if(renderable != null) {
-            	BondStyle oldStyle = (BondStyle)renderable.style;
-            	BondStyle style = new BondStyle();
-                style.setBondColor(bondColor);
-                if(oldStyle != null) {
-	                style.setBondForm(oldStyle.getBondForm());
-	                style.setBondLabel(oldStyle.getBondLabel());
-	                style.setBondRadius(oldStyle.getBondRadius());
-                }
-                ss.setStyle(b, style);
-            	
-            	renderable.style = style;
-//            	renderable.setDirty();
-            }*/
-        	
         	// delegate to atoms...
         	this.changeColor(b.getAtom(0));
         	this.changeColor(b.getAtom(1));
@@ -320,6 +305,26 @@ public class ColorMutator extends MutatorBase
             	renderable.style = style;
             }
             break;
+        case SURFACE:
+        	Chain cs = sm.getChain(r.getChainId());
+        	DisplayListRenderable srenderable = ((JoglSceneNode)sm.getUData()).getRenderable(cs);
+        	
+        	if(srenderable != null) {
+        		this.options.getCurrentColor().getColorComponents(ColorMutator.colorFl);
+        		Structure structure = AppBase.sgetModel().getStructures().get(0);
+        		
+        		for (Surface s: structure.getStructureMap().getSurfaces()) {
+        			if (s.getChain().getChainId().equals(cs.getChainId())) {
+        				Color4f newColor = new Color4f(ColorMutator.colorFl[0], 
+        						ColorMutator.colorFl[1],
+        						ColorMutator.colorFl[2], 1.0f);
+        				SurfaceColorUpdater.setSurfaceColor(s, newColor);
+        			}	
+        		}
+        		ProteinWorkshop.sgetGlGeometryViewer().surfaceRemoved(structure);
+				ProteinWorkshop.sgetGlGeometryViewer().surfaceAdded(structure);
+        	}
+            break;
             
         default:
             (new Exception("Invalid option: " + pickLevel)).printStackTrace();            
@@ -352,4 +357,5 @@ public class ColorMutator extends MutatorBase
 		for (Chain c : s.getStructureMap().getChains())
 			this.changeColor(c);
     }
+    
 }

@@ -52,7 +52,6 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -167,8 +166,8 @@ class ChangeFogStartListener implements ChangeListener {
 	}
 	
 	public void stateChanged(final ChangeEvent e) {
-		final JSlider source = (JSlider)e.getSource();
-		final float fogStartValue = source.getValue();
+//		final JSlider source = (JSlider)e.getSource();
+//		final float fogStartValue = source.getValue();
 	}
 
 	public void setRange(final int range) {

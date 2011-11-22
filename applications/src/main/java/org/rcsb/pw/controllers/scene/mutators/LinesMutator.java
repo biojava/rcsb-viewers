@@ -46,7 +46,6 @@
 package org.rcsb.pw.controllers.scene.mutators;
 
 import java.awt.Color;
-import java.util.Arrays;
 import java.util.Vector;
 
 import org.rcsb.mbt.model.Atom;
@@ -152,12 +151,17 @@ public class LinesMutator extends MutatorBase
 			if (scType == ComponentType.ATOM) {
 				final Atom atom = (Atom) structureComponent;
 
-				message =
-					"Atom: "
-					+ atom.authorChain_id + "/" 
-					+ atom.authorResidue_id + "/" 
-					+ atom.name	+ "/"
-					+ atom.compound;
+				message = atom.authorChain_id + " " 
+					+ atom.authorResidue_id + " " 
+					+ atom.compound + " "
+					+ atom.name;
+				
+//				message =
+//					"Atom: "
+//					+ atom.authorChain_id + "/" 
+//					+ atom.authorResidue_id + "/" 
+//					+ atom.name	+ "/"
+//					+ atom.compound;
 			}
 
 			else if (scType == ComponentType.BOND)
@@ -176,14 +180,18 @@ public class LinesMutator extends MutatorBase
 			else if (scType == ComponentType.RESIDUE)
 			{
 				final Residue r = (Residue) structureComponent;
-				final Fragment f = r.getFragment();
-				ComponentType conformationType = (f.getConformationType().isConformationType())? 
-						f.getConformationType() : ComponentType.UNDEFINED_CONFORMATION;
+//				final Fragment f = r.getFragment();
+//				ComponentType conformationType = (f.getConformationType().isConformationType())? 
+//						f.getConformationType() : ComponentType.UNDEFINED_CONFORMATION;
 
-						message = "Residue " + r.getAuthorResidueId()
-						+ ", from chain " + r.getAuthorChainId() + "; "
-						+ conformationType + " conformation; "
-						+ r.getCompoundCode() + " compound.";
+						message = r.getAuthorChainId() + " " +
+						r.getAuthorResidueId() + " "
+						+ r.getCompoundCode();
+
+//						message = "Residue " + r.getAuthorResidueId()
+//						+ ", from chain " + r.getAuthorChainId() + "; "
+//						+ conformationType + " conformation; "
+//						+ r.getCompoundCode() + " compound.";
 			}
 
 			else if (scType == ComponentType.FRAGMENT)

@@ -112,6 +112,7 @@ public class PdbStructureLoader
 	private long expectedInputBytes = 1;
 	private Structure structure;
 	private boolean treatModelsAsSubunits = false;
+	private Map<Integer, String> entityNameMap = new HashMap<Integer, String>();
 	
 	/**
 	 * Set this if the models are part of a greater whole.
@@ -350,6 +351,8 @@ public class PdbStructureLoader
 		int bytesRead = 0;
 		int lines = 0;
 		int modelCount = 0; // How many models have we seen?
+		int currentEntityId = 0;
+		Map<String, Integer> entityMap = new HashMap<String, Integer>();
 
 		while ( (line = rdr.readLine()) != null )
 		{
@@ -389,6 +392,12 @@ public class PdbStructureLoader
 				// 79 - 80  charge
 				// NOTE: In this application, we need to subtract 1 from
 				// each index in order to match the 0-based array offsets.
+				
+				// handle the case of a non-standard pdb file
+				// without COMPOUND information
+				if (entityNameMap.size() == 0) {
+					entityNameMap.put(currentEntityId,"");
+				}
 
 				Atom atom = new Atom( );
 				String str = null;
@@ -415,6 +424,11 @@ public class PdbStructureLoader
 				atom.compound = line.substring(17, 20 ).trim();
 
 				atom.chain_id = line.substring(21, 22 ).trim();
+				if (entityMap.size() > 0) {
+					atom.entity_id = entityMap.get(atom.chain_id);
+				} else {
+					atom.entity_id = 1;
+				}
 
 				if(treatModelsAsSubunits)
 				{
@@ -485,6 +499,31 @@ public class PdbStructureLoader
 
 				// Reset linePos to the start of the line buffer.
 				continue;
+				
+			} 
+			//
+			// Compound record
+			//
+			else if (line.startsWith("COMPND")) {
+				if (line.contains("MOL_ID:")) {
+                   String id = line.substring(18);
+                   id = id.replace(';', ' ');
+                   id = id.trim();
+                   currentEntityId = Integer.parseInt(id);
+				} else if (line.contains("CHAIN:")) {
+				   String chainId = line.substring(18);
+				   chainId = chainId.replaceAll(";", "");
+				   chainId = chainId.trim();
+				   String[] ids = chainId.split(",");
+				   for (String id: ids) {
+					   entityMap.put(id.trim(), currentEntityId);
+				   }
+				} else if (line.contains("MOLECULE:")) {
+					String entityName = line.substring(20).trim();
+					entityName = entityName.replaceAll(";","");
+					entityName = entityName.toLowerCase();
+					entityNameMap.put(currentEntityId, entityName);
+				}
 			}
 
 			if ( !this.shouldRecordMoreModels(modelCount) )
@@ -625,6 +664,10 @@ public class PdbStructureLoader
 
 	public boolean hasNonCrystallographicOperations() {
 		return false;
+	}
+
+	public Map<Integer, String> getEntityNameMap() {
+		return entityNameMap;
 	}
 
 }

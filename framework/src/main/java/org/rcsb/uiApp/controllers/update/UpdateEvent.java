@@ -46,6 +46,7 @@
 package org.rcsb.uiApp.controllers.update;
 
 import org.rcsb.mbt.model.Structure;
+import org.rcsb.mbt.model.Surface;
 
 
 /**
@@ -69,7 +70,8 @@ public class UpdateEvent
 	  * @author rickb
 	  *
 	  */
-	 public enum Action { STRUCTURE_ADDED, STRUCTURE_REMOVED, VIEW_ADDED, VIEW_REMOVED, VIEW_RESET, VIEW_UPDATE, CLEAR_ALL, EXTENDED }
+	 public enum Action { STRUCTURE_ADDED, STRUCTURE_REMOVED, VIEW_ADDED, VIEW_REMOVED, VIEW_RESET, VIEW_UPDATE, SURFACE_ADDED, 
+		 SURFACE_REMOVED, CLEAR_ALL, EXTENDED }
 	 
 	 /**
 	  * Constructor - takes an action
@@ -92,6 +94,20 @@ public class UpdateEvent
 		 this.action = action;
 		 this.structure = structure;
 		 this.view = null;
+		 this.surface = null;
+	 }
+	 
+	 /**
+	  * Constructor 
+	  * @param action - {@inheritDoc}
+	  * @param surface - the affected surface
+	  */
+	 public UpdateEvent(final Action action, final Surface surface)
+	 {
+		 this.action = action;
+		 this.structure = surface.getStructure();
+		 this.view = null;
+		 this.surface = surface;
 	 }
 	 
 	 /**
@@ -104,12 +120,19 @@ public class UpdateEvent
 		 this.action = action;
 		 this.view = view;
 		 this.structure = null;
+		 this.surface = null;
 	 }
 	 
 	/**
 	 * The Structure object that is affected in this change.
 	 */
 	 public Structure structure;
+	 
+	 /**
+	  * The Surface object that is affected in this change.
+      */
+	 public Surface surface;
+		 
 	 
 	 /**
 	  * The view affected in this change.

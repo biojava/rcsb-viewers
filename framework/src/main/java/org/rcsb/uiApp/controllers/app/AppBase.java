@@ -202,6 +202,9 @@ public abstract class AppBase
 					DebugState.setDebugState(true);
 				else if (args[i].equals("-treat_models_as_subunits"))
 					properties.setProperty("treat_models_as_subunits", "true");
+				
+				if (args[i].equals("-trace"))
+					DebugState.setTraceState(true);
 			}
 		
 		_theJApp = this;

@@ -53,15 +53,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.UnitCell;
+import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -123,6 +124,10 @@ public class XMLStructureLoader implements IFileStructureLoader
 
 	public Structure getStructure() {
 		return handler.getStructure();
+	}
+	
+	public Map<Integer, String> getEntityNameMap() {
+		return handler.getEntityNameMap();
 	}
 	
 	public boolean hasUnitCell()

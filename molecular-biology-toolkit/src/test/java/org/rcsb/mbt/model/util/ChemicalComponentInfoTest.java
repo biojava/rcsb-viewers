@@ -1,17 +1,40 @@
 package org.rcsb.mbt.model.util;
 
-import org.rcsb.mbt.model.util.ChemicalComponentInfo;
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
 
-public class ChemicalComponentInfoTest  extends TestCase{
+import org.junit.After;
+import org.junit.Before;
 
+import junit.framework.Test;
 
-	public void  testChemCompInfo(){
-		String letter = ChemicalComponentInfo.getLetterFromCode("ALA");
+/**
+ * @author Peter Rose
+ *
+ */
+public class ChemicalComponentInfoTest {
+	
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@Before
+	public void setUp() throws Exception {
+	}
 
-		assertNotNull("got a null instead of A", letter);
-		assertEquals("Is not A!", letter,"A");
-
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@After
+	public void tearDown() throws Exception {
+	}
+	
+	/**
+	 * Test method for getChemicalComponentType
+	 */
+//	@Test
+	public final void testGetChemicalComponent() {
+		ChemicalComponentType t = ChemicalComponentType.getChemicalComponentType("L-PEPTIDE LINKING");
+		assertEquals(ChemicalComponentType.L_PEPTIDE_LINKING, t);	
 	}
 }

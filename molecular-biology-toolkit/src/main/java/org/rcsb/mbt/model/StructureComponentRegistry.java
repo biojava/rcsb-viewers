@@ -84,7 +84,7 @@ public class StructureComponentRegistry
 	// TYPE_ field values
 	//
 
-	public static enum ComponentType
+	public enum ComponentType
 	{
 		NONE,
     	STRUCTURE,

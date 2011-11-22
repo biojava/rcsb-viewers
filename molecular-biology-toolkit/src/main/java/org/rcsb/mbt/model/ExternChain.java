@@ -80,6 +80,7 @@ public class ExternChain extends StructureComponent
     private Set<Residue> residuesSet = null;
     private Vector<Residue> residuesVec = null;	// equivalent to Chain residues
     private Set<Chain> mbtChains = null;	// unique list of Chains (no values)
+    private String entityName = new String("");
 
     private ExternChainType chainType = null;
     private String chainId = null;
@@ -92,29 +93,30 @@ public class ExternChain extends StructureComponent
      * public factory methods - insures creation of type requested.
      * note the constructor is private.
      */
-    static public ExternChain createBasicChain(final String pdbChainId, final Vector<Residue> residues)
+    static public ExternChain createBasicChain(final String pdbChainId, final String entityName, final Vector<Residue> residues)
     {
-    	return new ExternChain(ExternChainType.BASIC, pdbChainId, residues);
+    	return new ExternChain(ExternChainType.BASIC, pdbChainId, entityName, residues);
     }
     
     static public ExternChain createWaterChain(final Vector<Residue> residues)
     {
-    	return new ExternChain(ExternChainType.WATER, "HOH", residues);
+    	return new ExternChain(ExternChainType.WATER, "HOH", "", residues);
     }
     
     static public ExternChain createMiscellaneousMoleculeChain(final Vector<Residue> residues)
     {
-    	return new ExternChain(ExternChainType.MISCELLANEOUS, "_", residues);
+    	return new ExternChain(ExternChainType.MISCELLANEOUS, "_", "", residues);
     }
     
     /*
      * Private constructors
      */
-    private ExternChain(ExternChainType type, final String in_chainId, final Vector<Residue> residues)
+    private ExternChain(ExternChainType type, final String in_chainId, final String entityName, final Vector<Residue> residues)
     {
     	setResidues(residues);
     	chainType = type;
     	chainId = in_chainId;
+    	this.entityName = entityName;
     }
     
 	private void setResidues(final Vector<Residue> residues)
@@ -163,6 +165,7 @@ public class ExternChain extends StructureComponent
 	public Iterator<Chain> getMbtChainIterator() { return mbtChains.iterator(); }
 	public Residue getResidue(final int index) { return this.residuesVec.get(index); }
 	public int getResidueCount() { return this.residuesSet.size(); }
+	public String getEntityName() { return this.entityName; }
 	public boolean contains(final Residue r) { return this.residuesSet.contains(r); }
 	public Vector<Residue> getResiduesVec() { return this.residuesVec; }	
 	public Set<Chain> getMbtChains() { return mbtChains; }

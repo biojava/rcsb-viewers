@@ -59,6 +59,7 @@ import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
@@ -89,7 +90,7 @@ public abstract class MutatorBase implements IUpdateListener
 	
 	private Object previousMutee = null;
 	
-	public enum ActivationType { AUTO, ATOMS_AND_BONDS, RIBBONS }
+	public enum ActivationType { AUTO, ATOMS_AND_BONDS, RIBBONS, SURFACE }
 
 	static protected ActivationType activationType;
 
@@ -296,6 +297,10 @@ public abstract class MutatorBase implements IUpdateListener
 			}
 		}
 		
+		else if(mutee1 instanceof Surface) {
+			mutees.add((Surface)mutee1);
+		}
+
 		return mutees;
 	}
 	

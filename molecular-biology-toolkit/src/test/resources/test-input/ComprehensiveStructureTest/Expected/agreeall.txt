@@ -1,0 +1,179 @@
+===================================
+1BUZ_xml_gz.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: Y
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+1ES0_pdb.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: N (Reported: 74, Counted: 73)
+    Number Residues Agree: N (Reported: 448, Counted: 372)
+    Number Atoms Agree: N (Reported: 3088, Counted: 3012)
+    Number Bonds Agree: Y
+===================================
+1GIX_pdb.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: N (Reported: 28, Counted: 25)
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+1GIX_xml_gz.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: Y
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+1GIY_pdb.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: Y
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+1GIY_xml_gz.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: Y
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+1I5D_pdb.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: N (Reported: 39, Counted: 35)
+    Number Residues Agree: N (Reported: 240, Counted: 193)
+    Number Atoms Agree: N (Reported: 1558, Counted: 1511)
+    Number Bonds Agree: Y
+===================================
+1I5D_xml.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: N (Reported: 39, Counted: 35)
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+1I5D_xml_gz.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: N (Reported: 39, Counted: 35)
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+1Q70_pdb.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: Y
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+1STP_pdb1_gz.txt.gz
+===================================
+1STP_xml_gz.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: N (Reported: 24, Counted: 22)
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+1buz_pdb.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: Y
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+1es0_xml.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: N (Reported: 74, Counted: 73)
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+1es0_xml_gz.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: N (Reported: 74, Counted: 73)
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+1x7b_pdb_gz.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: N (Reported: 71, Counted: 68)
+    Number Residues Agree: N (Reported: 615, Counted: 475)
+    Number Atoms Agree: N (Reported: 3920, Counted: 3780)
+    Number Bonds Agree: Y
+===================================
+1x7b_xml_gz.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: N (Reported: 71, Counted: 68)
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+2EKG_pdb_gz.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: N (Reported: 101, Counted: 99)
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+2EKG_xml_gz.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: N (Reported: 106, Counted: 98)
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+2ELG_pdb_gz.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: N (Reported: 4, Counted: 2)
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+2ELG_xml_gz.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: N (Reported: 9, Counted: 2)
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+2FTE_pdb1_gz.txt.gz
+===================================
+2FTE_xml_gz.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: Y
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+2H2Q_xml_gz.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: N (Reported: 185, Counted: 179)
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+2QS2_xml_gz.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: N (Reported: 114, Counted: 106)
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y
+===================================
+4hhb_pdb_gz.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: N (Reported: 86, Counted: 79)
+    Number Residues Agree: N (Reported: 801, Counted: 580)
+    Number Atoms Agree: N (Reported: 4779, Counted: 4558)
+    Number Bonds Agree: Y
+===================================
+4hhb_xml_gz.txt.gz
+    Number Chains Agree: Y
+    Number Fragments Agree: N (Reported: 86, Counted: 79)
+    Number Residues Agree: Y
+    Number Atoms Agree: Y
+    Number Bonds Agree: Y

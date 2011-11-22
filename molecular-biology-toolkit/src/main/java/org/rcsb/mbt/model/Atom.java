@@ -101,6 +101,7 @@ public class Atom
 		this.altLoc        = atom.altLoc;
 		this.compound      = atom.compound;
 		this.chain_id      = atom.chain_id;
+		this.entity_id     = atom.entity_id;
 		this.authorChain_id = atom.authorChain_id;
 		this.residue_id    = atom.residue_id;
 		this.authorResidue_id    = atom.authorResidue_id;
@@ -186,6 +187,13 @@ public class Atom
 	 *  For example, "A", "B", "C", etc.
 	 */
 	public String chain_id = null; // _atom_site.label_asym_id
+	
+	
+	/**
+	 * Entity ID
+	 */
+	
+	public int entity_id = 0;
 	
 	/**
 	 *  Chain/Author assigned unit ID.

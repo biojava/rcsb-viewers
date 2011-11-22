@@ -307,7 +307,4 @@ public class KSStructureXMLHandler extends StructureXMLHandler
 		}
 	}
 	
-	public XMLRunnable createXMLRunnable__label_entity_id__End()
-	{ return new XMLRunnable__label_entity_id__End(); }
-	
 }

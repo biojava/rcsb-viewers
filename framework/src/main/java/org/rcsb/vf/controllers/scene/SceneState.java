@@ -1915,7 +1915,9 @@ public class SceneState
 					}
 				}
 			}
-		} catch(final Exception e) {}
+		} catch(final Exception e) {
+			e.printStackTrace();
+		}
 		
 		try {
 							// do we do this if fog is enabled??
@@ -1939,7 +1941,9 @@ public class SceneState
 					}
 				}
 			}
-		} catch(final Exception e) {}
+		} catch(final Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/*
