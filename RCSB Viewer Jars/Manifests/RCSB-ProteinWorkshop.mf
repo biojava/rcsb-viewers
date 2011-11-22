@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: org.rcsb.pw.controllers.app.ProteinWorkshop
-Class-Path: ../RCSBSupport/RCSB-MBT.jar ../RCSBSupport/RCSB-UIAppFramework.jar ../RCSBSupport/RCSB-ViewerFramework.jar ../3rdParty/jai_codec.jar ../3rdParty/jai_core.jar ../3rdParty/gluegen-rt.jar ../3rdParty/jogl.jar ../3rdParty/vecmath.jar

@@ -1,3 +1,0 @@
-#! /bin/tcsh -v
-set CLASSPATH='../../bin'
-java -cp ".:$CLASSPATH" org.rcsb.demo.MBT.SimpleReadStructureDemo "../../test-input/General/molecules/$1"

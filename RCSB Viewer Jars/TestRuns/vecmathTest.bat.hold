@@ -1,7 +1,0 @@
-setlocal
-set CLASSPATH=
-set CP=.;..\3rdParty\vecmath.jar
-set JNIPATH="java.library.path=../3rdParty/jnilibs"
-set PATHARGS=-cp "%CP%" -D%JNIPATH%
-java %PATHARGS% vecmathTest
-endlocal

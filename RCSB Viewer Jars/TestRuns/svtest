@@ -1,4 +1,0 @@
-#! /bin/tcsh
-set MOL="2FTE.xml.gz"
-source setargs.csh
-java $PATHARGS -jar ../RCSBViewers/RCSB-SimpleViewer.jar -standalone -structure_url molecules/$MOL

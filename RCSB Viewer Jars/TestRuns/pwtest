@@ -1,4 +1,0 @@
-#! /bin/tcsh -x
-set MOL="1STP.xml.gz"
-source setargs.csh
-java $PATHARGS -jar ../RCSBViewers/RCSB-ProteinWorkshop.jar -standalone -structure_url molecules/$MOL $2

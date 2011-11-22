@@ -1,4 +1,0 @@
-#! /bin/tcsh
-set CLASSPATH='../../bin'
-java -cp ".:$CLASSPATH" org.rcsb.demo.MBT.DumpPeriodicTable
-Done:

@@ -1,7 +1,0 @@
-#! /bin/tcsh
-set VIEWERS_HEAD="${DEV}/PDB/pdb-viewers-head"
-set THIRD_PARTY="${VIEWERS_HEAD}/3rd Party Libs"
-
-set CLASSPATH="${VIEWERS_HEAD}/SDSC Ligand Explorer/bin:${VIEWERS_HEAD}/SDSC MBT Libs/bin:${THIRD_PARTY}/apache_commons.jar:${THIRD_PARTY}/jai/jai_codec.jar:${THIRD_PARTY}/jai/jai_core.jar:${THIRD_PARTY}/jai/mlibwrapper_jai.jar:${THIRD_PARTY}/JOGL-1.1.0/gluegen-rt.jar:${THIRD_PARTY}/JOGL-1.1.0/jogl.jar:${THIRD_PARTY}/ostermillerutils_1_05_00_for_java_1_4.jar"
-
-java -cp "$CLASSPATH" -D"java.library.path=${THIRD_PARTY}/JOGL-1.1.0/jnilibs - Mac" edu.sdsc.lx.app.LigandExplorer -standalone -log_folder /Users/Shared/Dev/temp -structure_url /Users/Shared/Dev/PDB/molecules/1x7b.xml.gz -ligand 041
