@@ -57,9 +57,6 @@ import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.MutatorEnum;
 import org.rcsb.pw.ui.tree.TreeViewer;
 
-
-
-
 public class MutatorBasePanel extends JPanel
 {
 	private static final long serialVersionUID = 3893750857058349620L;
@@ -69,6 +66,7 @@ public class MutatorBasePanel extends JPanel
     private LabelsOptionsPanel labelsPanel = null;
     private ReCenterOptionsPanel reCenterPanel = null;
     private LinesOptionsPanel linesPanel = null;
+    private SurfacePanel surfacePanel = null;
 //    private SelectionOptionsPanel selectionPanel = null;
     
     private MutatorPanel mutatorPanel = null;
@@ -95,6 +93,7 @@ public class MutatorBasePanel extends JPanel
 			
 			final Dimension mutatorSize = mutatorPanel.getPreferredSize();
 			final Dimension pickLevelSize = pickLevelPanel.getPreferredSize();
+			final Dimension surfaceSize = surfacePanel.getPreferredSize();
 			
 			mutatorPanel.setBounds(curX, curY, fullWidth, mutatorSize.height);
 			curY += mutatorSize.height + buffer;
@@ -107,12 +106,11 @@ public class MutatorBasePanel extends JPanel
 				curY += currentSize.height + buffer;
 			}
 			
-			final int treeHeight = fullHeight - curY;
+			final int treeHeight = fullHeight - curY - surfaceSize.height;
 			tree.setBounds(curX, curY, fullWidth, treeHeight);
 			
-			Container parentParent = parent.getParent();
-			Insets parentParentInsets = parentParent.getInsets();
-//			this.maxSize.height = this.minSize.height = curY + buffer + insets.bottom;
+			curY = fullHeight - surfaceSize.height;
+			surfacePanel.setBounds(curX, curY, fullWidth, surfaceSize.height);
 		}
 
 		public Dimension minimumLayoutSize(Container parent) {
@@ -159,13 +157,17 @@ public class MutatorBasePanel extends JPanel
         this.linesPanel = new LinesOptionsPanel();
 //        this.selectionPanel = new SelectionOptionsPanel();
         this.pickLevelPanel = new MutatorActivationPanel();
+        this.surfacePanel = new SurfacePanel();
         
+      
         super.add(this.mutatorPanel);
         super.add(this.pickLevelPanel);
-        
+        super.add(this.surfacePanel);
+  
         this.updateOptionsPanel();
         
         super.add(this.tree);
+     
     }
     
     public void updateOptionsPanel()

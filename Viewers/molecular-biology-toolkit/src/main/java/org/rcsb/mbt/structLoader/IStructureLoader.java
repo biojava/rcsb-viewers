@@ -47,10 +47,11 @@ package org.rcsb.mbt.structLoader;
 
 
 import java.io.IOException;
+import java.util.Map;
 
-import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.UnitCell;
+import org.rcsb.mbt.model.geometry.ModelTransformationList;
 
 
 /**
@@ -101,6 +102,13 @@ public interface IStructureLoader
 	 * @return
 	 */
     public abstract Structure getStructure();
+	
+    
+    /**
+	 * get names for entities in the structure.
+	 * @return
+	 */
+    public abstract Map<Integer, String> getEntityNameMap();
 	
 	/**
 	 * Test

@@ -49,4 +49,9 @@ import javax.swing.JFrame;
 
 public class PerformanceTuner extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7177963699328968936L;
+
 }

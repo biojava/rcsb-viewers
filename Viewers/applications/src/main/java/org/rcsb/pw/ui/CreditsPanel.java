@@ -77,7 +77,7 @@ public class CreditsPanel extends JPanel implements ActionListener, ClipboardOwn
 	private static final long serialVersionUID = 4624398343284115661L;
 
 	public String citation = 
-				"J.L. Moreland, A.Gramada, O.V. Buzko, Q. Zhang and P.E. Bourne 2005 The Molecular Biology Toolkit (mbt): A Modular Platform for Developing Molecular Visualization Applications. BMC Bioinformatics, 6:21";
+				"J.L. Moreland, A.Gramada, O.V. Buzko, Q. Zhang and P.E. Bourne (2005) The Molecular Biology Toolkit (mbt): A Modular Platform for Developing Molecular Visualization Applications. BMC Bioinformatics, 6:21";
 	
 	public String html = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">" +
 						 "<html>" +
@@ -86,16 +86,17 @@ public class CreditsPanel extends JPanel implements ActionListener, ClipboardOwn
 							"</head>" +
 							"<body>" +
 							    "<a href=\"http://www.pdb.org/pdb/staticHelp.do?p=help/viewers/proteinWorkshop_viewer.html\">Protein Workshop Tutorial</a><br>" +
-//								"Online documentation: [<a href=\"http://www.pdb.org/robohelp/viewers/proteinworkshop.htm\">here</a>]<br>" +
-//								"Flash tutorial: [<a href=\"http://www.pdb.org/pdb/tutorials/viewers/pw.swf\">here</a>]" +
 								"<p>Scientific Lead: <u>Dr. Peter Rose, Dr. Phil Bourne</u></p>" +
 								"<p>Original implementation: John Beaver, with contributions from Philipp Steeger, based on a specification provided by Phil Bourne and using the molecular biology toolkit (MBT).</p>" +
 								"<p>Version 3 re-architect: Garrick Berger</p>" +
 								"<p>Published figures using this tool should cite:</p>" +
-								"<p>" +
-									this.citation + " [<a href=\"http://www.biomedcentral.com/1471-2105/6/21\">paper here</a>]" +
+								"<p><a href=\"http://www.biomedcentral.com/1471-2105/6/21\">" + this.citation + "</a>" +
+						        "</p>" +   
+						        "<p>Published figures with surfaces should also cite:</p>" +
+						        "<p><a href=\"http://www.plosone.org/article/info:doi/10.1371/journal.pone.0008140\">D. Xu, Y. Zhang (2009) Generating Triangulated Macromolecular Surfaces by Euclidean Distance Transform. PLoS ONE 4(12): e8140.</a>" +
 						        "</p>" +
 						        "<p>This work was supported in part by NIH grant GM63208</a></p>" +
+						        "</p>" +      
 						    "</body>" +
 						  "</html>";
 	
@@ -125,7 +126,8 @@ public class CreditsPanel extends JPanel implements ActionListener, ClipboardOwn
 				final Dimension copySize = CreditsPanel.this.copyCreditsButton.getPreferredSize();
 				
 //				CreditsPanel.this.area.setPreferredSize(new Dimension(parent.getWidth() - 50, parent.getHeight()));
-				CreditsPanel.this.scroller.setBounds(visualBuffer,visualBuffer,parent.getWidth() - visualBuffer * 2,parent.getHeight() - copySize.height - visualBuffer * 3);
+				
+                CreditsPanel.this.scroller.setBounds(visualBuffer,visualBuffer,parent.getWidth() - visualBuffer * 2,parent.getHeight() - copySize.height - visualBuffer * 3);
 				
 				// put this at the bottom of the screen.
 				CreditsPanel.this.copyCreditsButton.setBounds(parent.getWidth() / 2 - copySize.width / 2, parent.getHeight() - copySize.height - visualBuffer, copySize.width, copySize.height);

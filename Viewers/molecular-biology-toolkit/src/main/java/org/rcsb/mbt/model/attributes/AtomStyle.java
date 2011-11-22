@@ -55,8 +55,6 @@ import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
  * <P>
  * Please complete these missing tags
  * @author	John L. Moreland
- * @copyright	UCSD
- * @see
  */
 public class AtomStyle
 	extends Style

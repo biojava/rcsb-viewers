@@ -58,9 +58,9 @@ import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 
+import org.rcsb.mbt.model.util.Status;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.doc.LoadThread;
-import org.rcsb.mbt.model.util.Status;
 
 /**
  * This is a swing runnable - it is invoked to build the ActiveFrame UI at the appropriate
@@ -78,7 +78,7 @@ public class UIBuilder implements Runnable
 	 */
 
 	protected JMenuBar menuBar;
-	protected JMenu fileMenu;		
+	protected JMenu fileMenu;	
 	protected StatusPanel statusPanel = null;
 	protected int fileMenuPreSeparatorIX;
 	
@@ -153,6 +153,10 @@ public class UIBuilder implements Runnable
 											"Open a structure...",
 											JOptionPane.INFORMATION_MESSAGE);
 
+							if (pdbId == null) {
+								return;
+							}
+							
 							String[] pdbIds = pdbId.split(",");
 						
 							for (int i = 0; i < pdbIds.length; i++) {

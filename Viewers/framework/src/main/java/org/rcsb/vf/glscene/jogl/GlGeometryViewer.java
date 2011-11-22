@@ -45,7 +45,6 @@
  */ 
 package org.rcsb.vf.glscene.jogl;
 
-// CORE JAVA
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -72,7 +71,9 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import javax.media.opengl.DebugGL;
 import javax.media.opengl.GL;
@@ -80,6 +81,7 @@ import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
+import javax.media.opengl.TraceGL;
 import javax.media.opengl.glu.GLU;
 import javax.swing.JPanel;
 
@@ -91,14 +93,16 @@ import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.StructureModel.StructureList;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
 import org.rcsb.mbt.model.attributes.ChainStyle;
+import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
-import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
+import org.rcsb.mbt.model.attributes.SurfaceStyle;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.util.DebugState;
 import org.rcsb.mbt.model.util.ExternReferences;
@@ -110,11 +114,7 @@ import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.controllers.scene.SceneController;
 import org.rcsb.vf.glscene.jogl.ChainGeometry.RibbonForm;
 import org.rcsb.vf.glscene.jogl.tiles.TileRenderer;
-
 import org.rcsb.vf.glscene.surfaces.SurfaceGeometry;
-
-
-
 
 import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.GLUT;
@@ -233,9 +233,6 @@ WindowListener, IStructureStylesEventListener {
 
 	public static ChainGeometry chainGeometry = null;
 	
-	// TODO -pr 20100425
-	public static SurfaceGeometry surfaceGeometry = null;
-
 	protected VirtualSphere2 virtualSphere = new VirtualSphere2(150, 150, 150);
 
 	public float backgroundColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -517,11 +514,6 @@ WindowListener, IStructureStylesEventListener {
 		chainGeometry.setForm(Geometry.FORM_THICK); // JLM
 		// DEBUG
 		defaultGeometry.put(ComponentType.CHAIN, chainGeometry);
-		
-		// TODO -pr 20100425
-		surfaceGeometry = new SurfaceGeometry();
-		// atomGeometry.setForm( Geometry.FORM_LINES ); // JLM DEBUG
-		defaultGeometry.put(ComponentType.SURFACE, surfaceGeometry);
 
 		VFAppBase.sgetSceneController().setDefaultGeometry(defaultGeometry);
 
@@ -643,7 +635,8 @@ WindowListener, IStructureStylesEventListener {
 		if (DebugState.isDebug())
 			drawable.setGL(new DebugGL(drawable.getGL()));
 
-		//		 drawable.setGL(new TraceGL(drawable.getGL(), debugOut));
+		if (DebugState.isTrace())
+		    drawable.setGL(new TraceGL(drawable.getGL(), System.err));
 
 		//
 		//		 Set up JOGL (OpenGL)
@@ -1401,12 +1394,18 @@ WindowListener, IStructureStylesEventListener {
 
 			// Get a rotation delta using a virtual sphere mapping.
 			final double rotDelta[] = { 0.0f, 1.0f, 0.0f, 0.0f };
+			
+			// PR this will create an invalid rotDelta
+			if (prevMouseX == x && prevMouseY == y) {
+//				System.out.println("GlGeometryViewer: pX:" + prevMouseX + " pY:" + prevMouseY + " x:" + x + " y" + y);
+				return;
+			}
 			this.virtualSphere.compute(this.prevMouseX, this.prevMouseY, x, y,
 					rotDelta);
-			/*
-			 * for(int i = 0; i < rotDelta.length; i++) {
-			 * if(Double.isNaN(rotDelta[i])) { System.err.flush(); } }
-			 */
+			
+			 for(int i = 0; i < rotDelta.length; i++) {
+			 if(Double.isNaN(rotDelta[i])) { System.err.println("NaN1");System.err.flush(); } }
+			
 
 			// We want to make it look like we're rotating the object
 			// instead
@@ -1425,33 +1424,33 @@ WindowListener, IStructureStylesEventListener {
 			final double viewDirection[] = { this.viewCenter[0] - this.viewEye[0],
 					this.viewCenter[1] - this.viewEye[1],
 					this.viewCenter[2] - this.viewEye[2] };
-			/*
-			 * if (Double.isNaN(viewDirection[0]) ||
-			 * Double.isNaN(viewDirection[1]) || Double.isNaN(viewDirection[2])) {
-			 * System.err.flush(); }
-			 */
+			//
+			 if (Double.isNaN(viewDirection[0]) ||
+			 Double.isNaN(viewDirection[1]) || Double.isNaN(viewDirection[2])) {
+			 System.err.println("NaN2");System.err.flush(); }
+			 
 
 			ArrayLinearAlgebra.normalizeVector(viewDirection);
-			/*
-			 * if (Double.isNaN(viewDirection[0]) ||
-			 * Double.isNaN(viewDirection[1]) || Double.isNaN(viewDirection[2])) {
-			 * System.err.flush(); }
-			 */
+			//
+			  if (Double.isNaN(viewDirection[0]) ||
+			  Double.isNaN(viewDirection[1]) || Double.isNaN(viewDirection[2])) {
+			  System.err.println("NaN3");System.err.flush(); }
+			 
 
 			// Construct the viewRight vector (ie: viewDirection x viewUp).
 			final double viewRight[] = { 1.0f, 0.0f, 0.0f };
 			ArrayLinearAlgebra.crossProduct(viewDirection, this.viewUp, viewRight);
-			/*
-			 * if (Double.isNaN(viewRight[0]) || Double.isNaN(viewRight[1]) ||
-			 * Double.isNaN(viewRight[2])) { System.err.flush(); }
-			 */
+			//
+			  if (Double.isNaN(viewRight[0]) || Double.isNaN(viewRight[1]) ||
+			  Double.isNaN(viewRight[2])) { System.err.println("NaN4");System.err.flush(); }
+			 
 
 			ArrayLinearAlgebra.normalizeVector(viewRight);
 
-			/*
-			 * if (Double.isNaN(viewRight[0]) || Double.isNaN(viewRight[1]) ||
-			 * Double.isNaN(viewRight[2])) { System.err.flush(); }
-			 */
+			//
+			  if (Double.isNaN(viewRight[0]) || Double.isNaN(viewRight[1]) ||
+			  Double.isNaN(viewRight[2])) { System.err.println("NaN5");System.err.flush(); }
+			
 
 			// Construct the virtual-sphere-to-view rotation matrix
 			// (transpose)
@@ -1460,10 +1459,10 @@ WindowListener, IStructureStylesEventListener {
 					viewDirection[1], 0.0f, viewRight[2], this.viewUp[2],
 					viewDirection[2], 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
 
-			/*
-			 * for(int i = 0; i < viewMatrix.length; i++) {
-			 * if(Double.isNaN(viewMatrix[i])) { System.err.flush(); } }
-			 */
+			//
+			  for(int i = 0; i < viewMatrix.length; i++) {
+			  if(Double.isNaN(viewMatrix[i])) { System.err.println("NaN6");System.err.flush(); } }
+			
 
 			// Transform the virtual sphere axis's coordinate system
 			final double vsAxis[] = { rotDelta[1], rotDelta[2], rotDelta[3] };
@@ -1472,10 +1471,10 @@ WindowListener, IStructureStylesEventListener {
 			rotDelta[2] = vsAxis[1];
 			rotDelta[3] = vsAxis[2];
 
-			/*
-			 * for(int i = 0; i < rotDelta.length; i++) {
-			 * if(Double.isNaN(rotDelta[i])) { System.err.flush(); } }
-			 */
+			//
+			 for(int i = 0; i < rotDelta.length; i++) {
+			 if(Double.isNaN(rotDelta[i])) { System.err.println("NaN7");System.err.flush(); } }
+			 
 
 			// NOW we can apply the transformed rotation to the view!
 			// Compute the new viewEye.
@@ -1489,10 +1488,10 @@ WindowListener, IStructureStylesEventListener {
 			this.viewEye[1] += this.rotationCenter[1];
 			this.viewEye[2] += this.rotationCenter[2];
 
-			/*
-			 * for(int i = 0; i < viewEye.length; i++) {
-			 * if(Double.isNaN(viewEye[i])) { System.err.flush(); } }
-			 */
+			//
+			  for(int i = 0; i < viewEye.length; i++) {
+			  if(Double.isNaN(viewEye[i])) { System.err.println("NaN8");System.err.flush(); } }
+			 
 
 			// Compute the new viewCenter.
 			// Translate to the rotationCenter.
@@ -1505,27 +1504,27 @@ WindowListener, IStructureStylesEventListener {
 			this.viewCenter[1] += this.rotationCenter[1];
 			this.viewCenter[2] += this.rotationCenter[2];
 
-			/*
-			 * for(int i = 0; i < viewCenter.length; i++) {
-			 * if(Double.isNaN(viewCenter[i])) { System.err.flush(); } }
-			 */
+			//
+			  for(int i = 0; i < viewCenter.length; i++) {
+			  if(Double.isNaN(viewCenter[i])) { System.err.println("NaN9");System.err.flush(); } }
+			 
 
 			// Compute the new viewUp.
 			// (note that we do not translate to the rotation center first
 			// because viewUp is a direction vector not an absolute vector!)
 			ArrayLinearAlgebra.angleAxisRotate(rotDelta, this.viewUp);
 
-			/*
-			 * for(int i = 0; i < viewUp.length; i++) {
-			 * if(Double.isNaN(viewUp[i])) { System.err.flush(); } }
-			 */
+			//
+			 for(int i = 0; i < viewUp.length; i++) {
+			 if(Double.isNaN(viewUp[i])) { System.err.println("NaN10");System.err.flush(); } }
+			 
 
 			ArrayLinearAlgebra.normalizeVector(this.viewUp);
 
-			/*
-			 * for(int i = 0; i < viewUp.length; i++) {
-			 * if(Double.isNaN(viewUp[i])) { System.err.flush(); } }
-			 */
+			//
+			  for(int i = 0; i < viewUp.length; i++) {
+			  if(Double.isNaN(viewUp[i])) { System.err.println("NaN11");System.err.flush(); } }
+			
 		} else if ((e.getModifiers() & InputEvent.CTRL_MASK) == 0
 				&& (e.getModifiers() & InputEvent.SHIFT_MASK) != 0
 				|| (e.getModifiers() & InputEvent.BUTTON2_MASK) != 0) {
@@ -1807,7 +1806,7 @@ WindowListener, IStructureStylesEventListener {
 	 * @param doAtoms - whether or no to do the atom styles.
 	 */
 	protected void structureAdded(final Structure str, RibbonForm ribbonForm, boolean doAtoms)
-	{
+	{		
 		final StructureMap structureMap = str.getStructureMap();
 		final StructureStyles structureStyles = structureMap
 		.getStructureStyles();
@@ -1816,8 +1815,6 @@ WindowListener, IStructureStylesEventListener {
 		final ChainGeometry defaultChainGeometry = (ChainGeometry) defaultGeometry.get(ComponentType.CHAIN);
 		final AtomGeometry defaultAtomGeometry = (AtomGeometry) defaultGeometry.get(ComponentType.ATOM);
 		final BondGeometry defaultBondGeometry = (BondGeometry) defaultGeometry.get(ComponentType.BOND);
-		// TODO -pr 20104025
-		final SurfaceGeometry defaultSurfaceGeometry = (SurfaceGeometry) defaultGeometry.get(ComponentType.SURFACE);
 		
 		
 
@@ -1825,14 +1822,7 @@ WindowListener, IStructureStylesEventListener {
 		final AtomStyle defaultAtomStyle = (AtomStyle) structureStyles.getDefaultStyle(ComponentType.ATOM);
 		final BondStyle defaultBondStyle = (BondStyle) structureStyles.getDefaultStyle(ComponentType.BOND);
 		
-		// TODO -pr 20100425
-//		final SurfaceStyle defaultSurfaceStyle = (SurfaceStyle) structureStyles.getDefaultStyle(ComponentType.SURFACE);
-//		Vector atm = new Vector(0);
-//		Surface s = new Surface(atm, str);
-//		synchronized (sn.renderables) {
-//			sn.renderables.put(s, new DisplayListRenderable(s,
-//					defaultChainStyle, defaultSurfaceGeometry));
-//		}
+		
 
 		str.getStructureMap().getStructureStyles()
 		.removeStructureStylesEventListener(this);
@@ -1908,10 +1898,73 @@ WindowListener, IStructureStylesEventListener {
 							defaultAtomStyle, defaultAtomGeometry));
 				}
 			}
+			// should this go after the end of the if-statement ??
 			this.requestRepaint();
 		}
 	}
+	
+	/**
+	 * 
+	 * @param str
+	 */
+	public void surfaceAdded(final Structure str)
+	{
+		final StructureMap structureMap = str.getStructureMap();
+		final JoglSceneNode sn = (JoglSceneNode)structureMap.getUData();
+		
+		final SurfaceStyle defaultSurfaceStyle = new SurfaceStyle();
 
+		final SurfaceGeometry defaultSurfaceGeometry = new SurfaceGeometry();
+		
+		// add solid surfaces first
+		for (Surface s: structureMap.getSurfaces()) {
+			if (!s.isTransparent()) {
+				synchronized (sn.renderables) {
+					sn.renderables.put(s, 
+							new DisplayListRenderable(s,defaultSurfaceStyle, defaultSurfaceGeometry));
+				}
+			}
+		}
+		
+		// add transparent surfaces second
+		for (Surface s: structureMap.getSurfaces()) {
+			if (s.isTransparent()) {
+				synchronized (sn.renderables) {
+					sn.renderables.put(s, 
+							new DisplayListRenderable(s,defaultSurfaceStyle, defaultSurfaceGeometry));
+				}
+			}
+		}
+		// this.requestRepaint(); // doesn't seem to update reliably
+		VFAppBase.sgetGlGeometryViewer().requestRepaint();
+	}
+
+	public void surfaceRemoved(final Structure str) {
+		final StructureMap structureMap = str.getStructureMap();
+		JoglSceneNode sn = (JoglSceneNode)structureMap.getUData();
+		
+		Set<Entry<StructureComponent, DisplayListRenderable>> set = sn.renderables.entrySet();
+		boolean needsRepaint = false;
+		Iterator<Entry<StructureComponent, DisplayListRenderable>> iter = set.iterator();
+	
+		synchronized (sn.renderables) {
+			while (iter.hasNext()) {
+				Entry<StructureComponent, DisplayListRenderable> entry = iter.next();
+				if (entry.getKey() instanceof Surface) {
+					DisplayListRenderable renderable = entry.getValue();
+					iter.remove();
+					this.renderablesToDestroy.add(renderable);
+					needsRepaint = true;
+				}
+			}
+		}
+		
+		if (needsRepaint) {
+		//	this.requestRepaint(); // doesn't seem to update reliably
+			VFAppBase.sgetGlGeometryViewer().requestRepaint();
+		}
+	}
+	
 	public void windowActivated(final WindowEvent e)
 	{
 		requestRepaint();
@@ -1925,13 +1978,15 @@ WindowListener, IStructureStylesEventListener {
 
 	public void windowDeactivated(final WindowEvent e)
 	{
-		requestRepaint();
+	//	requestRepaint();
 	}
 
 	public void windowDeiconified(final WindowEvent e) {
+		requestRepaint();
 	}
 
 	public void windowIconified(final WindowEvent e) {
+	//	requestRepaint();
 	}
 
 	public void windowOpened(final WindowEvent e) {

@@ -49,8 +49,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Vector;
+
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
+
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.util.DebugState;
@@ -60,6 +62,7 @@ import org.rcsb.mbt.structLoader.IStructureLoader;
 import org.rcsb.mbt.structLoader.PdbStructureLoader;
 import org.rcsb.mbt.structLoader.XMLStructureLoader;
 import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.uiApp.controllers.update.UpdateEvent;
 
 public class DocController
 {
@@ -94,6 +97,9 @@ public class DocController
 
 		AppBase.sgetUpdateController().clear();
 
+		AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.STRUCTURE_REMOVED);
+		AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE);
+
 		Structure[] structure = readStructuresFromUrl(url);
 		if (structure != null)
 		{
@@ -102,7 +108,9 @@ public class DocController
 
 			AppBase.sgetModel().setStructures(structure);
 		}
+		
 	}
+	
 
 	/**
 	 * Given a url, read the structures and return the structures array.
@@ -163,10 +171,8 @@ public class DocController
 
 				else
 					System.out.println("Data set loaded: " + dataset);
-// PR
-//				new StructureMap(structureTmp, AppBase.sgetAppModuleFactory().createStructureMapUserData(),
-//						loader.getNonProteinChainIds());
-				new StructureMap(structureTmp, AppBase.sgetAppModuleFactory().createStructureMapUserData());
+
+				new StructureMap(structureTmp, loader.getEntityNameMap(), AppBase.sgetAppModuleFactory().createStructureMapUserData());
 				finalizeNewStructure(loader, structureTmp);
 
 				if (loader.getUnitCell() != null)
@@ -278,5 +284,6 @@ public class DocController
 			StructureMap.NonCrystallographicTransforms nc = structureMap.addNonCrystallographicTransforms();
 			nc.setNonCrystallographicTranslations(handler.getNonCrystallographicOperations());
 		}
+		
 	}
 }

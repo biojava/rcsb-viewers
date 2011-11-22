@@ -117,8 +117,7 @@ public class DisplayListRenderable
 		this.geometry = geometry;
 		
 		// quick fix - only ribbons are dynamic enough to warrent automatic deletion of their display lists when they're destroyed. I never destroy ribbons, so the effect is that no array list is ever destroyed.
-		if(this.structureComponent.getStructureComponentType() == ComponentType.SURFACE ||
-			this.structureComponent.getStructureComponentType() == ComponentType.ATOM ||
+		if(this.structureComponent.getStructureComponentType() == ComponentType.ATOM ||
 			this.structureComponent.getStructureComponentType() == ComponentType.BOND) {
 			this.deleteListsOnDeconstruction = false;
 		}

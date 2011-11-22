@@ -50,6 +50,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Vector;
 
@@ -65,6 +66,7 @@ import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms;
 import org.rcsb.mbt.model.attributes.ChainStyle;
@@ -81,9 +83,9 @@ public class JoglSceneNode
 
 	// value: Integer
 	// displaylist.
-	public class RenderablesMap extends HashMap<StructureComponent, DisplayListRenderable>
+	public class RenderablesMap extends LinkedHashMap<StructureComponent, DisplayListRenderable>
 	{
-		private static final long serialVersionUID = -3286356986071701750L;		
+		private static final long serialVersionUID = -3286356986071701750L;	
 	};
 	public interface RenderablesIt extends Iterator<StructureComponent>{}
 	
@@ -499,10 +501,13 @@ public class JoglSceneNode
 						} else if (sc.getStructureComponentType() == ComponentType.CHAIN) {
 							final Chain c = (Chain) sc;
 							chainId = c.getChainId();
+						}  else if (sc.getStructureComponentType() == ComponentType.SURFACE) {
+							final Surface s = (Surface) sc;
+							chainId = s.getChain().getChainId();
 						} 
 
 						// if the chain id is not listed, don't draw this.
-						if (VFAppBase.sgetSceneController().showAsymmetricUnitOnly() || sc.getStructureComponentType() == ComponentType.SURFACE)
+						if (VFAppBase.sgetSceneController().showAsymmetricUnitOnly())
 						{
 							try {
 								gl.glPushMatrix();
@@ -619,11 +624,16 @@ public class JoglSceneNode
 
 				try {
 					gl.glPushMatrix();
-					gl.glTranslated(atom.coordinate[0],
-							atom.coordinate[1], atom.coordinate[2]);
-					gl.glRasterPos3f(0, 0, 0);
+					if (Double.isNaN(atom.coordinate[0])) {
+						System.out.println("JoglSceneNode: atom.coordinate[] is NaN");
+					}
+					if (! Double.isNaN(atom.coordinate[0])) {
+						gl.glTranslated(atom.coordinate[0],
+								atom.coordinate[1], atom.coordinate[2]);
+						gl.glRasterPos3f(0, 0, 0);
 
-					gl.glCallList(list);
+						gl.glCallList(list);
+					}
 				} catch (Exception e)
 				{
 					if (DebugState.isDebug())
@@ -647,11 +657,16 @@ public class JoglSceneNode
 			{
 				try {
 					gl.glPushMatrix();
-					gl.glTranslated(atom.coordinate[0],
-							atom.coordinate[1], atom.coordinate[2]);
-					gl.glRasterPos3f(0, 0, 0);
+					if (Double.isNaN(atom.coordinate[0])) {
+						System.out.println("JoglSceneNode: atom.coordinate[] is NaN");
+					}
+					if (! Double.isNaN(atom.coordinate[0])) {
+						gl.glTranslated(atom.coordinate[0],
+								atom.coordinate[1], atom.coordinate[2]);
+						gl.glRasterPos3f(0, 0, 0);
 
-					gl.glCallList(list);
+						gl.glCallList(list);
+					}
 				} catch (Exception e)
 				{
 					if (DebugState.isDebug())
@@ -677,15 +692,21 @@ public class JoglSceneNode
 					for (int i = 0; i < 3; i++)
 						this.tempMidpoint[i] = (firstPointArray[i] + secondPointArray[i]) / 2;
 
-					gl.glTranslated(this.tempMidpoint[0] + .5f,
-							this.tempMidpoint[1] - .5f,
-							this.tempMidpoint[2] + .5f);
-					// constants represent an arbitrary displacement to separate
-					// the label from the line.
+					if (Double.isNaN(tempMidpoint[0])) {
+						System.out.println("JoglSceneNode: tempMidPoint is NaN");
+					}
+					
+					if (! Double.isNaN(tempMidpoint[0])) {
+						gl.glTranslated(this.tempMidpoint[0] + .5f,
+								this.tempMidpoint[1] - .5f,
+								this.tempMidpoint[2] + .5f);
+						// constants represent an arbitrary displacement to separate
+						// the label from the line.
 
-					gl.glRasterPos3f(0, 0, 0);
+						gl.glRasterPos3f(0, 0, 0);
 
-					gl.glCallList(list);
+						gl.glCallList(list);
+					}
 				} catch (Exception e) {
 					if (DebugState.isDebug())
 						e.printStackTrace();

@@ -140,6 +140,17 @@ public class InterpolatedColorMap
 		{ 0.75f,    1.00f, 1.00f, 0.50f },  // Yellow
 		{ 1.00f,    1.00f, 0.50f, 0.50f }   // Red
 	};
+	
+	/**
+	 * Predefined knots defining a continuous hydyrophobicity sweep ramp.
+	 */
+	private static final float[][] hydrophobicityRamp =
+	{
+		{ 0.00f,    0.00f, 0.00f, 0.50f },  // Blue
+		{ 0.30f,    0.90f, 0.90f, 1.00f },  // White
+//		{ 1.00f,    0.00f, 0.50f, 0.00f },  // Green
+		{ 1.00f,    0.85f, 0.70f, 0.10f },  // Dark yellow
+	};
 
 	/**
 	 * Predefined knot index defining a black to white ramp.
@@ -170,6 +181,11 @@ public class InterpolatedColorMap
 	 * Predefined knot index defining a continuous MolScript-like sweep ramp.
 	 */
 	public static final int MOLSCRIPT_RAMP = 5;
+	
+	/**
+	 * Predefined knot index defining a continuous hydrophobicity sweep ramp.
+	 */
+	public static final int HYDROPHOBICITY_RAMP = 6;
 
 	/**
 	 * Indexable predefined knot sets.
@@ -181,7 +197,8 @@ public class InterpolatedColorMap
 		InterpolatedColorMap.coldToHot,
 		InterpolatedColorMap.coolToWarm,
 		InterpolatedColorMap.hsbHues,
-		InterpolatedColorMap.molscriptRamp
+		InterpolatedColorMap.molscriptRamp,
+		InterpolatedColorMap.hydrophobicityRamp
 	};
 
 
