@@ -50,55 +50,39 @@
  * and Kidney Diseases (NIDDK).
  *
  * Created on 2011/11/08
- *
- */ 
-package org.rcsb.mbt.surface;
+ */
 
-import java.util.ArrayList;
-import java.util.List;
+package org.rcsb.mbt.surface.datastructure;
 
-import org.rcsb.mbt.surface.core.EdtSurfaceCalculator;
-import org.rcsb.mbt.surface.core.SurfacePatchCalculator;
-import org.rcsb.mbt.surface.datastructure.Sphere;
-import org.rcsb.mbt.surface.datastructure.TriangulatedSurface;
 
 /**
- * Creates a solvent-accessible surface using the Euclidean Distance Transform method
- * by D. Xu, Y. Zhang (2009) Generating Triangulated Macromolecular Surfaces by Euclidean 
- * Distance Transform. PLoS ONE 4(12): e8140.
- * 
- * @author Dong Xu (original C++ version)
- * @author Peter Rose (converted and refactored in Java)
+ * @author Peter Rose (converted to Java)
  */
-public class EdtSolventAccessibleSurface implements SurfaceCalculator {
-    private static boolean bcolor = true; // not sure what this is used for, it's always true in EDTSurf
-    private static int stype = 3;
-    private TriangulatedSurface surface;
-
-    public EdtSolventAccessibleSurface(List<Sphere> spheres, float probeRadius, float resolution) {
-        EdtSurfaceCalculator c = new EdtSurfaceCalculator(spheres, probeRadius, resolution);
-        c.initparam();
-        c.boundingatom();
-        c.fillvoxels(bcolor);
-        c.buildbounary();
-        c.marchingcube(stype);
-
-        surface = c.getSurface();
-    }
-
-    public EdtSolventAccessibleSurface(List<Sphere> patch, List<Sphere> context, float probeRadius, float distanceThreshold, float resolution) {
-        List<Sphere> surrounding = new ArrayList<Sphere>();
-        surrounding.addAll(SurfacePatchCalculator.calcSurroundings(patch, context, distanceThreshold + 2.0f));
-
-        SurfaceCalculator eas = new EdtSolventAccessibleSurface(surrounding, probeRadius, resolution);
-        surface = eas.getSurface();
-
-        SurfacePatchCalculator sp = new SurfacePatchCalculator(surface, context, distanceThreshold);
-        surface = sp.getSurfacePatch();
-    }
-
-    public TriangulatedSurface getSurface() {
-        return surface;
-    }
-
+public class LineInfo {
+	public static int c = (int) Math.sqrt(Integer.MAX_VALUE);
+	public int a,b;
+	
+	public LineInfo(int a, int b) {
+		if (a < b) {
+			this.a = a;
+			this.b = b;
+		} else {
+			this.a = b;
+			this.b = a;
+		}
+	}
+	
+	public int hashCode() {
+		   return a + b * c;
+	}
+	
+	public boolean equals(Object a) {
+		if (this == a) return true;
+		
+		if (! (a instanceof LineInfo)) return false;
+		
+		LineInfo la = (LineInfo)a;
+		
+		return this.a == la.a && this.b == la.b;
+	}
 }

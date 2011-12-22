@@ -173,7 +173,7 @@ public class EdtVanDerWaalsSurfaceTest {
         List<Sphere>context = new ArrayList<Sphere>();
         context.add(sphere2);
 
-        SurfaceCalculator instance = new EdtVanDerWaalsSurface(patch, context, 5.0f);
+        SurfaceCalculator instance = new EdtVanDerWaalsSurface(patch, context, 10.0f, 5.0f);
         TriangulatedSurface surface = instance.getSurface();
 
         float probeRadius = 0.0f;

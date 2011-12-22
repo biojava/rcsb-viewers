@@ -147,7 +147,7 @@ public class EdtSolventAccessibleSurfaceTest {
         List<Sphere>context = new ArrayList<Sphere>();
         context.add(sphere2);
 
-        SurfaceCalculator instance = new EdtSolventAccessibleSurface(patch, context, PROBE_RADIUS, 5.0f);
+        SurfaceCalculator instance = new EdtSolventAccessibleSurface(patch, context, PROBE_RADIUS, 6.0f, 5.0f);
         TriangulatedSurface surface = instance.getSurface();
 
         TwoSphereOverlap overlap = new TwoSphereOverlap(sphere1, sphere2, PROBE_RADIUS);

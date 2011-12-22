@@ -87,14 +87,14 @@ public class EdtVanDerWaalsSurface implements SurfaceCalculator {
         surface = c.getSurface();
     }
 
-    public EdtVanDerWaalsSurface(List<Sphere> patch, List<Sphere> context, float resolution) {
-        List<Sphere> all = new ArrayList<Sphere>(patch);
-        all.addAll(SurfacePatchCalculator.calcSurroundings(patch, context));
+    public EdtVanDerWaalsSurface(List<Sphere> patch, List<Sphere> context, float distanceThreshold, float resolution) {
+        List<Sphere> surrounding = new ArrayList<Sphere>();
+        surrounding.addAll(SurfacePatchCalculator.calcSurroundings(patch, context, distanceThreshold + 2.0f));
 
-        SurfaceCalculator evs = new EdtVanDerWaalsSurface(all, resolution);
+        SurfaceCalculator evs = new EdtVanDerWaalsSurface(surrounding, resolution);
         surface = evs.getSurface();
 
-        SurfacePatchCalculator sp = new SurfacePatchCalculator(surface, patch.size(), patch);
+        SurfacePatchCalculator sp = new SurfacePatchCalculator(surface, context, distanceThreshold);
         surface = sp.getSurfacePatch();
     }
 

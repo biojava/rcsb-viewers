@@ -46,6 +46,8 @@
 package org.rcsb.mbt.model;
 
 import javax.vecmath.Color4f;
+import javax.vecmath.Vector3f;
+
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.surface.datastructure.TriangulatedSurface;
 
@@ -53,7 +55,11 @@ import org.rcsb.mbt.surface.datastructure.TriangulatedSurface;
 public class Surface extends StructureComponent {
 	private Chain chain;
 	private TriangulatedSurface triangulatedSurface;
+	private boolean backfaceRendered = false;
+	private boolean meshSurface = false;
+	private boolean dotSurface = false;
 	private Color4f[] colors;
+	private Vector3f alignment;
 
 	public Surface(final Chain chain, final Structure structure) {
 		super();
@@ -89,7 +95,51 @@ public class Surface extends StructureComponent {
 		return chain;
 	}
 		
+	public boolean setBackfaceRendered(boolean backFaceRendered) {
+		return this.backfaceRendered = backFaceRendered;
+	}
+	
+	public boolean isBackfaceRendered() {
+		return backfaceRendered;
+	}
+	
 	public boolean isTransparent() {
 		return colors[0].w < 1.0f;
+	}
+
+	/**
+	 * @param meshSurface
+	 */
+	public void setMeshSurface(boolean meshSurface) {
+		this.meshSurface = meshSurface;
+	}
+
+	/**
+	 * @return the meshSurface
+	 */
+	public boolean isMeshSurface() {
+		return meshSurface;
+	}
+
+	/**
+	 * @param drawDots the drawDots to set
+	 */
+	public void setDotSurface(boolean dotSurface) {
+		this.dotSurface = dotSurface;
+	}
+
+	/**
+	 * @return the dotSurface
+	 */
+	public boolean isDotSurface() {
+		return dotSurface;
+	}
+	
+	public Vector3f getAlignment() {
+		return alignment;
+	}
+	
+	public void setAlignment(Vector3f alignment) {
+		this.alignment = alignment;
 	}
 }

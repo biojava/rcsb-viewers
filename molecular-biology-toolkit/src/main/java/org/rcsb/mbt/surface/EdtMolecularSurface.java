@@ -58,6 +58,7 @@ package org.rcsb.mbt.surface;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.surface.core.EdtSurfaceCalculator;
 import org.rcsb.mbt.surface.core.SurfacePatchCalculator;
 import org.rcsb.mbt.surface.datastructure.Sphere;
@@ -74,7 +75,7 @@ import org.rcsb.mbt.surface.datastructure.TriangulatedSurface;
 public class EdtMolecularSurface implements SurfaceCalculator {
     private static boolean bcolor = true; // not sure what this is used for, it's always true in EDTSurf
     private static int stype = 4;//
-    private TriangulatedSurface surface;
+    private TriangulatedSurface surface = new TriangulatedSurface();
 
     public EdtMolecularSurface(List<Sphere> spheres, float probeRadius, float resolution) {
         EdtSurfaceCalculator c = new EdtSurfaceCalculator(spheres, probeRadius, resolution);
@@ -88,14 +89,20 @@ public class EdtMolecularSurface implements SurfaceCalculator {
         surface = c.getSurface();
     }
 
-    public EdtMolecularSurface(List<Sphere> patch, List<Sphere> context, float probeRadius, float resolution) {
-        List<Sphere> all = new ArrayList<Sphere>(patch);
-        all.addAll(SurfacePatchCalculator.calcSurroundings(patch, context));
+    public EdtMolecularSurface(List<Sphere> patch, List<Sphere> context, float probeRadius, float distanceThreshold, float resolution) {
+        System.out.println("EdtMolecularSurface: patch " + patch.size());
+        System.out.println("EdtMolecularSurface: context " + context.size());
+    	List<Sphere> surrounding = new ArrayList<Sphere>();
+        surrounding.addAll(SurfacePatchCalculator.calcSurroundings(patch, context, distanceThreshold + 10.0f));
 
-        EdtMolecularSurface ems = new EdtMolecularSurface(all, probeRadius, resolution);
+        System.out.println("EdtMolecularSurface: all " + surrounding.size());
+        if (surrounding.size() == 0) {
+        	return;
+        }
+        EdtMolecularSurface ems = new EdtMolecularSurface(surrounding, probeRadius, resolution);
         surface = ems.getSurface();
 
-        SurfacePatchCalculator sp = new SurfacePatchCalculator(surface, patch.size(), patch);
+        SurfacePatchCalculator sp = new SurfacePatchCalculator(surface, context, distanceThreshold);
         surface = sp.getSurfacePatch();
     }
     

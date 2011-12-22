@@ -53,7 +53,12 @@
 
 package org.rcsb.mbt.surface.datastructure;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
@@ -65,8 +70,8 @@ import javax.vecmath.Vector3f;
  */
 public class TriangulatedSurface {
 
-    private List<VertInfo> vertices;
-    private List<FaceInfo> faces;
+    private List<VertInfo> vertices = new ArrayList<VertInfo>(0);
+    private List<FaceInfo> faces = new ArrayList<FaceInfo>(0);
 
     public void setVertices(List<VertInfo> vertices) {
         this.vertices = vertices;
@@ -82,6 +87,32 @@ public class TriangulatedSurface {
 
     public List<FaceInfo> getFaces() {
         return faces;
+    }
+    
+    public List<LineInfo> getLines() {
+    	Set<LineInfo> lines = new HashSet<LineInfo>();
+    	for (FaceInfo f: faces) {
+    		// make sure to add each line only once
+    		LineInfo lab = new LineInfo(f.a,f.b);
+    		if (! lines.contains(lab)) {
+    			lines.add(lab);
+    		} else {
+    			lab = null;
+    		}
+    		LineInfo lac = new LineInfo(f.a,f.c);
+    		if (! lines.contains(lac)) {
+    			lines.add(lac);
+    		} else {
+    			lac = null;
+    		}
+    		LineInfo lbc = new LineInfo(f.b,f.c);
+    		if (! lines.contains(lbc)) {
+    			lines.add(lbc);
+    		} else {
+    			lbc = null;
+    		}
+    	}
+    	return new ArrayList<LineInfo>(lines);
     }
 
     /**
@@ -112,6 +143,28 @@ public class TriangulatedSurface {
         return area;
     }
 
+    public Point3f getCentroid() {
+    	Point3f centroid = new Point3f();
+    	for (VertInfo v: vertices) {
+    		centroid.add(v.p);
+    	}
+    	System.out.println("Centroid sum: " + centroid);
+    	if (vertices.size() > 0) {
+    		centroid.scale(1.0f/vertices.size());
+    	}
+    	System.out.println("Centroid scaled: " + centroid);
+    	return centroid;
+    }
+    
+    public Vector3f getCompositeNormal() {
+    	Vector3f normal = new Vector3f();
+    	for (VertInfo v: vertices) {
+    		normal.add(v.normal);
+    	}
+    	normal.normalize();
+    	return normal;
+    }
+    
     public void computenorm() {
         Vector3f ab = new Vector3f();
         Vector3f ac = new Vector3f();
@@ -129,6 +182,7 @@ public class TriangulatedSurface {
             ac.sub(vc.p, va.p);
             faceNormal.cross(ab, ac);
             faceNormal.normalize();
+            f.pn = faceNormal;
             va.normal.add(faceNormal);
             vb.normal.add(faceNormal);
             vc.normal.add(faceNormal);
@@ -139,7 +193,7 @@ public class TriangulatedSurface {
             v.normalize();
         }
     }
-
+    
     public void laplaciansmooth(int numiter) {
 
     	// TODO

@@ -54,7 +54,7 @@
 
 package org.rcsb.mbt.surface.datastructure;
 
-import javax.vecmath.Point3f;
+import javax.vecmath.Vector3f;
 
 /**
  * @author Dong Xu (original C++ version)
@@ -62,7 +62,7 @@ import javax.vecmath.Point3f;
  */
 public class FaceInfo {
 	public int a,b,c;
-	public Point3f pn = new Point3f();
+	public Vector3f pn = new Vector3f();
 	public float area;
 	public boolean inout;//interior true
 }

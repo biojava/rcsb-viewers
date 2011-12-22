@@ -49,6 +49,7 @@ package org.rcsb.mbt.surface.core;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,46 +66,45 @@ import org.rcsb.mbt.surface.datastructure.VertInfo;
  * @author Peter Rose
  */
 public class SurfacePatchCalculator {
-    private static float thresholdSq = 10.0f * 10.0f;
     TriangulatedSurface surface;
     Map<Integer, Integer> vertexMap = new HashMap<Integer, Integer>(); // maps original vertex indices to the truncated vertex list
 
-    public SurfacePatchCalculator(TriangulatedSurface surface, int patchSize, List<Sphere> patch) {
+    public SurfacePatchCalculator(TriangulatedSurface surface, List<Sphere> context, float distanceThreshold) {
         this.surface = surface;
         // truncate vertices and faces to the patch site region
         System.out.println("before vertices: " + surface.getVertices().size());
-        truncateVertices(patchSize, patch);
+        truncateByDistance(context, distanceThreshold);
         System.out.println("truncated vertices: " + surface.getVertices().size());
         truncateFaces();
+        smoothEdges();      
+        System.out.println("truncated vertices after smoothing: " + surface.getVertices().size());
     }
 
     public TriangulatedSurface getSurfacePatch() {
         return surface;
     }
 
-    private void truncateVertices(int patchSize, List<Sphere> patch) {
-        // truncate vertices array to just the patch spheres
-        List<VertInfo> truncatedVertices = new ArrayList<VertInfo>();
-        List<VertInfo> vertices = surface.getVertices();
-        int vertCount = 0;
-
-        Set<Object> patchObject = new HashSet<Object>(patch.size());
-        for (Sphere s: patch) {
-        	patchObject.add(s.getReference());
-        }
-        for (int i = 0; i < vertices.size(); i++) {
-            VertInfo v = vertices.get(i);
-       //     if (patchObject.contains(v.reference)) {
-           if (v.atomid < patchSize) {
-   //     	   System.out.println("adding vertex");
-                truncatedVertices.add(v);
-                vertexMap.put(i, vertCount);
-                vertCount++;
-            }
-        }
-        System.out.println("vertex count: "  + vertCount);
-
-        surface.setVertices(truncatedVertices);
+    private void truncateByDistance(List<Sphere> context, float distanceThreshold) {
+    	 List<VertInfo> truncatedVertices = new ArrayList<VertInfo>();
+         List<VertInfo> vertices = surface.getVertices();
+  
+         float thresholdSq = distanceThreshold * distanceThreshold;
+         
+         int vertCount = 0;
+         for (int i = 0; i < vertices.size(); i++ ) {
+        	 VertInfo v = vertices.get(i);
+             for (Sphere s : context) {
+                 Point3f ps = s.getLocation();       
+                 if (ps.distanceSquared(v.p) < thresholdSq) {
+                     vertexMap.put(i,vertCount);
+                     vertCount++;
+                     truncatedVertices.add(v);
+                     break;
+                 }
+             }
+         }
+         
+         surface.setVertices(truncatedVertices);
     }
 
     private void truncateFaces() {
@@ -122,19 +122,57 @@ public class SurfacePatchCalculator {
                 truncatedFaces.add(f);
             }
         }
-
+        vertexMap.clear();
         surface.setFaces(truncatedFaces);
     }
+    
+    private void smoothEdges() {
+    	int vertexCount = 0;
+    	do {
+    		vertexCount = surface.getVertices().size();
+    		System.out.println("smoothing: " + vertexCount);
+    		removeJaggedEdge();
+    		truncateFaces();
+    	} while (surface.getVertices().size() < vertexCount);
+    }
+    
+    private void removeJaggedEdge() {
+    	int[] edgeCount = new int[surface.getVertices().size()];
+    	List<FaceInfo> faces = surface.getFaces();
+    	for (FaceInfo f: faces) {
+    		edgeCount[f.a]++;
+    		edgeCount[f.b]++;
+    		edgeCount[f.c]++;
+    	}
+    	
+    	List<VertInfo> vertices = surface.getVertices();
+    	List<VertInfo> truncatedVertices = new ArrayList<VertInfo>();
+    	
+    	int vertCount = 0;
+    	for (int i = 0; i < edgeCount.length; i++) {
+    		if (edgeCount[i] > 1) {
+    			vertexMap.put(i,vertCount);
+                vertCount++;
+                truncatedVertices.add(vertices.get(i));
+    		}
+    	}
+        surface.setVertices(truncatedVertices);
+    }
+    
+    private void removeFragments() {
+    	// only keep largest surface
+    	// TODO implement
+    }
 
-    public static List<Sphere> calcSurroundings(List<Sphere> spheres, List<Sphere> patch) {
+    public static List<Sphere> calcSurroundings(List<Sphere> patch, List<Sphere> context, float distanceThreshold) {
         List<Sphere> surroundings = new ArrayList<Sphere>();
-
-        for (Sphere s : spheres) {
+        float thresholdSq = distanceThreshold * distanceThreshold;
+        for (Sphere s : patch) {
             Point3f ps = s.getLocation();
-            for (Sphere p: patch) {
+            for (Sphere p: context) {
                 Point3f pp = p.getLocation();
                 if (ps.distanceSquared(pp) < thresholdSq) {
-                    surroundings.add(p);
+                    surroundings.add(s);
                     break;
                 }
             }
