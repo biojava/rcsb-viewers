@@ -82,21 +82,20 @@ import org.rcsb.lx.ui.dialogs.AngleDialog;
 import org.rcsb.lx.ui.dialogs.DihedralDialog;
 import org.rcsb.lx.ui.dialogs.DistanceDialog;
 import org.rcsb.lx.ui.dialogs.IPickInfoReceiver;
+import org.rcsb.mbt.model.Chain;
+import org.rcsb.mbt.model.Structure;
+import org.rcsb.mbt.model.StructureModel;
+import org.rcsb.mbt.model.util.Status;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.uiApp.ui.FileLocs;
 import org.rcsb.uiApp.ui.views.StructureComponentInspector;
-import org.rcsb.vf.controllers.app.VFAppBase;
-import org.rcsb.mbt.model.Chain;
-import org.rcsb.mbt.model.StructureModel;
-import org.rcsb.mbt.model.Structure;
-import org.rcsb.mbt.model.util.Status;
 import org.rcsb.vf.controllers.app.BBBrowserLauncher;
+import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
 import org.rcsb.vf.ui.VFUIBuilder;
-
 
 
 public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListener
@@ -328,15 +327,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 								String url = FileLocs.pdbFileBase + pdbId
 										+ FileLocs.pdbFileExtension;
 								VFAppBase.sgetDocController().loadStructure(url, pdbId);
-
-/* **
-								Status.progress(-1, "Creating side bar...");
-								sidebar = new LigandSideBar(LXDocumentFrame.this);
-								LXDocumentFrame.this
-										.displaySideBar(sidebar);
-* **/
 							}
-							// if ( cmd.equals( "comboBoxEdited" ) )
 						}
 					};
 				
@@ -364,10 +355,10 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 				pdbIdList.addPopupMenuListener(idCodePopupListener);
 
 				// Create the sidebar
-				sidebar = new LigandSideBar(LXDocumentFrame.this);
+				sidebar = new LigandSideBar(LXDocumentFrame.this);		
 				horizontalSplitPane
 						.setLeftComponent(sidebar);
-
+				
 				// Create a splitPane for the structure viewer and the
 				// sequence viewer
 				horizontalSplitPane
@@ -438,7 +429,6 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 
 	public SequenceTabbedPane sequenceViewer = null;
 
-//	private final String helpURL = "http://www.pdb.org/robohelp_f/#molecular_viewers/ligandviewer/user_guide.htm";
 	private final String helpURL = "http://www.pdb.org/pdb/staticHelp.do?p=help/viewers/ligandExplorer_viewer.html";
 
 	/**
@@ -522,6 +512,7 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 	public void displaySideBar(final LigandSideBar ligandSideBar)
 	{
 		this.horizontalSplitPane.setLeftComponent(ligandSideBar);
+		
 	}
 
 	public void displayErrorMessage(final String text) {
@@ -575,13 +566,14 @@ public class LXDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 						//
 				
 				sidebar = new LigandSideBar(this);
-				displaySideBar(sidebar);
+				displaySideBar(sidebar);	
 
 				Vector<Chain> ligandList = sidebar.getLigandList();
 				if (ligandList != null && !ligandList.isEmpty())
 				{
 					getModel().setInitialLigand((String)VFAppBase.getApp().properties.get("ligand"));
 					sidebar.selectInitialLigand();
+					horizontalSplitPane.setLeftComponent(sidebar);
 					LigandExplorer.sgetGlGeometryViewer().requestRedrawInitialLigand();
 				}
 		}

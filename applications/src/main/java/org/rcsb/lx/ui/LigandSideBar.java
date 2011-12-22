@@ -86,6 +86,8 @@ import org.rcsb.mbt.model.util.Status;
 
 public class LigandSideBar extends JPanel
 {
+	private Residue initialLigandResidue;
+	
 	private final class InteractionListener implements ActionListener {
 		private final JCheckBox box;
 		private final JCheckBox hydrogenBondBox;
@@ -98,6 +100,7 @@ public class LigandSideBar extends JPanel
 		private final FloatLimitField phobicFLF2;
 		private final FloatLimitField otherFLF2;
 		private final FloatLimitField neighborFLF1;
+		
 
 		private InteractionListener(JCheckBox box,
 				JCheckBox hydrogenBondBox, JCheckBox hydrophobicBox,
@@ -481,12 +484,17 @@ public class LigandSideBar extends JPanel
 			distanceBox.setBackground(LXDocumentFrame.sidebarColor);
 			distanceBox.setSelected(true);
 			this.add(distanceBox);
+			
+			final JPanel surfacePanel = new BindingSiteSurfacePanel();
+			surfacePanel.setBackground(LXDocumentFrame.sidebarColor);
+			this.add(surfacePanel);
 
 			// this button should eventually be removed. Its still used
 			// to fire some update events
 			applyButton = new JButton("Apply");
 			this.add(applyButton);
 
+			
 
 			this.setLayout(
 					new LayoutManager()
@@ -522,13 +530,15 @@ public class LigandSideBar extends JPanel
 								Dimension otherFLF2Preferred = otherFLF2.getPreferredSize();
 								Dimension neighborFLF1Preferred = neighborFLF1.getPreferredSize();
 								Dimension separatorPreferred = separator.getPreferredSize();
+								Dimension surfacePanelPreferred = surfacePanel.getPreferredSize();
 
 								int parentHeight = parent.getHeight();
 								int parentWidth = parent.getWidth();
 								int fullWidth = parentWidth - parentInsets.left - parentInsets.right - visualBuffer * 2;
 
 								int listHeight = parentHeight - parentInsets.top - parentInsets.bottom - (step1Preferred.height + step2Preferred.height + hydrophilicBoxPreferred.height + 
-										hydrophobicBoxPreferred.height + l_h2o_pBoxPreferred.height + otherBoxPreferred.height + neighborBoxPreferred.height + separatorPreferred.height + distancePreferred.height + visualBuffer * 13);
+										hydrophobicBoxPreferred.height + l_h2o_pBoxPreferred.height + otherBoxPreferred.height + neighborBoxPreferred.height + separatorPreferred.height + 
+										distancePreferred.height + surfacePanelPreferred.height + visualBuffer * 13);
 
 								int curY = parentInsets.top + visualBuffer;
 								int curX = parentInsets.left + visualBuffer;
@@ -599,6 +609,11 @@ public class LigandSideBar extends JPanel
 								curY += distancePreferred.height + visualBuffer;
 								maxWidth = Math.max(maxWidth, distancePreferred.width);
 
+								surfacePanel.setBounds(curX, curY, surfacePanelPreferred.width, surfacePanelPreferred.height);
+								System.out.println("LigandSideBar: " + surfacePanel.getPreferredSize());
+								curY += surfacePanelPreferred.height + visualBuffer;
+								maxWidth = Math.max(maxWidth, surfacePanelPreferred.width);
+								
 								this.layoutSize.width = maxWidth + parentInsets.left + parentInsets.right + visualBuffer * 2;
 							}
 						}
@@ -697,6 +712,12 @@ public class LigandSideBar extends JPanel
 					
 					if (isInitialLigandResidue(residue, initialLigand))
 					{
+						// PR new code
+		                initialLigandResidue = residue;
+		                Residue[] ligs = new Residue[1];
+		                ligs[0] = residue;
+		                LigandExplorer.sgetSceneController().setLigandResidues(ligs);
+		                
 						// The following code generates an exception in the swing libs 
 						// (see bug PDBWW-1917 PDB ID 1OLN, ligand XBB), most likely because
 						// the path has null entries, i.e. for the case above.

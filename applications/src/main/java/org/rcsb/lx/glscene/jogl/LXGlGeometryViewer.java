@@ -49,10 +49,18 @@ import java.awt.Dimension;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Matrix4d;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Point3f;
+import javax.vecmath.Vector3f;
+
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.controllers.scene.LXViewMovementThread;
 import org.rcsb.lx.controllers.update.LXUpdateEvent;
@@ -66,6 +74,7 @@ import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
+import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
@@ -74,6 +83,11 @@ import org.rcsb.mbt.model.attributes.LineStyle;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
+import org.rcsb.mbt.surface.BindingSiteSurfaceOrienter;
+import org.rcsb.mbt.surface.datastructure.IcosahedralSampler;
+import org.rcsb.mbt.surface.datastructure.TriangulatedSurface;
+import org.rcsb.mbt.surface.datastructure.VertInfo;
+import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.vf.controllers.scene.ViewMovementThread;
@@ -739,7 +753,112 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 
 		return new double[][] { { minX, minY, minZ }, { maxX, maxY, maxZ } };
 	}
+	
+	public void ligandViewWithSurface(final Structure structure)
+	{
 
+		System.out.println("Adjust surface view");
+		final double[][] ligandBounds =
+			getLigandBounds(structure, LigandExplorer.sgetSceneController().getLigandResidues());
+
+		if (ligandBounds == null) {
+			return;
+		}
+
+		final StructureMap sm = structure.getStructureMap();
+		final LXSceneNode node = (LXSceneNode)sm.getUData();
+
+		// a water molecule is assumed to be 1.4 angstroms in "diameter". Use a
+		// multiple of this to push the display out to show a reasonable amount
+		// of interactions.
+		final double padding = 1.4 * 9;
+
+		double maxLigandLength = 0;
+		for (int i = 0; i < ligandBounds[0].length; i++) {
+			maxLigandLength += Math.pow(
+					ligandBounds[0][i] - ligandBounds[1][i], 2);
+		}
+		maxLigandLength = Math.sqrt(maxLigandLength);
+
+		// float[] eye = { 0.0, 0.0, maxDistance * 1.4 };
+
+		
+		final double[] center = {
+				(ligandBounds[0][0] + ligandBounds[1][0]) / 2,
+				(ligandBounds[0][1] + ligandBounds[1][1]) / 2,
+				(ligandBounds[0][2] + ligandBounds[1][2]) / 2 };
+		
+		long t1 = System.nanoTime();
+		BindingSiteSurfaceOrienter orienter = getBindingSiteSurfaceOrienter();
+		Vector3f normal = orienter.getOptimalOrientation();
+		long t2 = System.nanoTime();
+		System.out.println("Opimal orientation: " + ((t2-t1)/1000000) + " ms");
+		Vector3f alignment = orienter.getHorizontalAlignment();
+		long t3 = System.nanoTime();
+		System.out.println("Horizontal aligment: " + ((t3-t2)/1000000) + " ms");
+		alignment.cross(alignment, normal);
+		
+		// can we use centroid of sample instead of ligand center?
+		Point3f cntr = orienter.sampleCentroid();
+		center[0] = cntr.x;
+		center[1] = cntr.y;
+		center[2] = cntr.z;
+		
+		// Make sure normal is not pointing in "up" direction. It will cause numerical problems
+		// and causes the view to disappear.
+		double[] up = { 0.0f, 1.0f, 0.0f };
+		up[0] = alignment.x;
+		up[1] = alignment.y;
+		up[2] = alignment.z;
+		
+		float epsilon = 0.0001f;
+		if (normal.epsilonEquals(alignment, epsilon)) {
+			normal.set(epsilon, 1.0f, epsilon);
+			normal.normalize();
+		}
+		normal.scale((float)(maxLigandLength+padding));
+		
+//		final double[] eye = { center[0], center[1],
+//				center[2] + maxLigandLength + padding };
+		final double[] eye = { center[0]+normal.x, center[1]+normal.y,
+		center[2] + normal.z};
+
+		
+		// scene.lookAt(eye, scene.rotationCenter, up);
+
+		final double[] currentOrientation = node.getEye();
+		final double[] currentPosition = node.getCenter();
+		final double[] currentUp = node.getUp();
+
+		LXViewMovementThread.createMovementThread(
+				currentOrientation, eye, currentPosition, center, currentUp, up, 0, 0, 0, 0).start();
+
+		requestRepaint();
+	}
+	
+	private BindingSiteSurfaceOrienter getBindingSiteSurfaceOrienter() {
+		List<Point3f> samplePoints = new ArrayList<Point3f>();
+		
+        Residue[] residues = LigandExplorer.sgetSceneController().getLigandResidues();	
+		for (Residue r: residues) {
+			for (Atom a: r.getAtoms()) {
+				samplePoints.add(new Point3f((float)a.coordinate[0], (float)a.coordinate[1], (float)a.coordinate[2]));
+			}
+		}
+		
+		List<TriangulatedSurface> surfaces = new ArrayList<TriangulatedSurface>();
+		
+		Structure structure = AppBase.sgetModel().getStructures().get(0);
+		StructureMap smap = structure.getStructureMap();
+		
+		for (Surface s: smap.getSurfaces()){
+			s.getTriangulatedSurface().computenorm();
+            surfaces.add(s.getTriangulatedSurface());
+		}
+		BindingSiteSurfaceOrienter orienter = new BindingSiteSurfaceOrienter(samplePoints, surfaces);
+		return orienter;
+	}
+	
 	/**
 	 * Process in incoming StructureStylesEvent.
 	 */
