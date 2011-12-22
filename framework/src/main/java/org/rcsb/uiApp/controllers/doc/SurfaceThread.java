@@ -52,6 +52,7 @@ import java.util.Vector;
 
 import javax.swing.JOptionPane;
 import javax.vecmath.Point3f;
+import javax.vecmath.Vector3f;
 
 import org.jcolorbrewer.ColorBrewer;
 import org.rcsb.mbt.model.Atom;
@@ -64,11 +65,11 @@ import org.rcsb.mbt.model.Residue.Classification;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms;
 import org.rcsb.mbt.model.StructureMap.BiologicUnitTransforms.BiologicalUnitGenerationMapByChain;
 import org.rcsb.mbt.model.attributes.AtomRadiusRegistry;
-
 import org.rcsb.mbt.model.attributes.IAtomRadius;
 import org.rcsb.mbt.model.attributes.SurfaceColorUpdater;
 import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.util.Status;
+import org.rcsb.mbt.surface.BindingSiteSurfaceOrienter;
 import org.rcsb.mbt.surface.EdtMolecularSurface;
 import org.rcsb.mbt.surface.SurfaceCalculator;
 import org.rcsb.mbt.surface.datastructure.Sphere;
@@ -86,6 +87,9 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
  */
 public class SurfaceThread extends Thread {
 	private static float PROBE_RADIUS = 1.4f;
+	private static float DISTANCE_THRESHOLD = 6.5f;
+	private boolean drawLines = true;
+	private boolean drawDots = false;
 	
 	public void createSurface() {
 		IAtomRadius registry = AtomRadiusRegistry.get("By CPK");
@@ -94,6 +98,9 @@ public class SurfaceThread extends Thread {
 		StructureMap smap = structure.getStructureMap();	
 		List<Chain> polymerChains = getPolymerChains();
 		float resolution = calcResolution(polymerChains);	
+		if (drawLines) {
+			resolution *= 0.5f;
+		}
 		
 		long t0 = System.nanoTime();
 		// create progress bar
@@ -124,6 +131,8 @@ public class SurfaceThread extends Thread {
 			};
 	
 			// calculate molecular surface
+			System.out.println("Resolution: " + resolution);
+			
 			SurfaceCalculator s = new EdtMolecularSurface(spheres, PROBE_RADIUS, resolution);
 			TriangulatedSurface ts = s.getSurface();
 			s = null; // this is a very large object that should be garbage collected ASAP
@@ -132,6 +141,8 @@ public class SurfaceThread extends Thread {
 			ts.laplaciansmooth(1);
 			Surface surface = new Surface(c, structure);
 			surface.setTriangulatedSurface(ts);
+			surface.setMeshSurface(drawLines);
+			surface.setDotSurface(drawDots);
 			
 			// set default surface color
 			SurfaceColorUpdater.setPaletteColor(surface, ColorBrewer.BrBG, polymerChains.size(), smap.getSurfaceCount());
@@ -148,6 +159,96 @@ public class SurfaceThread extends Thread {
 		long t5 = System.nanoTime();
 		System.out.println("Surface calculation: " + (t5-t0)/1000000 + " ms");
 		AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE); 
+	}
+
+	public void createBindingSiteSurface(Residue[] ligands, int surfaceRepresentation) {
+		IAtomRadius registry = AtomRadiusRegistry.get("By CPK");
+		
+		Structure structure = AppBase.sgetModel().getStructures().get(0);
+		StructureMap smap = structure.getStructureMap();	
+		List<Chain> polymerChains = getPolymerChains();
+		System.out.println("begin polymerchains: " + polymerChains.size() + " index: " + smap.getSurfaceCount());
+		float resolution = 0.4f;
+		if (surfaceRepresentation == 1) {
+			resolution = 0.3f;
+		}
+		
+		long t0 = System.nanoTime();
+		// create progress bar
+		ProgressPanelController.StartProgress(AppBase.sgetActiveFrame());
+		Status.progress(0, "Creating surfaces");
+		
+		for (Chain c: polymerChains) {
+			List<Sphere> spheres = new ArrayList<Sphere>();
+			Vector<Residue> residues = c.getResidues();
+			
+			// TODO How to deal with non-standard residues in a polymer?
+			for (Residue r: residues) {
+				if (r.getClassification().equals(Classification.AMINO_ACID) ||
+						r.getClassification().equals(Classification.NUCLEIC_ACID)) {
+					Vector<Atom> atoms = r.getAtoms();
+					for (Atom a: atoms) {
+						double[] coord = a.coordinate;
+						Point3f location = new Point3f((float)coord[0], (float)coord[1], (float)coord[2]);
+						float radius = registry.getAtomRadius(a);
+						// enlarge spheres by 10% to avoid that helices touch the surface
+						spheres.add(new Sphere(location, radius, a));
+					}
+				}
+			}
+			// TODO should there be a size cutoff? I.e. min 24 residues?
+			if (spheres.size() == 0) {
+				continue;
+			};
+			
+			List<Sphere> ligandSpheres = new ArrayList<Sphere>();
+			for (Residue r: ligands) {
+				Vector<Atom> atoms = r.getAtoms();
+				for (Atom a: atoms) {
+					double[] coord = a.coordinate;
+					Point3f location = new Point3f((float)coord[0], (float)coord[1], (float)coord[2]);
+					float radius = registry.getAtomRadius(a);
+					// enlarge spheres by 10% to avoid that helices touch the surface
+					ligandSpheres.add(new Sphere(location, radius, a));
+				}
+			}
+	
+			// calculate binding site molecular surface
+			SurfaceCalculator s = new EdtMolecularSurface(spheres, ligandSpheres, PROBE_RADIUS, DISTANCE_THRESHOLD, resolution);
+			TriangulatedSurface ts = s.getSurface();
+			s = null; // this is a very large object that should be garbage collected ASAP
+			if (ts.getVertices().size() == 0) {
+				continue;
+			}
+
+			// smooth surface
+		//	ts.laplaciansmooth(5);
+			ts.laplaciansmooth(2);
+			Surface surface = new Surface(c, structure);
+			surface.setTriangulatedSurface(ts);
+			surface.setBackfaceRendered(true);
+			if (surfaceRepresentation == 1) {
+				surface.setMeshSurface(true);
+			} else if (surfaceRepresentation == 2) {
+				surface.setDotSurface(true);
+			}
+			
+			// set default surface color
+			SurfaceColorUpdater.setHydrophobicSurfaceColor(surface);
+
+			smap.addSurface(surface);
+			
+			// update progress bar
+			Status.progress(((int)(100* smap.getSurfaceCount()/(float)polymerChains.size())), "Creating surfaces");
+			
+//			AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.SURFACE_ADDED, surface); // has no effect
+	//		AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE); 
+		}
+		ProgressPanelController.EndProgress();
+		long t5 = System.nanoTime();
+		System.out.println("Surface calculation: " + (t5-t0)/1000000 + " ms");
+	//	AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE); 
+
 	}
 
 	/**
@@ -200,7 +301,7 @@ public class SurfaceThread extends Thread {
 		
 		// TODO
 		// this creates a dependency on other packages! How can this be avoided?
-		final String showAsymmetricUnitOnly = AppBase.getApp().properties.getProperty("show_asymmetric_unit_only");;
+		final String showAsymmetricUnitOnly = AppBase.getApp().properties.getProperty("show_asymmetric_unit_only");
 		if (showAsymmetricUnitOnly != null && showAsymmetricUnitOnly.equals("true")) {
 			return 1;
 		}
@@ -227,6 +328,8 @@ public class SurfaceThread extends Thread {
 
 		return symOps;
 	}
+	
+	
 	
 	public void run()
 	{
