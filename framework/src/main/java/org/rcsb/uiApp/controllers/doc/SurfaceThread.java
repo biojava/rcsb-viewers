@@ -74,6 +74,7 @@ import org.rcsb.mbt.surface.EdtMolecularSurface;
 import org.rcsb.mbt.surface.SurfaceCalculator;
 import org.rcsb.mbt.surface.datastructure.Sphere;
 import org.rcsb.mbt.surface.datastructure.TriangulatedSurface;
+import org.rcsb.mbt.surface.gamer.ImproveMesh;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.app.ProgressPanelController;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
@@ -99,7 +100,7 @@ public class SurfaceThread extends Thread {
 		List<Chain> polymerChains = getPolymerChains();
 		float resolution = calcResolution(polymerChains);	
 		if (drawLines) {
-			resolution *= 0.5f;
+			resolution *= 0.75f;
 		}
 		
 		long t0 = System.nanoTime();
@@ -138,7 +139,11 @@ public class SurfaceThread extends Thread {
 			s = null; // this is a very large object that should be garbage collected ASAP
 
 			// smooth surface
+			System.out.println("Surface area before smoothing: " + ts.getSurfaceArea());
 			ts.laplaciansmooth(1);
+		//	ts.laplacianEdgeSmooth(1, resolution*4);
+			System.out.println("Surface area after smoothing:  " + ts.getSurfaceArea());
+		//	ImproveMesh.Coarse(ts, 1);
 			Surface surface = new Surface(c, structure);
 			surface.setTriangulatedSurface(ts);
 			surface.setMeshSurface(drawLines);
@@ -170,7 +175,7 @@ public class SurfaceThread extends Thread {
 		System.out.println("begin polymerchains: " + polymerChains.size() + " index: " + smap.getSurfaceCount());
 		float resolution = 0.4f;
 		if (surfaceRepresentation == 1) {
-			resolution = 0.3f;
+		//	resolution = 0.3f;
 		}
 		
 		long t0 = System.nanoTime();
@@ -221,9 +226,11 @@ public class SurfaceThread extends Thread {
 				continue;
 			}
 
-			// smooth surface
-		//	ts.laplaciansmooth(5);
-			ts.laplaciansmooth(2);
+			// smooth surface;
+			System.out.println("Surface area before smoothing: " + ts.getSurfaceArea());
+			ts.edgesmooth(5);
+			ts.laplaciansmooth(3);
+			System.out.println("Surface area after smoothing:  " + ts.getSurfaceArea());
 			Surface surface = new Surface(c, structure);
 			surface.setTriangulatedSurface(ts);
 			surface.setBackfaceRendered(true);

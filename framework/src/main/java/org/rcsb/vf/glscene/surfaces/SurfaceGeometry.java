@@ -101,7 +101,7 @@ public class SurfaceGeometry extends DisplayListGeometry {
 
 		if(surface.isMeshSurface()) {
 			gl.glPushAttrib(GL.GL_LINE_WIDTH);
-			gl.glLineWidth(2.0f);	
+			gl.glLineWidth(1.0f);	
 			drawLines(gl, GL.GL_LINES);	
 			gl.glPopAttrib();
 		} else if (surface.isDotSurface()) {

@@ -771,7 +771,8 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		// a water molecule is assumed to be 1.4 angstroms in "diameter". Use a
 		// multiple of this to push the display out to show a reasonable amount
 		// of interactions.
-		final double padding = 1.4 * 9;
+//		final double padding = 1.4 * 9;
+		final double padding = 1.4 * 5;
 
 		double maxLigandLength = 0;
 		for (int i = 0; i < ligandBounds[0].length; i++) {

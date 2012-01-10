@@ -69,6 +69,8 @@ import javax.vecmath.Vector3f;
  * @author Peter Rose
  */
 public class TriangulatedSurface {
+	private static float EPSILON = 10 * Math.ulp(1.0f);
+	private static Vector3f ZERO = new Vector3f(0,0,0);
 
     private List<VertInfo> vertices = new ArrayList<VertInfo>(0);
     private List<FaceInfo> faces = new ArrayList<FaceInfo>(0);
@@ -128,6 +130,13 @@ public class TriangulatedSurface {
         float d2 = vertices.get(fb).p.distance(vertices.get(fc).p);
         float d3 = vertices.get(fc).p.distance(vertices.get(fa).p);
         float s = 0.5f * (d1 + d2 + d3); // half of the perimeter
+        float tmp = s * (s-d1) * (s-d2) * (s-d3);
+        if (Float.isNaN(d1)) {
+        	System.out.println("A: " + vertices.get(fa).p + " - B: " + vertices.get(fb).p);
+        }
+      //  if (Float.isNaN((float)Math.sqrt(s * (s-d1) * (s-d2) * (s-d3)))) {
+      //  	System.out.println("NaN in SurfaceArea: " + d1 + " " + d2 + " " + d3);
+      //  }
         return (float) Math.sqrt(s * (s-d1) * (s-d2) * (s-d3));
     }
 
@@ -140,6 +149,7 @@ public class TriangulatedSurface {
         for (int i = 0, n = faces.size(); i < n; i++) {
             area += getFaceArea(i);
         }
+        System.out.println("getSurfaceArea: " + area);
         return area;
     }
 
@@ -168,7 +178,6 @@ public class TriangulatedSurface {
     public void computenorm() {
         Vector3f ab = new Vector3f();
         Vector3f ac = new Vector3f();
-        Vector3f faceNormal = new Vector3f();
 
         for (VertInfo v : vertices) {
             v.normal.set(0.0f, 0.0f, 0.0f);
@@ -180,20 +189,41 @@ public class TriangulatedSurface {
             VertInfo vc = vertices.get(f.c);
             ab.sub(vb.p, va.p);
             ac.sub(vc.p, va.p);
-            faceNormal.cross(ab, ac);
-            faceNormal.normalize();
-            f.pn = faceNormal;
-            va.normal.add(faceNormal);
-            vb.normal.add(faceNormal);
-            vc.normal.add(faceNormal);
+            fixSmallNumbers(ab);
+            fixSmallNumbers(ac);
+            f.pn.cross(ab, ac);
+            f.pn.normalize();
+            if (!Float.isNaN(f.pn.x) && !Float.isNaN(f.pn.y) && !Float.isNaN(f.pn.z)) {
+            	va.normal.add(f.pn);
+            	vb.normal.add(f.pn);
+            	vc.normal.add(f.pn);
+            } else {
+            	System.out.println("Component of normal is NaN");
+            }
         }
-
-        for (int i = 0; i < vertices.size(); i++) {
-            Vector3f v = vertices.get(i).normal;
-            v.normalize();
+        for (VertInfo v : vertices) {
+            v.normal.normalize();
         }
     }
-    
+
+	/**
+	 * @param v
+	 */
+	private void fixSmallNumbers(Vector3f v) {
+		if (Math.abs(v.x) < EPSILON) {
+		//	System.out.println("fixing normal v.x");
+			v.x = EPSILON * Math.signum(v.x);
+		}
+		if (Math.abs(v.y) < EPSILON) {
+		//	System.out.println("fixing normal v.y");
+			v.y = EPSILON * Math.signum(v.x);
+		}
+		if (Math.abs(v.z) < EPSILON) {
+		//	System.out.println("fixing normal v.z");
+			v.z = EPSILON * Math.signum(v.x);
+		}
+	}
+	
     public void laplaciansmooth(int numiter) {
 
     	// TODO
@@ -207,19 +237,84 @@ public class TriangulatedSurface {
         for (int i = 0; i < tps.length; i++) {
             tps[i] = new Point3f();
         }
-        int[][] vertdeg = new int[20][vertnumber];
+        int i;
+		int j;
+		int degMax = 0;
+		int[][] vertdeg = calcNeighborList();
+
+        float wt = 1.00f;
+        float wt2 = 0.50f; // original value
+//        int ssign;
+        int k;
+        float outwt = 0.75f / (scalefactor + 3.5f);//area-preserving
+        // usually, scalefactor = 4 -> 0.75/(4 + 3.5) = 0.1
+        for (k = 0; k < numiter; k++) {
+            for (i = 0; i < vertnumber; i++) {
+            	int degree = vertdeg[0][i];
+            	degMax = Math.max(degree, degMax);
+                if (degree < 3) {
+                    tps[i].set(vertices.get(i).p);
+                } else {
+                	float weight = wt;
+                	if (degree == 3 || degree == 4) {
+                		weight = wt2;
+                	}
+                	tps[i].set(ZERO);
+                    for (j = 0; j < degree; j++) {
+                       tps[i].add(vertices.get(vertdeg[j + 1][i]).p);
+                    }
+                    VertInfo vertex = vertices.get(i);
+                    tps[i].x+=weight*vertex.p.x;
+                    tps[i].y+=weight*vertex.p.y;
+	                tps[i].z+=weight*vertex.p.z;
+
+	                float w = 1.0f/(weight + degree);
+	                tps[i].scale(w);
+	                for (j = 0; j < degree; j++) {
+	                	if (tps[i].epsilonEquals((vertices.get(vertdeg[j + 1][i]).p), EPSILON)) {
+	                		System.out.println("Degenerate coords");
+	                	}
+	                }
+                } 
+            }
+            for (i = 0; i < vertnumber; i++) {
+                VertInfo vertex = vertices.get(i);
+                if (!Float.isNaN(tps[i].x) && !Float.isNaN(tps[i].y) && !Float.isNaN(tps[i].z)) {
+                	vertex.p.set(tps[i]);
+                }
+            }
+            computenorm();
+            for (i = 0; i < vertnumber; i++) {
+                VertInfo vertex = vertices.get(i);
+                // vertex.inout is never set (obsolete variable?)
+//                if (vertex.inout) {
+//                    ssign = 1;
+//                } else {
+//                    ssign = -1;
+//
+//                }
+//		verts[i].p.x+=ssign*outwt*verts[i].pn.x;
+//		verts[i].p.y+=ssign*outwt*verts[i].pn.y;
+//		verts[i].p.z+=ssign*outwt*verts[i].pn.z;
+                if (!Float.isNaN(vertex.normal.x) && !Float.isNaN(vertex.normal.y) && !Float.isNaN(vertex.normal.z)) {
+                	vertex.p.x+= outwt*vertex.normal.x;
+                	vertex.p.y+= outwt*vertex.normal.y;
+                	vertex.p.z+= outwt*vertex.normal.z;
+                }
+            }
+        }
+        System.out.println("Max degree: " + degMax);
+    }
+
+	/**
+	 * @param vertnumber
+	 * @return
+	 */
+	public int[][] calcNeighborList() {
+		int[][] vertdeg = new int[20][vertices.size()];
         int i, j;
         boolean flagvert;
-//	for(i=0;i<20;i++)
-//	{
-//		vertdeg[i]=new int[vertnumber];
-//	}
-//	for(i=0;i<vertnumber;i++)
-//	{
-//		vertdeg[0][i]=0;
-//	}
-//        FaceInfo[] faces = this.faces.toArray(new FaceInfo[0]);
-//        int facenumber = faces.length;
+        
         for (FaceInfo face : faces) {
             //a
             flagvert = true;
@@ -296,101 +391,90 @@ public class TriangulatedSurface {
                 vertdeg[vertdeg[0][face.c]][face.c] = face.b;
             }
         }
+		return vertdeg;
+	}
 
-        double wt = 1.00;
-        double wt2 = 0.50;
-//        int ssign;
-        int k;
-        double outwt = 0.75 / (scalefactor + 3.5);//area-preserving
-        // usually, scalefactor = 4 -> 0.75/(4 + 3.5) = 0.1
-        for (k = 0; k < numiter; k++) {
-            for (i = 0; i < vertnumber; i++) {
-      //          System.out.println("vertdeg " + vertdeg[0][i]);
-//                System.out.println(vertices.get(i).p);
-                if (vertdeg[0][i] < 3) {
-//			tps[i].x=verts[i].p.x;
-//			tps[i].y=verts[i].p.y;
-//			tps[i].z=verts[i].p.z;
-                    VertInfo vertex = vertices.get(i);
-                    tps[i].set(vertex.p);
-                } else if (vertdeg[0][i] == 3 || vertdeg[0][i] == 4) {
-                    tps[i].x = 0;
-                    tps[i].y = 0;
-                    tps[i].z = 0;
-                    for (j = 0; j < vertdeg[0][i]; j++) {
-//				tps[i].x+=verts[vertdeg[j+1][i]].p.x;
-//				tps[i].y+=verts[vertdeg[j+1][i]].p.y;
-//				tps[i].z+=verts[vertdeg[j+1][i]].p.z;
-                       tps[i].add(vertices.get(vertdeg[j + 1][i]).p);
+	   public void edgesmooth(int numiter) {
 
-                    }
- //                   System.out.println("tpsi: " + tps[i]);
-//			tps[i].x+=wt2*verts[i].p.x;
-//			tps[i].y+=wt2*verts[i].p.y;
-//			tps[i].z+=wt2*verts[i].p.z;
-                    VertInfo vertex = vertices.get(i);
-                    tps[i].x+=wt2*vertex.p.x;
-                    tps[i].y+=wt2*vertex.p.y;
-	            tps[i].z+=wt2*vertex.p.z;
+	    	// TODO
+	 //       float scalefactor = 4.0f; // note, this is the original scalefactor from EDTSurf, How should it be set???
+	        // coords used here are the actual coordinates, not the scaled coordinates
+	 
+	    	// typically, the scalefactor is around 2. or lower
+	    	float scalefactor = 2.0f;
+	    	int vertnumber = vertices.size();
+	        Point3f[] tps = new Point3f[vertnumber];
+	        for (int i = 0; i < tps.length; i++) {
+	            tps[i] = new Point3f();
+	        }
+	        int i;
+			int j;
+			int degMax = 0;
+			int[][] vertdeg = calcNeighborList();
 
-                    tps[i].x /= (float) (wt2 + vertdeg[0][i]);
-                    tps[i].y /= (float) (wt2 + vertdeg[0][i]);
-                    tps[i].z /= (float) (wt2 + vertdeg[0][i]);
-       //             System.out.println(i + ": " + tps[i]);
-                } else {
-                    tps[i].x = 0;
-                    tps[i].y = 0;
-                    tps[i].z = 0;
-                    for (j = 0; j < vertdeg[0][i]; j++) {
-//				tps[i].x+=verts[vertdeg[j+1][i]].p.x;
-//				tps[i].y+=verts[vertdeg[j+1][i]].p.y;
-//				tps[i].z+=verts[vertdeg[j+1][i]].p.z;
-                        tps[i].add(vertices.get(vertdeg[j + 1][i]).p);
-                    }
-//			tps[i].x+=wt*verts[i].p.x;
-//			tps[i].y+=wt*verts[i].p.y;
-//			tps[i].z+=wt*verts[i].p.z;
-                    VertInfo vertex = vertices.get(i);
-                    tps[i].x+=wt*vertex.p.x;
-	     	    tps[i].y+=wt*vertex.p.y;
-		    tps[i].z+=wt*vertex.p.z;
+	        float wt = 1.00f;
+	        float wt2 = 0.50f; // original value
+//	        int ssign;
+	        int k;
+	        float outwt = 0.75f / (scalefactor + 3.5f);//area-preserving
+	        // usually, scalefactor = 4 -> 0.75/(4 + 3.5) = 0.1
+	        for (k = 0; k < numiter; k++) {
+	            for (i = 0; i < vertnumber; i++) {
+	            	int degree = vertdeg[0][i];
+	            	degMax = Math.max(degree, degMax);
+	                if (degree < 3 || degree > 5) {
+	                    tps[i].set(vertices.get(i).p);
+	                } else {
+	                	float weight = wt;
+	                	if (degree == 3 || degree == 4) {
+	                		weight = wt2;
+	                	}
+	                	tps[i].set(ZERO);
+	                    for (j = 0; j < degree; j++) {
+	                       tps[i].add(vertices.get(vertdeg[j + 1][i]).p);
+	                    }
+	                    VertInfo vertex = vertices.get(i);
+	                    tps[i].x+=weight*vertex.p.x;
+	                    tps[i].y+=weight*vertex.p.y;
+		                tps[i].z+=weight*vertex.p.z;
 
-                    tps[i].x /= (float) (wt + vertdeg[0][i]);
-                    tps[i].y /= (float) (wt + vertdeg[0][i]);
-                    tps[i].z /= (float) (wt + vertdeg[0][i]);
-             //                           System.out.println(i + ": " + tps[i]);
-                }
-            }
-            for (i = 0; i < vertnumber; i++) {
-//		verts[i].p.x=tps[i].x;
-//		verts[i].p.y=tps[i].y;
-//		verts[i].p.z=tps[i].z;
-                VertInfo vertex = vertices.get(i);
-                vertex.p.set(tps[i]);
- //               System.out.println("vert: " + i + " " + vertex.p);
-            }
-            computenorm();
-            for (i = 0; i < vertnumber; i++) {
-                VertInfo vertex = vertices.get(i);
-                // vertex.inout is never set (obsolete variable?)
-//                if (vertex.inout) {
-//                    ssign = 1;
-//                } else {
-//                    ssign = -1;
-//
-//                }
-//		verts[i].p.x+=ssign*outwt*verts[i].pn.x;
-//		verts[i].p.y+=ssign*outwt*verts[i].pn.y;
-//		verts[i].p.z+=ssign*outwt*verts[i].pn.z;
-                vertex.p.x+= outwt*vertex.normal.x;
- 		vertex.p.y+= outwt*vertex.normal.y;
-		vertex.p.z+= outwt*vertex.normal.z;
-//                System.out.println("vert: " + i + " " + ssign*outwt);
-            }
-        }
-//	delete[]tps;
-//	for(i=0;i<20;i++)
-//		delete[]vertdeg[i];
+		                float w = 1.0f/(weight + degree);
+		                tps[i].scale(w);
+		                for (j = 0; j < degree; j++) {
+		                	if (tps[i].epsilonEquals((vertices.get(vertdeg[j + 1][i]).p), EPSILON)) {
+		                		System.out.println("Degenerate coords");
+		                	}
+		                }
+	                } 
+	            }
+	            for (i = 0; i < vertnumber; i++) {
+	                VertInfo vertex = vertices.get(i);
+	                if (!Float.isNaN(tps[i].x) && !Float.isNaN(tps[i].y) && !Float.isNaN(tps[i].z)) {
+	                	vertex.p.set(tps[i]);
+	                }
+	            }
+	            computenorm();
+	            for (i = 0; i < vertnumber; i++) {
+	                VertInfo vertex = vertices.get(i);
+	                int degree = vertdeg[0][i];
+	                // vertex.inout is never set (obsolete variable?)
+//	                if (vertex.inout) {
+//	                    ssign = 1;
+//	                } else {
+//	                    ssign = -1;
+	//
+//	                }
+//			verts[i].p.x+=ssign*outwt*verts[i].pn.x;
+//			verts[i].p.y+=ssign*outwt*verts[i].pn.y;
+//			verts[i].p.z+=ssign*outwt*verts[i].pn.z;
+	            //    if (!Float.isNaN(vertex.normal.x) && !Float.isNaN(vertex.normal.y) && !Float.isNaN(vertex.normal.z)) {
+	            //    	vertex.p.x+= outwt*vertex.normal.x;
+	             //   	vertex.p.y+= outwt*vertex.normal.y;
+	            //    	vertex.p.z+= outwt*vertex.normal.z;
+	            //    }
+	            }
+	        }
+	        System.out.println("Max degree: " + degMax);
+	    }
 
-    }
 }
