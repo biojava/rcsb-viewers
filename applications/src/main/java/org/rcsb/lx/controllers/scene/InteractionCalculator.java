@@ -60,10 +60,19 @@ import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
+import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+import org.rcsb.mbt.model.attributes.AtomColorRegistry;
+import org.rcsb.mbt.model.attributes.AtomRadiusByScaledCpk;
+import org.rcsb.mbt.model.attributes.AtomRadiusRegistry;
 import org.rcsb.mbt.model.attributes.AtomStyle;
+import org.rcsb.mbt.model.attributes.BondColorRegistry;
 import org.rcsb.mbt.model.attributes.BondStyle;
+import org.rcsb.mbt.model.attributes.IAtomColor;
+import org.rcsb.mbt.model.attributes.IAtomRadius;
+import org.rcsb.mbt.model.attributes.IBondColor;
+import org.rcsb.mbt.model.attributes.Style;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.util.Element;
 import org.rcsb.mbt.model.util.PeriodicTable;
@@ -77,6 +86,7 @@ import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
  */
 public class InteractionCalculator
 {
+	
 
 	public Residue[] currentLigandResidues = null;
 	
@@ -471,14 +481,23 @@ public class InteractionCalculator
 		
 		final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry
 		.get(ComponentType.ATOM);
-		final AtomStyle as = (AtomStyle) structure.getStructureMap()
+		AtomStyle as = (AtomStyle) structure.getStructureMap()
 		.getStructureStyles().getDefaultStyle(
 				ComponentType.ATOM);
+		
 		final BondGeometry bg = (BondGeometry) GlGeometryViewer.defaultGeometry
 		.get(ComponentType.BOND);
 		final BondStyle bs = (BondStyle) structure.getStructureMap()
 		.getStructureStyles().getDefaultStyle(
 				ComponentType.BOND);
+		
+		// change residue color
+		AtomStyle grayDefault = new AtomStyle();
+		grayDefault.setAtomRadius(as.getAtomRadius());
+		grayDefault.setAtomLabel(as.getAtomLabel());
+		IAtomColor iatomColor = AtomColorRegistry.get("By Element Carbon Gray");
+		grayDefault.setAtomColor(iatomColor);
+		as = grayDefault;
 		
 		LXGlGeometryViewer glViewer = LigandExplorer.sgetGlGeometryViewer();
 		StructureMap structureMap = structure.getStructureMap();
@@ -488,6 +507,8 @@ public class InteractionCalculator
 		otherAtoms.removeAll(currentLigandAtoms);
 		HashSet<Residue> uniqRes = new HashSet<Residue>();
 		
+		final LXSceneNode node = (LXSceneNode)structure.getStructureMap().getUData();
+		
 		for (Atom ligAtom : currentLigandAtoms) {
 			for (Atom otherAtom: otherAtoms) {
 					double distance = ArrayLinearAlgebra.distance(ligAtom.coordinate,
@@ -496,15 +517,22 @@ public class InteractionCalculator
 					if (distance < upperBound) {
 						if (interactionsOut == null) {
 							Residue res = structureMap.getResidue(otherAtom);		
-							if (!uniqRes.contains(res)) {
+							if (!uniqRes.contains(res) && !node.isRendered(res)) {
 								glViewer.renderResidue(res, as, ag, bs, bg, true);
+								System.out.println("Neighbor residue: " + res.getCompoundCode());
 								uniqRes.add(res);
-							}
+							} 
 						}
 					}
 			}
 		}
+		System.out.println("hide chains");
+		glViewer.hideChains();
+		System.out.println("render chains");
+	//	glViewer.renderChains();;
+		// reset atom color to default
 	}
+	
 	/**
 	 * Returns a list of metal atoms in ligand residues
 	 * @param structure

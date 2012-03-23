@@ -83,11 +83,11 @@ import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.util.Status;
+import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.uiApp.controllers.update.UpdateEvent;
 
 public class LigandSideBar extends JPanel
 {
-	private Residue initialLigandResidue;
-	
 	private final class InteractionListener implements ActionListener {
 		private final JCheckBox box;
 		private final JCheckBox hydrogenBondBox;
@@ -277,7 +277,12 @@ public class LigandSideBar extends JPanel
 				// }
 				// };
 				// runner.start();
-
+				
+				// remove current surfaces from display list and add them again to ensure
+				// transparent surfaces are drawn on top of the interactions
+				System.out.println("LigandSideBar: redraw surfaces");
+				LigandExplorer.sgetGlGeometryViewer().surfaceRemoved(structure);
+				LigandExplorer.sgetGlGeometryViewer().surfaceAdded(structure);	
 			}
 
 			else
@@ -418,9 +423,13 @@ public class LigandSideBar extends JPanel
 						{
 							public void valueChanged(TreeSelectionEvent e)
 							{
-								applyButton.doClick();
-								LigandExplorer.sgetGlGeometryViewer().ligandView(
-										LigandExplorer.sgetModel().getStructures().get(0));
+							    applyButton.doClick();
+							    Structure structure = AppBase.sgetModel().getStructures().get(0);
+							    if (structure.getStructureMap().getSurfaceCount() > 0) {
+							    	LigandExplorer.sgetGlGeometryViewer().ligandViewWithSurface(structure);
+							    } else {
+							    	LigandExplorer.sgetGlGeometryViewer().ligandView(structure);
+							    }
 							}				
 						});
 
@@ -485,10 +494,11 @@ public class LigandSideBar extends JPanel
 			distanceBox.setSelected(true);
 			this.add(distanceBox);
 			
+			System.out.println("Adding BindingSiteSurfacePanel");
 			final JPanel surfacePanel = new BindingSiteSurfacePanel();
 			surfacePanel.setBackground(LXDocumentFrame.sidebarColor);
 			this.add(surfacePanel);
-
+			
 			// this button should eventually be removed. Its still used
 			// to fire some update events
 			applyButton = new JButton("Apply");
@@ -610,7 +620,6 @@ public class LigandSideBar extends JPanel
 								maxWidth = Math.max(maxWidth, distancePreferred.width);
 
 								surfacePanel.setBounds(curX, curY, surfacePanelPreferred.width, surfacePanelPreferred.height);
-								System.out.println("LigandSideBar: " + surfacePanel.getPreferredSize());
 								curY += surfacePanelPreferred.height + visualBuffer;
 								maxWidth = Math.max(maxWidth, surfacePanelPreferred.width);
 								
@@ -712,9 +721,7 @@ public class LigandSideBar extends JPanel
 					
 					if (isInitialLigandResidue(residue, initialLigand))
 					{
-						// PR new code
-		                initialLigandResidue = residue;
-		                Residue[] ligs = new Residue[1];
+						Residue[] ligs = new Residue[1];
 		                ligs[0] = residue;
 		                LigandExplorer.sgetSceneController().setLigandResidues(ligs);
 		                

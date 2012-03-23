@@ -14,7 +14,7 @@ public class Demo {
 
 		//showSimpleViewer();
 	    // showProteinWorkshop();
-		 showLigandExplorer();
+		  showLigandExplorer();
 		//showKiosk();
 	}
 
@@ -28,6 +28,7 @@ public class Demo {
 		
 	//	String[] pdbIds = new String[]{"-structure_url","http://www.rcsb.org:80/pdb/files/1CDG.xml.gz","-unit_id","1","-standalone"};
 		String[] pdbIds = new String[]{"-structure_url","http://www.rcsb.org:80/pdb/files/1CDG.xml.gz","-standalone"};
+	//	String[] pdbIds = new String[]{"-structure_url","http://www.rcsb.org:80/pdb/files/1STP.xml.gz","-standalone"};
 		final ProteinWorkshop app = new ProteinWorkshop(pdbIds);	
 		app.initialize(true, true);
 	}

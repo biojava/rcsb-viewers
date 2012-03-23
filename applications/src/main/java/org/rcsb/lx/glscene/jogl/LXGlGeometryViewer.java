@@ -50,7 +50,9 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.media.opengl.GL;
@@ -76,9 +78,11 @@ import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+import org.rcsb.mbt.model.attributes.AtomColorRegistry;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
 import org.rcsb.mbt.model.attributes.ChainStyle;
+import org.rcsb.mbt.model.attributes.IAtomColor;
 import org.rcsb.mbt.model.attributes.LineStyle;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
@@ -270,6 +274,12 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 			struc = this.lastComponentMouseWasOver.structure;
 		}
 		if (struc == null) {
+			return;
+		}
+		
+		// if mouse position is the same, do nothing,
+		// or else will run into numerical problems.
+		if (x == prevMouseX && y == prevMouseY) {
 			return;
 		}
 
@@ -540,7 +550,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		final ChainGeometry defaultChainGeometry = (ChainGeometry) GlGeometryViewer.defaultGeometry
 		.get(ComponentType.CHAIN);
 		final AtomGeometry defaultAtomGeometry = (AtomGeometry) GlGeometryViewer.defaultGeometry
-		.get(ComponentType.ATOM);
+		.get(ComponentType.ATOM);	
 		final BondGeometry defaultBondGeometry = (BondGeometry) GlGeometryViewer.defaultGeometry
 		.get(ComponentType.BOND);
 
@@ -619,12 +629,34 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 			}
 		}
 
+		// new atom style for non-ligand atoms
+		AtomStyle grayDefault = new AtomStyle();
+		grayDefault.setAtomRadius(defaultAtomStyle.getAtomRadius());
+		grayDefault.setAtomLabel(defaultAtomStyle.getAtomLabel());
+		IAtomColor iatomColor = AtomColorRegistry.get("By Element Carbon Gray");
+		grayDefault.setAtomColor(iatomColor);
+
+		Set<Atom> ligandAtoms = new HashSet<Atom>();
+		for (Residue ligand: structureMap.getLigands()) {
+			ligandAtoms.addAll(ligand.getAtoms());
+		}
+		
 		final int atomCount = atoms.size();
 		for (int i = 0; i < atomCount; i++) {
 			final Atom a = atoms.get(i);
-
+			
 			// set the default style
-			structureStyles.setStyle(a, defaultAtomStyle);
+	//		structureStyles.setStyle(a, defaultAtomStyle);
+			
+			AtomStyle as = null;
+			if (ligandAtoms.contains(a)) {
+				as = defaultAtomStyle;
+				System.out.println("default style: " + a.compound);
+			} else {
+				as = grayDefault;
+			    System.out.println("gray style: " + a.compound);
+			}
+			structureStyles.setStyle(a, as);
 
 			// ignore invisible atoms...
 			if (!structureStyles.isVisible(a)) {
@@ -633,8 +665,10 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 
 			synchronized (renderables)
 			{
+	//			renderables.put(a, new DisplayListRenderable(a,
+	//					defaultAtomStyle, defaultAtomGeometry));
 				renderables.put(a, new DisplayListRenderable(a,
-						defaultAtomStyle, defaultAtomGeometry));
+						as, defaultAtomGeometry));
 			}
 		}
 
@@ -681,7 +715,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 	// added for protein-ligand interactions
 	public void ligandView(final Structure structure)
 	{
-
+		System.out.println("ligandView: Adjust surface view");
 		final double[][] ligandBounds =
 			getLigandBounds(structure, LigandExplorer.sgetSceneController().getLigandResidues());
 
@@ -756,8 +790,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 	
 	public void ligandViewWithSurface(final Structure structure)
 	{
-
-		System.out.println("Adjust surface view");
+		System.out.println("ligandViewWithSurface: Adjust surface view");
 		final double[][] ligandBounds =
 			getLigandBounds(structure, LigandExplorer.sgetSceneController().getLigandResidues());
 
@@ -765,14 +798,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 			return;
 		}
 
-		final StructureMap sm = structure.getStructureMap();
-		final LXSceneNode node = (LXSceneNode)sm.getUData();
 
-		// a water molecule is assumed to be 1.4 angstroms in "diameter". Use a
-		// multiple of this to push the display out to show a reasonable amount
-		// of interactions.
-//		final double padding = 1.4 * 9;
-		final double padding = 1.4 * 5;
 
 		double maxLigandLength = 0;
 		for (int i = 0; i < ligandBounds[0].length; i++) {
@@ -780,9 +806,6 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 					ligandBounds[0][i] - ligandBounds[1][i], 2);
 		}
 		maxLigandLength = Math.sqrt(maxLigandLength);
-
-		// float[] eye = { 0.0, 0.0, maxDistance * 1.4 };
-
 		
 		final double[] center = {
 				(ligandBounds[0][0] + ligandBounds[1][0]) / 2,
@@ -791,42 +814,33 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		
 		long t1 = System.nanoTime();
 		BindingSiteSurfaceOrienter orienter = getBindingSiteSurfaceOrienter();
-		Vector3f normal = orienter.getOptimalOrientation();
+		Vector3f eyeOrientation = orienter.getOptimalEyeOrientation();
 		long t2 = System.nanoTime();
 		System.out.println("Opimal orientation: " + ((t2-t1)/1000000) + " ms");
 		Vector3f alignment = orienter.getHorizontalAlignment();
 		long t3 = System.nanoTime();
 		System.out.println("Horizontal aligment: " + ((t3-t2)/1000000) + " ms");
-		alignment.cross(alignment, normal);
+		// make the alignment vector orthogonal to the eye orientation and the original alignment
+		alignment.cross(alignment, eyeOrientation);
+				
+		double[] up = {alignment.x, alignment.y, alignment.z};
 		
-		// can we use centroid of sample instead of ligand center?
-		Point3f cntr = orienter.sampleCentroid();
-		center[0] = cntr.x;
-		center[1] = cntr.y;
-		center[2] = cntr.z;
-		
-		// Make sure normal is not pointing in "up" direction. It will cause numerical problems
-		// and causes the view to disappear.
-		double[] up = { 0.0f, 1.0f, 0.0f };
-		up[0] = alignment.x;
-		up[1] = alignment.y;
-		up[2] = alignment.z;
-		
+		// If the eyeOrientation is in the "up" direction, there will be numerical 
+		// problems and causes the display to go black.
+		// Adjust eyeOrientation if that happens.
 		float epsilon = 0.0001f;
-		if (normal.epsilonEquals(alignment, epsilon)) {
-			normal.set(epsilon, 1.0f, epsilon);
-			normal.normalize();
+		if (eyeOrientation.epsilonEquals(alignment, epsilon)) {
+			eyeOrientation.set(epsilon, 1.0f, epsilon);
+			eyeOrientation.normalize();
 		}
-		normal.scale((float)(maxLigandLength+padding));
 		
-//		final double[] eye = { center[0], center[1],
-//				center[2] + maxLigandLength + padding };
-		final double[] eye = { center[0]+normal.x, center[1]+normal.y,
-		center[2] + normal.z};
+		// calculate eye position
+		final double padding = 10.0;
+		eyeOrientation.scale((float)(maxLigandLength+padding));	
+		final double[] eye = {center[0]+eyeOrientation.x, center[1]+eyeOrientation.y, center[2] + eyeOrientation.z};
 
-		
-		// scene.lookAt(eye, scene.rotationCenter, up);
-
+		final StructureMap sm = structure.getStructureMap();
+		final LXSceneNode node = (LXSceneNode)sm.getUData();
 		final double[] currentOrientation = node.getEye();
 		final double[] currentPosition = node.getCenter();
 		final double[] currentUp = node.getUp();
@@ -928,6 +942,14 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		for (int i = 0; i < atoms.size(); i++) {
 			final Atom a = atoms.get(i);
 			if (!node.isRendered(a)) {
+				// added
+				System.out.println("LXGlGeometryViewer:renderResidue: " + r.getCompoundCode());
+			//	final StructureStyles structureStyles =
+			//		a.getStructure().getStructureMap().getStructureStyles();
+			//	final AtomStyle atomStyle = (AtomStyle) structureStyles.getStyle(a);
+			//	atomStyle.setAtomColor(as.getAtomColor());
+				
+				// end
 				final DisplayListRenderable renderable = new DisplayListRenderable(a,
 						as, ag);
 				node.addRenderable(renderable);
@@ -951,6 +973,41 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		sm.getStructureStyles().setSelected(r, true);
 	}
 
+	public void hideChains() {
+		Structure structure = AppBase.sgetModel().getStructures().get(0);
+		final StructureMap sm = structure.getStructureMap();
+		final JoglSceneNode node = (JoglSceneNode)sm.getUData();
+
+		final Vector<Chain> chains = sm.getChains();
+		for (Chain c: chains) {
+			node.removeRenderable(c);
+		}
+	}
+	
+	public void renderChains() {
+		Structure structure = AppBase.sgetModel().getStructures().get(0);
+		final StructureMap sm = structure.getStructureMap();
+		StructureStyles structureStyles = sm.getStructureStyles();
+		
+		final LXSceneNode node = (LXSceneNode)sm.getUData();
+		final ChainStyle defaultChainStyle = (ChainStyle) structureStyles
+		.getDefaultStyle(ComponentType.CHAIN);
+		final ChainGeometry defaultChainGeometry = (ChainGeometry) GlGeometryViewer.defaultGeometry
+		.get(ComponentType.CHAIN);
+		defaultChainGeometry.setRibbonForm(RibbonForm.RIBBON_SIMPLE_LINE);
+		defaultChainGeometry.setRibbonsAreSmoothed(true);
+
+		final Vector<Chain> chains = sm.getChains();
+		for (Chain c: chains) {
+			node.removeRenderable(c);
+			if (!node.isRendered(c)) {
+				final DisplayListRenderable renderable = new DisplayListRenderable(c,
+						defaultChainStyle, defaultChainGeometry);
+				node.addRenderable(renderable);
+			}
+		}
+	}
+	
 	public void hideResidue(final Residue r) {
 		final StructureMap sm = r.structure.getStructureMap();
 		final JoglSceneNode node = (JoglSceneNode)sm.getUData();

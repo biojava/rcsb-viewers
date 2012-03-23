@@ -156,7 +156,7 @@ public class LigandExplorer extends VFAppBase
 	}
 	
 	@Override
-	public String toString() { return "SDSC Ligand Explorer"; }
+	public String toString() { return "RCSB Ligand Explorer"; }
 	
 	/**
 	 * Constructor
