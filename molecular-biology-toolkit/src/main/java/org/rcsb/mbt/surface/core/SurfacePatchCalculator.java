@@ -47,11 +47,15 @@
 package org.rcsb.mbt.surface.core;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -74,14 +78,24 @@ public class SurfacePatchCalculator {
 
     public SurfacePatchCalculator(TriangulatedSurface surface, List<Sphere> context, float distanceThreshold) {
         this.surface = surface;
+        
         // truncate vertices and faces to the patch site region
         System.out.println("before vertices: " + surface.getVertices().size());
+        long t1 = System.nanoTime();
+        int vertexCount = surface.getVertices().size();
         truncateByDistance(context, distanceThreshold);
-        System.out.println("truncated vertices: " + surface.getVertices().size());
-        truncateFaces();
-        flipper();
-        smoothEdges();      
-        System.out.println("truncated vertices after smoothing: " + surface.getVertices().size());
+        
+        // if surface patch was cut out of whole surface, clean up the face list, remove
+        // small surface patches, and smooth the edge of the surface patch
+        if (surface.getVertices().size() < vertexCount) {
+        	truncateFaces();
+        	removeSmallFragments(0.25f);
+        	truncateFaces();
+        	flipEdges();
+        	smoothEdges();      
+        }
+        long t2 = System.nanoTime();
+        System.out.println("truncated vertices after smoothing: " + surface.getVertices().size() + " time: " + ((t2-t1)/1000000000.0));
     }
 
     public TriangulatedSurface getSurfacePatch() {
@@ -95,7 +109,7 @@ public class SurfacePatchCalculator {
          float thresholdSq = distanceThreshold * distanceThreshold;
          
          int vertCount = 0;
-         for (int i = 0; i < vertices.size(); i++ ) {
+         for (int i = 0, n = vertices.size(); i < n; i++ ) {
         	 VertInfo v = vertices.get(i);
              for (Sphere s : context) {
                  Point3f ps = s.getLocation();       
@@ -134,7 +148,7 @@ public class SurfacePatchCalculator {
     	int vertexCount = 0;
     	do {
     		vertexCount = surface.getVertices().size();
-    		System.out.println("smoothing: " + vertexCount);
+   // 		System.out.println("smoothing: " + vertexCount);
     		removeJaggedEdge();
     		truncateFaces();
     	} while (surface.getVertices().size() < vertexCount);
@@ -194,15 +208,16 @@ public class SurfacePatchCalculator {
     }
     
     /**
-     * Flip triangles
-     *         v0
-     *        / |\
-     *       /  | \
+     * Flips edges at the rim of a surface patch
+     * 
+     *         v0                        v0
+     *        / |\                      /  \
+     *       /  | \                    /    \
      * -----v1  | v2---  change to ----v1---v2----
      *       \  |/                     \   /
      *        \v3                       \v3
      */
-    private void flipper() {
+    private void flipEdges() {
     	float ANGLE_THRESHOLD = (float) Math.toRadians(150.0f);
     	List<Integer> s1 = new ArrayList<Integer>(3);
        	List<Integer> s2 = new ArrayList<Integer>(3);
@@ -302,9 +317,72 @@ public class SurfacePatchCalculator {
     	return false;
     }
     
-    private void removeFragments() {
-    	// only keep largest surface
-    	// TODO implement
+    private void removeSmallFragments(float threshold) {
+    	List<VertInfo> vertices = surface.getVertices();
+    	List<VertInfo> truncatedVertices = new ArrayList<VertInfo>();
+    	List<List<Integer>> fragments = calcFragments();
+    	int vertCount = 0;
+    	for (List<Integer> fragment: fragments) {
+    		float ratio = (float)fragment.size()/vertices.size();
+    		System.out.println("Fragment size: " + fragment.size() + " ratio: " + ratio);
+    		if (ratio > threshold) {
+   // 			System.out.println("Keeping fragment: " + fragment.size());
+    			for (Integer f: fragment) {
+    				vertexMap.put(f, vertCount);
+    				vertCount++;
+    				truncatedVertices.add(vertices.get(f));
+    			}
+    		}
+    	}
+    	surface.setVertices(truncatedVertices);
+    }
+    
+    private List<List<Integer>> calcFragments() {
+    	int[][] neighbors = surface.calcNeighborList();
+    	List<List<Integer>> fragments = new ArrayList<List<Integer>>();
+
+    //	List<Integer> queue = Collections.synchronizedList(new LinkedList<Integer>());
+       	List<Integer> queue = new LinkedList<Integer>();
+    	for (int i = 0, n = surface.getVertices().size(); i < n; i++) {
+    		queue.add(new Integer(i));
+    	}
+	
+    	while (queue.size() > 0)	 {
+        	List<Integer> fragment = new ArrayList<Integer>();
+        	fragment.add(queue.get(0));
+        	fragments.add(fragment);
+        
+        	int begin = 0;
+        	int end = fragment.size();
+    		do {
+    			for (int j = begin; j < end; j++) {
+    				addNeighbors(fragment.get(j), neighbors, fragment);
+    			}
+    			begin = end;
+    			end = fragment.size();
+    //			System.out.println("begin: " + begin + " end: " + end);
+    		} while (end > begin);
+    		
+    		queue.removeAll(fragment);
+    		System.out.println("queue size: " + queue.size() + " fragment size: " + fragments.size());
+        }
+    	return fragments;
+    }
+
+    /**
+     * Adds neigbors of start vertex to the fragment list
+     * @param start index of start vertex
+     * @param neighbors list of neighbors
+     * @param fragment list of vertices in this fragment
+     */
+    private void addNeighbors(int start, int[][] neighbors, List<Integer> fragment) {
+    	for (int j = 1; j <= neighbors[0][start]; j++) {
+    		Integer next = neighbors[j][start];
+    		if (! fragment.contains(next)) {
+    			fragment.add(next);
+    	//		System.out.println("start->next: " + start + " -> " + next);
+    		}
+    	}
     }
 
     public static List<Sphere> calcSurroundings(List<Sphere> patch, List<Sphere> context, float distanceThreshold) {

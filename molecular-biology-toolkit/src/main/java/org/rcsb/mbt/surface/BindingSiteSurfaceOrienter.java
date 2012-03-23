@@ -19,10 +19,10 @@ import org.rcsb.mbt.surface.datastructure.TriangulatedSurface;
 import org.rcsb.mbt.surface.datastructure.VertInfo;
 
 public class BindingSiteSurfaceOrienter {
-	List<Point3f> samplePoints = new ArrayList<Point3f>(0);
-	List<TriangulatedSurface> surfaces;
-	Vector3f optimalOrientation = null;
-	Vector3f horizonalAlignment = null;
+	private List<Point3f> samplePoints = new ArrayList<Point3f>(0);
+	private List<TriangulatedSurface> surfaces;
+	private Vector3f optimalOrientation = null;
+	private Vector3f horizonalAlignment = null;
 
 	private Vector3f zero = new Vector3f();	
 	private Vector3f i = new Vector3f();
@@ -37,7 +37,7 @@ public class BindingSiteSurfaceOrienter {
 		this.surfaces = surfaces;
 	}
 
-	public Vector3f getOptimalOrientation() {
+	public Vector3f getOptimalEyeOrientation() {
 		if (optimalOrientation == null) {
 			optimalOrientation = calcOptimalOrientation();
 		}
@@ -45,7 +45,7 @@ public class BindingSiteSurfaceOrienter {
 	}
 
 	public Vector3f getHorizontalAlignment() {
-		getOptimalOrientation();
+		getOptimalEyeOrientation();
 		if (horizonalAlignment == null) {
 			horizonalAlignment = calcHorizontalAlignment();
 		}
@@ -75,6 +75,7 @@ public class BindingSiteSurfaceOrienter {
 				dotProduct = dot;
 				optimalOrientation = orientation;
 			}
+			// test if first direction is good enough
 		}
 
 		if (dotProduct == 0.0f) {
@@ -148,9 +149,8 @@ public class BindingSiteSurfaceOrienter {
 	 */
 	private List<Integer> bestLigandOrientations() {
 		long t1 = System.nanoTime();
-		int nRays = IcosahedralSampler.getSphereCount();
-		int[] unobstructedRays = new int[nRays];
 		Vector3f[] dirs = getRays();
+		int[] unobstructedRays = new int[dirs.length];
 
 		for (Point3f sample: samplePoints) {
 			for (int i = 0; i < dirs.length; i++) {
@@ -173,7 +173,7 @@ public class BindingSiteSurfaceOrienter {
 		int maxRays = 0;
 		List<Integer> directions = new ArrayList<Integer>();
 
-		for (int i = 0; i < nRays; i++) {
+		for (int i = 0; i < unobstructedRays.length; i++) {
 			if (unobstructedRays[i] >= maxRays) {
 				if (unobstructedRays[i] > maxRays) {
 					directions.clear();
@@ -220,7 +220,7 @@ public class BindingSiteSurfaceOrienter {
 		return basePoint;
 	}
 
-	public Point3f sampleCentroid() {
+	private Point3f sampleCentroid() {
 		Point3f centroid = new Point3f();
 
 		for (Point3f s: samplePoints) {;

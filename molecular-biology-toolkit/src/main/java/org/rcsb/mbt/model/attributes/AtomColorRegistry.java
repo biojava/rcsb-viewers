@@ -74,6 +74,7 @@ public class AtomColorRegistry
 	static
 	{
 		AtomColorRegistry.add( AtomColorByElement.NAME, AtomColorByElement.create() );
+		AtomColorRegistry.add( AtomColorByElementCarbonGray.NAME, AtomColorByElementCarbonGray.create() );
 		AtomColorRegistry.add( AtomColorByResidueColor.NAME, AtomColorByResidueColor.create() );
 		AtomColorRegistry.add( AtomColorByBFactor.NAME, AtomColorByBFactor.create() );
 
