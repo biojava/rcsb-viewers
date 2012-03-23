@@ -86,7 +86,8 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
  * @author Peter Rose
  *
  */
-public class SurfaceThread extends Thread {
+//public class SurfaceThread extends Thread {
+	public class SurfaceThread {
 	private static float PROBE_RADIUS = 1.4f;
 	private static float DISTANCE_THRESHOLD = 6.5f;
 	private boolean drawLines = true;
@@ -166,7 +167,7 @@ public class SurfaceThread extends Thread {
 		AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE); 
 	}
 
-	public void createBindingSiteSurface(Residue[] ligands, int surfaceRepresentation) {
+	public void createBindingSiteSurface(Residue[] ligands, int surfaceRepresentation, float thresholdDistance) {
 		IAtomRadius registry = AtomRadiusRegistry.get("By CPK");
 		
 		Structure structure = AppBase.sgetModel().getStructures().get(0);
@@ -174,9 +175,6 @@ public class SurfaceThread extends Thread {
 		List<Chain> polymerChains = getPolymerChains();
 		System.out.println("begin polymerchains: " + polymerChains.size() + " index: " + smap.getSurfaceCount());
 		float resolution = 0.4f;
-		if (surfaceRepresentation == 1) {
-		//	resolution = 0.3f;
-		}
 		
 		long t0 = System.nanoTime();
 		// create progress bar
@@ -219,7 +217,7 @@ public class SurfaceThread extends Thread {
 			}
 	
 			// calculate binding site molecular surface
-			SurfaceCalculator s = new EdtMolecularSurface(spheres, ligandSpheres, PROBE_RADIUS, DISTANCE_THRESHOLD, resolution);
+			SurfaceCalculator s = new EdtMolecularSurface(spheres, ligandSpheres, PROBE_RADIUS, thresholdDistance, resolution);
 			TriangulatedSurface ts = s.getSurface();
 			s = null; // this is a very large object that should be garbage collected ASAP
 			if (ts.getVertices().size() == 0) {
@@ -246,16 +244,11 @@ public class SurfaceThread extends Thread {
 			smap.addSurface(surface);
 			
 			// update progress bar
-			Status.progress(((int)(100* smap.getSurfaceCount()/(float)polymerChains.size())), "Creating surfaces");
-			
-//			AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.SURFACE_ADDED, surface); // has no effect
-	//		AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE); 
+			Status.progress(((int)(100* smap.getSurfaceCount()/(float)polymerChains.size())), "Creating surfaces"); 
 		}
 		ProgressPanelController.EndProgress();
 		long t5 = System.nanoTime();
 		System.out.println("Surface calculation: " + (t5-t0)/1000000 + " ms");
-	//	AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE); 
-
 	}
 
 	/**
