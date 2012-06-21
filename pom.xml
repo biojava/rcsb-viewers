@@ -31,12 +31,12 @@
 	</repositories>
 
 	<distributionManagement>
-		<downloadUrl>http://source.rcsb.org/maven/</downloadUrl>
+		<downloadUrl>http://maven.rcsb.org/</downloadUrl>
 		<repository>
 			<uniqueVersion>false</uniqueVersion>
 			<id>rcsb-pdb-maven-repo</id>
 			<name>RCSB PDB Maven Repository</name>
-			<url>scp://emmy.rcsb.org/opt/maven/</url>
+			<url>scp://maven.rcsb.org/Website/</url>
 			<layout>default</layout>
 		</repository>
 	</distributionManagement>
