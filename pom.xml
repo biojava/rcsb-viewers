@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.rcsb</groupId>
 	<artifactId>viewers</artifactId>
-	<version>0.9.0-SNAPSHOT</version>
+	<version>4.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>rcsbviewers</name>
 	<description>The RCSB PDB 3D viewers as a maven project.</description>

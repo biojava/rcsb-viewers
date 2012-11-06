@@ -775,7 +775,8 @@ WindowListener, IStructureStylesEventListener {
 	double rotate = 0;
 
 	public boolean needsRepaint = true;
-
+	//long prevRepaint = System.currentTimeMillis();
+	
 	public void requestRepaint() {
 		this.needsRepaint = true;
 		if (this.drawable != null && !AppBase.backgroundScreenshotOnly) {
@@ -783,8 +784,13 @@ WindowListener, IStructureStylesEventListener {
 			//this.repaint();
 			
 			//this.repaint();
-			if ( drawableViewer != null)
+			if ( drawableViewer != null) {
+				//long timeS = System.currentTimeMillis();
 				drawableViewer.repaint();
+				//long timeE = System.currentTimeMillis();
+				//System.out.println("repaint took " + (timeE- timeS) + " ms. Previous repaint was called " + (timeS - prevRepaint) + "ms ago." );
+				//prevRepaint = timeE;
+			}
 			
 		}
 	}
@@ -985,6 +991,7 @@ WindowListener, IStructureStylesEventListener {
 			boolean isPick)
 	{
 
+		
 		GL2 gl2 = gl.getGL2();
 		
 		synchronized (this.renderablesToDestroy)
@@ -1200,6 +1207,8 @@ WindowListener, IStructureStylesEventListener {
 					this.backBufferContainsPickData = true;
 				}
 			}
+			
+			
 		}
 
 		catch (final Exception e)
@@ -2324,7 +2333,7 @@ WindowListener, IStructureStylesEventListener {
 
 	@Override
 	public void dispose(GLAutoDrawable arg0) {
-		// TODO Auto-generated method stub
+
 		
 	}
 
