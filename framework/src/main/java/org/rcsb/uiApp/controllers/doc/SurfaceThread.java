@@ -90,7 +90,7 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 	public class SurfaceThread {
 	private static float PROBE_RADIUS = 1.4f;
 	private static float DISTANCE_THRESHOLD = 6.5f;
-	private boolean drawLines = true;
+	private boolean drawLines = false;
 	private boolean drawDots = false;
 	
 	public void createSurface() {
