@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 import org.rcsb.mbt.model.Atom;
@@ -74,7 +75,7 @@ import org.rcsb.mbt.model.util.DebugState;
 import org.rcsb.vf.controllers.app.VFAppBase;
 
 
-import com.sun.opengl.util.GLUT;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 
 public class JoglSceneNode
@@ -107,6 +108,9 @@ public class JoglSceneNode
 	
 	public void createLabels(final GL gl, final GLUT glut)
 	{
+		
+		GL2 gl2 = gl.getGL2();
+		
 		synchronized (this.labelsToCreate)
 		{
 			synchronized (this.labels)
@@ -122,12 +126,12 @@ public class JoglSceneNode
 					if (this.isLabelActive(component))
 						continue;
 
-					final int labelDl = gl.glGenLists(1);
-					gl.glNewList(labelDl, GL.GL_COMPILE);
+					final int labelDl = gl2.glGenLists(1);
+					gl2.glNewList(labelDl, GL2.GL_COMPILE);
 	
 					if (allowLighting)
 					{
-						gl.glDisable(GL.GL_LIGHTING);
+						gl.glDisable(GL2.GL_LIGHTING);
 						gl.glDepthFunc(GL.GL_ALWAYS);
 					}
 	
@@ -135,10 +139,10 @@ public class JoglSceneNode
 					if (allowLighting)
 					{
 						gl.glDepthFunc(GL.GL_LEQUAL);
-						gl.glEnable(GL.GL_LIGHTING);
+						gl2.glEnable(GL2.GL_LIGHTING);
 					}
 	
-					gl.glEndList();
+					gl2.glEndList();
 	
 					this.labels.put(component, new Object[] { new Integer(labelDl),
 							color, Boolean.FALSE });	
@@ -455,8 +459,10 @@ public class JoglSceneNode
 	protected boolean innerDraw(final GL gl, final GLU glu, final GLUT glut, boolean isPick,
 			final Structure struc, final FloatBuffer inTransform)
 	{
+		GL2 gl2 = gl.getGL2();
+		
 		try {
-			gl.glPushMatrix();
+			gl2.glPushMatrix();
 
 			final GlGeometryViewer viewer = VFAppBase.sgetGlGeometryViewer();
 			/**
@@ -472,7 +478,7 @@ public class JoglSceneNode
 							// supplied transform overrides anything else(?)
 			{
 				inTransform.rewind();
-				gl.glMultMatrixf(inTransform);
+				gl2.glMultMatrixf(inTransform);
 			}
 			
 			else if (sm.hasBiologicUnitTransforms() &&
@@ -510,14 +516,14 @@ public class JoglSceneNode
 						if (VFAppBase.sgetSceneController().showAsymmetricUnitOnly())
 						{
 							try {
-								gl.glPushMatrix();
+								gl2.glPushMatrix();
 								renderable.draw(gl, glu, glut, isPick);
 							} catch (Exception e)
 							{
 								if (DebugState.isDebug())
 									e.printStackTrace();
 							}
-							gl.glPopMatrix();
+							gl2.glPopMatrix();
 						}
 						
 						else
@@ -530,16 +536,16 @@ public class JoglSceneNode
 									final FloatBuffer transformation = matricesVec.get(i);
 
 									try {
-										gl.glPushMatrix();
+										gl2.glPushMatrix();
 										transformation.rewind();
-										gl.glMultMatrixf(transformation);
+										gl2.glMultMatrixf(transformation);
 										renderable.draw(gl, glu, glut, isPick);
 									} catch (Exception e)
 									{
 										if (DebugState.isDebug())
 											e.printStackTrace();
 									}
-									gl.glPopMatrix();
+									gl2.glPopMatrix();
 								}
 							}
 						}
@@ -551,7 +557,7 @@ public class JoglSceneNode
 
 					// pick cycles do not need to finish, and paints get priority.
 					if (isPick && viewer.needsRepaint) {
-						gl.glPopMatrix(); // make sure we clean up the stack...
+						gl2.glPopMatrix(); // make sure we clean up the stack...
 						return false;
 					}
 				}
@@ -566,12 +572,12 @@ public class JoglSceneNode
 						gl.glDisable(GL.GL_DEPTH_TEST);
 
 						if (GlGeometryViewer.currentProgram != 0) {
-							gl.glUseProgram(0);
+							gl2.glUseProgram(0);
 						}
-						gl.glDisable(GL.GL_LIGHTING);
+						gl.glDisable(GL2.GL_LIGHTING);
 
-						gl.glColorMaterial(GL.GL_FRONT, GL.GL_EMISSION);
-						gl.glEnable(GL.GL_COLOR_MATERIAL);
+						gl2.glColorMaterial(GL.GL_FRONT, GL2.GL_EMISSION);
+						gl.glEnable(GL2.GL_COLOR_MATERIAL);
 						
 						final Iterator it = this.labels.values().iterator();
 						final Iterator keyIt = this.labels.keySet().iterator();
@@ -579,20 +585,20 @@ public class JoglSceneNode
 							final Object[] tmp = (Object[]) it.next();
 							final Integer label = (Integer) tmp[0];
 							final float[] color = (float[]) tmp[1];
-							gl.glColor3fv(color, 0);
+							gl2.glColor3fv(color, 0);
 
 							final Object key = keyIt.next();
 							drawTypeLabels(gl, key, label);
 						}
 
-						gl.glDisable(GL.GL_COLOR_MATERIAL);
+						gl.glDisable(GL2.GL_COLOR_MATERIAL);
 						
 						gl.glEnable(GL.GL_DEPTH_TEST);
 
 						if (GlGeometryViewer.currentProgram != 0)
-							gl.glUseProgram(GlGeometryViewer.currentProgram);
+							gl2.glUseProgram(GlGeometryViewer.currentProgram);
 
-						gl.glEnable(GL.GL_LIGHTING);
+						gl.glEnable(GL2.GL_LIGHTING);
 					}
 				}
 			}
@@ -602,7 +608,7 @@ public class JoglSceneNode
 				e.printStackTrace();
 		}
 		
-		gl.glPopMatrix();
+		gl2.glPopMatrix();
 
 		return true;
 	}
@@ -617,22 +623,24 @@ public class JoglSceneNode
 	 */
 	protected void drawTypeLabels(GL gl, Object key, Integer label)
 	{
+		GL2 gl2 = gl.getGL2();
+		
 		if (key instanceof Atom) {
 			final Atom atom = (Atom) key;
 			final int list = label.intValue();
 			if (list >= 0) {
 
 				try {
-					gl.glPushMatrix();
+					gl2.glPushMatrix();
 					if (Double.isNaN(atom.coordinate[0])) {
 						System.out.println("JoglSceneNode: atom.coordinate[] is NaN");
 					}
 					if (! Double.isNaN(atom.coordinate[0])) {
-						gl.glTranslated(atom.coordinate[0],
+						gl2.glTranslated(atom.coordinate[0],
 								atom.coordinate[1], atom.coordinate[2]);
-						gl.glRasterPos3f(0, 0, 0);
+						gl2.glRasterPos3f(0, 0, 0);
 
-						gl.glCallList(list);
+						gl2.glCallList(list);
 					}
 				} catch (Exception e)
 				{
@@ -640,7 +648,7 @@ public class JoglSceneNode
 						e.printStackTrace();
 				}
 				
-				gl.glPopMatrix();
+				gl2.glPopMatrix();
 			}
 		}
 		
@@ -656,16 +664,16 @@ public class JoglSceneNode
 			if (list >= 0)
 			{
 				try {
-					gl.glPushMatrix();
+					gl2.glPushMatrix();
 					if (Double.isNaN(atom.coordinate[0])) {
 						System.out.println("JoglSceneNode: atom.coordinate[] is NaN");
 					}
 					if (! Double.isNaN(atom.coordinate[0])) {
-						gl.glTranslated(atom.coordinate[0],
+						gl2.glTranslated(atom.coordinate[0],
 								atom.coordinate[1], atom.coordinate[2]);
-						gl.glRasterPos3f(0, 0, 0);
+						gl2.glRasterPos3f(0, 0, 0);
 
-						gl.glCallList(list);
+						gl2.glCallList(list);
 					}
 				} catch (Exception e)
 				{
@@ -673,7 +681,7 @@ public class JoglSceneNode
 						e.printStackTrace();
 				}
 				
-				gl.glPopMatrix();
+				gl2.glPopMatrix();
 			}
 		}
 		
@@ -684,7 +692,7 @@ public class JoglSceneNode
 			final int list = label.intValue();
 			if (list >= 0) {
 				try {
-					gl.glPushMatrix();
+					gl2.glPushMatrix();
 
 					double firstPointArray[] = new double[3], secondPointArray[] = new double[3];
 					line.getFirstPoint().get(firstPointArray);
@@ -697,22 +705,22 @@ public class JoglSceneNode
 					}
 					
 					if (! Double.isNaN(tempMidpoint[0])) {
-						gl.glTranslated(this.tempMidpoint[0] + .5f,
+						gl2.glTranslated(this.tempMidpoint[0] + .5f,
 								this.tempMidpoint[1] - .5f,
 								this.tempMidpoint[2] + .5f);
 						// constants represent an arbitrary displacement to separate
 						// the label from the line.
 
-						gl.glRasterPos3f(0, 0, 0);
+						gl2.glRasterPos3f(0, 0, 0);
 
-						gl.glCallList(list);
+						gl2.glCallList(list);
 					}
 				} catch (Exception e) {
 					if (DebugState.isDebug())
 						e.printStackTrace();
 				}
 				
-				gl.glPopMatrix();
+				gl2.glPopMatrix();
 			}
 		}
 	}

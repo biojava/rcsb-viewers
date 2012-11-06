@@ -50,6 +50,7 @@ import java.nio.IntBuffer;
 import java.util.Arrays;
 import java.util.TreeMap;
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 import javax.vecmath.Color4b;
 import javax.vecmath.Color4f;
@@ -73,8 +74,8 @@ import org.rcsb.mbt.model.util.DebugState;
 import org.rcsb.vf.controllers.app.VFAppBase;
 
 
-import com.sun.opengl.util.BufferUtil;
-import com.sun.opengl.util.GLUT;
+import com.jogamp.common.nio.Buffers;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 
 public class DisplayLists
@@ -318,25 +319,27 @@ public class DisplayLists
 
 	public void drawSimple(final GL gl, final GLU glu, final GLUT glut,
 			final boolean isPickMode) {
+		
+		GL2 gl2 = gl.getGL2();
 		try {
-			gl.glPushMatrix();
+			gl2.glPushMatrix();
 
 			if (this.translation != null && Double.isNaN(this.translation[0])) {
 				System.out.println("DisplayLists: translation[0] is NaN");
 			}
 			if (this.translation != null) {
-				gl.glTranslatef(this.translation[0], this.translation[1],
+				gl2.glTranslatef(this.translation[0], this.translation[1],
 						this.translation[2]);
 			}
 			if (this.rotation != null) {
-				gl.glRotatef(this.rotation[0], this.rotation[1], this.rotation[2],
+				gl2.glRotatef(this.rotation[0], this.rotation[1], this.rotation[2],
 						this.rotation[3]);
 			}
 
 			if (doPreRot)   // (for multiple order bonds)
 			{
 /* **/
-				gl.glMultMatrixd(new double[]  {
+				gl2.glMultMatrixd(new double[]  {
 				           preRotYcos, 0.0, preRotYsin,  0.0,
 			 			   0.0, 	   1.0, 	0.0,	 0.0,
 			 			   -preRotYsin, 0.0, preRotYcos, 0.0,
@@ -353,14 +356,14 @@ public class DisplayLists
 					System.err.println("DisplayLists: preTranslateX = NaN!");
 				}
 				if (preTranslateX != 0.0 && ! Double.isNaN(preTranslateX))
-					gl.glTranslated(preTranslateX, 0.0, 0.0);
+					gl2.glTranslated(preTranslateX, 0.0, 0.0);
 						// second, do pretranslation if defined.  Translation is along the x axis,
 						// plus or minus some delta
 			}
 
 			if (this.scale != null) {
 				// Radius
-				gl.glScalef(this.scale[0], this.scale[1], this.scale[2]);
+				gl2.glScalef(this.scale[0], this.scale[1], this.scale[2]);
 			}
 
 			final StructureStyles ss = this.structureComponent.structure
@@ -373,9 +376,9 @@ public class DisplayLists
 
 				if (!this.memoryReferencesAreToDisplayLists) {
 					gl.glBindBuffer(GL.GL_ARRAY_BUFFER, this.normalReference);
-					gl.glNormalPointer(GL.GL_FLOAT,0, 0);
+					gl2.glNormalPointer(GL.GL_FLOAT,0, 0);
 					gl.glBindBuffer(GL.GL_ARRAY_BUFFER, this.vertexReference);
-					gl.glVertexPointer(3, GL.GL_FLOAT,0, 0);
+					gl2.glVertexPointer(3, GL.GL_FLOAT,0, 0);
 				}
 
 				final Fragment f = (Fragment) this.structureComponent;
@@ -392,26 +395,26 @@ public class DisplayLists
 							if (isPickMode)
 							{
 								if (viewer.alphaBits == 0)
-									gl.glColor3ubv(this.uniqueColors[i].color, 0);
+									gl2.glColor3ubv(this.uniqueColors[i].color, 0);
 								
 								else
-									gl.glColor4ubv(this.uniqueColors[i].color, 0);
+									gl2.glColor4ubv(this.uniqueColors[i].color, 0);
 							}
 							
 							else
 							{
 								glPush = true;
-								gl.glPushMatrix();
+								gl2.glPushMatrix();
 								enactMutableColor(r, gl, glu, glut);
 							}					
 
 							if (memoryReferencesAreToDisplayLists)
-								gl.glCallList(this.videoMemoryReferences[i]);
+								gl2.glCallList(this.videoMemoryReferences[i]);
 							
 							else
 							{
 								indexArrays[i].rewind();
-								gl.glDrawRangeElements(GL.GL_TRIANGLE_STRIP, this.ranges[i][0], this.ranges[i][1], this.indexArrays[i].capacity(),
+								gl2.glDrawRangeElements(GL.GL_TRIANGLE_STRIP, this.ranges[i][0], this.ranges[i][1], this.indexArrays[i].capacity(),
 										GL.GL_UNSIGNED_INT, this.indexArrays[i]);
 							}
 						}
@@ -423,7 +426,7 @@ public class DisplayLists
 						}
 
 						if (glPush)
-							gl.glPopMatrix();
+							gl2.glPopMatrix();
 					}
 				}
 			}
@@ -438,9 +441,9 @@ public class DisplayLists
 				if (isPickMode) {
 					// just use the first color.
 					if (viewer.alphaBits == 0) {
-						gl.glColor3ubv(this.uniqueColors[0].color, 0);
+						gl2.glColor3ubv(this.uniqueColors[0].color, 0);
 					} else {
-						gl.glColor4ubv(this.uniqueColors[0].color, 0);
+						gl2.glColor4ubv(this.uniqueColors[0].color, 0);
 					}
 				} else {
 					this.enactMutableColor(this.structureComponent, gl, glu, glut);
@@ -449,7 +452,7 @@ public class DisplayLists
 				if (this.videoMemoryReferences != null) {
 					for (int i = 0; i < this.videoMemoryReferences.length; i++) {
 						if (this.videoMemoryReferences[i] >= 0) {
-							gl.glCallList(this.videoMemoryReferences[i]);
+							gl2.glCallList(this.videoMemoryReferences[i]);
 						}
 					}
 				}
@@ -461,7 +464,7 @@ public class DisplayLists
 				e.printStackTrace();
 		}
 
-		gl.glPopMatrix();
+		gl2.glPopMatrix();
 	}
 
 	private void enactMutableColor(final StructureComponent sc, final GL gl,
@@ -469,6 +472,9 @@ public class DisplayLists
 		final StructureStyles ss = sc.structure.getStructureMap()
 				.getStructureStyles();
 
+		
+		GL2 gl2 =gl.getGL2();
+		
 //		if (ss.isSelected(sc)) {
 //			StructureStyles.getSelectionColor(DisplayLists.tempColorFloat);
 //			// tempColorFloat[3] = .5f;
@@ -482,15 +488,15 @@ public class DisplayLists
 			final ChainStyle style = (ChainStyle) ss.getStyle(c);
 			style.getResidueColor(r, DisplayLists.tempColorFloat);
 			// tempColorFloat[3] = .5f;
-			gl.glMaterialfv(GL.GL_FRONT, this.mutableColorType, DisplayLists.tempColorFloat, 0);
-			gl.glColor3fv(DisplayLists.tempColorFloat, 0);
+			gl2.glMaterialfv(GL.GL_FRONT, this.mutableColorType, DisplayLists.tempColorFloat, 0);
+			gl2.glColor3fv(DisplayLists.tempColorFloat, 0);
 		} else if (sc.getStructureComponentType() == ComponentType.ATOM) {
 			final Atom a = (Atom) sc;
 
 			final AtomStyle style = (AtomStyle) ss.getStyle(a);
 			style.getAtomColor(a, DisplayLists.tempColorFloat);
 			// tempColorFloat[3] = 1f;
-			gl.glMaterialfv(GL.GL_FRONT, this.mutableColorType, DisplayLists.tempColorFloat, 0);
+			gl2.glMaterialfv(GL.GL_FRONT, this.mutableColorType, DisplayLists.tempColorFloat, 0);
 		} else if (sc.getStructureComponentType() == ComponentType.BOND) {
 			final Bond b = (Bond) sc;
 
@@ -501,7 +507,7 @@ public class DisplayLists
 				style.getSplitBondColor(b, DisplayLists.tempColorFloat);
 			}
 			DisplayLists.tempColorFloat[3] = 1f;
-			gl.glMaterialfv(GL.GL_FRONT, this.mutableColorType, DisplayLists.tempColorFloat, 0);
+			gl2.glMaterialfv(GL.GL_FRONT, this.mutableColorType, DisplayLists.tempColorFloat, 0);
 		} else if(sc.getStructureComponentType() == ComponentType.SURFACE) {
 			// TODO -pr 20100501
 			final Surface s = (Surface) sc;
@@ -510,7 +516,7 @@ public class DisplayLists
 		} else if (sc instanceof LineSegment) {
 			final LineStyle style = (LineStyle) ss.getStyle(sc);
 			final float[] color = style.getColor();
-			gl.glColor3fv(color, 0);
+			gl2.glColor3fv(color, 0);
 		}
 		
 //		gl.glFinish();
@@ -521,32 +527,34 @@ public class DisplayLists
 	public void draw(final GL gl, final GLU glu, final GLUT glut,
 			final boolean isPickMode) {
 
+		GL2 gl2 = gl.getGL2();
+		
 		if (this.disableLigting && !isPickMode) {
 			if (GlGeometryViewer.currentProgram != 0) {
-				gl.glUseProgram(0);
+				gl2.glUseProgram(0);
 			}
-			gl.glDisable(GL.GL_LIGHTING);
+			gl.glDisable(GL2.GL_LIGHTING);
 		}
 
 		if (this.specularColor != null) {
-			gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, this.specularColor, 0);
+			gl2.glMaterialfv(GL.GL_FRONT, GL2.GL_SPECULAR, this.specularColor, 0);
 		}
 		if (this.emissiveColor != null) {
-			gl.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, this.emissiveColor, 0);
+			gl2.glMaterialfv(GL.GL_FRONT, GL2.GL_EMISSION, this.emissiveColor, 0);
 		}
 		if (this.ambientColor != null) {
-			gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, this.ambientColor, 0);
+			gl2.glMaterialfv(GL.GL_FRONT, GL2.GL_AMBIENT, this.ambientColor, 0);
 		}
 		if (this.diffuseColor != null) {
-			gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, this.diffuseColor, 0);
+			gl2.glMaterialfv(GL.GL_FRONT, GL2.GL_DIFFUSE, this.diffuseColor, 0);
 		}
 		if (this.shininess != null) {
-			gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, this.shininess, 0);
+			gl2.glMaterialfv(GL.GL_FRONT, GL2.GL_SHININESS, this.shininess, 0);
 		} 
 
 		if (!this.memoryReferencesAreToDisplayLists) {
-			gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
-			gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
+			gl2.glEnableClientState(GL2.GL_VERTEX_ARRAY);
+			gl2.glEnableClientState(GL2.GL_NORMAL_ARRAY);
 		}
 
 //		if (this.mutableColorType >= 0) {
@@ -561,25 +569,28 @@ public class DisplayLists
 //		}
 
 		if (!this.memoryReferencesAreToDisplayLists) {
-			gl.glDisableClientState(GL.GL_VERTEX_ARRAY);
-			gl.glDisableClientState(GL.GL_NORMAL_ARRAY);
+			gl2.glDisableClientState(GL2.GL_VERTEX_ARRAY);
+			gl2.glDisableClientState(GL2.GL_NORMAL_ARRAY);
 		}
 
 		if (this.disableLigting && !isPickMode) {
 			if (GlGeometryViewer.currentProgram != 0) {
-				gl.glUseProgram(GlGeometryViewer.currentProgram);
+				gl2.glUseProgram(GlGeometryViewer.currentProgram);
 			}
-			gl.glEnable(GL.GL_LIGHTING);
+			gl.glEnable(GL2.GL_LIGHTING);
 		}
 	}
 
 	public void deleteVideoMemory(final GL gl, final GLU glu, final GLUT glut) {
+		
+		GL2 gl2 = gl.getGL2();
+		
 		if (this.memoryReferencesAreToDisplayLists) {
 			if(this.videoMemoryReferences != null) {
 				final int listCount = this.videoMemoryReferences.length;
 				for (int i = 0; i < listCount; i++) {
 					if (this.videoMemoryReferences[i] >= 0) {
-						gl.glDeleteLists(this.videoMemoryReferences[i], 1);
+						gl2.glDeleteLists(this.videoMemoryReferences[i], 1);
 					}
 				}
 			}
@@ -604,13 +615,17 @@ public class DisplayLists
 
 	public void startDefine(final int index, final GL gl, final GLU glu,
 			final GLUT glut) {
-		final int list = gl.glGenLists(1);
+		
+		GL2 gl2 = gl.getGL2();
+		
+		final int list = gl2.glGenLists(1);
 		this.videoMemoryReferences[index] = list;
-		gl.glNewList(list, GL.GL_COMPILE);
+		gl2.glNewList(list, GL2.GL_COMPILE);
 	}
 
 	public void endDefine(final GL gl, final GLU glu, final GLUT glut) {
-		gl.glEndList();
+		GL2 gl2 = gl.getGL2();
+		gl2.glEndList();
 	}
 
 	public int getUniqueColorsSize() {
@@ -623,7 +638,7 @@ public class DisplayLists
 		this.ranges = new int[countIndexArrays][];
 	}
 
-	private static final IntBuffer tmpIntBuffer = BufferUtil.newIntBuffer(1);
+	private static final IntBuffer tmpIntBuffer = Buffers.newDirectIntBuffer(1);
 
 	public void defineVertexBufferObject(final GL gl, final GLU glu, final GLUT glut,
 			final FloatBuffer vertices, final FloatBuffer normals, final int vertexCount) {
@@ -635,7 +650,7 @@ public class DisplayLists
 		this.vertexReference = DisplayLists.tmpIntBuffer.get(0);
 		gl.glBindBuffer(GL.GL_ARRAY_BUFFER, this.vertexReference);
 		gl.glBufferData(GL.GL_ARRAY_BUFFER, vertexCount
-				* BufferUtil.SIZEOF_FLOAT, vertices, GL.GL_STATIC_DRAW);
+				* Buffers.SIZEOF_FLOAT, vertices, GL.GL_STATIC_DRAW);
 
 		normals.rewind();
 		DisplayLists.tmpIntBuffer.rewind();
@@ -643,7 +658,7 @@ public class DisplayLists
 		this.normalReference = DisplayLists.tmpIntBuffer.get(0);
 		gl.glBindBuffer(GL.GL_ARRAY_BUFFER, this.normalReference);
 		gl.glBufferData(GL.GL_ARRAY_BUFFER, vertexCount
-				* BufferUtil.SIZEOF_FLOAT, normals, GL.GL_STATIC_DRAW);
+				* Buffers.SIZEOF_FLOAT, normals, GL.GL_STATIC_DRAW);
 	}
 	
 	public void setIndexArray(final int index, final IntBuffer array, final int[] range) {

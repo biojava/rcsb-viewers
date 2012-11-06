@@ -66,7 +66,7 @@ import org.rcsb.vf.glscene.jogl.Color3f;
 import org.rcsb.vf.glscene.jogl.Constants;
 import org.rcsb.vf.glscene.jogl.DisplayLists;
 
-import com.sun.opengl.util.GLUT;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 
 /**

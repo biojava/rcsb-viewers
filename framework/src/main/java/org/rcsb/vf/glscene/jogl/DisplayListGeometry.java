@@ -51,7 +51,9 @@ import javax.media.opengl.glu.GLU;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.attributes.Style;
 
-import com.sun.opengl.util.GLUT;
+import com.jogamp.opengl.util.gl2.GLUT;
+
+
 
 
 public abstract class DisplayListGeometry extends Geometry {

@@ -46,6 +46,7 @@
 package org.rcsb.vf.glscene.jogl;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 import javax.vecmath.Point3d;
@@ -56,7 +57,7 @@ import org.rcsb.mbt.model.attributes.Style;
 import org.rcsb.uiApp.controllers.app.AppBase;
 
 
-import com.sun.opengl.util.GLUT;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 
 public class LineGeometry extends DisplayListGeometry {
@@ -71,6 +72,8 @@ public class LineGeometry extends DisplayListGeometry {
 			final StructureComponent structureComponent, final Style style, final GL gl, final GLU glu,
 			final GLUT glut) {
 
+		
+		GL2 gl2 = gl.getGL2();
 		// Handle quality, form, and shared display lists.
 		//
 
@@ -100,26 +103,26 @@ public class LineGeometry extends DisplayListGeometry {
 		final Point3d secondPoint = line.getSecondPoint();
 		
 		if(lineStyle.lineStyle == LineStyle.DASHED || lineStyle.lineStyle == LineStyle.DOTTED) {
-			gl.glEnable(GL.GL_LINE_STIPPLE);
+			gl.glEnable(GL2.GL_LINE_STIPPLE);
 			if(lineStyle.lineStyle == LineStyle.DASHED) {
-				gl.glLineStipple(1, (short)0xFFF);
+				gl2.glLineStipple(1, (short)0xFFF);
 			} else if(lineStyle.lineStyle == LineStyle.DOTTED) {
-				gl.glLineStipple(0, (short)0x3);
+				gl2.glLineStipple(0, (short)0x3);
 			}
 		} else if(lineStyle.lineStyle == LineStyle.SOLID) {
-			gl.glDisable(GL.GL_LINE_STIPPLE);
+			gl.glDisable(GL2.GL_LINE_STIPPLE);
 		}
 		
-		gl.glPointSize(7.0f);
-		gl.glBegin(GL.GL_LINES);
-		gl.glVertex3d(firstPoint.x,firstPoint.y,firstPoint.z);
-		gl.glVertex3d(secondPoint.x,secondPoint.y,secondPoint.z);
+		gl2.glPointSize(7.0f);
+		gl2.glBegin(GL.GL_LINES);
+		gl2.glVertex3d(firstPoint.x,firstPoint.y,firstPoint.z);
+		gl2.glVertex3d(secondPoint.x,secondPoint.y,secondPoint.z);
 //		gl.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, Constants.white, 0);
-		gl.glEnd();
-		gl.glPointSize(1.0f);
+		gl2.glEnd();
+		gl2.glPointSize(1.0f);
 		
 		if(lineStyle.lineStyle == LineStyle.DASHED || lineStyle.lineStyle == LineStyle.DOTTED) {
-			gl.glDisable(GL.GL_LINE_STIPPLE);
+			gl.glDisable(GL2.GL_LINE_STIPPLE);
 		}
 
 		// lists[0].shaderProgram = this.shaderProgram;
@@ -135,8 +138,8 @@ public class LineGeometry extends DisplayListGeometry {
 		JoglSceneNode sceneNode = (JoglSceneNode)AppBase.sgetModel().getStructures().get(0).getStructureMap().getUData();
 		if ( lineStyle.label != null )
 		{
-			labelDl = gl.glGenLists( 1 );
-			gl.glNewList( labelDl, GL.GL_COMPILE );
+			labelDl = gl2.glGenLists( 1 );
+			gl2.glNewList( labelDl, GL2.GL_COMPILE );
 			
 //			gl.glDisable(GL.GL_LIGHTING);
 //			gl.glDisable(GL.GL_DEPTH_TEST);
@@ -145,7 +148,7 @@ public class LineGeometry extends DisplayListGeometry {
 //			gl.glEnable(GL.GL_DEPTH_TEST);
 //			gl.glEnable(GL.GL_LIGHTING);
 
-			gl.glEndList( );
+			gl2.glEndList( );
 			
 			sceneNode.registerLabel(line, new Integer(labelDl), false, GlGeometryViewer.white);
 		}
@@ -160,7 +163,7 @@ public class LineGeometry extends DisplayListGeometry {
 		// gl.glMaterialfv( GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, black, 0 );
 		// gl.glMaterialfv( GL.GL_FRONT, GL.GL_SPECULAR, black, 0 );
 		// gl.glMaterialfv( GL.GL_FRONT, GL.GL_EMISSION, color, 0 );
-		lists[0].mutableColorType = GL.GL_EMISSION;
+		lists[0].mutableColorType = GL2.GL_EMISSION;
 		lists[0].specularColor = Constants.black;
 		lists[0].ambientColor = Constants.black;
 		lists[0].diffuseColor = Constants.black;

@@ -51,6 +51,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
+import jogamp.opengl.GLPbufferImpl;
+
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.doc.DocController;
 import org.rcsb.vf.controllers.doc.VFDocController;
@@ -59,7 +61,7 @@ import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
 
-import com.sun.opengl.impl.GLPbufferImpl;
+
 
 
 /**

@@ -49,11 +49,12 @@ import java.util.Map;
 import java.util.Vector;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 
-import com.sun.opengl.util.GLUT;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 
 public class DisplayListStateOrganizer {
@@ -248,6 +249,9 @@ public class DisplayListStateOrganizer {
 	// also cleans/compacts the data structure automatically. May take several
 	// draws to completely clean the data structure.
 	public synchronized void draw(final GL gl, final GLU glu, final GLUT glut, final boolean isSelectionMode) {
+		
+		GL2 gl2 = gl.getGL2();
+		
 		for (int mutableIndex = 0; mutableIndex < this.listsByMutableColorType.size(); mutableIndex++) {
 			final Object[] tmp = (Object[])this.listsByMutableColorType.get(mutableIndex);
 			final Integer mutableColorType =  tmp[0] == null ? (Integer)null : (Integer)tmp[0];
@@ -260,16 +264,16 @@ public class DisplayListStateOrganizer {
 
 			if (mutableColorType != null) {
 				if (DisplayListStateOrganizer.currentColorMaterialType == null || DisplayListStateOrganizer.currentColorMaterialType.intValue() != mutableColorType.intValue()) {
-					gl.glColorMaterial(GL.GL_FRONT, mutableColorType.intValue());
+					gl2.glColorMaterial(GL.GL_FRONT, mutableColorType.intValue());
 					if (DisplayListStateOrganizer.isColorMaterialEnabled) {
-						gl.glDisable(GL.GL_COLOR_MATERIAL);
+						gl2.glDisable(GL2.GL_COLOR_MATERIAL);
 						DisplayListStateOrganizer.isColorMaterialEnabled = false;
 					}
 					DisplayListStateOrganizer.currentColorMaterialType = mutableColorType;
 				}
 
 				if (!DisplayListStateOrganizer.isColorMaterialEnabled) {
-					gl.glEnable(GL.GL_COLOR_MATERIAL);
+					gl2.glEnable(GL2.GL_COLOR_MATERIAL);
 					DisplayListStateOrganizer.isColorMaterialEnabled = true;
 				}
 			}
@@ -287,7 +291,7 @@ public class DisplayListStateOrganizer {
 				}
 
 				if (ambientColor != null && (DisplayListStateOrganizer.currentAmbientColor == null || ambientColor != DisplayListStateOrganizer.currentAmbientColor)) {
-					gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, ambientColor, 0);
+					gl2.glMaterialfv(GL.GL_FRONT, GL2.GL_AMBIENT, ambientColor, 0);
 				}
 				DisplayListStateOrganizer.currentAmbientColor = ambientColor;
 
@@ -304,7 +308,7 @@ public class DisplayListStateOrganizer {
 					}
 
 					if (diffuseColor != null && (DisplayListStateOrganizer.currentDiffuseColor == null || diffuseColor != DisplayListStateOrganizer.currentDiffuseColor)) {
-						gl.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, diffuseColor, 0);
+						gl2.glMaterialfv(GL.GL_FRONT, GL2.GL_DIFFUSE, diffuseColor, 0);
 					}
 					DisplayListStateOrganizer.currentDiffuseColor = diffuseColor;
 
@@ -321,7 +325,7 @@ public class DisplayListStateOrganizer {
 						}
 
 						if (emissiveColor != null && (DisplayListStateOrganizer.currentEmissiveColor == null || emissiveColor != DisplayListStateOrganizer.currentEmissiveColor)) {
-							gl.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, emissiveColor, 0);
+							gl2.glMaterialfv(GL.GL_FRONT, GL2.GL_EMISSION, emissiveColor, 0);
 						}
 						DisplayListStateOrganizer.currentEmissiveColor = emissiveColor;
 
@@ -338,7 +342,7 @@ public class DisplayListStateOrganizer {
 							}
 
 							if (shininess != null && (DisplayListStateOrganizer.currentShininess == null || shininess != DisplayListStateOrganizer.currentShininess)) {
-								gl.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, shininess, 0);
+								gl2.glMaterialfv(GL.GL_FRONT, GL2.GL_SHININESS, shininess, 0);
 							}
 							DisplayListStateOrganizer.currentShininess = shininess;
 
@@ -355,7 +359,7 @@ public class DisplayListStateOrganizer {
 								}
 
 								if (specularColor != null && (DisplayListStateOrganizer.currentSpecularColor == null || specularColor != DisplayListStateOrganizer.currentSpecularColor)) {
-									gl.glMaterialfv(GL.GL_FRONT,GL.GL_SPECULAR, specularColor, 0);
+									gl2.glMaterialfv(GL.GL_FRONT,GL2.GL_SPECULAR, specularColor, 0);
 								}
 								DisplayListStateOrganizer.currentSpecularColor = specularColor;
 
@@ -369,10 +373,10 @@ public class DisplayListStateOrganizer {
 									childrenExistLighting = true;
 
 									if (i == 0 && DisplayListStateOrganizer.isLightingDisabled) {
-										gl.glEnable(GL.GL_LIGHTING);
+										gl.glEnable(GL2.GL_LIGHTING);
 										DisplayListStateOrganizer.isLightingDisabled = false;
 									} else if (i == 1 && !DisplayListStateOrganizer.isLightingDisabled) {
-										gl.glDisable(GL.GL_LIGHTING);
+										gl.glDisable(GL2.GL_LIGHTING);
 										DisplayListStateOrganizer.isLightingDisabled = true;
 									}
 

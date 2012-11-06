@@ -49,6 +49,7 @@ package org.rcsb.vf.glscene.jogl;
 
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUquadric;
 
@@ -56,7 +57,7 @@ import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.attributes.*;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 
-import com.sun.opengl.util.GLUT;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 import java.util.*;
 
@@ -161,6 +162,8 @@ public class BondGeometry
 		//
 		// Handle quality, form, and shared display lists.
 		//
+		
+		GL2 gl2 = gl.getGL2();
 
 		final Bond bond = (Bond)structureComponent;
 		final BondStyle bondStyle = (BondStyle)style;
@@ -190,10 +193,10 @@ public class BondGeometry
 				(form == Geometry.FORM_LINES) )
 			{
 				gl.glLineWidth( 3.0f );
-				gl.glBegin( GL.GL_LINES );
-				gl.glVertex3fv( topPt, 0 );
-				gl.glVertex3fv( botPt, 0 );
-				gl.glEnd( );
+				gl2.glBegin( GL.GL_LINES );
+				gl2.glVertex3fv( topPt, 0 );
+				gl2.glVertex3fv( botPt, 0 );
+				gl2.glEnd( );
 				gl.glLineWidth( 1.0f );
 			}
 			else if ( form == Geometry.FORM_FLAT ) {
@@ -455,13 +458,13 @@ public class BondGeometry
 
 				if (  form == Geometry.FORM_POINTS || form == Geometry.FORM_LINES )
 				{
-					currentList.mutableColorType = GL.GL_EMISSION;
+					currentList.mutableColorType = GL2.GL_EMISSION;
 					currentList.emissiveColor = null;
 					currentList.disableLigting = true;
 				}
 				else
 				{
-					currentList.mutableColorType = GL.GL_AMBIENT_AND_DIFFUSE;
+					currentList.mutableColorType = GL2.GL_AMBIENT_AND_DIFFUSE;
 				}
 				
 				if ( this.showOrder && bondPartIX == partialIX )
@@ -533,10 +536,12 @@ public class BondGeometry
 	{
 		double halfHeight = height / 2.0f;
 
+		GL2 gl2 = gl.getGL2();
+		
 		// Transform the GLU Z-Out cylinder orientation to a Y-Up orientation,
 		// and change it's center from the base to its mid-point!
-		gl.glTranslated( 0.0, halfHeight, 0.0 );
-		gl.glRotated( 90.0, 1.0, 0.0, 0.0 );
+		gl2.glTranslated( 0.0, halfHeight, 0.0 );
+		gl2.glRotated( 90.0, 1.0, 0.0, 0.0 );
 
 		//
 		// Draw the cylinder body.
@@ -554,7 +559,7 @@ public class BondGeometry
 
 		if ( drawTop )
 		{
-			gl.glTranslated( 0.0, halfHeight, 0.0 );
+			gl2.glTranslated( 0.0, halfHeight, 0.0 );
 			disk = glu.gluNewQuadric( );
 			glu.gluDisk( disk, 0.0, topRadius, slices, 1 );
 			glu.gluDeleteQuadric( disk );
@@ -563,9 +568,9 @@ public class BondGeometry
 		if ( drawBottom )
 		{
 			if ( drawTop ) {
-				gl.glTranslated( 0.0, -height, 0.0 );
+				gl2.glTranslated( 0.0, -height, 0.0 );
 			} else {
-				gl.glTranslated( 0.0, -halfHeight, 0.0 );
+				gl2.glTranslated( 0.0, -halfHeight, 0.0 );
 			}
 			disk = glu.gluNewQuadric( );
 			glu.gluDisk( disk, 0.0, bottomRadius, slices, 1 );

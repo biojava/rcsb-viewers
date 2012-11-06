@@ -2,9 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>Viewers</artifactId>
+		<artifactId>viewers</artifactId>
 		<groupId>org.rcsb</groupId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.9.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>framework</artifactId>
@@ -83,7 +83,7 @@
 		<dependency>
 			<groupId>org.rcsb</groupId>
 			<artifactId>molecular-biology-toolkit</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.9.0-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
@@ -99,7 +99,7 @@
 		<dependency>
 			<groupId>org.rcsb</groupId>
 			<artifactId>colorbrewer</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>

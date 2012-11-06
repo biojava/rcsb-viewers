@@ -46,7 +46,10 @@
 package org.rcsb.lx.glscene.jogl;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
+
+
 
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.model.Interaction;
@@ -58,7 +61,9 @@ import org.rcsb.vf.glscene.jogl.DisplayListGeometry;
 import org.rcsb.vf.glscene.jogl.DisplayLists;
 import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 
-import com.sun.opengl.util.GLUT;
+import com.jogamp.opengl.util.gl2.GLUT;
+
+
 
 
 public class InteractionGeometry extends DisplayListGeometry
@@ -72,6 +77,8 @@ public class InteractionGeometry extends DisplayListGeometry
 			final StructureComponent structureComponent, final Style style, final GL gl, final GLU glu,
 			final GLUT glut)
 	{
+		
+		 GL2 gl2 = gl.getGL2();
 		final Interaction line = (Interaction) structureComponent;
 		final LineStyle interactionStyle = (LineStyle) style;
 
@@ -87,26 +94,26 @@ public class InteractionGeometry extends DisplayListGeometry
 		final double[] secondPoint = line.getSecondAtom().coordinate;
 		
 		if(interactionStyle.lineStyle == LineStyle.DASHED || interactionStyle.lineStyle == LineStyle.DOTTED) {
-			gl.glEnable(GL.GL_LINE_STIPPLE);
+			gl.glEnable(GL2.GL_LINE_STIPPLE);
 			if(interactionStyle.lineStyle == LineStyle.DASHED) {
-				gl.glLineStipple(1, (short)0xFFF);
+				gl2.glLineStipple(1, (short)0xFFF);
 			} else if(interactionStyle.lineStyle == LineStyle.DOTTED) {
-				gl.glLineStipple(0, (short)0x3);
+				gl2.glLineStipple(0, (short)0x3);
 			}
 		} else if(interactionStyle.lineStyle == LineStyle.SOLID) {
-			gl.glDisable(GL.GL_LINE_STIPPLE);
+			gl.glDisable(GL2.GL_LINE_STIPPLE);
 		}
 
-		gl.glPointSize(7.0f);
-		gl.glBegin(GL.GL_LINES);
-		gl.glVertex3d(firstPoint[0],firstPoint[1],firstPoint[2]);
-		gl.glVertex3d(secondPoint[0],secondPoint[1],secondPoint[2]);
+		gl2.glPointSize(7.0f);
+		gl2.glBegin(GL.GL_LINES);
+		gl2.glVertex3d(firstPoint[0],firstPoint[1],firstPoint[2]);
+		gl2.glVertex3d(secondPoint[0],secondPoint[1],secondPoint[2]);
 //		gl.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, Constants.white, 0);
-		gl.glEnd();
-		gl.glPointSize(1.0f);
+		gl2.glEnd();
+		gl2.glPointSize(1.0f);
 		
 		if(interactionStyle.lineStyle == LineStyle.DASHED || interactionStyle.lineStyle == LineStyle.DOTTED) {
-			gl.glDisable(GL.GL_LINE_STIPPLE);
+			gl.glDisable(GL2.GL_LINE_STIPPLE);
 		}
 
 		// lists[0].shaderProgram = this.shaderProgram;
@@ -122,17 +129,17 @@ public class InteractionGeometry extends DisplayListGeometry
 
 		if ( interactionStyle.label != null )
 		{
-			labelDl = gl.glGenLists( 1 );
-			gl.glNewList( labelDl, GL.GL_COMPILE );
+			labelDl = gl2.glGenLists( 1 );
+			gl2.glNewList( labelDl, GL2.GL_COMPILE );
 			
-			gl.glDisable(GL.GL_LIGHTING);
+			gl.glDisable(GL2.GL_LIGHTING);
 			gl.glDepthFunc(GL.GL_ALWAYS);
 			
 			glut.glutBitmapString( GLUT.BITMAP_HELVETICA_12, interactionStyle.label );
 			gl.glDepthFunc(GL.GL_LEQUAL);
-			gl.glEnable(GL.GL_LIGHTING);
+			gl.glEnable(GL2.GL_LIGHTING);
 
-			gl.glEndList( );
+			gl2.glEndList( );
 			
 			topsn.registerLabel(line, new Integer(labelDl), false, interactionStyle.getColor());
 		}
@@ -144,7 +151,7 @@ public class InteractionGeometry extends DisplayListGeometry
 		// gl.glMaterialfv( GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, black, 0 );
 		// gl.glMaterialfv( GL.GL_FRONT, GL.GL_SPECULAR, black, 0 );
 		// gl.glMaterialfv( GL.GL_FRONT, GL.GL_EMISSION, color, 0 );
-		lists[0].mutableColorType = GL.GL_EMISSION;
+		lists[0].mutableColorType = GL2.GL_EMISSION;
 		lists[0].specularColor = Constants.black;  // these were all black
 		lists[0].ambientColor = Constants.black;
 		lists[0].diffuseColor = Constants.black;

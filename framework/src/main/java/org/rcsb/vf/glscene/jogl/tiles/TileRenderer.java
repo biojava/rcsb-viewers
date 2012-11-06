@@ -50,6 +50,7 @@ import java.awt.Dimension;
 import java.nio.Buffer;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 import org.rcsb.mbt.model.util.DebugState;
@@ -459,6 +460,8 @@ public class TileRenderer
 	 */
 	public void beginTile( final GL gl )
 	{
+		GL2 gl2 = gl.getGL2();
+		
 		if( this.currentTile <= 0 )
 		{
 			this.setup();
@@ -519,9 +522,9 @@ public class TileRenderer
 
 		/* save current matrix mode */
 		final int[] matrixMode = new int[ 1 ];
-		gl.glGetIntegerv( GL.GL_MATRIX_MODE, matrixMode, 0 );
-		gl.glMatrixMode( GL.GL_PROJECTION );
-		gl.glLoadIdentity();
+		gl.glGetIntegerv( GL2.GL_MATRIX_MODE, matrixMode, 0 );
+		gl2.glMatrixMode( GL2.GL_PROJECTION );
+		gl2.glLoadIdentity();
 
 		/* compute projection parameters */
 		final double l =
@@ -535,15 +538,15 @@ public class TileRenderer
 
 		if( this.perspective )
 		{
-			gl.glFrustum( l, r, b, t, this.near, this.far );
+			gl2.glFrustum( l, r, b, t, this.near, this.far );
 		}
 		else
 		{
-			gl.glOrtho( l, r, b, t, this.near, this.far );
+			gl2.glOrtho( l, r, b, t, this.near, this.far );
 		}
 
 		/* restore user's matrix mode */
-		gl.glMatrixMode( matrixMode[ 0 ] );
+		gl2.glMatrixMode( matrixMode[ 0 ] );
 	}
 
 	/**
@@ -565,10 +568,10 @@ public class TileRenderer
 		gl.glFlush();
 
 		/* save current glPixelStore values */
-		gl.glGetIntegerv( GL.GL_PACK_ROW_LENGTH, prevRowLength, 0 );
-		gl.glGetIntegerv( GL.GL_PACK_SKIP_ROWS, prevSkipRows, 0 );
-		gl.glGetIntegerv( GL.GL_PACK_SKIP_PIXELS, prevSkipPixels, 0 );
-		gl.glGetIntegerv( GL.GL_PACK_ALIGNMENT, prevAlignment, 0 );
+		gl.glGetIntegerv( GL2.GL_PACK_ROW_LENGTH, prevRowLength, 0 );
+		gl.glGetIntegerv( GL2.GL_PACK_SKIP_ROWS, prevSkipRows, 0 );
+		gl.glGetIntegerv( GL2.GL_PACK_SKIP_PIXELS, prevSkipPixels, 0 );
+		gl.glGetIntegerv( GL2.GL_PACK_ALIGNMENT, prevAlignment, 0 );
 
 		if( this.tileBuffer != null )
 		{
@@ -589,20 +592,20 @@ public class TileRenderer
 			final int destY = this.tileSizeNB.height * this.currentRow;
 
 			/* setup pixel store for glReadPixels */
-			gl.glPixelStorei( GL.GL_PACK_ROW_LENGTH, this.imageSize.width );
-			gl.glPixelStorei( GL.GL_PACK_SKIP_ROWS, destY );
-			gl.glPixelStorei( GL.GL_PACK_SKIP_PIXELS, destX );
-			gl.glPixelStorei( GL.GL_PACK_ALIGNMENT, 1 );
+			gl.glPixelStorei( GL2.GL_PACK_ROW_LENGTH, this.imageSize.width );
+			gl.glPixelStorei( GL2.GL_PACK_SKIP_ROWS, destY );
+			gl.glPixelStorei( GL2.GL_PACK_SKIP_PIXELS, destX );
+			gl.glPixelStorei( GL2.GL_PACK_ALIGNMENT, 1 );
 
 			/* read the tile into the final image */
 			gl.glReadPixels( srcX, srcY, srcWidth, srcHeight, this.imageFormat, this.imageType, this.imageBuffer );
 		}
 
 		/* restore previous glPixelStore values */
-		gl.glPixelStorei( GL.GL_PACK_ROW_LENGTH, prevRowLength[ 0 ] );
-		gl.glPixelStorei( GL.GL_PACK_SKIP_ROWS, prevSkipRows[ 0 ] );
-		gl.glPixelStorei( GL.GL_PACK_SKIP_PIXELS, prevSkipPixels[ 0 ] );
-		gl.glPixelStorei( GL.GL_PACK_ALIGNMENT, prevAlignment[ 0 ] );
+		gl.glPixelStorei( GL2.GL_PACK_ROW_LENGTH, prevRowLength[ 0 ] );
+		gl.glPixelStorei( GL2.GL_PACK_SKIP_ROWS, prevSkipRows[ 0 ] );
+		gl.glPixelStorei( GL2.GL_PACK_SKIP_PIXELS, prevSkipPixels[ 0 ] );
+		gl.glPixelStorei( GL2.GL_PACK_ALIGNMENT, prevAlignment[ 0 ] );
 
 		/* increment tile counter, return 1 if more tiles left to render */
 		this.currentTile++;
@@ -634,10 +637,12 @@ public class TileRenderer
 	 */
 	public void trRasterPos3f( final float x, final float y, final float z, final GL gl, final GLU glu )
 	{
+		GL2 gl2 = gl.getGL2();
+		
 		if( this.currentTile < 0 )
 		{
 			/* not doing tile rendering right now. Let OpenGL do this. */
-			gl.glRasterPos3f( x, y, z );
+			gl2.glRasterPos3f( x, y, z );
 		}
 		else
 		{
@@ -646,8 +651,8 @@ public class TileRenderer
 			final double[] winCoords = new double[ 3 ];
 
 			/* Get modelview, projection and viewport */
-			gl.glGetDoublev( GL.GL_MODELVIEW_MATRIX, modelview, 0 );
-			gl.glGetDoublev( GL.GL_PROJECTION_MATRIX, proj, 0 );
+			gl2.glGetDoublev( GL2.GL_MODELVIEW_MATRIX, modelview, 0 );
+			gl2.glGetDoublev( GL2.GL_PROJECTION_MATRIX, proj, 0 );
 			viewport[ 0 ] = 0;
 			viewport[ 1 ] = 0;
 			viewport[ 2 ] = this.currentTileWidth;
@@ -659,14 +664,14 @@ public class TileRenderer
 
 				try {
 					/* set raster pos to window coord (0,0) */
-					gl.glMatrixMode( GL.GL_MODELVIEW );
-					gl.glPushMatrix();
-					gl.glLoadIdentity();
-					gl.glMatrixMode( GL.GL_PROJECTION );
-					gl.glPushMatrix();
-					gl.glLoadIdentity();
-					gl.glOrtho( 0.0, this.currentTileWidth, 0.0, this.currentTileHeight, 0.0, 1.0 );
-					gl.glRasterPos3d( 0.0, 0.0, -winCoords[2] );
+					gl2.glMatrixMode( GL2.GL_MODELVIEW );
+					gl2.glPushMatrix();
+					gl2.glLoadIdentity();
+					gl2.glMatrixMode( GL2.GL_PROJECTION );
+					gl2.glPushMatrix();
+					gl2.glLoadIdentity();
+					gl2.glOrtho( 0.0, this.currentTileWidth, 0.0, this.currentTileHeight, 0.0, 1.0 );
+					gl2.glRasterPos3d( 0.0, 0.0, -winCoords[2] );
 
 					/*
 					 * Now use empty bitmap to adjust raster position to
@@ -674,7 +679,7 @@ public class TileRenderer
 					 */
 					{
 						final byte[] bitmap = { 0 };
-						gl.glBitmap( 1, 1, 0.0f, 0.0f, ( float ) winCoords[0], ( float ) winCoords[1], bitmap, 0);
+						gl2.glBitmap( 1, 1, 0.0f, 0.0f, ( float ) winCoords[0], ( float ) winCoords[1], bitmap, 0);
 					}
 				} catch (Exception e) {
 					if (DebugState.isDebug())
@@ -682,9 +687,9 @@ public class TileRenderer
 				}
 
 				/* restore original matrices */
-				gl.glPopMatrix(); /* proj */
-				gl.glMatrixMode( GL.GL_MODELVIEW );
-				gl.glPopMatrix();
+				gl2.glPopMatrix(); /* proj */
+				gl2.glMatrixMode( GL2.GL_MODELVIEW );
+				gl2.glPopMatrix();
 			}
 		}
 	}

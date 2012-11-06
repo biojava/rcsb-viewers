@@ -52,8 +52,11 @@ import java.nio.IntBuffer;
 import java.util.Stack;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
-import com.sun.opengl.util.BufferUtil;
+import com.jogamp.common.nio.Buffers;
+
+
 
 public class GlslProgram {
 	public static boolean supportsShaderPrograms = false;
@@ -118,19 +121,21 @@ public class GlslProgram {
 			return;
 		}
 		
+		GL2 gl2 = gl.getGL2();
+		
 		this.isDestroyed = true;
 		this.programError = false;
 		
 		if(this.fragmentShader != 0) {
-			gl.glDeleteShader(this.fragmentShader);
+			gl2.glDeleteShader(this.fragmentShader);
 			this.fragmentShader = 0;
 		}
 		if(this.vertexShader != 0) {
-			gl.glDeleteShader(this.vertexShader);
+			gl2.glDeleteShader(this.vertexShader);
 			this.vertexShader = 0;
 		}
 		if(this.shaderProgram != 0) {
-			gl.glDeleteProgram(this.shaderProgram);
+			gl2.glDeleteProgram(this.shaderProgram);
 			this.shaderProgram = 0;
 		}
 	}
@@ -142,9 +147,9 @@ public class GlslProgram {
 		if(!supportsShaderPrograms || (!stack.empty() && stack.peek() == this)) {
 			return;
 		}
-		
+		GL2 gl2 = gl.getGL2();
 		if(!this.programError) {
-			gl.glUseProgram(this.shaderProgram);
+			gl2.glUseProgram(this.shaderProgram);
 		}
 		stack.push(this);
 	}
@@ -153,7 +158,7 @@ public class GlslProgram {
 		if(stack.empty() || stack.peek() != this) {
 			return;
 		}
-		
+		GL2 gl2 = gl.getGL2();
 		stack.pop();
 			
 		if(!supportsShaderPrograms) {
@@ -163,10 +168,10 @@ public class GlslProgram {
 		if(stack.size() > 0) {
 			GlslProgram prog = (GlslProgram)stack.lastElement();
 			if(!prog.programError) {
-				gl.glUseProgram(prog.shaderProgram);
+				gl2.glUseProgram(prog.shaderProgram);
 			}
 		} else {
-			gl.glUseProgram(0);
+			gl2.glUseProgram(0);
 		}
 	}
 	
@@ -174,17 +179,17 @@ public class GlslProgram {
 		final String[] lines = this.getReaderLines(fileName);
 		// final String[] lines = this.getReaderLines("test_v.glsl");
 		final int[] lengths = this.createLengthArray(lines);
-
-		this.vertexShader = gl.glCreateShader(GL.GL_VERTEX_SHADER);
-		gl.glShaderSource(this.vertexShader, lines.length, lines, lengths, 0);
-		gl.glCompileShader(this.vertexShader);
+		GL2 gl2 = gl.getGL2();
+		this.vertexShader = gl2.glCreateShader(GL2.GL_VERTEX_SHADER);
+		gl2.glShaderSource(this.vertexShader, lines.length, lines, lengths, 0);
+		gl2.glCompileShader(this.vertexShader);
 
 		gl.glFlush();
-		final IntBuffer buf = BufferUtil.newIntBuffer(1);
-		gl.glGetShaderiv(this.vertexShader, GL.GL_INFO_LOG_LENGTH, buf);
+		final IntBuffer buf = Buffers.newDirectIntBuffer(1);
+		gl2.glGetShaderiv(this.vertexShader, GL2.GL_INFO_LOG_LENGTH, buf);
 		int logLength = buf.get(0);
 		buf.rewind();
-		gl.glGetShaderiv(this.vertexShader, GL.GL_COMPILE_STATUS, buf);
+		gl2.glGetShaderiv(this.vertexShader, GL2.GL_COMPILE_STATUS, buf);
 		final int status = buf.get(0);
 		System.err.println("Vertex shader creation...");
 		System.err.println("\tstatus: " + (status == GL.GL_TRUE));
@@ -195,7 +200,7 @@ public class GlslProgram {
 
 		final int[] length = new int[1];
 		final byte[] bufArray = new byte[logLength];
-		gl.glGetShaderInfoLog(this.vertexShader, logLength, length, 0, bufArray, 0);
+		gl2.glGetShaderInfoLog(this.vertexShader, logLength, length, 0, bufArray, 0);
 
 		final StringBuffer s = new StringBuffer();
 		for (int i = 0; i < length[0]; i++) {
@@ -211,7 +216,7 @@ public class GlslProgram {
 		}
 		if (log.indexOf("software") >= 0) {
 			if (this.vertexShader > 0) {
-				gl.glDeleteShader(this.vertexShader);
+				gl2.glDeleteShader(this.vertexShader);
 			}
 			return false;
 		}
@@ -223,17 +228,17 @@ public class GlslProgram {
 		final String[] lines = this.getReaderLines(fileName);
 		// final String[] lines = this.getReaderLines("test_f.glsl");
 		final int[] lengths = this.createLengthArray(lines);
-
-		this.fragmentShader = gl.glCreateShader(GL.GL_FRAGMENT_SHADER);
-		gl.glShaderSource(this.fragmentShader, lines.length, lines, lengths, 0);
-		gl.glCompileShader(this.fragmentShader);
+		GL2 gl2 = gl.getGL2();
+		this.fragmentShader = gl2.glCreateShader(GL2.GL_FRAGMENT_SHADER);
+		gl2.glShaderSource(this.fragmentShader, lines.length, lines, lengths, 0);
+		gl2.glCompileShader(this.fragmentShader);
 
 		gl.glFlush();
-		final IntBuffer buf = BufferUtil.newIntBuffer(1);
-		gl.glGetShaderiv(this.fragmentShader, GL.GL_INFO_LOG_LENGTH, buf);
+		final IntBuffer buf = Buffers.newDirectIntBuffer(1);
+		gl2.glGetShaderiv(this.fragmentShader, GL2.GL_INFO_LOG_LENGTH, buf);
 		int logLength = buf.get(0);
 		buf.rewind();
-		gl.glGetShaderiv(this.fragmentShader, GL.GL_COMPILE_STATUS, buf);
+		gl2.glGetShaderiv(this.fragmentShader, GL2.GL_COMPILE_STATUS, buf);
 		final int status = buf.get(0);
 		System.err.println("Fragment shader creation...");
 		System.err.println("\tstatus: " + (status == GL.GL_TRUE));
@@ -244,8 +249,7 @@ public class GlslProgram {
 
 		final int[] length = new int[1];
 		final byte[] bufArray = new byte[logLength];
-		gl
-				.glGetShaderInfoLog(this.fragmentShader, logLength, length, 0,
+		gl2.glGetShaderInfoLog(this.fragmentShader, logLength, length, 0,
 						bufArray, 0);
 
 		final StringBuffer s = new StringBuffer();
@@ -262,7 +266,7 @@ public class GlslProgram {
 		}
 		if (log.indexOf("software") >= 0) {
 			if (this.fragmentShader > 0) {
-				gl.glDeleteShader(this.fragmentShader);
+				gl2.glDeleteShader(this.fragmentShader);
 			}
 			return false;
 		}
@@ -271,18 +275,19 @@ public class GlslProgram {
 	}
 
 	private boolean createShaderProgram(final GL gl) {
-		this.shaderProgram = gl.glCreateProgram();
-		gl.glAttachShader(this.shaderProgram, this.vertexShader);
-		gl.glAttachShader(this.shaderProgram, this.fragmentShader);
-		gl.glLinkProgram(this.shaderProgram);
+		GL2 gl2 = gl.getGL2();
+		this.shaderProgram = gl2.glCreateProgram();
+		gl2.glAttachShader(this.shaderProgram, this.vertexShader);
+		gl2.glAttachShader(this.shaderProgram, this.fragmentShader);
+		gl2.glLinkProgram(this.shaderProgram);
 //		gl.glUseProgram(this.shaderProgram);
 
 		gl.glFlush();
-		final IntBuffer buf = BufferUtil.newIntBuffer(1);
-		gl.glGetProgramiv(this.shaderProgram, GL.GL_INFO_LOG_LENGTH, buf);
+		final IntBuffer buf = Buffers.newDirectIntBuffer(1);
+		gl2.glGetProgramiv(this.shaderProgram, GL2.GL_INFO_LOG_LENGTH, buf);
 		int logLength = buf.get(0);
 		buf.rewind();
-		gl.glGetProgramiv(this.shaderProgram, GL.GL_LINK_STATUS, buf);
+		gl2.glGetProgramiv(this.shaderProgram, GL2.GL_LINK_STATUS, buf);
 		final int status = buf.get(0);
 		System.err.println("Shader program creation...");
 		System.err.println("\tstatus: " + (status == GL.GL_TRUE));
@@ -293,8 +298,7 @@ public class GlslProgram {
 
 		final int[] length = new int[1];
 		final byte[] bufArray = new byte[logLength];
-		gl
-				.glGetProgramInfoLog(this.shaderProgram, logLength, length, 0,
+		gl2.glGetProgramInfoLog(this.shaderProgram, logLength, length, 0,
 						bufArray, 0);
 
 		final StringBuffer s = new StringBuffer();

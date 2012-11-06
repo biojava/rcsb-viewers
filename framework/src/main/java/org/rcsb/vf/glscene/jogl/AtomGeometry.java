@@ -49,12 +49,13 @@ package org.rcsb.vf.glscene.jogl;
 
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 import org.rcsb.mbt.model.*;
 import org.rcsb.mbt.model.attributes.*;
 
-import com.sun.opengl.util.GLUT;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 import java.util.*;
 
@@ -113,7 +114,7 @@ public class AtomGeometry
 		// Handle quality, form, and shared display lists.
 		//
 		
-		
+		GL2 gl2 = gl.getGL2();
 		
 		final Atom atom = (Atom)structureComponent;
 		final AtomStyle atomStyle = (AtomStyle)style;
@@ -140,11 +141,11 @@ public class AtomGeometry
 			
 			if ( form == Geometry.FORM_POINTS )
 			{
-				gl.glPointSize( 7.0f );
-				gl.glBegin( GL.GL_POINTS );
-				gl.glVertex3f( 0.0f, 0.0f, 0.0f );
-				gl.glEnd( );
-				gl.glPointSize( 1.0f );
+				gl2.glPointSize( 7.0f );
+				gl2.glBegin( GL.GL_POINTS );
+				gl2.glVertex3f( 0.0f, 0.0f, 0.0f );
+				gl2.glEnd( );
+				gl2.glPointSize( 1.0f );
 			}
 			else if ( form == Geometry.FORM_LINES )
 			{
@@ -184,8 +185,8 @@ public class AtomGeometry
 			Integer labelDLInteger = (Integer)AtomGeometry.sharedDisplayLists.get( label );
 			if ( labelDLInteger == null )
 			{
-				labelDl = gl.glGenLists( 1 );
-				gl.glNewList( labelDl, GL.GL_COMPILE );
+				labelDl = gl2.glGenLists( 1 );
+				gl2.glNewList( labelDl, GL2.GL_COMPILE );
 				
 //				gl.glDisable(GL.GL_LIGHTING);
 //				gl.glDepthFunc(GL.GL_ALWAYS);
@@ -194,7 +195,7 @@ public class AtomGeometry
 //				gl.glDepthFunc(GL.GL_LEQUAL);
 //				gl.glEnable(GL.GL_LIGHTING);
 				
-				gl.glEndList( );
+				gl2.glEndList( );
 
 				labelDLInteger = new Integer( labelDl );
 				AtomGeometry.sharedDisplayLists.put( label, labelDLInteger );
@@ -212,14 +213,14 @@ public class AtomGeometry
 
 		if ( form == Geometry.FORM_POINTS )
 		{
-			lists[0].mutableColorType = GL.GL_EMISSION;
+			lists[0].mutableColorType = GL2.GL_EMISSION;
 			lists[0].specularColor = Constants.black;
 			lists[0].ambientColor = Constants.black;
 			lists[0].diffuseColor = Constants.black;
 		}
 		else
 		{
-			lists[0].mutableColorType = GL.GL_AMBIENT_AND_DIFFUSE;
+			lists[0].mutableColorType = GL2.GL_AMBIENT_AND_DIFFUSE;
 			lists[0].specularColor = Constants.mat_specular;
 			lists[0].shininess = Constants.atomHighShininess;
 			lists[0].emissiveColor = Constants.black;

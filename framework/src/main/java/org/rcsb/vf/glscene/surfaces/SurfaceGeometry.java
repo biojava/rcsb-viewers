@@ -49,6 +49,7 @@ import java.awt.Color;
 import java.util.List;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 import javax.vecmath.Color4f;
 import javax.vecmath.Point3f;
@@ -66,7 +67,7 @@ import org.rcsb.vf.glscene.jogl.Constants;
 import org.rcsb.vf.glscene.jogl.DisplayListGeometry;
 import org.rcsb.vf.glscene.jogl.DisplayLists;
 
-import com.sun.opengl.util.GLUT;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 
 /**
@@ -80,6 +81,9 @@ public class SurfaceGeometry extends DisplayListGeometry {
 	private Vector3f alignment = null;
 
 	public DisplayLists[] getDisplayLists(final StructureComponent structureComponent, final Style style, final GL gl, final GLU glu, final GLUT glut) {
+		
+		
+		GL2 gl2 = gl.getGL2();
 		final Surface surface = (Surface)structureComponent;
 		colors = surface.getColors();
 		alignment = surface.getAlignment();
@@ -91,24 +95,24 @@ public class SurfaceGeometry extends DisplayListGeometry {
 		lists[0].startDefine(0, gl, glu, glut);
 
 		// enable color tracking with glColor
-		gl.glPushAttrib(GL.GL_COLOR_MATERIAL);
-		gl.glEnable(GL.GL_COLOR_MATERIAL);
+		gl2.glPushAttrib(GL2.GL_COLOR_MATERIAL);
+		gl.glEnable(GL2.GL_COLOR_MATERIAL);
 
 		// draw with transparency
-		gl.glPushAttrib(GL.GL_BLEND);
+		gl2.glPushAttrib(GL.GL_BLEND);
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
 		if(surface.isMeshSurface()) {
-			gl.glPushAttrib(GL.GL_LINE_WIDTH);
+			gl2.glPushAttrib(GL.GL_LINE_WIDTH);
 			gl.glLineWidth(1.0f);	
 			drawLines(gl, GL.GL_LINES);	
-			gl.glPopAttrib();
+			gl2.glPopAttrib();
 		} else if (surface.isDotSurface()) {
-			gl.glPushAttrib(GL.GL_POINT_SIZE);
-    	  	gl.glPointSize(3.0f);
+			gl2.glPushAttrib(GL.GL_POINT_SIZE);
+    	  	gl2.glPointSize(3.0f);
 		    drawDots(gl, GL.GL_POINTS);
-		    gl.glPopAttrib();
+		    gl2.glPopAttrib();
 		} else {
 			// for open surfaces color render both sides
 			if (surface.isBackfaceRendered()) {
@@ -126,13 +130,13 @@ public class SurfaceGeometry extends DisplayListGeometry {
 			}
 		}
 		
-		gl.glPopAttrib();
-		gl.glPopAttrib();
+		gl2.glPopAttrib();
+		gl2.glPopAttrib();
 
 		lists[0].endDefine(gl, glu, glut);
 		lists[0].structureComponent = surface;
 
-		lists[0].mutableColorType = GL.GL_AMBIENT_AND_DIFFUSE;	
+		lists[0].mutableColorType = GL2.GL_AMBIENT_AND_DIFFUSE;	
 		lists[0].specularColor = Constants.chainSpecularColor.color;
 		lists[0].emissiveColor = Constants.chainEmissiveColor.color;
 		lists[0].shininess = Constants.chainHighShininess;
@@ -141,7 +145,9 @@ public class SurfaceGeometry extends DisplayListGeometry {
 	}
 
 	private void drawFaces(GL gl, int shadeType) {
-		gl.glBegin(shadeType);
+		GL2 gl2 = gl.getGL2();
+		
+		gl2.glBegin(shadeType);
 
 		List<FaceInfo> faces = triangulatedSurface.getFaces();
 		List<VertInfo> vertices = triangulatedSurface.getVertices();
@@ -160,24 +166,25 @@ public class SurfaceGeometry extends DisplayListGeometry {
 			Color4f c2 = colors[face.c];
 
 			// draw triangle       
-			gl.glNormal3f(n0.x, n0.y, n0.z);
-			gl.glColor4f(c0.x, c0.y, c0.z, c0.w);
-			gl.glVertex3f(p0.x, p0.y, p0.z);
+			gl2.glNormal3f(n0.x, n0.y, n0.z);
+			gl2.glColor4f(c0.x, c0.y, c0.z, c0.w);
+			gl2.glVertex3f(p0.x, p0.y, p0.z);
 
-			gl.glNormal3f(n1.x, n1.y, n1.z);
-			gl.glColor4f(c1.x, c1.y, c1.z, c1.w);
-			gl.glVertex3f(p1.x, p1.y, p1.z);
+			gl2.glNormal3f(n1.x, n1.y, n1.z);
+			gl2.glColor4f(c1.x, c1.y, c1.z, c1.w);
+			gl2.glVertex3f(p1.x, p1.y, p1.z);
 
-			gl.glNormal3f(n2.x, n2.y, n2.z);
-			gl.glColor4f(c2.x, c2.y, c2.z, c2.w);
-			gl.glVertex3f(p2.x, p2.y, p2.z);
+			gl2.glNormal3f(n2.x, n2.y, n2.z);
+			gl2.glColor4f(c2.x, c2.y, c2.z, c2.w);
+			gl2.glVertex3f(p2.x, p2.y, p2.z);
 		}
-		gl.glEnd();
-		gl.glFlush();
+		gl2.glEnd();
+		gl2.glFlush();
 	}
 	
 	private void drawLines(GL gl, int shadeType) {
-		gl.glBegin(shadeType);
+		GL2 gl2 = gl.getGL2();
+		gl2.glBegin(shadeType);
 
 		List<LineInfo> lines = triangulatedSurface.getLines();
 		List<VertInfo> vertices = triangulatedSurface.getVertices();
@@ -193,13 +200,13 @@ public class SurfaceGeometry extends DisplayListGeometry {
 			Color4f c1 = colors[line.b];
 
 			// draw lines     
-			gl.glNormal3f(n0.x, n0.y, n0.z);
-			gl.glColor4f(c0.x, c0.y, c0.z, c0.w);
-			gl.glVertex3f(p0.x, p0.y, p0.z);
+			gl2.glNormal3f(n0.x, n0.y, n0.z);
+			gl2.glColor4f(c0.x, c0.y, c0.z, c0.w);
+			gl2.glVertex3f(p0.x, p0.y, p0.z);
 
-			gl.glNormal3f(n1.x, n1.y, n1.z);
-			gl.glColor4f(c1.x, c1.y, c1.z, c1.w);
-			gl.glVertex3f(p1.x, p1.y, p1.z);
+			gl2.glNormal3f(n1.x, n1.y, n1.z);
+			gl2.glColor4f(c1.x, c1.y, c1.z, c1.w);
+			gl2.glVertex3f(p1.x, p1.y, p1.z);
 		}
 		// draw composite normal vector
 		Point3f base = triangulatedSurface.getCentroid();
@@ -211,93 +218,93 @@ public class SurfaceGeometry extends DisplayListGeometry {
 		System.out.println("Tip: " + tip);
 		
 		gl.glLineWidth(15.0f);
-		gl.glNormal3f(normal.x, normal.y, normal.z);
+		gl2.glNormal3f(normal.x, normal.y, normal.z);
 //		gl.glNormal3f(1.0f, 1.0f, 1.0f);
-		gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		gl.glVertex3f(base.x, base.y, base.z);
+		gl2.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		gl2.glVertex3f(base.x, base.y, base.z);
 		
-		gl.glNormal3f(normal.x, normal.y, normal.z);
+		gl2.glNormal3f(normal.x, normal.y, normal.z);
 	//	gl.glNormal3f(1.0f, 1.0f, 1.0f);
-		gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		gl.glVertex3f(tip.x, tip.y, tip.z);
+		gl2.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		gl2.glVertex3f(tip.x, tip.y, tip.z);
 		
 		// draw longest distance
 		gl.glLineWidth(15.0f);
-		gl.glNormal3f(normal.x, normal.y, normal.z);
+		gl2.glNormal3f(normal.x, normal.y, normal.z);
 //		gl.glNormal3f(1.0f, 0.0f, 0.0f);
-		gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+		gl2.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 		// vertex
-		gl.glVertex3f(-20f, 0f, 0f);
+		gl2.glVertex3f(-20f, 0f, 0f);
 		
-		gl.glNormal3f(normal.x, normal.y, normal.z);
+		gl2.glNormal3f(normal.x, normal.y, normal.z);
 //		gl.glNormal3f(1.0f, 1.0f, 1.0f);
-		gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+		gl2.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 		// base point
-		gl.glVertex3f(20, 0, 0);
+		gl2.glVertex3f(20, 0, 0);
 		
 		gl.glLineWidth(15.0f);
-		gl.glNormal3f(normal.x, normal.y, normal.z);
+		gl2.glNormal3f(normal.x, normal.y, normal.z);
 //		gl.glNormal3f(1.0f, 0.0f, 0.0f);
-		gl.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+		gl2.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
 		// vertex
-		gl.glVertex3f(0f, -20f, 0f);
+		gl2.glVertex3f(0f, -20f, 0f);
 		
-		gl.glNormal3f(normal.x, normal.y, normal.z);
+		gl2.glNormal3f(normal.x, normal.y, normal.z);
 //		gl.glNormal3f(1.0f, 1.0f, 1.0f);
-		gl.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+		gl2.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
 		// base point
-		gl.glVertex3f(0, 20, 0);
+		gl2.glVertex3f(0, 20, 0);
 		
 		gl.glLineWidth(15.0f);
-		gl.glNormal3f(normal.x, normal.y, normal.z);
+		gl2.glNormal3f(normal.x, normal.y, normal.z);
 //		gl.glNormal3f(1.0f, 0.0f, 0.0f);
-		gl.glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+		gl2.glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
 		// vertex
-		gl.glVertex3f(0f, 0f, -20f);
+		gl2.glVertex3f(0f, 0f, -20f);
 		
-		gl.glNormal3f(normal.x, normal.y, normal.z);
+		gl2.glNormal3f(normal.x, normal.y, normal.z);
 //		gl.glNormal3f(1.0f, 1.0f, 1.0f);
-		gl.glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+		gl2.glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
 		// base point
-		gl.glVertex3f(0, 0, 20);
+		gl2.glVertex3f(0, 0, 20);
 		
 		//----------------------------
 		// alignment vector
 		
 		gl.glLineWidth(15.0f);
-		gl.glNormal3f(normal.x, normal.y, normal.z);
+		gl2.glNormal3f(normal.x, normal.y, normal.z);
 //		gl.glNormal3f(1.0f, 0.0f, 0.0f);
-		gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		gl2.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		// vertex
-		gl.glVertex3f(0f, 0f, 0f);
+		gl2.glVertex3f(0f, 0f, 0f);
 		
-		gl.glNormal3f(normal.x, normal.y, normal.z);
+		gl2.glNormal3f(normal.x, normal.y, normal.z);
 //		gl.glNormal3f(1.0f, 1.0f, 1.0f);
-		gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		gl2.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		// base point
 		// 1stp
-		gl.glVertex3f(-2.1638867f, 9.4748944f, -2.3545647f);
+		gl2.glVertex3f(-2.1638867f, 9.4748944f, -2.3545647f);
 		// 2jfz
 	//	gl.glVertex3f(6.276257f, 7.4633217f, -2.2152701f);
 		//-------------------------------------------------
 		// adjusted alignment vector
 		gl.glLineWidth(15.0f);
-		gl.glNormal3f(normal.x, normal.y, normal.z);
+		gl2.glNormal3f(normal.x, normal.y, normal.z);
 //		gl.glNormal3f(1.0f, 0.0f, 0.0f);
-		gl.glColor4f(0.5f, 0.50f, 1.0f, 1.0f);
+		gl2.glColor4f(0.5f, 0.50f, 1.0f, 1.0f);
 		// vertex
-		gl.glVertex3f(0f, 0f, 0f);
+		gl2.glVertex3f(0f, 0f, 0f);
 		
-		gl.glNormal3f(normal.x, normal.y, normal.z);
+		gl2.glNormal3f(normal.x, normal.y, normal.z);
 //		gl.glNormal3f(1.0f, 1.0f, 1.0f);
-		gl.glColor4f(0.50f, 0.50f, 1.0f, 1.0f);
+		gl2.glColor4f(0.50f, 0.50f, 1.0f, 1.0f);
 		// base point
 		// 1stp
-		gl.glVertex3f(-0.930412f, 9.9460393f, -0.4589443f);
+		gl2.glVertex3f(-0.930412f, 9.9460393f, -0.4589443f);
 		
 		
 	//	drawNormals(gl, GL.GL_LINES);
-		gl.glEnd();
+		gl2.glEnd();
 		gl.glFlush();
 	}
 	
@@ -349,7 +356,9 @@ public class SurfaceGeometry extends DisplayListGeometry {
 //	}
 //	
 	private void drawDots(GL gl, int shadeType) {
-		gl.glBegin(shadeType);
+		
+		GL2 gl2 = gl.getGL2();
+		gl2.glBegin(shadeType);
 
 		List<VertInfo> vertices = triangulatedSurface.getVertices();
 
@@ -360,11 +369,11 @@ public class SurfaceGeometry extends DisplayListGeometry {
 			Color4f c0 = colors[i];
 
 			// draw dots    
-			gl.glNormal3f(n0.x, n0.y, n0.z);
-			gl.glColor4f(c0.x, c0.y, c0.z, c0.w);
-			gl.glVertex3f(p0.x, p0.y, p0.z);
+			gl2.glNormal3f(n0.x, n0.y, n0.z);
+			gl2.glColor4f(c0.x, c0.y, c0.z, c0.w);
+			gl2.glVertex3f(p0.x, p0.y, p0.z);
 		}
-		gl.glEnd();
+		gl2.glEnd();
 		gl.glFlush();
 	}
 

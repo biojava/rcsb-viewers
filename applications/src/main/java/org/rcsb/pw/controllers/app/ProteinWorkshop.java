@@ -58,7 +58,6 @@ import org.rcsb.vf.controllers.scene.mutators.MutatorBase;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 import org.rcsb.vf.ui.VFDocumentFrameBase;
 
-import fr.iscpif.jogl.JOGLWrapper;
 
 /**
 * ProteinWorkshopViewer.java

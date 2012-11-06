@@ -52,6 +52,7 @@ import java.util.Vector;
 
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 
@@ -63,8 +64,11 @@ import org.rcsb.vf.glscene.jogl.Color3f;
 import org.rcsb.vf.glscene.jogl.DisplayLists;
 
 
-import com.sun.opengl.util.BufferUtil;
-import com.sun.opengl.util.GLUT;
+
+import com.jogamp.common.nio.Buffers;
+import com.jogamp.opengl.util.gl2.GLUT;
+
+
 
 /**
  * Extrusion is the main building block for ribbon-like secondary structure
@@ -141,6 +145,9 @@ public class Extrusion {
 
 	public void draw(final DisplayLists lists, final GL gl, final GLU glu,
 			final GLUT glut, final Object[] ranges) {
+		
+		GL2 gl2 = gl.getGL2();
+		
 		// arrayLists.setupVertices(this.vertexCount);
 		// arrayLists.setupColors(this.vertexCount);
 		// arrayLists.setupNormals(this.vertexCount);
@@ -148,7 +155,7 @@ public class Extrusion {
 		// gl.glColorMaterial(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE);
 		// gl.glEnable(GL.GL_COLOR_MATERIAL);
 
-		lists.mutableColorType = GL.GL_AMBIENT_AND_DIFFUSE;
+		lists.mutableColorType = GL2.GL_AMBIENT_AND_DIFFUSE;
 		// lists.primitiveType = GL.GL_TRIANGLE_STRIP;
 
 		if (DisplayLists.useVertexBufferObjects) {
@@ -175,7 +182,7 @@ public class Extrusion {
 			int maxIndex = 0;
 
 			if (DisplayLists.useVertexBufferObjects) {
-				final IntBuffer indexBuffer = BufferUtil.newIntBuffer(range[1] - range[0] + 1); 
+				final IntBuffer indexBuffer = Buffers.newDirectIntBuffer(range[1] - range[0] + 1); 
 				for (int j = range[0]; j <= range[1]; j++) {
 					final String key = this.coordinates[j].x + " " + this.coordinates[j].y + " " + this.coordinates[j].z + " " + this.normals[j].x + " " + this.normals[j].y + " " + this.normals[j].z;
 					Integer index = (Integer)vertexCache.get(key);
@@ -202,24 +209,24 @@ public class Extrusion {
 				lists.setIndexArray(i, indexBuffer, new int[] {minIndex, maxIndex});
 			} else {
 				lists.startDefine(i, gl, glu, glut);
-				gl.glBegin(GL.GL_TRIANGLE_STRIP);
+				gl2.glBegin(GL.GL_TRIANGLE_STRIP);
 				float coordsArray[] = new float[3];
 				double vtxArray[] = new double[3];
 				for (int j = range[0]; j <= range[1]; j++)
 				{
 					normals[j].get(coordsArray);
 					coordinates[j].get(vtxArray);
-					gl.glNormal3fv(coordsArray, 0);
-					gl.glVertex3dv(vtxArray, 0);
+					gl2.glNormal3fv(coordsArray, 0);
+					gl2.glVertex3dv(vtxArray, 0);
 				}
-				gl.glEnd();
+				gl2.glEnd();
 				lists.endDefine(gl, glu, glut);
 			}
 		}
 
 		if (DisplayLists.useVertexBufferObjects) {
-			final FloatBuffer vertexBuffer = BufferUtil.newFloatBuffer(vertexVector.size() * 3);
-			final FloatBuffer normalBuffer = BufferUtil.newFloatBuffer(normalVector.size() * 3);
+			final FloatBuffer vertexBuffer = Buffers.newDirectFloatBuffer(vertexVector.size() * 3);
+			final FloatBuffer normalBuffer = Buffers.newDirectFloatBuffer(normalVector.size() * 3);
 			for(int i = 0; i < vertexVector.size(); i++)
 			{
 				final Point3d vertex = (Point3d)vertexVector.get(i);

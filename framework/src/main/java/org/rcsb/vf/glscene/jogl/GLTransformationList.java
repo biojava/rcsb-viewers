@@ -51,7 +51,8 @@ import java.util.ArrayList;
 import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
 
-import com.sun.opengl.util.BufferUtil;
+import com.jogamp.common.nio.Buffers;
+
 
 
 
@@ -82,7 +83,7 @@ public class GLTransformationList extends ArrayList<FloatBuffer>
 		GLTransformationList glList = new GLTransformationList();
 		for (ModelTransformationMatrix modelTrans : modelList)
 		{
-			FloatBuffer buf = BufferUtil.newFloatBuffer(16);
+			FloatBuffer buf = Buffers.newDirectFloatBuffer(16);
 			for (Float value : modelTrans.values)
 				buf.put(value);
 			glList.add(buf);

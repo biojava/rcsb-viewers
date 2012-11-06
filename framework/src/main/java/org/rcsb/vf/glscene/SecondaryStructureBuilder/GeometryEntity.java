@@ -51,7 +51,7 @@ import javax.media.opengl.glu.GLU;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.vf.glscene.jogl.DisplayLists;
 
-import com.sun.opengl.util.GLUT;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 
 //***********************************************************************************

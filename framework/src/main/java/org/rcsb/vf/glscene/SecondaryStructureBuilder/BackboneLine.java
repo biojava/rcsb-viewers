@@ -46,13 +46,14 @@
 package org.rcsb.vf.glscene.SecondaryStructureBuilder;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 import javax.vecmath.Vector3f;
 
 import org.rcsb.vf.glscene.jogl.DisplayLists;
 
-import com.sun.opengl.util.GLUT;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 
 /**
@@ -78,8 +79,10 @@ public class BackboneLine {
 	public void draw(final DisplayLists lists, final GL gl, final GLU glu, final GLUT glut, final Object[] ranges) {
 //		arrayLists.setupColors(this.vertexCount);
 		
-		lists.mutableColorType = GL.GL_EMISSION;
+		lists.mutableColorType = GL2.GL_EMISSION;
 //		lists.primitiveType = GL.GL_TRIANGLE_STRIP;
+		
+		GL2 gl2 = gl.getGL2();
 		
 		lists.setupLists(ranges.length);
 		for(int i = 0; i < ranges.length; i++) {
@@ -87,14 +90,14 @@ public class BackboneLine {
 			final int[] range = (int[])tmp[1];
 			
 			lists.startDefine(i, gl, glu, glut);
-			gl.glBegin(GL.GL_LINE_STRIP);
+			gl2.glBegin(GL.GL_LINE_STRIP);
 			float coordsArray[] = new float[3];
 			for(int j = range[0]; j <= range[1]; j++)
 			{
 				this.coords[j].get(coordsArray);
-				gl.glVertex3fv(coordsArray, 0);
+				gl2.glVertex3fv(coordsArray, 0);
 			}
-			gl.glEnd();
+			gl2.glEnd();
 			lists.endDefine(gl, glu, glut);
 		}
 	}

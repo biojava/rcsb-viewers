@@ -65,7 +65,7 @@ import org.rcsb.vf.glscene.SecondaryStructureBuilder.CrossSectionStyle.CrossSect
 import org.rcsb.vf.glscene.SecondaryStructureBuilder.vec.Vec3f;
 import org.rcsb.vf.glscene.jogl.DisplayLists;
 
-import com.sun.opengl.util.GLUT;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 /**
  * SsGeometry is the base class for the geometry of all Secondary Structure

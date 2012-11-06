@@ -75,13 +75,18 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.Map.Entry;
 
-import javax.media.opengl.DebugGL;
+
+import javax.media.opengl.DebugGL2;
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLCanvas;
+import javax.media.opengl.GLProfile;
+import javax.media.opengl.TraceGL2;
+
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
-import javax.media.opengl.TraceGL;
+
+import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
 import javax.swing.JPanel;
 
@@ -116,9 +121,11 @@ import org.rcsb.vf.glscene.jogl.ChainGeometry.RibbonForm;
 import org.rcsb.vf.glscene.jogl.tiles.TileRenderer;
 import org.rcsb.vf.glscene.surfaces.SurfaceGeometry;
 
-import com.sun.opengl.util.BufferUtil;
-import com.sun.opengl.util.GLUT;
-import com.sun.opengl.util.ImageUtil;
+
+import com.jogamp.common.nio.Buffers;
+import com.jogamp.opengl.util.awt.ImageUtil;
+import com.jogamp.opengl.util.gl2.GLUT;
+
 
 
 /**
@@ -518,7 +525,7 @@ WindowListener, IStructureStylesEventListener {
 		VFAppBase.sgetSceneController().setDefaultGeometry(defaultGeometry);
 
 		// Set up a GL Canvas
-		this.glCapabilities = new GLCapabilities();
+		this.glCapabilities = new GLCapabilities(GLProfile.getDefault());
 		// glCapabilities.setAccumBlueBits(16);
 		// glCapabilities.setAccumRedBits(16);
 		// glCapabilities.setAccumGreenBits(16);
@@ -620,7 +627,7 @@ WindowListener, IStructureStylesEventListener {
 
 	public int colorCount = 0;
 
-	public IntBuffer tmpIntBufferOne = BufferUtil.newIntBuffer(1);
+	public IntBuffer tmpIntBufferOne = Buffers.newDirectIntBuffer(1);
 
 	public boolean supportsShaderPrograms = false;
 
@@ -630,20 +637,25 @@ WindowListener, IStructureStylesEventListener {
 	 */
 	public void init(final GLAutoDrawable drawable)
 	{
+		
+		System.err.println("IN GlGeometryViewer - init " + drawable.getClass().getName());
 		this.drawable = drawable;
 
+		
 		if (DebugState.isDebug())
-			drawable.setGL(new DebugGL(drawable.getGL()));
+			
+			drawable.setGL(new DebugGL2(drawable.getGL().getGL2()));
 
 		if (DebugState.isTrace())
-		    drawable.setGL(new TraceGL(drawable.getGL(), System.err));
+		    drawable.setGL(new TraceGL2(drawable.getGL().getGL2(), System.err));
 
 		//
 		//		 Set up JOGL (OpenGL)
 		//
 
 		final GL gl = drawable.getGL();
-
+		final GL2 gl2 = gl.getGL2();
+		
 		// gl.glEnable(GL.GL_POLYGON_SMOOTH);
 		// gl.glSampleCoverage(.1f, true);
 
@@ -666,30 +678,34 @@ WindowListener, IStructureStylesEventListener {
 				+ this.alphaBits);
 
 		// Lighting
-		gl.glEnable(GL.GL_LIGHTING);
-		gl.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, new float[] { 0.8f, 0.8f,
+		gl.glEnable(GL2.GL_LIGHTING);
+		gl2.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, new float[] { 0.8f, 0.8f,
 				0.8f, 1.0f }, 0);
-		gl.glEnable(GL.GL_LIGHT0);
+		gl.glEnable(GL2.GL_LIGHT0);
 
 		// Rendering
-		gl.glEnable(GL.GL_NORMALIZE); 
-		gl.glEnable(GL.GL_CULL_FACE);
-		gl.glEnable(GL.GL_DEPTH_TEST);
-		gl.glShadeModel(GL.GL_SMOOTH);
+		gl.glEnable(GL2.GL_NORMALIZE); 
+		gl.glEnable(GL2.GL_CULL_FACE);
+		gl.glEnable(GL2.GL_DEPTH_TEST);
+		gl2.glShadeModel(GL2.GL_SMOOTH);
 
 		checkSetShaderSupport();
 
 		gl.glLineWidth(3.0f);
-		gl.glPointSize(10f);
+		gl2.glPointSize(10f);
 		gl.glCullFace(GL.GL_BACK);
-		gl.glPolygonMode(GL.GL_FRONT, GL.GL_FILL);
+		gl2.glPolygonMode(GL.GL_FRONT, GL2.GL_FILL);
 
-		gl.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
+		gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
+		
 		//
 		// Add mouse listeners
 		//
-		drawable.addMouseListener(this);
-		drawable.addMouseMotionListener(this);
+		//System.err.println("GlGeometryViewer needs to re-enable adding of mouse listeners");
+		
+		//System.out.println("Drawable: " + drawable.getClass());
+		this.addMouseListener(this);
+		this.addMouseMotionListener(this);
 
 		drawable.setAutoSwapBufferMode(false);
 	}
@@ -748,7 +764,9 @@ WindowListener, IStructureStylesEventListener {
 	public void requestRepaint() {
 		this.needsRepaint = true;
 		if (this.drawable != null && !AppBase.backgroundScreenshotOnly) {
-			this.drawable.repaint();
+			//this.drawable.;
+			//this.repaint();
+			System.out.println("requesting repaint!");
 		}
 	}
 
@@ -761,7 +779,9 @@ WindowListener, IStructureStylesEventListener {
 	public void requestPick() {
 		this.needsPick = true;
 		if (this.drawable != null && !AppBase.backgroundScreenshotOnly) {
-			this.drawable.repaint();
+			//this.drawable.display();
+			//this.repaint();
+			System.out.println("requestPick!");
 		}
 	}
 
@@ -769,7 +789,9 @@ WindowListener, IStructureStylesEventListener {
 		this.needsPick = true;
 		this.needsRepaint = true;
 		if (this.drawable != null && !AppBase.backgroundScreenshotOnly) {
-			this.drawable.repaint();
+			//this.drawable.display();
+			//this.repaint();
+			System.out.println("requestPickAndRepaint!");
 		}
 	}
 
@@ -779,7 +801,7 @@ WindowListener, IStructureStylesEventListener {
 	public void display(final GLAutoDrawable drawable) {
 		try {
 			final GL gl = drawable.getGL();
-
+			final GL2 gl2 = gl.getGL2();
 			final SceneController sceneController = VFAppBase.sgetSceneController();
 
 			if (this.needsPick && !this.isScreenshotRequested)
@@ -792,13 +814,13 @@ WindowListener, IStructureStylesEventListener {
 
 				if (sceneController.isDebugEnabled()
 						&& sceneController.getDebugSettings().isAntialiasingEnabled) {
-					gl.glClearAccum(this.backgroundColor[0],
+					gl2.glClearAccum(this.backgroundColor[0],
 							this.backgroundColor[1], this.backgroundColor[2],
 							this.backgroundColor[3]);
-					gl.glClear(GL.GL_ACCUM_BUFFER_BIT);
+					gl.glClear(GL2.GL_ACCUM_BUFFER_BIT);
 
-					gl.glMatrixMode(GL.GL_MODELVIEW);
-					gl.glLoadIdentity();
+					gl2.glMatrixMode(GL2.GL_MODELVIEW);
+					gl2.glLoadIdentity();
 
 					for (int jitter = 0; jitter < sceneController.getDebugSettings().JITTER_ARRAY.length; jitter++) {
 						JoglUtils.accPerspective(
@@ -820,11 +842,11 @@ WindowListener, IStructureStylesEventListener {
 						this.drawOrPick(gl, this.glu, this.glut, drawable,
 								false, false, false);
 						// gl.glFlush();
-						gl.glAccum(GL.GL_ACCUM, 1f / sceneController
+						gl2.glAccum(GL2.GL_ACCUM, 1f / sceneController
 								.getDebugSettings().JITTER_ARRAY.length);
 						gl.glFlush();
 					}
-					gl.glAccum(GL.GL_RETURN, 1);
+					gl2.glAccum(GL2.GL_RETURN, 1);
 				}
 
 				else
@@ -878,7 +900,7 @@ WindowListener, IStructureStylesEventListener {
 				tr.setTileSize(super.getWidth(), super.getHeight(), 0);
 			}
 			tr.setImageSize(this.screenshotWidth, this.screenshotHeight);
-			tr.setImageBuffer(GL.GL_BGR, GL.GL_UNSIGNED_BYTE, imageBuffer);
+			tr.setImageBuffer(GL2.GL_BGR, GL.GL_UNSIGNED_BYTE, imageBuffer);
 			tr.trPerspective(fovy, 1.0 / this.aspect,
 					zNear, zFar);
 
@@ -941,6 +963,8 @@ WindowListener, IStructureStylesEventListener {
 			boolean isPick)
 	{
 
+		GL2 gl2 = gl.getGL2();
+		
 		synchronized (this.renderablesToDestroy)
 		{
 			for (DisplayListRenderable renderable : renderablesToDestroy)
@@ -952,7 +976,7 @@ WindowListener, IStructureStylesEventListener {
 		synchronized (this.simpleDisplayListsToDestroy)
 		{
 			for (Integer list : simpleDisplayListsToDestroy)
-				gl.glDeleteLists(list.intValue(), 1);
+				gl2.glDeleteLists(list.intValue(), 1);
 
 			this.simpleDisplayListsToDestroy.clear();
 		}
@@ -980,20 +1004,20 @@ WindowListener, IStructureStylesEventListener {
 		{
 			if (canModifyProjectionMatrix)
 			{
-				gl.glMatrixMode(GL.GL_PROJECTION);
+				gl2.glMatrixMode(GL2.GL_PROJECTION);
 
-				gl.glLoadIdentity();
+				gl2.glLoadIdentity();
 			}
 
 			if (isPick)
 			{
-				gl.glDisable(GL.GL_LIGHTING);
-				gl.glShadeModel(GL.GL_FLAT);
+				gl.glDisable(GL2.GL_LIGHTING);
+				gl2.glShadeModel(GL2.GL_FLAT);
 
 				if (this.supportsShaderPrograms && currentProgram != 0
 						&& shaderProgram != 0)
 				{
-					gl.glUseProgram(0);
+					gl2.glUseProgram(0);
 					currentProgram = 0;
 				}
 
@@ -1003,8 +1027,8 @@ WindowListener, IStructureStylesEventListener {
 			{
 				this.backBufferContainsPickData = false;
 
-				gl.glEnable(GL.GL_LIGHTING);
-				gl.glShadeModel(GL.GL_SMOOTH);
+				gl.glEnable(GL2.GL_LIGHTING);
+				gl2.glShadeModel(GL2.GL_SMOOTH);
 
 				if (this.supportsShaderPrograms)
 				{
@@ -1023,7 +1047,7 @@ WindowListener, IStructureStylesEventListener {
 
 					if (currentProgram == 0 && shaderProgram != 0 && successful)
 					{
-						gl.glUseProgram(shaderProgram);
+						gl2.glUseProgram(shaderProgram);
 						currentProgram = shaderProgram;
 					}
 
@@ -1058,12 +1082,12 @@ WindowListener, IStructureStylesEventListener {
 
 			gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 
-			gl.glMatrixMode(GL.GL_MODELVIEW);
+			gl2.glMatrixMode(GL2.GL_MODELVIEW);
 			if (canClearModelviewMatrix)
-				gl.glLoadIdentity();
+				gl2.glLoadIdentity();
 
 			// Position the headlight relative to the viewpoint.
-			gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, this.lightPosition, 0);
+			gl2.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, this.lightPosition, 0);
 
 
 			// Set the viewpoint.
@@ -1080,7 +1104,7 @@ WindowListener, IStructureStylesEventListener {
 			{
 				boolean continuePick = false;
 				try {
-					gl.glPushMatrix();
+					gl2.glPushMatrix();
 					JoglSceneNode sceneNode = (JoglSceneNode)structure.getStructureMap().getUData();
 					continuePick = sceneNode.draw(gl, glu, glut, isPick, structure);
 				} catch (Exception e)
@@ -1089,7 +1113,7 @@ WindowListener, IStructureStylesEventListener {
 						e.printStackTrace();
 				}
 
-				gl.glPopMatrix();
+				gl2.glPopMatrix();
 
 				// pick cycles do not need to finish, and paints get
 				// priority.
@@ -1108,7 +1132,7 @@ WindowListener, IStructureStylesEventListener {
 				boolean picked = false;
 
 				if (this.rgbaBuffer == null)
-					this.rgbaBuffer = BufferUtil.newByteBuffer(4);
+					this.rgbaBuffer = Buffers.newDirectByteBuffer(4);
 
 				if (this.alphaBits == 0)
 				{
@@ -2042,24 +2066,25 @@ WindowListener, IStructureStylesEventListener {
 	protected boolean createVertexShader(final GL gl, final GLU glu,
 			final GLUT glut)
 	{
+		GL2 gl2 = gl.getGL2();
 		final String[] lines = this.getReaderLines("per_pixel_v.glsl");
 		// final String[] lines = this.getReaderLines("test_v.glsl");
 		final int[] lengths = this.createLengthArray(lines);
 
-		vertexShader = gl.glCreateShader(GL.GL_VERTEX_SHADER);
-		gl.glShaderSource(vertexShader, lines.length, lines, lengths, 0);
-		gl.glCompileShader(vertexShader);
+		vertexShader = gl2.glCreateShader(GL2.GL_VERTEX_SHADER);
+		gl2.glShaderSource(vertexShader, lines.length, lines, lengths, 0);
+		gl2.glCompileShader(vertexShader);
 
 		if (this.do_glFinishInShaders)
 			gl.glFinish();
 		else
 			gl.glFlush();
 
-		final IntBuffer buf = BufferUtil.newIntBuffer(1);
-		gl.glGetShaderiv(vertexShader, GL.GL_INFO_LOG_LENGTH, buf);
+		final IntBuffer buf = Buffers.newDirectIntBuffer(1);
+		gl2.glGetShaderiv(vertexShader, GL2.GL_INFO_LOG_LENGTH, buf);
 		int logLength = buf.get(0);
 		buf.rewind();
-		gl.glGetShaderiv(vertexShader, GL.GL_COMPILE_STATUS, buf);
+		gl2.glGetShaderiv(vertexShader, GL2.GL_COMPILE_STATUS, buf);
 		final int status = buf.get(0);
 
 		/* ** DEBUGGING - output shader information
@@ -2073,7 +2098,7 @@ WindowListener, IStructureStylesEventListener {
 
 		final int[] length = new int[1];
 		final byte[] bufArray = new byte[logLength];
-		gl.glGetShaderInfoLog(vertexShader, logLength, length, 0, bufArray, 0);
+		gl2.glGetShaderInfoLog(vertexShader, logLength, length, 0, bufArray, 0);
 
 		final StringBuffer s = new StringBuffer();
 		for (int i = 0; i < length[0]; i++) {
@@ -2092,7 +2117,7 @@ WindowListener, IStructureStylesEventListener {
 		}
 		if (log.indexOf("software") >= 0) {
 			if (vertexShader > 0) {
-				gl.glDeleteShader(vertexShader);
+				gl2.glDeleteShader(vertexShader);
 			}
 			return false;
 		}
@@ -2105,20 +2130,22 @@ WindowListener, IStructureStylesEventListener {
 		final String[] lines = this.getReaderLines("per_pixel_f.glsl");
 		final int[] lengths = this.createLengthArray(lines);
 
-		fragmentShader = gl.glCreateShader(GL.GL_FRAGMENT_SHADER);
-		gl.glShaderSource(fragmentShader, lines.length, lines, lengths, 0);
-		gl.glCompileShader(fragmentShader);
+		GL2 gl2 =gl.getGL2();
+		
+		fragmentShader = gl2.glCreateShader(GL2.GL_FRAGMENT_SHADER);
+		gl2.glShaderSource(fragmentShader, lines.length, lines, lengths, 0);
+		gl2.glCompileShader(fragmentShader);
 
 		if (this.do_glFinishInShaders)
 			gl.glFinish();
 		else
 			gl.glFlush();
 
-		final IntBuffer buf = BufferUtil.newIntBuffer(1);
-		gl.glGetShaderiv(fragmentShader, GL.GL_INFO_LOG_LENGTH, buf);
+		final IntBuffer buf = Buffers.newDirectIntBuffer(1);
+		gl2.glGetShaderiv(fragmentShader, GL2.GL_INFO_LOG_LENGTH, buf);
 		int logLength = buf.get(0);
 		buf.rewind();
-		gl.glGetShaderiv(fragmentShader, GL.GL_COMPILE_STATUS, buf);
+		gl2.glGetShaderiv(fragmentShader, GL2.GL_COMPILE_STATUS, buf);
 		final int status = buf.get(0);
 		/* ** DEBUGGING - output fragment shader informaiton
 		System.err.println("Fragment shader creation...");
@@ -2131,7 +2158,7 @@ WindowListener, IStructureStylesEventListener {
 
 		final int[] length = new int[1];
 		final byte[] bufArray = new byte[logLength];
-		gl.glGetShaderInfoLog(fragmentShader, logLength, length, 0,
+		gl2.glGetShaderInfoLog(fragmentShader, logLength, length, 0,
 				bufArray, 0);
 
 		final StringBuffer s = new StringBuffer();
@@ -2148,7 +2175,7 @@ WindowListener, IStructureStylesEventListener {
 		}
 		if (log.indexOf("software") >= 0) {
 			if (fragmentShader > 0) {
-				gl.glDeleteShader(fragmentShader);
+				gl2.glDeleteShader(fragmentShader);
 			}
 			return false;
 		}
@@ -2158,22 +2185,25 @@ WindowListener, IStructureStylesEventListener {
 
 	private boolean createShaderProgram(final GL gl, final GLU glu,
 			final GLUT glut) {
-		shaderProgram = gl.glCreateProgram();
-		gl.glAttachShader(shaderProgram, vertexShader);
-		gl.glAttachShader(shaderProgram, fragmentShader);
-		gl.glLinkProgram(shaderProgram);
-		gl.glUseProgram(shaderProgram);
+		
+		GL2 gl2 = gl.getGL2();
+		
+		shaderProgram = gl2.glCreateProgram();
+		gl2.glAttachShader(shaderProgram, vertexShader);
+		gl2.glAttachShader(shaderProgram, fragmentShader);
+		gl2.glLinkProgram(shaderProgram);
+		gl2.glUseProgram(shaderProgram);
 
 		if (this.do_glFinishInShaders)
 			gl.glFinish();
 		else
 			gl.glFlush();
 
-		final IntBuffer buf = BufferUtil.newIntBuffer(1);
-		gl.glGetProgramiv(shaderProgram, GL.GL_INFO_LOG_LENGTH, buf);
+		final IntBuffer buf = Buffers.newDirectIntBuffer(1);
+		gl2.glGetProgramiv(shaderProgram, GL2.GL_INFO_LOG_LENGTH, buf);
 		int logLength = buf.get(0);
 		buf.rewind();
-		gl.glGetProgramiv(shaderProgram, GL.GL_LINK_STATUS, buf);
+		gl2.glGetProgramiv(shaderProgram, GL2.GL_LINK_STATUS, buf);
 		final int status = buf.get(0);
 		/* ** DEBUGGING - output shader program information
 		System.err.println("Shader program creation...");
@@ -2186,8 +2216,7 @@ WindowListener, IStructureStylesEventListener {
 
 		final int[] length = new int[1];
 		final byte[] bufArray = new byte[logLength];
-		gl
-		.glGetProgramInfoLog(shaderProgram, logLength, length, 0,
+		gl2.glGetProgramInfoLog(shaderProgram, logLength, length, 0,
 				bufArray, 0);
 
 		final StringBuffer s = new StringBuffer();
@@ -2204,7 +2233,7 @@ WindowListener, IStructureStylesEventListener {
 		}
 		if (log.indexOf("software") >= 0) {
 			if (shaderProgram > 0) {
-				gl.glDeleteProgram(shaderProgram);
+				gl2.glDeleteProgram(shaderProgram);
 			}
 			return false;
 		}
@@ -2270,4 +2299,12 @@ WindowListener, IStructureStylesEventListener {
 			break;
 		}
 	}
+
+	@Override
+	public void dispose(GLAutoDrawable arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 }

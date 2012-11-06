@@ -50,6 +50,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 import org.rcsb.lx.controllers.app.LigandExplorer;
@@ -69,7 +70,9 @@ import org.rcsb.vf.glscene.jogl.DisplayListRenderable;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 import org.rcsb.vf.glscene.jogl.JoglSceneNode;
 
-import com.sun.opengl.util.GLUT;
+import com.jogamp.opengl.util.gl2.GLUT;
+
+
 
 
 public class LXSceneNode extends JoglSceneNode
@@ -77,7 +80,7 @@ public class LXSceneNode extends JoglSceneNode
 	////////////////////////////////////////////////////////////////////
 	// BEG Fog implementation
 	////////////////////////////////////////////////////////////////////
-	
+
 	public double[] viewEye = { 0d, 0d, 0d };
 
 	public double[] viewCenter = { 0d, 0d, 0d };
@@ -132,7 +135,7 @@ public class LXSceneNode extends JoglSceneNode
 			this.fogEquation = GL.GL_LINEAR; // the computationally simplest
 			// algorithm.
 		}
-		
+
 		else
 		{
 			this.isFogEnabled = false;
@@ -388,7 +391,7 @@ public class LXSceneNode extends JoglSceneNode
 		// Model.getSingleton().getViewer().requestRepaint();
 	}
 	////////////////////////////////////////////////////////////////////
-    // END viewpoint implementation
+	// END viewpoint implementation
 	////////////////////////////////////////////////////////////////////
 
 	// -----------------------------------------------------------------------------
@@ -397,7 +400,7 @@ public class LXSceneNode extends JoglSceneNode
 	{
 		allowLighting = true;
 	}
-	
+
 	private final double[] tempMidpoint = { 0, 0, 0 };
 
 	/**
@@ -417,9 +420,9 @@ public class LXSceneNode extends JoglSceneNode
 				|| Double.isNaN(this.rotationCenter[1])
 				|| Double.isNaN(this.rotationCenter[2]))
 			LigandExplorer.sgetGlGeometryViewer().resetView(false, false);
-	
+
 		createLabels(gl, glut);
-		
+
 		// Set the viewpoint.
 		glu.gluLookAt(this.viewEye[0], this.viewEye[1], this.viewEye[2],
 				this.viewCenter[0], this.viewCenter[1], this.viewCenter[2],
@@ -467,15 +470,17 @@ public class LXSceneNode extends JoglSceneNode
 	protected boolean innerDraw(final GL gl, final GLU glu, final GLUT glut, boolean isPick,
 			final Structure struc, final FloatBuffer nc_transform)
 	{
+		GL2 gl2 = gl.getGL2();
 		try {
-			gl.glPushMatrix();
+
+			gl2.glPushMatrix();
 
 			final GlGeometryViewer glViewer = VFAppBase.sgetGlGeometryViewer();
 
 			if (nc_transform != null)
 			{
 				nc_transform.rewind();
-				gl.glMultMatrixf(nc_transform);
+				gl2.glMultMatrixf(nc_transform);
 			}
 
 			synchronized (this.renderables)
@@ -486,7 +491,7 @@ public class LXSceneNode extends JoglSceneNode
 
 					// pick cycles do not need to finish, and paints get priority.
 					if (isPick && glViewer.needsRepaint) {
-						gl.glPopMatrix(); // make sure we clean up the stack...
+						gl2.glPopMatrix(); // make sure we clean up the stack...
 						return false;
 					}
 				}
@@ -501,9 +506,9 @@ public class LXSceneNode extends JoglSceneNode
 						gl.glDisable(GL.GL_DEPTH_TEST);
 
 						if (LXGlGeometryViewer.currentProgram != 0)
-							gl.glUseProgram(0);
+							gl2.glUseProgram(0);
 
-						gl.glDisable(GL.GL_LIGHTING);
+						gl.glDisable(GL2.GL_LIGHTING);
 
 						final Iterator it = this.labels.values().iterator();
 						final Iterator keyIt = this.labels.keySet().iterator();
@@ -511,7 +516,7 @@ public class LXSceneNode extends JoglSceneNode
 							final Object[] tmp = (Object[]) it.next();
 							final Integer label = (Integer) tmp[0];
 							final float[] color = (float[]) tmp[1];
-							gl.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, color, 0);
+							gl2.glMaterialfv(GL.GL_FRONT, GL2.GL_EMISSION, color, 0);
 
 							final Object key = keyIt.next();
 							drawTypeLabels(gl, key, label);
@@ -520,9 +525,9 @@ public class LXSceneNode extends JoglSceneNode
 						gl.glEnable(GL.GL_DEPTH_TEST);
 
 						if (GlGeometryViewer.currentProgram != 0)
-							gl.glUseProgram(GlGeometryViewer.currentProgram);
+							gl2.glUseProgram(GlGeometryViewer.currentProgram);
 
-						gl.glEnable(GL.GL_LIGHTING);
+						gl.glEnable(GL2.GL_LIGHTING);
 					}
 				}
 			}
@@ -532,10 +537,10 @@ public class LXSceneNode extends JoglSceneNode
 				e.printStackTrace();
 		}
 
-		gl.glPopMatrix();
+		gl2.glPopMatrix();
 		return true;
 	}
-	
+
 	@Override
 	public void registerLabel(final StructureComponent sc,
 			final Integer displayList, final boolean isDisplayListShared,
@@ -544,12 +549,12 @@ public class LXSceneNode extends JoglSceneNode
 		synchronized (this.labels)
 		{
 			this.labels.put(sc,
-				new Object[]
-			    {
+					new Object[]
+							{
 					displayList,
 					color,
 					isDisplayListShared ? Boolean.TRUE : Boolean.FALSE
-				});
+							});
 		}
 	}
 
@@ -592,7 +597,7 @@ public class LXSceneNode extends JoglSceneNode
 		{
 			residueToLabel = (Residue) sc;
 		}
-		
+
 		else if (sc instanceof Residue[])
 		{
 			final Residue[] reses = (Residue[]) sc;
@@ -607,7 +612,7 @@ public class LXSceneNode extends JoglSceneNode
 				style.getResidueColor(r, color);
 			}
 		}
-		
+
 		else if (sc instanceof Fragment)
 		{
 			final Fragment frag = (Fragment) sc;
@@ -623,7 +628,7 @@ public class LXSceneNode extends JoglSceneNode
 				style.getResidueColor(middleRes, color);
 			}
 		}
-		
+
 		else if (sc instanceof Chain)
 		{
 			final Chain ch = (Chain) sc;
@@ -656,6 +661,8 @@ public class LXSceneNode extends JoglSceneNode
 	@Override
 	protected void drawTypeLabels(GL gl, Object key, Integer label)
 	{
+		 GL2 gl2 = gl.getGL2();
+		
 		float LABEL_DISPLACEMENT = 0.2f; // was 0.5f originally
 		if (key instanceof Interaction)
 		{
@@ -665,7 +672,7 @@ public class LXSceneNode extends JoglSceneNode
 			if (list >= 0)
 			{
 				try {
-					gl.glPushMatrix();
+					gl2.glPushMatrix();
 
 					for (int i = 0; i < line.getFirstAtom().coordinate.length; i++)
 					{
@@ -674,25 +681,25 @@ public class LXSceneNode extends JoglSceneNode
 								.getSecondAtom().coordinate[i]) / 2;
 					}
 					if (! Double.isNaN(tempMidpoint[0])) {
-						gl.glTranslated(this.tempMidpoint[0] + LABEL_DISPLACEMENT,
+						gl2.glTranslated(this.tempMidpoint[0] + LABEL_DISPLACEMENT,
 								this.tempMidpoint[1] - LABEL_DISPLACEMENT,
 								this.tempMidpoint[2] + LABEL_DISPLACEMENT);
 						// constants represent arbitrary displacement to separate
 						// the label from the line.
 
-						gl.glRasterPos3f(0, 0, 0);
+						gl2.glRasterPos3f(0, 0, 0);
 
-						gl.glCallList(list);
+						gl2.glCallList(list);
 					}
 				} catch (Exception e)
 				{
 					if (DebugState.isDebug())
 						e.printStackTrace();
 				}
-				gl.glPopMatrix();
+				gl2.glPopMatrix();
 			}
 		}
-		
+
 		else super.drawTypeLabels(gl, key, label);
 	}
 }

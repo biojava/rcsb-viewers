@@ -46,15 +46,19 @@
 package org.rcsb.vf.glscene.jogl;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
-import com.sun.opengl.util.GLUT;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 public class JoglUtils {
 
 	public static void accFrustum(final GL gl, final GLU glu, final GLUT glut, final double left,
 			final double right, final double bottom, final double top, final double zNear, final double zFar,
 			final double pixdx, final double pixdy, final double eyedx, final double eyedy, final double focus) {
+		
+		GL2 gl2 = gl.getGL2();
+		
 		double xwSize, ywSize;
 		double dx, dy;
 		final int[] viewport = new int[4];
@@ -66,12 +70,12 @@ public class JoglUtils {
 		dx = -(pixdx * xwSize / viewport[2] + eyedx * zNear / focus);
 		dy = -(pixdy * ywSize / viewport[3] + eyedy * zNear / focus);
 
-		gl.glMatrixMode(GL.GL_PROJECTION);
-		gl.glLoadIdentity();
-		gl.glFrustum(left + dx, right + dx, bottom + dy, top + dy, zNear, zFar);
-		gl.glMatrixMode(GL.GL_MODELVIEW);
-		gl.glLoadIdentity();
-		gl.glTranslatef(-(float) eyedx, -(float) eyedy, 0f);
+		gl2.glMatrixMode(GL2.GL_PROJECTION);
+		gl2.glLoadIdentity();
+		gl2.glFrustum(left + dx, right + dx, bottom + dy, top + dy, zNear, zFar);
+		gl2.glMatrixMode(GL2.GL_MODELVIEW);
+		gl2.glLoadIdentity();
+		gl2.glTranslatef(-(float) eyedx, -(float) eyedy, 0f);
 	}
 
 	public static void accPerspective(final GL gl, final GLU glu, final GLUT glut, final double fovy,

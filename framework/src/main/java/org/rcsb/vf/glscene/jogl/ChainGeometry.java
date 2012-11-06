@@ -57,7 +57,7 @@ import org.rcsb.vf.glscene.SecondaryStructureBuilder.SsGeometry.ConformationShap
 
 
 
-import com.sun.opengl.util.GLUT;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 
 

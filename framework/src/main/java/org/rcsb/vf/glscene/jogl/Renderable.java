@@ -49,7 +49,7 @@ package org.rcsb.vf.glscene.jogl;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
-import com.sun.opengl.util.GLUT;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 
 /**
