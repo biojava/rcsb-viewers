@@ -158,6 +158,8 @@ WindowListener, IStructureStylesEventListener {
 	private boolean backBufferContainsPickData = false;
 
 	GLAutoDrawable drawable = null;
+	
+	GLCanvas drawableViewer = null;
 
 	public List<DisplayListRenderable> renderablesToDestroy = Collections.synchronizedList(new ArrayList<DisplayListRenderable>());
 
@@ -638,9 +640,21 @@ WindowListener, IStructureStylesEventListener {
 	public void init(final GLAutoDrawable drawable)
 	{
 		
-		System.err.println("IN GlGeometryViewer - init " + drawable.getClass().getName());
+		System.err.println("IN GlGeometryViewer - init " + drawable.getClass().getSimpleName());
+		
 		this.drawable = drawable;
+		
+		Class c = drawable.getClass();
+		
+	
 
+		
+		if ( GLCanvas.class.isAssignableFrom(c)) {				
+			drawableViewer = (GLCanvas) drawable;
+			System.err.println("we got a drawable viewer!");
+		} else {
+			System.err.println("??? not a GlGeometryViewer, but " + drawable.getClass().getName());
+		}
 		
 		if (DebugState.isDebug())
 			
@@ -701,11 +715,12 @@ WindowListener, IStructureStylesEventListener {
 		//
 		// Add mouse listeners
 		//
-		//System.err.println("GlGeometryViewer needs to re-enable adding of mouse listeners");
+				
 		
-		//System.out.println("Drawable: " + drawable.getClass());
-		this.addMouseListener(this);
-		this.addMouseMotionListener(this);
+		if ( drawableViewer != null){
+			drawableViewer.addMouseListener(this);
+			drawableViewer.addMouseMotionListener(this);
+		}
 
 		drawable.setAutoSwapBufferMode(false);
 	}
@@ -766,7 +781,11 @@ WindowListener, IStructureStylesEventListener {
 		if (this.drawable != null && !AppBase.backgroundScreenshotOnly) {
 			//this.drawable.;
 			//this.repaint();
-			System.out.println("requesting repaint!");
+			
+			//this.repaint();
+			if ( drawableViewer != null)
+				drawableViewer.repaint();
+			
 		}
 	}
 
@@ -781,7 +800,9 @@ WindowListener, IStructureStylesEventListener {
 		if (this.drawable != null && !AppBase.backgroundScreenshotOnly) {
 			//this.drawable.display();
 			//this.repaint();
-			System.out.println("requestPick!");
+			
+			if ( drawableViewer != null)
+				drawableViewer.repaint();
 		}
 	}
 
@@ -791,7 +812,8 @@ WindowListener, IStructureStylesEventListener {
 		if (this.drawable != null && !AppBase.backgroundScreenshotOnly) {
 			//this.drawable.display();
 			//this.repaint();
-			System.out.println("requestPickAndRepaint!");
+			if ( drawableViewer != null)
+				drawableViewer.repaint();
 		}
 	}
 
