@@ -56,4 +56,7 @@ package org.rcsb.uiApp.controllers.app;
 public abstract class VersionInformation
 {
 	public static String version() { return "No Version - app must override and set."; }
+	
+	
+	public static final String release = "4.0";
 }

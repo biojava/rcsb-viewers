@@ -17,9 +17,9 @@ public class Demo {
 
 			
 		//showSimpleViewer();
-	    // showProteinWorkshop();
-		  showLigandExplorer();
-		//showKiosk();
+	     //showProteinWorkshop();
+		//  showLigandExplorer();
+		showKiosk();
 	}
 
 	
