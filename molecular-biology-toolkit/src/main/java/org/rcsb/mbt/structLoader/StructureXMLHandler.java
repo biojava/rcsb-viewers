@@ -54,12 +54,15 @@ import javax.vecmath.Matrix3f;
 import javax.vecmath.Vector3f;
 
 import org.rcsb.mbt.model.Atom;
+import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.UnitCell;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.geometry.ModelTransformationList;
 import org.rcsb.mbt.model.geometry.ModelTransformationMatrix;
+import org.rcsb.mbt.model.util.Element;
+import org.rcsb.mbt.model.util.PeriodicTable;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -140,7 +143,24 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected Atom prevAtom = null;
 	protected String currentEntityName = "";
 	protected int currentEntityId = 0;
+	
+	// temp fields for struc_conn records
+	protected String curConnType = null;
+	protected String curAsymId1 = null;
+	protected String curAsymId2 = null;
+	protected int curSeqId1 = -1;
+	protected int curSeqId2 = -1;
+	protected String curAtomName1 = null;
+	protected String curAtomName2 = null;
+	protected String curInsertionCode1 = null;
+	protected String curInsertionCode2 = null;
+	protected String curCompId1 = null;
+	protected String curCompId2 = null;
+	protected String curAltId1 = null;
+	protected String curAltId2 = null;
+	
 	protected Vector<Atom> atomVector = new Vector<Atom>();
+	protected Vector<Bond> bondVector = new Vector<Bond>();
 	private Map<Integer, String> entityNameMap = new HashMap<Integer, String>();
 
 	/**
@@ -151,7 +171,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 	 * 
 	 */
 	protected enum eIsParsing {
-		NONE, CELL, ATOM_SITES, ATOM_SITE, DATABASE_PDB_MATRIX, ENTITY, STRUCT_BIOLGEN, STRUCT_ASSEMBLY, NON_CRYSTALLOGRAPHIC_OPERATIONS, LEGACY_BIOLOGIC_UNIT_OPERATIONS
+		NONE, CELL, ATOM_SITES, ATOM_SITE, DATABASE_PDB_MATRIX, ENTITY, STRUCT_BIOLGEN, STRUCT_ASSEMBLY, STRUCT_CONN, NON_CRYSTALLOGRAPHIC_OPERATIONS, LEGACY_BIOLOGIC_UNIT_OPERATIONS
 	}
 
 	private Stack<eIsParsing> isParsingStack = new Stack<eIsParsing>();
@@ -196,7 +216,9 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	UnitCell unitCell = null;
 
-	private Hashtable<ComponentType, Vector<Atom>> componentsHash = new Hashtable<ComponentType, Vector<Atom>>();
+	// TODO need generic hashtable for multiple component types
+//	private Hashtable<ComponentType, Vector<Atom>> componentsHash = new Hashtable<ComponentType, Vector<Atom>>();
+	private Hashtable<ComponentType, Vector<?>> componentsHash = new Hashtable<ComponentType, Vector<?>>();
 	protected Structure structure = null;
 
 	// key : qName , value : Runnable
@@ -206,6 +228,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected HashMap<String, XMLRunnable> endElementNonCrystallographicRunnables = new HashMap<String, XMLRunnable>(); 
 	protected HashMap<String, XMLRunnable> endElementDatabasePDBMatrixRunnables = new HashMap<String, XMLRunnable>(); 
 	protected HashMap<String, XMLRunnable> endElementAtomSitesRunnables = new HashMap<String, XMLRunnable>(); 
+	protected HashMap<String, XMLRunnable> endElementStructConnRunnables = new HashMap<String, XMLRunnable>(); 
 
 	protected static final String xmlPrefix = "PDBx:";
 
@@ -401,6 +424,45 @@ public class StructureXMLHandler extends DefaultHandler implements
 		endElementEntityRunnables.put(xmlPrefix + "entity",
 				createXMLRunnable__entities__End());
 		
+		//
+		// BEG Struct Conn
+		//
+		startElementRunnables.put(xmlPrefix + "struct_conn",
+				createXMLRunnable__struct_conn__Start());
+		endElementStructConnRunnables.put(xmlPrefix + "struct_conn",
+				createXMLRunnable__struct_conn__End());
+		
+		endElementStructConnRunnables.put(xmlPrefix + "structConnCategory",
+				createXMLRunnable__struct_connCategory__End());
+
+		endElementStructConnRunnables.put(xmlPrefix + "conn_type_id",
+				createXMLRunnable__conn_type_id__End());
+		endElementStructConnRunnables.put(xmlPrefix + "ptnr1_auth_asym_id",
+				createXMLRunnable__ptnr1_auth_asym_id__End());
+		endElementStructConnRunnables.put(xmlPrefix + "ptnr2_auth_asym_id",
+				createXMLRunnable__ptnr2_auth_asym_id__End());
+		endElementStructConnRunnables.put(xmlPrefix + "ptnr1_auth_seq_id",
+				createXMLRunnable__ptnr1_auth_seq_id__End());
+		endElementStructConnRunnables.put(xmlPrefix + "ptnr2_auth_seq_id",
+				createXMLRunnable__ptnr2_auth_seq_id__End());
+		endElementStructConnRunnables.put(xmlPrefix + "ptnr1_label_atom_id",
+				createXMLRunnable__ptnr1_label_atom_id__End());
+		endElementStructConnRunnables.put(xmlPrefix + "ptnr2_label_atom_id",
+				createXMLRunnable__ptnr2_label_atom_id__End());		
+		endElementStructConnRunnables.put(xmlPrefix + "ptnr1_label_comp_id",
+				createXMLRunnable__ptnr1_label_comp_id__End());
+		endElementStructConnRunnables.put(xmlPrefix + "ptnr2_label_comp_id",
+				createXMLRunnable__ptnr2_label_comp_id__End());		
+		endElementStructConnRunnables.put(xmlPrefix + "pdbx_ptnr1_label_alt_id",
+				createXMLRunnable__pdbx_ptnr1_label_alt_id__End());
+		endElementStructConnRunnables.put(xmlPrefix + "pdbx_ptnr2_label_alt_id",
+				createXMLRunnable__pdbx_ptnr2_label_alt_id__End());	
+		
+		// TODO the next two tokens are missing in the .xml file, example: 2YOK
+		endElementStructConnRunnables.put(xmlPrefix + "pdbx_ptnr1_PDB_ins_code",
+				createXMLRunnable__pdbx_ptnr1_PDB_ins_code__End());
+		endElementStructConnRunnables.put(xmlPrefix + "pdbx_ptnr2_PDB_ins_code",
+				createXMLRunnable__pdbx_ptnr2_PDB_ins_code__End());
 
 	}
 
@@ -421,6 +483,8 @@ public class StructureXMLHandler extends DefaultHandler implements
 	public void endDocument() throws SAXException {
 		atomVector.trimToSize();
 		componentsHash.put(ComponentType.ATOM, atomVector);
+		// TODO can we add ComponentType.BOND here ...
+		componentsHash.put(ComponentType.BOND, bondVector);
 
 		//
 		// Create the Structure object
@@ -568,6 +632,12 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 			case ENTITY:
 				runnable = endElementEntityRunnables.get(qName);
+				break;
+				
+			case STRUCT_CONN:
+				runnable = endElementStructConnRunnables.get(qName);
+				
+			default:
 				break;
 			
 		    }
@@ -1300,6 +1370,239 @@ public class StructureXMLHandler extends DefaultHandler implements
 		return new XMLRunnable__entities__End();
 	}
 	
+	
+	// TODO struct conn
+	
+	protected XMLRunnable__struct_conn__Start createXMLRunnable__struct_conn__Start() {
+		return new XMLRunnable__struct_conn__Start();
+	}
+
+	protected XMLRunnable__struct_conn__End createXMLRunnable__struct_conn__End() {
+		return new XMLRunnable__struct_conn__End();
+	}
+	
+	protected class XMLRunnable__struct_connCategory__End extends XMLRunnable {
+		public void run() {
+		}
+	}
+
+	protected XMLRunnable__struct_connCategory__End createXMLRunnable__struct_connCategory__End() {
+		return new XMLRunnable__struct_connCategory__End();
+	}
+	
+	protected class XMLRunnable__struct_conn__Start extends XMLRunnable {
+		public void run() {
+			setParsingFlag(eIsParsing.STRUCT_CONN);
+			curConnType = "";
+			curAsymId1 = "";
+			curAsymId2 = "";
+			curSeqId1 = -1;
+			curSeqId2 = -1;
+			curAtomName1 = "";
+			curAtomName2 = "";
+			curCompId1 = "";
+			curCompId2 = "";
+			curInsertionCode1 = "";
+			curInsertionCode2 = "";
+			curAltId1 = "";
+			curAltId2 = "";
+		}
+	}
+	
+	protected class XMLRunnable__struct_conn__End extends XMLRunnable {
+		public void run() {
+			
+			// we handle only covalent bonds. Hydrogen bonds and metal coordination is
+			// handled separately in the MBT viewers.
+			if (! (curConnType.equals("disulf") || curConnType.equals("covale"))) {
+				return;
+			}
+			Atom atom1 = findAtom(curAsymId1, curSeqId1, curAtomName1, curCompId1, curInsertionCode1, curAltId1);
+			Atom atom2 = findAtom(curAsymId2, curSeqId2, curAtomName2, curCompId2, curInsertionCode2, curAltId2);
+
+			if (atom1 == null) {
+				System.err.println("Error parsing _struct_conn record. Atom cannot be found: ");
+				System.err.println("_struct_conn.ptnr1_auth_asym_id       : " + curAsymId1);	
+				System.err.println("_struct_conn.ptnr1_auth_seq_id        : " + curSeqId1);	
+				System.err.println("_struct_conn.ptnr1_label_atom_id      : " + curAtomName1);
+				System.err.println("_struct_conn.ptnr1_label_comp_id      : " + curCompId1);
+				System.err.println("_struct_conn.pdbx_ptnr1_PDB_ins_code  : " + curInsertionCode1);
+				System.err.println("_struct_conn.pdbx_ptnr1_label_alt_id  : " + curAltId1);
+			}
+			if (atom2 == null) {
+				System.err.println("Error parsing _struct_conn record. Atom cannot be found: ");
+				System.err.println("_struct_conn.ptnr2_auth_asym_id       : " + curAsymId2);	
+				System.err.println("_struct_conn.ptnr2_auth_seq_id        : " + curSeqId2);	
+				System.err.println("_struct_conn.ptnr2_label_atom_id      : " + curAtomName2);
+				System.err.println("_struct_conn.ptnr2_label_comp_id      : " + curCompId2);
+				System.err.println("_struct_conn.pdbx_ptnr2_PDB_ins_code  : " + curInsertionCode2);
+				System.err.println("_struct_conn.pdbx_ptnr2_label_alt_id  : " + curAltId2);
+			}
+		    // ignore bonds to metals. They will be handled separately in the MBT viewers
+			if (isMetal(atom1) || isMetal(atom2)) {
+				return;
+			}
+		
+			Bond bond = new Bond(atom1, atom2);
+            bondVector.add(bond);
+			clearParsingFlag(eIsParsing.STRUCT_CONN);
+		}
+
+		/**
+		 * @param a1
+		 */
+		private boolean isMetal(Atom a1) {
+			Element e = PeriodicTable.getElement(a1.element);
+			return PeriodicTable.isMetal(e.atomic_number);
+		}
+	}
+	
+	protected class XMLRunnable__conn_type_id__End extends XMLRunnable {
+		public void run() {
+            curConnType = buf.trim();
+		}
+	}
+
+	protected XMLRunnable__conn_type_id__End createXMLRunnable__conn_type_id__End() {
+		return new XMLRunnable__conn_type_id__End();
+	}
+	
+	protected class XMLRunnable__ptnr1_auth_asym_id__End extends XMLRunnable {
+		public void run() {
+			curAsymId1 = buf.trim();
+		}
+	}
+
+	protected XMLRunnable__ptnr1_auth_asym_id__End createXMLRunnable__ptnr1_auth_asym_id__End() {
+		return new XMLRunnable__ptnr1_auth_asym_id__End();
+	}
+	
+	protected class XMLRunnable__ptnr2_auth_asym_id__End extends XMLRunnable {
+		public void run() {
+			curAsymId2 = buf.trim();
+		}
+	}
+
+	protected XMLRunnable__ptnr2_auth_asym_id__End createXMLRunnable__ptnr2_auth_asym_id__End() {
+		return new XMLRunnable__ptnr2_auth_asym_id__End();
+	}
+	
+	protected class XMLRunnable__ptnr1_auth_seq_id__End extends XMLRunnable {
+		public void run() {
+			curSeqId1 = Integer.parseInt(buf.trim());
+		}
+	}
+
+	protected XMLRunnable__ptnr1_auth_seq_id__End createXMLRunnable__ptnr1_auth_seq_id__End() {
+		return new XMLRunnable__ptnr1_auth_seq_id__End();
+	}
+	
+	protected class XMLRunnable__ptnr2_auth_seq_id__End extends XMLRunnable {
+		public void run() {
+			curSeqId2 = Integer.parseInt(buf.trim());
+		}
+	}
+
+	protected XMLRunnable__ptnr2_auth_seq_id__End createXMLRunnable__ptnr2_auth_seq_id__End() {
+		return new XMLRunnable__ptnr2_auth_seq_id__End();
+	}
+	
+	protected class XMLRunnable__ptnr1_label_atom_id__End extends XMLRunnable {
+		public void run() {
+			curAtomName1 = buf.trim();
+		}
+	}
+
+	protected XMLRunnable__ptnr1_label_atom_id__End createXMLRunnable__ptnr1_label_atom_id__End() {
+		return new XMLRunnable__ptnr1_label_atom_id__End();
+	}
+	
+	protected class XMLRunnable__ptnr2_label_atom_id__End extends XMLRunnable {
+		public void run() {
+			curAtomName2 = buf.trim();
+		}
+	}
+
+	protected XMLRunnable__ptnr2_label_atom_id__End createXMLRunnable__ptnr2_label_atom_id__End() {
+		return new XMLRunnable__ptnr2_label_atom_id__End();
+	}
+	
+
+	protected class XMLRunnable__pdbx_ptnr1_label_alt_id__End extends XMLRunnable {
+		public void run() {
+			// this field is missing in .xml files
+			if (! buf.trim().equals("?")) {
+				curAltId1 = buf.trim();
+			}
+		}
+	}
+
+	protected XMLRunnable__pdbx_ptnr1_label_alt_id__End createXMLRunnable__pdbx_ptnr1_label_alt_id__End() {
+		return new XMLRunnable__pdbx_ptnr1_label_alt_id__End();
+	}
+	
+	protected class XMLRunnable__pdbx_ptnr2_label_alt_id__End extends XMLRunnable {
+		public void run() {
+			// this field is missing in .xml files
+			if (! buf.trim().equals("?")) {
+		    	curAltId2 = buf.trim();
+			}
+		}
+	}
+
+	protected XMLRunnable__pdbx_ptnr2_label_alt_id__End createXMLRunnable__pdbx_ptnr2_label_alt_id__End() {
+		return new XMLRunnable__pdbx_ptnr2_label_alt_id__End();
+	}
+	
+	// ----
+	protected class XMLRunnable__pdbx_ptnr1_PDB_ins_code__End extends XMLRunnable {
+		public void run() {
+			// this field is missing in .xml files
+			if (! buf.trim().equals("?")) {
+			    curInsertionCode1 = buf.trim();
+			}
+		}
+	}
+
+	protected XMLRunnable__pdbx_ptnr1_PDB_ins_code__End createXMLRunnable__pdbx_ptnr1_PDB_ins_code__End() {
+		return new XMLRunnable__pdbx_ptnr1_PDB_ins_code__End();
+	}
+	
+	protected class XMLRunnable__pdbx_ptnr2_PDB_ins_code__End extends XMLRunnable {
+		public void run() {
+			// this field is missing in .xml files
+			if (! buf.trim().equals("?")) {
+			    curInsertionCode2 = buf.trim();
+			}
+		}
+	}
+
+	protected XMLRunnable__pdbx_ptnr2_PDB_ins_code__End createXMLRunnable__pdbx_ptnr2_PDB_ins_code__End() {
+		return new XMLRunnable__pdbx_ptnr2_PDB_ins_code__End();
+	}
+	
+	// --
+	
+	protected class XMLRunnable__ptnr1_label_comp_id__End extends XMLRunnable {
+		public void run() {
+			curCompId1 = buf.trim();
+		}
+	}
+
+	protected XMLRunnable__ptnr1_label_comp_id__End createXMLRunnable__ptnr1_label_comp_id__End() {
+		return new XMLRunnable__ptnr1_label_comp_id__End();
+	}
+	
+	protected class XMLRunnable__ptnr2_label_comp_id__End extends XMLRunnable {
+		public void run() {
+			curCompId2 = buf.trim();
+		}
+	}
+
+	protected XMLRunnable__ptnr2_label_comp_id__End createXMLRunnable__ptnr2_label_comp_id__End() {
+		return new XMLRunnable__ptnr2_label_comp_id__End();
+	}
+	
 	public boolean canLoad(String name) {
 		return true;
 	}
@@ -1315,23 +1618,48 @@ public class StructureXMLHandler extends DefaultHandler implements
 	public Structure load(String name) {
 		return null;
 	}
+	
+	/**
+	 * Finds atom based on chain id, residue sequence number, and atom name.
+	 * Note, the insertion code is not available in the .xml files, and is ignored here!
+	 * @param curAsymId
+	 * @param curSeqId
+	 * @param curAtomName
+	 * @return
+	 */
+	protected Atom findAtom(String curAsymId, int curSeqId, String curAtomName, String curCompId, String curInsertionCode, String curAltId) {
+		for (Atom a: atomVector) {
+			if (a.partialEquals(curAsymId, curSeqId, curAtomName, curCompId, curInsertionCode, curAltId)) {
+				return a;
+			}
+		}
+		return null;
+	}
 }
 
 class CustomStructure extends Structure {
 	// A hashtable of vectors where
 	// each hash KEY is the StructureComponent type String.
 	// each hash VALUE is a Vector of StructureComponent objects.
-	protected Hashtable<ComponentType, Vector<Atom>> structureComponents = null;
+	
+	// TODO make generic to accomodate bonds
+//	protected Hashtable<ComponentType, Vector<Atom>> structureComponents = null;
+	protected Hashtable<ComponentType, Vector<?>> structureComponents = null;
 
 	// To free up the global state for another load call.
 	private String localUrlString;
 
 	// public Structure() Anonymous inner class constructor.
-	public CustomStructure(
-			final Hashtable<ComponentType, Vector<Atom>> structureComponents,
+	public CustomStructure(	
+			// TODO extend to bonds
+//			final Hashtable<ComponentType, Vector<Atom>> structureComponents,
+			final Hashtable<ComponentType, Vector<?>> structureComponents,
 			final String localUrlString) {
 		super();
 		this.structureComponents = structureComponents;
+		
+		// TODO need to set structure pointer for bonds
+	//	StructureComponent bonds = getStructureComponentByIndex(ComponentType.BOND, 0);
 
 		this.localUrlString = localUrlString;
 	}

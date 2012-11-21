@@ -214,8 +214,9 @@ public class EdtSurfaceCalculator {
 //		pheight=boxlength;
 //	boundingatom(btype);
 //	cutradis=proberadius*scalefactor;
-        System.out.printf("box[%3d *%3d *%3d], scale factor: %6.3f\n",
-                plength, pwidth, pheight, scalefactor);
+        
+//        System.out.printf("box[%3d *%3d *%3d], scale factor: %6.3f\n",
+//                plength, pwidth, pheight, scalefactor);
     }
 
  

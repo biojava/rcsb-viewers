@@ -8,11 +8,6 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
-import org.rcsb.mbt.model.Atom;
-import org.rcsb.mbt.model.Residue;
-import org.rcsb.mbt.model.Structure;
-import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.surface.datastructure.FaceInfo;
 import org.rcsb.mbt.surface.datastructure.IcosahedralSampler;
 import org.rcsb.mbt.surface.datastructure.TriangulatedSurface;
@@ -56,7 +51,7 @@ public class BindingSiteSurfaceOrienter {
 		long t1 = System.nanoTime();
 		Vector3f surfaceNormal = surfaceCompositeNormal();	
 		long t2 = System.nanoTime();
-		System.out.println("SurfaceComposite: " + ((t2-t1)/1000000) + " ms");
+//		System.out.println("SurfaceComposite: " + ((t2-t1)/1000000) + " ms");
 		Vector3f optimalOrientation = new Vector3f();
 		float dotProduct = 0;
 
@@ -82,7 +77,7 @@ public class BindingSiteSurfaceOrienter {
 			optimalOrientation = surfaceNormal;
 		}
 
-		System.out.println("optimalOrientation: dot product: " + dotProduct);
+//		System.out.println("optimalOrientation: dot product: " + dotProduct);
 		return optimalOrientation;
 	}
 
@@ -182,9 +177,9 @@ public class BindingSiteSurfaceOrienter {
 				directions.add(i);
 			}
 		}
-		System.out.println("Ligand orientations: " + directions.size() + " maxRays: " + maxRays);
+//		System.out.println("Ligand orientations: " + directions.size() + " maxRays: " + maxRays);
 		long t2 = System.nanoTime();
-		System.out.println("Best ligand orientation: " + ((t2-t1)/1000000) + " ms");
+//		System.out.println("Best ligand orientation: " + ((t2-t1)/1000000) + " ms");
 		return directions;
 	}
 

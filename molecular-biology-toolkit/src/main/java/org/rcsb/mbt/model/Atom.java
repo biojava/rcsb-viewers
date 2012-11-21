@@ -162,13 +162,13 @@ public class Atom
 	 *  The element symbol.
 	 *  For example, "C", "O", "N", "H", etc.
 	 */
-	public String element = null; // _atom_site.type_symbol
+	public String element = ""; // _atom_site.type_symbol
 
 	/**
 	 *  The macromolecular ID (element name).
 	 *  For example, "CA", "CB", "OG1", "N", etc.
 	 */
-	public String name = null; // _atom_site.label_atom_id
+	public String name = ""; // _atom_site.label_atom_id
 
 	/**
 	 *  The atom serial number.
@@ -179,14 +179,14 @@ public class Atom
 	 *  Compound 3-letter code.
 	 *  For example, "VAL", "THR", "ILE", etc.
 	 */
-	public String compound = null; // _atom_site.label_comp_id
+	public String compound = ""; // _atom_site.label_comp_id
 
 
 	/**
 	 *  Chain/Asymm unit ID.
 	 *  For example, "A", "B", "C", etc.
 	 */
-	public String chain_id = null; // _atom_site.label_asym_id
+	public String chain_id = ""; // _atom_site.label_asym_id
 	
 	
 	/**
@@ -199,7 +199,7 @@ public class Atom
 	 *  Chain/Author assigned unit ID.
 	 *  For example, "A", "B", "C", etc.
 	 */
-	public String authorChain_id = null; // _atom_site.author_asym_id
+	public String authorChain_id = ""; // _atom_site.author_asym_id
 	
 	/**
 	 *  Residue/Sequence ID.
@@ -245,7 +245,7 @@ public class Atom
 	 *  @see #occupancy
 	 *  <P>
 	 */
-	public String altLoc = null; // _atom_site.label_alt_id
+	public String altLoc = ""; // _atom_site.label_alt_id
 
 	/**
 	 *  Temperature B-Factor (0.0 - 100.0).
@@ -264,5 +264,19 @@ public class Atom
 	 *  is not in a polymer, i.e. a ligand atom
 	 */
 	public Boolean nonpolymer = null;
+	
+	/**
+	 * Return true if author chain id, author residue id and atom name match. Note, this is only
+	 * a partial match of atom attributes, for example it does not check for insertion code!
+	 * @param authorChainId
+	 * @param authorResidueId
+	 * @param name
+	 * @return
+	 */
+	public boolean partialEquals(String authorChainId, int authorResidueId, String name, String compId, String insertionCode, String altId) {
+		return this.authorChain_id.equals(authorChainId) && this.authorResidue_id == authorResidueId &&
+				this.name.equals(name) && this.compound.equals(compId) && this.insertionCode.equals(insertionCode) &&
+				this.altLoc.equals(altId);
+	}
 }
 

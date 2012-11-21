@@ -58,7 +58,6 @@ package org.rcsb.mbt.surface;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.surface.core.EdtSurfaceCalculator;
 import org.rcsb.mbt.surface.core.SurfacePatchCalculator;
 import org.rcsb.mbt.surface.datastructure.Sphere;
@@ -90,12 +89,12 @@ public class EdtMolecularSurface implements SurfaceCalculator {
     }
 
     public EdtMolecularSurface(List<Sphere> patch, List<Sphere> context, float probeRadius, float distanceThreshold, float resolution) {
-        System.out.println("EdtMolecularSurface: patch " + patch.size());
-        System.out.println("EdtMolecularSurface: context " + context.size());
+//        System.out.println("EdtMolecularSurface: patch " + patch.size());
+//        System.out.println("EdtMolecularSurface: context " + context.size());
     	List<Sphere> surrounding = new ArrayList<Sphere>();
         surrounding.addAll(SurfacePatchCalculator.calcSurroundings(patch, context, distanceThreshold + 10.0f));
 
-        System.out.println("EdtMolecularSurface: all " + surrounding.size());
+//        System.out.println("EdtMolecularSurface: all " + surrounding.size());
         if (surrounding.size() == 0) {
         	return;
         }

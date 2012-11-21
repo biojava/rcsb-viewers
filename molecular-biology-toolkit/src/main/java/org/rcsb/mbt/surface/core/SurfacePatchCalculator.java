@@ -80,8 +80,8 @@ public class SurfacePatchCalculator {
         this.surface = surface;
         
         // truncate vertices and faces to the patch site region
-        System.out.println("before vertices: " + surface.getVertices().size());
-        long t1 = System.nanoTime();
+//        System.out.println("before vertices: " + surface.getVertices().size());
+//        long t1 = System.nanoTime();
         int vertexCount = surface.getVertices().size();
         truncateByDistance(context, distanceThreshold);
         
@@ -94,8 +94,8 @@ public class SurfacePatchCalculator {
         	flipEdges();
         	smoothEdges();      
         }
-        long t2 = System.nanoTime();
-        System.out.println("truncated vertices after smoothing: " + surface.getVertices().size() + " time: " + ((t2-t1)/1000000000.0));
+//        long t2 = System.nanoTime();
+//        System.out.println("truncated vertices after smoothing: " + surface.getVertices().size() + " time: " + ((t2-t1)/1000000000.0));
     }
 
     public TriangulatedSurface getSurfacePatch() {
@@ -324,7 +324,7 @@ public class SurfacePatchCalculator {
     	int vertCount = 0;
     	for (List<Integer> fragment: fragments) {
     		float ratio = (float)fragment.size()/vertices.size();
-    		System.out.println("Fragment size: " + fragment.size() + " ratio: " + ratio);
+//    		System.out.println("Fragment size: " + fragment.size() + " ratio: " + ratio);
     		if (ratio > threshold) {
    // 			System.out.println("Keeping fragment: " + fragment.size());
     			for (Integer f: fragment) {
@@ -364,7 +364,7 @@ public class SurfacePatchCalculator {
     		} while (end > begin);
     		
     		queue.removeAll(fragment);
-    		System.out.println("queue size: " + queue.size() + " fragment size: " + fragments.size());
+   // 		System.out.println("queue size: " + queue.size() + " fragment size: " + fragments.size());
         }
     	return fragments;
     }

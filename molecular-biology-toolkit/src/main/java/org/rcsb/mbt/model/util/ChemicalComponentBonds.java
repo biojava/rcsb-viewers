@@ -161,7 +161,7 @@ public class ChemicalComponentBonds
 	private enum ItemParts { COMPOUND_CODE, ATOM0, ATOM1, BOND_TYPE }
 					// keys into the split strings.
 	
-	static private final String bondFileUrlPrefix = "http://www.pdb.org/pdb/files/ligand/",
+	static private final String bondFileUrlPrefix = "http://www.rcsb.org/pdb/files/ligand/",
 								bondFileUrlSuffix = ".cif.gz";
 
 	@SuppressWarnings("serial")

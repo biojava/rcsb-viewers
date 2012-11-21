@@ -99,7 +99,10 @@ public class Bond
 	 */
 	public Bond( final Atom atom0, final Atom atom1 )
 	{
-		this.setStructure( atom0.getStructure() );
+		Structure s =  atom0.getStructure();
+		if (s != null) {
+			this.setStructure( atom0.getStructure() );
+		}
 
 		this.atoms = new Atom[2];
 		this.setAtom( 0, atom0 );
@@ -294,6 +297,20 @@ public class Bond
 	public Atom getAtom( final int index )
 	{
 		return this.atoms[index];
+	}
+	
+	/**
+	 * Returns the neighbor of the specified atom, null if the specified atom is not part of this bond
+	 * @param atom
+	 * @return the neighbor atom of the specified atom
+	 */
+	public Atom getNeighbor(Atom atom) {
+		if (atoms[0] == atom) {
+			return atoms[1];
+		} else if (atoms[1] == atom) {
+		    return atoms[0];
+		}
+		return null;
 	}
 
 	/**

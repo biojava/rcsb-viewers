@@ -131,9 +131,9 @@ public class TriangulatedSurface {
         float d3 = vertices.get(fc).p.distance(vertices.get(fa).p);
         float s = 0.5f * (d1 + d2 + d3); // half of the perimeter
         float tmp = s * (s-d1) * (s-d2) * (s-d3);
-        if (Float.isNaN(d1)) {
-        	System.out.println("A: " + vertices.get(fa).p + " - B: " + vertices.get(fb).p);
-        }
+//        if (Float.isNaN(d1)) {
+//        	System.out.println("A: " + vertices.get(fa).p + " - B: " + vertices.get(fb).p);
+//        }
       //  if (Float.isNaN((float)Math.sqrt(s * (s-d1) * (s-d2) * (s-d3)))) {
       //  	System.out.println("NaN in SurfaceArea: " + d1 + " " + d2 + " " + d3);
       //  }
@@ -149,7 +149,7 @@ public class TriangulatedSurface {
         for (int i = 0, n = faces.size(); i < n; i++) {
             area += getFaceArea(i);
         }
-        System.out.println("getSurfaceArea: " + area);
+ //       System.out.println("getSurfaceArea: " + area);
         return area;
     }
 
@@ -158,11 +158,11 @@ public class TriangulatedSurface {
     	for (VertInfo v: vertices) {
     		centroid.add(v.p);
     	}
-    	System.out.println("Centroid sum: " + centroid);
+//    	System.out.println("Centroid sum: " + centroid);
     	if (vertices.size() > 0) {
     		centroid.scale(1.0f/vertices.size());
     	}
-    	System.out.println("Centroid scaled: " + centroid);
+//    	System.out.println("Centroid scaled: " + centroid);
     	return centroid;
     }
     
@@ -198,7 +198,7 @@ public class TriangulatedSurface {
             	vb.normal.add(f.pn);
             	vc.normal.add(f.pn);
             } else {
-            	System.out.println("Component of normal is NaN");
+ //           	System.out.println("Component of normal is NaN");
             }
         }
         for (VertInfo v : vertices) {
@@ -272,7 +272,7 @@ public class TriangulatedSurface {
 	                tps[i].scale(w);
 	                for (j = 0; j < degree; j++) {
 	                	if (tps[i].epsilonEquals((vertices.get(vertdeg[j + 1][i]).p), EPSILON)) {
-	                		System.out.println("Degenerate coords");
+//	                		System.out.println("Degenerate coords");
 	                	}
 	                }
                 } 
@@ -303,7 +303,7 @@ public class TriangulatedSurface {
                 }
             }
         }
-        System.out.println("Max degree: " + degMax);
+ //       System.out.println("Max degree: " + degMax);
     }
 
 	/**
@@ -442,7 +442,7 @@ public class TriangulatedSurface {
 		                tps[i].scale(w);
 		                for (j = 0; j < degree; j++) {
 		                	if (tps[i].epsilonEquals((vertices.get(vertdeg[j + 1][i]).p), EPSILON)) {
-		                		System.out.println("Degenerate coords");
+//		                		System.out.println("Degenerate coords");
 		                	}
 		                }
 	                } 
@@ -474,7 +474,7 @@ public class TriangulatedSurface {
 	            //    }
 	            }
 	        }
-	        System.out.println("Max degree: " + degMax);
+//	        System.out.println("Max degree: " + degMax);
 	    }
 
 }
