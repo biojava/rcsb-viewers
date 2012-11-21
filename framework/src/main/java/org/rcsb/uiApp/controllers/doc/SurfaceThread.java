@@ -133,17 +133,17 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 			};
 	
 			// calculate molecular surface
-			System.out.println("Resolution: " + resolution);
+//			System.out.println("Resolution: " + resolution);
 			
 			SurfaceCalculator s = new EdtMolecularSurface(spheres, PROBE_RADIUS, resolution);
 			TriangulatedSurface ts = s.getSurface();
 			s = null; // this is a very large object that should be garbage collected ASAP
 
 			// smooth surface
-			System.out.println("Surface area before smoothing: " + ts.getSurfaceArea());
+//			System.out.println("Surface area before smoothing: " + ts.getSurfaceArea());
 			ts.laplaciansmooth(1);
 		//	ts.laplacianEdgeSmooth(1, resolution*4);
-			System.out.println("Surface area after smoothing:  " + ts.getSurfaceArea());
+//			System.out.println("Surface area after smoothing:  " + ts.getSurfaceArea());
 		//	ImproveMesh.Coarse(ts, 1);
 			Surface surface = new Surface(c, structure);
 			surface.setTriangulatedSurface(ts);
@@ -173,7 +173,7 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 		Structure structure = AppBase.sgetModel().getStructures().get(0);
 		StructureMap smap = structure.getStructureMap();	
 		List<Chain> polymerChains = getPolymerChains();
-		System.out.println("begin polymerchains: " + polymerChains.size() + " index: " + smap.getSurfaceCount());
+//		System.out.println("begin polymerchains: " + polymerChains.size() + " index: " + smap.getSurfaceCount());
 		float resolution = 0.4f;
 		
 		long t0 = System.nanoTime();
@@ -225,10 +225,10 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 			}
 
 			// smooth surface;
-			System.out.println("Surface area before smoothing: " + ts.getSurfaceArea());
+//			System.out.println("Surface area before smoothing: " + ts.getSurfaceArea());
 			ts.edgesmooth(5);
 			ts.laplaciansmooth(3);
-			System.out.println("Surface area after smoothing:  " + ts.getSurfaceArea());
+//			System.out.println("Surface area after smoothing:  " + ts.getSurfaceArea());
 			Surface surface = new Surface(c, structure);
 			surface.setTriangulatedSurface(ts);
 			surface.setBackfaceRendered(true);
@@ -248,7 +248,7 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 		}
 		ProgressPanelController.EndProgress();
 		long t5 = System.nanoTime();
-		System.out.println("Surface calculation: " + (t5-t0)/1000000 + " ms");
+//		System.out.println("Surface calculation: " + (t5-t0)/1000000 + " ms");
 	}
 
 	/**
@@ -273,7 +273,7 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 		int residueCount = getResidueCount(polymerChains);
 		int symOps = getSymmetryOperationCount(polymerChains);
 		float resolution = 0.4f - 0.00005f * residueCount - 0.000005f * residueCount*symOps;
-		System.out.println("resolution: " + resolution + ", residues: " + residueCount + ", symmetry operations: " + symOps);
+//		System.out.println("resolution: " + resolution + ", residues: " + residueCount + ", symmetry operations: " + symOps);
 		// clamp lowest resolution
 		resolution = Math.max(resolution, 0.1f);
 		return resolution;

@@ -640,18 +640,15 @@ WindowListener, IStructureStylesEventListener {
 	public void init(final GLAutoDrawable drawable)
 	{
 		
-		System.err.println("IN GlGeometryViewer - init " + drawable.getClass().getSimpleName());
+//		System.err.println("IN GlGeometryViewer - init " + drawable.getClass().getSimpleName());
 		
 		this.drawable = drawable;
 		
 		Class c = drawable.getClass();
-		
-	
-
-		
+			
 		if ( GLCanvas.class.isAssignableFrom(c)) {				
 			drawableViewer = (GLCanvas) drawable;
-			System.err.println("we got a drawable viewer!");
+//			System.err.println("we got a drawable viewer!");
 		} else {
 			System.err.println("??? not a GlGeometryViewer, but " + drawable.getClass().getName());
 		}

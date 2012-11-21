@@ -104,7 +104,7 @@ public class LoadThread extends Thread
 		_url = "";
 		_pdbid = "";
 	    for (String id: pdbIds) {
-	    	_url += "http://www.pdb.org/pdb/files/" + id + ".xml.gz" + ",";
+	    	_url += "http://www.rcsb.org/pdb/files/" + id + ".xml.gz" + ",";
 	    	_pdbid += id + ", ";
 	    }
 	    _url = _url.substring(0, _url.length()-1); // remove last comma

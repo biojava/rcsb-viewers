@@ -209,100 +209,85 @@ public class SurfaceGeometry extends DisplayListGeometry {
 			gl2.glVertex3f(p1.x, p1.y, p1.z);
 		}
 		// draw composite normal vector
-		Point3f base = triangulatedSurface.getCentroid();
-		Point3f tip = new Point3f(base);
-		Vector3f normal = triangulatedSurface.getCompositeNormal();
-		normal.scale(5.0f);
-		tip.add(normal);
-		System.out.println("Base: " + base);
-		System.out.println("Tip: " + tip);
-		
-		gl.glLineWidth(15.0f);
-		gl2.glNormal3f(normal.x, normal.y, normal.z);
-//		gl.glNormal3f(1.0f, 1.0f, 1.0f);
-		gl2.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		gl2.glVertex3f(base.x, base.y, base.z);
-		
-		gl2.glNormal3f(normal.x, normal.y, normal.z);
-	//	gl.glNormal3f(1.0f, 1.0f, 1.0f);
-		gl2.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		gl2.glVertex3f(tip.x, tip.y, tip.z);
-		
-		// draw longest distance
-		gl.glLineWidth(15.0f);
-		gl2.glNormal3f(normal.x, normal.y, normal.z);
-//		gl.glNormal3f(1.0f, 0.0f, 0.0f);
-		gl2.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-		// vertex
-		gl2.glVertex3f(-20f, 0f, 0f);
-		
-		gl2.glNormal3f(normal.x, normal.y, normal.z);
-//		gl.glNormal3f(1.0f, 1.0f, 1.0f);
-		gl2.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-		// base point
-		gl2.glVertex3f(20, 0, 0);
-		
-		gl.glLineWidth(15.0f);
-		gl2.glNormal3f(normal.x, normal.y, normal.z);
-//		gl.glNormal3f(1.0f, 0.0f, 0.0f);
-		gl2.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-		// vertex
-		gl2.glVertex3f(0f, -20f, 0f);
-		
-		gl2.glNormal3f(normal.x, normal.y, normal.z);
-//		gl.glNormal3f(1.0f, 1.0f, 1.0f);
-		gl2.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-		// base point
-		gl2.glVertex3f(0, 20, 0);
-		
-		gl.glLineWidth(15.0f);
-		gl2.glNormal3f(normal.x, normal.y, normal.z);
-//		gl.glNormal3f(1.0f, 0.0f, 0.0f);
-		gl2.glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
-		// vertex
-		gl2.glVertex3f(0f, 0f, -20f);
-		
-		gl2.glNormal3f(normal.x, normal.y, normal.z);
-//		gl.glNormal3f(1.0f, 1.0f, 1.0f);
-		gl2.glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
-		// base point
-		gl2.glVertex3f(0, 0, 20);
-		
-		//----------------------------
-		// alignment vector
-		
-		gl.glLineWidth(15.0f);
-		gl2.glNormal3f(normal.x, normal.y, normal.z);
-//		gl.glNormal3f(1.0f, 0.0f, 0.0f);
-		gl2.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		// vertex
-		gl2.glVertex3f(0f, 0f, 0f);
-		
-		gl2.glNormal3f(normal.x, normal.y, normal.z);
-//		gl.glNormal3f(1.0f, 1.0f, 1.0f);
-		gl2.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		// base point
-		// 1stp
-		gl2.glVertex3f(-2.1638867f, 9.4748944f, -2.3545647f);
-		// 2jfz
-	//	gl.glVertex3f(6.276257f, 7.4633217f, -2.2152701f);
-		//-------------------------------------------------
-		// adjusted alignment vector
-		gl.glLineWidth(15.0f);
-		gl2.glNormal3f(normal.x, normal.y, normal.z);
-//		gl.glNormal3f(1.0f, 0.0f, 0.0f);
-		gl2.glColor4f(0.5f, 0.50f, 1.0f, 1.0f);
-		// vertex
-		gl2.glVertex3f(0f, 0f, 0f);
-		
-		gl2.glNormal3f(normal.x, normal.y, normal.z);
-//		gl.glNormal3f(1.0f, 1.0f, 1.0f);
-		gl2.glColor4f(0.50f, 0.50f, 1.0f, 1.0f);
-		// base point
-		// 1stp
-		gl2.glVertex3f(-0.930412f, 9.9460393f, -0.4589443f);
-		
-		
+//		Point3f base = triangulatedSurface.getCentroid();
+//		Point3f tip = new Point3f(base);
+//		Vector3f normal = triangulatedSurface.getCompositeNormal();
+//		normal.scale(5.0f);
+//		tip.add(normal);
+//		System.out.println("Base: " + base);
+//		System.out.println("Tip: " + tip);
+//		
+//		gl.glLineWidth(15.0f);
+//		gl2.glNormal3f(normal.x, normal.y, normal.z);
+//		gl2.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+//		gl2.glVertex3f(base.x, base.y, base.z);
+//		
+//		gl2.glNormal3f(normal.x, normal.y, normal.z);
+//		gl2.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+//		gl2.glVertex3f(tip.x, tip.y, tip.z);
+//		
+//		// draw longest distance
+//		gl.glLineWidth(15.0f);
+//		gl2.glNormal3f(normal.x, normal.y, normal.z);
+//		gl2.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+//		// vertex
+//		gl2.glVertex3f(-20f, 0f, 0f);
+//		
+//		gl2.glNormal3f(normal.x, normal.y, normal.z);
+//		gl2.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+//		// base point
+//		gl2.glVertex3f(20, 0, 0);
+//		
+//		gl.glLineWidth(15.0f);
+//		gl2.glNormal3f(normal.x, normal.y, normal.z);
+//		gl2.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+//		// vertex
+//		gl2.glVertex3f(0f, -20f, 0f);
+//		
+//		gl2.glNormal3f(normal.x, normal.y, normal.z);
+//		gl2.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+//		// base point
+//		gl2.glVertex3f(0, 20, 0);
+//		
+//		gl.glLineWidth(15.0f);
+//		gl2.glNormal3f(normal.x, normal.y, normal.z);
+//		gl2.glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+//		// vertex
+//		gl2.glVertex3f(0f, 0f, -20f);
+//		
+//		gl2.glNormal3f(normal.x, normal.y, normal.z);
+//		gl2.glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+//		// base point
+//		gl2.glVertex3f(0, 0, 20);
+//		
+//		//----------------------------
+//		// alignment vector
+//		
+//		gl.glLineWidth(15.0f);
+//		gl2.glNormal3f(normal.x, normal.y, normal.z);
+//		gl2.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+//		// vertex
+//		gl2.glVertex3f(0f, 0f, 0f);
+//		
+//		gl2.glNormal3f(normal.x, normal.y, normal.z);
+//		gl2.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+//		// base point
+//		// 1stp
+//		//-------------------------------------------------
+//		// adjusted alignment vector
+//		gl.glLineWidth(15.0f);
+//		gl2.glNormal3f(normal.x, normal.y, normal.z);
+//		gl2.glColor4f(0.5f, 0.50f, 1.0f, 1.0f);
+//		// vertex
+//		gl2.glVertex3f(0f, 0f, 0f);
+//		
+//		gl2.glNormal3f(normal.x, normal.y, normal.z);
+//		gl2.glColor4f(0.50f, 0.50f, 1.0f, 1.0f);
+//		// base point
+//		// 1stp
+//		gl2.glVertex3f(-0.930412f, 9.9460393f, -0.4589443f);
+//		
+//		
 	//	drawNormals(gl, GL.GL_LINES);
 		gl2.glEnd();
 		gl.glFlush();
