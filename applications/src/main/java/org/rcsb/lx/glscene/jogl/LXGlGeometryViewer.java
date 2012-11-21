@@ -64,6 +64,7 @@ import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
 import org.rcsb.lx.controllers.app.LigandExplorer;
+import org.rcsb.lx.controllers.scene.InteractionCalculator;
 import org.rcsb.lx.controllers.scene.LXViewMovementThread;
 import org.rcsb.lx.controllers.update.LXUpdateEvent;
 import org.rcsb.lx.model.Interaction;
@@ -542,6 +543,9 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 	@Override
 	public void structureAdded(final Structure str)
 	{
+	
+        
+        
 		final StructureMap structureMap = str.getStructureMap();
 		final StructureStyles structureStyles = structureMap
 		.getStructureStyles();
@@ -651,10 +655,10 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 			AtomStyle as = null;
 			if (ligandAtoms.contains(a)) {
 				as = defaultAtomStyle;
-				System.out.println("default style: " + a.compound);
+//				System.out.println("default style: " + a.compound);
 			} else {
 				as = grayDefault;
-			    System.out.println("gray style: " + a.compound);
+//			    System.out.println("gray style: " + a.compound);
 			}
 			structureStyles.setStyle(a, as);
 
@@ -662,15 +666,16 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 			if (!structureStyles.isVisible(a)) {
 				continue;
 			}
+			
 
 			synchronized (renderables)
 			{
-	//			renderables.put(a, new DisplayListRenderable(a,
-	//					defaultAtomStyle, defaultAtomGeometry));
 				renderables.put(a, new DisplayListRenderable(a,
 						as, defaultAtomGeometry));
 			}
 		}
+
+        renderCovalentlyBoundResidues();
 
 		// this.requestRepaint();
 	}
@@ -715,7 +720,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 	// added for protein-ligand interactions
 	public void ligandView(final Structure structure)
 	{
-		System.out.println("ligandView: Adjust surface view");
+//		System.out.println("ligandView: Adjust surface view");
 		final double[][] ligandBounds =
 			getLigandBounds(structure, LigandExplorer.sgetSceneController().getLigandResidues());
 
@@ -790,7 +795,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 	
 	public void ligandViewWithSurface(final Structure structure)
 	{
-		System.out.println("ligandViewWithSurface: Adjust surface view");
+//		System.out.println("ligandViewWithSurface: Adjust surface view");
 		final double[][] ligandBounds =
 			getLigandBounds(structure, LigandExplorer.sgetSceneController().getLigandResidues());
 
@@ -816,10 +821,10 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		BindingSiteSurfaceOrienter orienter = getBindingSiteSurfaceOrienter();
 		Vector3f eyeOrientation = orienter.getOptimalEyeOrientation();
 		long t2 = System.nanoTime();
-		System.out.println("Opimal orientation: " + ((t2-t1)/1000000) + " ms");
+//		System.out.println("Opimal orientation: " + ((t2-t1)/1000000) + " ms");
 		Vector3f alignment = orienter.getHorizontalAlignment();
 		long t3 = System.nanoTime();
-		System.out.println("Horizontal aligment: " + ((t3-t2)/1000000) + " ms");
+//		System.out.println("Horizontal aligment: " + ((t3-t2)/1000000) + " ms");
 		// make the alignment vector orthogonal to the eye orientation and the original alignment
 		alignment.cross(alignment, eyeOrientation);
 				
@@ -942,14 +947,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		for (int i = 0; i < atoms.size(); i++) {
 			final Atom a = atoms.get(i);
 			if (!node.isRendered(a)) {
-				// added
-				System.out.println("LXGlGeometryViewer:renderResidue: " + r.getCompoundCode());
-			//	final StructureStyles structureStyles =
-			//		a.getStructure().getStructureMap().getStructureStyles();
-			//	final AtomStyle atomStyle = (AtomStyle) structureStyles.getStyle(a);
-			//	atomStyle.setAtomColor(as.getAtomColor());
-				
-				// end
+	//			System.out.println("render residue: " + r.getCompoundCode() + " style: " + as.getAtomColor());
 				final DisplayListRenderable renderable = new DisplayListRenderable(a,
 						as, ag);
 				node.addRenderable(renderable);
@@ -1068,7 +1066,8 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 
 		final DisplayListRenderable renderable = new DisplayListRenderable(ia, ls, lg);
 
-		lg.setForm(ls.lineStyle);
+
+	    lg.setForm(ls.lineStyle);
 
 		float[] textColor = new float[3];
 
@@ -1080,6 +1079,8 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 			InteractionConstants.metalInteractionColor.getRGBColorComponents(textColor);
 		} else if (interactionType == InteractionConstants.waterMediatedType) {
 			InteractionConstants.waterMediatedColor.getRGBColorComponents(textColor);
+		} else if (interactionType == InteractionConstants.covalentType) {
+			InteractionConstants.covalentColor.getRGBColorComponents(textColor);
 		}
 
 		ls.setColor(textColor);
@@ -1088,7 +1089,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		final StructureMap sm = structure.getStructureMap();
 		final StructureStyles ss = sm.getStructureStyles();
 
-		ss.setStyle(ia, ls);
+	    ss.setStyle(ia, ls);
 
 		final LXSceneNode node = (LXSceneNode)sm.getUData();
 
@@ -1114,4 +1115,69 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		float[] colors = new float[3];
 		node.lxCreateAndAddLabel(r, label, InteractionConstants.hydrogenBondColor.getRGBColorComponents(colors));
 	}
+	
+	/**
+	 * Renders residues that have covalent bonds to ligand atoms (from struct_conn records)
+	 */
+	
+	public void renderCovalentlyBoundResidues() {
+		Structure structure = AppBase.sgetModel().getStructures().get(0);
+		StructureMap structureMap = structure.getStructureMap();
+		
+		Vector<Atom> ligandAtoms = new Vector<Atom>();
+		for (Residue residue : structureMap.getLigands())
+			if (residue != null)
+				ligandAtoms.addAll(residue.getAtoms());
+		
+		final Vector<Atom> proteinAtoms = new Vector<Atom>();
+
+		for (Chain chain : structureMap.getChains())
+			if (chain.getClassification() == Residue.Classification.AMINO_ACID ||
+					chain.getClassification() == Residue.Classification.NUCLEIC_ACID)
+				proteinAtoms.addAll(chain.getAtoms());
+
+		final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry
+				.get(ComponentType.ATOM);
+		AtomStyle as = (AtomStyle) structure.getStructureMap()
+				.getStructureStyles().getDefaultStyle(
+						ComponentType.ATOM);
+		
+		// change residue color - this has no effect????
+		AtomStyle grayDefault = new AtomStyle();
+		grayDefault.setAtomRadius(as.getAtomRadius());
+		grayDefault.setAtomLabel(as.getAtomLabel());
+		IAtomColor iatomColor = AtomColorRegistry.get("By Element Carbon Gray");
+		grayDefault.setAtomColor(iatomColor);
+		as = grayDefault;
+		//
+				
+		final BondGeometry bg = (BondGeometry) GlGeometryViewer.defaultGeometry
+				.get(ComponentType.BOND);
+		final BondStyle bs = (BondStyle) structure.getStructureMap()
+				.getStructureStyles().getDefaultStyle(
+						ComponentType.BOND);
+
+		final Vector<Bond> bonds = structureMap.getBonds();
+		for (Bond bond: bonds) {
+			Atom atom_i = bond.getAtom(0);
+			Atom atom_j = bond.getAtom(1);
+			Atom ligandAtom = null;
+			Atom proteinAtom = null;
+			if (proteinAtoms.contains(atom_i)) {
+				proteinAtom = atom_i;
+			} else if (ligandAtoms.contains(atom_i)) {
+				ligandAtom = atom_i;
+			}
+			if (proteinAtoms.contains(atom_j)) {
+				proteinAtom = atom_j;
+			} else if (ligandAtoms.contains(atom_j)) {
+				ligandAtom = atom_j;
+			}
+			if (ligandAtom != null && proteinAtom != null) {
+				Residue r = structureMap.getResidue(proteinAtom);
+				renderResidue(r, as, ag, bs, bg, false);
+			} 
+		}
+	}
+	
 }

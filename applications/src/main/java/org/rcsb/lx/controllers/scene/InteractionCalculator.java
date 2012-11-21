@@ -60,19 +60,12 @@ import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
-import org.rcsb.mbt.model.StructureComponent;
-import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.AtomColorRegistry;
-import org.rcsb.mbt.model.attributes.AtomRadiusByScaledCpk;
-import org.rcsb.mbt.model.attributes.AtomRadiusRegistry;
 import org.rcsb.mbt.model.attributes.AtomStyle;
-import org.rcsb.mbt.model.attributes.BondColorRegistry;
 import org.rcsb.mbt.model.attributes.BondStyle;
 import org.rcsb.mbt.model.attributes.IAtomColor;
-import org.rcsb.mbt.model.attributes.IAtomRadius;
-import org.rcsb.mbt.model.attributes.IBondColor;
-import org.rcsb.mbt.model.attributes.Style;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.util.Element;
 import org.rcsb.mbt.model.util.PeriodicTable;
@@ -95,8 +88,7 @@ public class InteractionCalculator
 			final double hbondlower, final double hydroupper, final double hydrolower,
 			final double otherupper, final double otherlower, final boolean displayDisLabel,
 			final PrintWriter interactionsOut) {
-		int count = 0;
-		int count_hydro = 0;
+		
 		final StructureMap structureMap = structure.getStructureMap();
 		Vector<Atom> ligandAtoms = new Vector<Atom>();
 		for (Residue residue : currentLigandResidues)
@@ -121,9 +113,19 @@ public class InteractionCalculator
 		
 		final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry
 				.get(ComponentType.ATOM);
-		final AtomStyle as = (AtomStyle) structure.getStructureMap()
+		AtomStyle as = (AtomStyle) structure.getStructureMap()
 				.getStructureStyles().getDefaultStyle(
 						ComponentType.ATOM);
+		
+		// ---
+		// change residue color
+		AtomStyle grayDefault = new AtomStyle();
+		grayDefault.setAtomRadius(as.getAtomRadius());
+		grayDefault.setAtomLabel(as.getAtomLabel());
+		IAtomColor iatomColor = AtomColorRegistry.get("By Element Carbon Gray");
+		grayDefault.setAtomColor(iatomColor);
+		as = grayDefault;
+		// ---
 		final BondGeometry bg = (BondGeometry) GlGeometryViewer.defaultGeometry
 				.get(ComponentType.BOND);
 		final BondStyle bs = (BondStyle) structure.getStructureMap()
@@ -135,33 +137,53 @@ public class InteractionCalculator
 
 			final Atom atom_i = ligandAtoms.get(i);
 
-			// -PR
-			// The following loop seemed to start at the wrong index
-            //	for (int j = i + 1; j < proteinAtoms.size(); j++) {
-			// changed it to: 
-			
 				for (int j = 0; j < proteinAtoms.size(); j++) {
 				final Atom atom_j = proteinAtoms.get(j);
 
 				if (hbondflag) {
-
-					if ((atom_i.element.equals("N") || atom_i.element
-							.equals("O"))
-							&& (atom_j.element.equals("N") || atom_j.element
-									.equals("O"))) {
-
-						distance = ArrayLinearAlgebra.distance(atom_i.coordinate,
-								atom_j.coordinate);
-
-						if (distance <= hbondupper && distance >= hbondlower) {
+					
+					if (isNOSAtom(atom_i) && isNOSAtom(atom_j)) {
+						// TODO need to overhaul donor/acceptor assignment
+						int type1 = getDonorAcceptorType(atom_i);
+						int type2 = getDonorAcceptorType(atom_j);
+						if (type1 == 0 || type2 == 0) {
+							continue;
+						}
+						if (type1 < 3 && type2 < 3 && type1 == type2) {
+							continue;
+						}
+					
+						Atom donor = null;
+						Atom acceptor = null;
+						if (type1 == 1 && (type2 == 2 || type2 == 3)) {
+							donor = atom_i;
+							acceptor = atom_j;
+						} else if (type2 == 1 && (type1 == 2 || type1 == 3)) {
+							donor = atom_j;
+							acceptor = atom_i;
+						}
+						if (type1 == 2 && (type2 == 1 || type2 == 3)) {
+							donor = atom_j;
+							acceptor = atom_i;
+						} else if (type2 == 2 && (type1 == 1 || type1 == 3)) {
+							donor = atom_i;
+							acceptor = atom_j;
+						}
+						// here donor/acceptor assignments are ambiguous, should we try both d/a and a/d combinations?
+						if (type1 == 3 && type2 == 3) {
+							donor = atom_i;
+							acceptor = atom_j;
+						} 
+						
+						distance = ArrayLinearAlgebra.distance(atom_i.coordinate, atom_j.coordinate);
+						
+						if (distance <= hbondupper && distance >= hbondlower && isDillRoseHydrogenBond(donor, acceptor)) {
 							interactionType = InteractionConstants.hydrogenBondType;
 							distString = LXGlGeometryViewer.getDistString(distance);
 
 							if (interactionsOut == null) {
 								glViewer.renderResidue(structureMap.getResidue(atom_j), as, ag, bs, bg,true);
 							}
-
-							count++;
 
 							glViewer.drawInteraction(structure, atom_i, atom_j,
 									interactionType, displayDisLabel,
@@ -179,15 +201,11 @@ public class InteractionCalculator
 							interactionType = InteractionConstants.hydrophobicType;
 							distString = LXGlGeometryViewer.getDistString(distance);
 
-							count_hydro++;
-
 							if (interactionsOut == null) {
 								glViewer.renderResidue(structureMap
 										.getResidue(atom_j), as, ag, bs, bg,
 										true);
 							}
-
-							// Display distance label
 
 							glViewer.drawInteraction(structure, atom_i, atom_j,
 									interactionType, displayDisLabel,
@@ -283,8 +301,6 @@ public class InteractionCalculator
 		String distString = null;
 		final String interactionType = InteractionConstants.waterMediatedType;
 		HashSet<Residue> uniqRes = new HashSet<Residue>();
-		int ct = 0;
-
 		for (int i = 0; i < atomCt; i++) {
 			final Atom atom = structureMap.getAtom(i);
 			if (structureMap.getChain(atom).getClassification() ==
@@ -331,8 +347,6 @@ public class InteractionCalculator
 
 								glViewer.renderResidue(res, as, ag, bs, bg, true);
 							}
-
-							ct++;
 						}
 						uniqRes.add(res);
 					}
@@ -519,16 +533,15 @@ public class InteractionCalculator
 							Residue res = structureMap.getResidue(otherAtom);		
 							if (!uniqRes.contains(res) && !node.isRendered(res)) {
 								glViewer.renderResidue(res, as, ag, bs, bg, true);
-								System.out.println("Neighbor residue: " + res.getCompoundCode());
 								uniqRes.add(res);
 							} 
 						}
 					}
 			}
 		}
-		System.out.println("hide chains");
+	//	System.out.println("hide chains");
 		glViewer.hideChains();
-		System.out.println("render chains");
+	//	System.out.println("render chains");
 	//	glViewer.renderChains();;
 		// reset atom color to default
 	}
@@ -604,6 +617,229 @@ public class InteractionCalculator
 		return false;
 	}
 	
+	/**
+	 * Returns donor acceptor type
+	 * 0: not donor or acceptor
+	 * 1: donor
+	 * 2: acceptor
+	 * 3: donor and acceptor
+	 * @param atom
+	 * @return
+	 */
+	private int getDonorAcceptorType(Atom atom) {
+		int valence = calcValence(atom);
+		if (atom.element.equals("O") || atom.element.equals("S")) {
+			if (valence == 2) {
+				return 2;
+			} else {
+				return 3;
+			}
+		} else if (atom.element.equals("N")) {
+			if (valence < 3) {
+				return 1;
+			} else {
+				return 2;
+			}
+		}
+		return 0;
+	}
+
+	/**
+	 * @param bonds
+	 * @param valence
+	 * @return
+	 */
+	private int calcValence(Atom atom) {
+		int valence = 0;
+		Vector<Bond> bonds = atom.structure.getStructureMap().getBonds(atom);
+		for (Bond b: bonds) {
+			// don't count explicit hydrogens
+			if (b.getAtom(0).element.equals("H")) {
+				continue;
+			}
+			if (b.getAtom(1).element.equals("H")) {
+				continue;
+			}
+			valence += Math.round(b.getOrder());
+		}
+		return valence;
+	}
+	
+	/**
+	 * Returns true if hydrogen bond angles satisfy the Dill-Rose criteria
+	 * @param donor
+	 * @param acceptor
+	 * @return true if hydrogen bond angles satisfy the Dill-Rose criteria
+	 */
+	private boolean isDillRoseHydrogenBond(Atom donor, Atom acceptor) {
+		double DONOR_ACCEPTOR_ANTECEDENT_SP3_ANGLE = 60.0;
+		double DONOR_ACCEPTOR_ANTECEDENT_SP2_ANGLE = 90.0;
+		double ACCEPTOR_DONOR_ANTECEDENT_ANGLE     = 90.0;
+		double ACCEPTOR_DONOR_PLANE_ANGLE          = 60.0;
+		double DONOR_ACCEPTOR_PLANE_ANGLE          = 90.0;
+
+		double daaAngle = DONOR_ACCEPTOR_ANTECEDENT_SP3_ANGLE;
+		if (isSp2Center(acceptor)) {
+			daaAngle = DONOR_ACCEPTOR_ANTECEDENT_SP2_ANGLE;
+		}
+		if (minDonorAcceptorAcceptorAntecedentAngle(donor, acceptor) < daaAngle) {
+			return false;
+		}
+
+		if (minAcceptorDonorDonorAntecedentAngle(donor, acceptor) < ACCEPTOR_DONOR_ANTECEDENT_ANGLE) {
+			return false;
+		}
+
+		if (acceptorInDonorPlaneAngle(donor, acceptor) > ACCEPTOR_DONOR_PLANE_ANGLE) {
+			return false;
+		}
+		
+		if (donorInAcceptorPlaneAngle(donor, acceptor) > DONOR_ACCEPTOR_PLANE_ANGLE) {
+			return false;
+		}
+		return true;
+	}
+	/**
+	 * Returns the minimum angle formed between the donor, acceptor and any of the
+	 * acceptor-antecedent atoms
+	 * @param donor
+	 * @param acceptor
+	 * @return minimum donor-acceptor-acceptor-antecedent angle
+	 */
+	private double minDonorAcceptorAcceptorAntecedentAngle(Atom donor, Atom acceptor) {
+		Vector<Bond> bonds = acceptor.structure.getStructureMap().getBonds(acceptor);
+		
+		double angle = 180.0;
+		for (Bond b: bonds) {
+			Atom antecedent = b.getNeighbor(acceptor);
+			angle = Math.min(ArrayLinearAlgebra.angle(donor.coordinate, acceptor.coordinate, antecedent.coordinate), angle);
+		}
+		return angle;
+	}
+	
+	/**
+	 * Returns the minimum angle formed between the acceptor, donor and any of the
+	 * donor-antecedent atoms
+	 * @param donor
+	 * @param acceptor
+	 * @return minimum donor-acceptor-acceptor-antecedent angle
+	 */
+	private double minAcceptorDonorDonorAntecedentAngle(Atom donor, Atom acceptor) {
+		Vector<Bond> bonds = donor.structure.getStructureMap().getBonds(donor);
+		
+		double angle = 180.0;
+		for (Bond b: bonds) {
+			Atom antecedent = b.getNeighbor(donor);
+			if (! antecedent.element.equals("H")) {
+				angle = Math.min(ArrayLinearAlgebra.angle(acceptor.coordinate, donor.coordinate, antecedent.coordinate), angle);
+			}
+		}
+		return angle;
+	}
+	
+	/**
+	 * Returns the out of plane angle of the acceptor from the donor plane
+	 * @param donor
+	 * @param acceptor
+	 * @return out of plane angle of the acceptor from the donor plane
+	 */
+	private double acceptorInDonorPlaneAngle(Atom donor, Atom acceptor) {
+		Vector<Bond> bonds = donor.structure.getStructureMap().getBonds(donor);
+		
+		Atom antecedent1 = null;
+		Atom antecedent2 = null;
+		
+		double angle = 0;
+		for (Bond b: bonds) {
+			Atom antecedent = b.getNeighbor(donor);
+			if (! antecedent.element.equals("H")) {
+				if (antecedent1 == null) {
+					antecedent1 = antecedent;
+				} else if (antecedent2 == null) {
+					antecedent2 = antecedent;
+				}
+				
+			}
+		}
+		
+		if (antecedent1 != null && antecedent2 != null) {
+			angle = Math.abs(ArrayLinearAlgebra.dihedralAngle(antecedent1.coordinate, donor.coordinate, antecedent2.coordinate, acceptor.coordinate));
+			if (angle > 90) {
+				angle = 180 - angle;
+			}
+		}
+		return angle;
+	}
+	
+	/**
+	 * Returns the out of plane angle of the donor from the acceptor plane
+	 * @param donor
+	 * @param acceptor
+	 * @return out of plane angle of the donor from the acceptor plane
+	 */
+	private double donorInAcceptorPlaneAngle(Atom donor, Atom acceptor) {
+		Vector<Bond> bonds = acceptor.structure.getStructureMap().getBonds(acceptor);
+		
+		Atom antecedent1 = null;
+		Atom antecedent2 = null;
+		
+		double angle = 0;
+		for (Bond b: bonds) {
+			Atom antecedent = b.getNeighbor(acceptor);
+			if (! antecedent.element.equals("H")) {
+				if (antecedent1 == null) {
+					antecedent1 = antecedent;
+				} else if (antecedent2 == null) {
+					antecedent2 = antecedent;
+				}
+			}
+		}
+		
+		if (antecedent1 != null && antecedent2 == null) {
+			bonds = antecedent1.structure.getStructureMap().getBonds(antecedent1);
+			for (Bond b: bonds) {
+				Atom antecedent = b.getNeighbor(antecedent1);
+				if (! antecedent.element.equals("H")) {
+				    if (antecedent2 == null && antecedent1 != acceptor) {
+						antecedent2 = antecedent;
+						break;
+					}
+				}
+			}
+		}
+		
+		if (antecedent1 != null && antecedent2 != null) {
+			angle = Math.abs(ArrayLinearAlgebra.dihedralAngle(donor.coordinate, acceptor.coordinate, antecedent1.coordinate, antecedent2.coordinate));
+			if (angle > 90) {
+				angle = 180 - angle;
+			}
+		}
+		return angle;
+	}
+	
+	
+	private boolean isSp2Center(Atom atom) {
+		Vector<Bond> bonds = atom.structure.getStructureMap().getBonds(atom);
+		for (Bond b: bonds) {
+			if (Math.round(b.getOrder()) == 2) {
+				return true;
+			}
+		}
+		// check if a lone pair on N,O,S is in conjugation with a double bond
+		if (atom.element.equals("N") || atom.element.equals("O") || atom.element.equals("S")) {
+		for (Bond b: bonds) {
+			Atom neighbor = b.getNeighbor(atom);
+			bonds = neighbor.structure.getStructureMap().getBonds(neighbor);
+			for (Bond bn: bonds) {
+				if (Math.round(bn.getOrder()) == 2) {
+					return true;
+				}
+			}
+		}
+		}
+		return false;
+		
+	}
 	/**
 	 * Returns a list of atoms in the structure
 	 * @param structure

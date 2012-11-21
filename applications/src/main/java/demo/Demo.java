@@ -17,7 +17,7 @@ public class Demo {
 
 			
 		//showSimpleViewer();
-	     //showProteinWorkshop();
+	    // showProteinWorkshop();
 		  showLigandExplorer();
 		//showKiosk();
 	}
@@ -25,24 +25,25 @@ public class Demo {
 	
 
 	public static void showSimpleViewer(){
-		String[] args = new String[]{"-structure_url","http://www.rcsb.org:80/pdb/files/1STP.xml.gz","-unit_id","1","-standalone"};
+		String[] args = new String[]{"-structure_url","http://www.rcsb.org/pdb/files/1STP.xml.gz","-unit_id","1","-standalone"};
 		final SimpleViewer app = new SimpleViewer(args);
 		app.initialize(true, true);
 	}
 	
 	public static void showProteinWorkshop(){
 		
-	//	String[] pdbIds = new String[]{"-structure_url","http://www.rcsb.org:80/pdb/files/1CDG.xml.gz","-unit_id","1","-standalone"};
-		String[] pdbIds = new String[]{"-structure_url","http://www.rcsb.org:80/pdb/files/1CDG.xml.gz","-standalone"};
-	//	String[] pdbIds = new String[]{"-structure_url","http://www.rcsb.org:80/pdb/files/1STP.xml.gz","-standalone"};
+	//	String[] pdbIds = new String[]{"-structure_url","http://www.rcsb.org/pdb/files/1CDG.xml.gz","-unit_id","1","-standalone"};
+		String[] pdbIds = new String[]{"-structure_url","http://www.rcsb.org/pdb/files/1CDG.xml.gz","-standalone"};
+	//	String[] pdbIds = new String[]{"-structure_url","http://www.rcsb.org/pdb/files/1STP.xml.gz","-standalone"};
 		final ProteinWorkshop app = new ProteinWorkshop(pdbIds);	
 		app.initialize(true, true);
 	}
 	
 	public static void showLigandExplorer() {
 		System.out.println("Showing Ligand Explorer");
-		String[] args = new String[]{"-structure_url","http://www.rcsb.org:80/pdb/files/1STP.xml.gz","-unit_id","1","-standalone"};
-//		String[] args = new String[]{"-structure_url","http://www.rcsb.org:80/pdb/files/1HWK.xml.gz","-unit_id","1","-standalone"};
+//		String[] args = new String[]{"-structure_url","http://www.rcsb.org/pdb/files/1STP.xml.gz","-unit_id","1","-standalone"};
+//		String[] args = new String[]{"-structure_url","http://www.rcsb.org/pdb/files/2YOK.xml.gz","-unit_id","1","-standalone"};
+		String[] args = new String[]{"-structure_url","http://www.rcsb.org/pdb/files/4FQC.xml.gz","-unit_id","1","-standalone"};
 		final LigandExplorer app = new LigandExplorer(args);		
 		app.initialize(true);
 		

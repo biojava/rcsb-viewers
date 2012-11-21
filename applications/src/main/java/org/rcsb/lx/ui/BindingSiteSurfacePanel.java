@@ -47,47 +47,34 @@ package org.rcsb.lx.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.vecmath.Color4f;
 
 import org.jcolorbrewer.ColorBrewer;
 import org.jcolorbrewer.ui.ColorPaletteChooserDialog;
 import org.rcsb.lx.controllers.app.LigandExplorer;
-import org.rcsb.lx.controllers.update.LXUpdateEvent;
 import org.rcsb.lx.model.SurfaceState;
-import org.rcsb.lx.model.LXModel;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.Surface;
-
-import org.rcsb.mbt.model.attributes.SurfaceColorUpdater;
 import org.rcsb.uiApp.controllers.app.AppBase;
-import org.rcsb.uiApp.controllers.doc.SurfaceThread;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.uiApp.ui.dialogs.ColorChooserDialog;
-import org.rcsb.vf.controllers.app.VFAppBase;
 
 
 /**
@@ -129,7 +116,6 @@ public class BindingSiteSurfacePanel extends JPanel implements IUpdateListener
 	public BindingSiteSurfacePanel() {
 		super(false);
 		setLayout(new BorderLayout());
-		System.out.println("Creating new BindingSiteSurfacePanel");
 		
 		// create border around surface panel
 		Border border = BorderFactory.createLineBorder(Color.BLACK);
@@ -230,6 +216,9 @@ public class BindingSiteSurfacePanel extends JPanel implements IUpdateListener
 		secondPanel.add(new JLabel("Type"));
 		secondPanel.add(surfaceRepType);
 		secondPanel.setVisible(true);
+		
+		// the surface option panels is cutoff slightly on Mac OSX. Does this help??
+		this.repaint();
 	}
 	
 	private void removeOptions() {
@@ -347,13 +336,13 @@ public class BindingSiteSurfacePanel extends JPanel implements IUpdateListener
 			final JComboBox source = (JComboBox)e.getSource();
 			source.hidePopup();	
 			
-			if (source.getSelectedIndex() == 0) {
-				System.out.println("Solid");
-			} else if (source.getSelectedIndex() == 1) {
-				System.out.println("Mesh");
-			} else if (source.getSelectedIndex() == 2) {
-				System.out.println("Dot");
-			}
+//			if (source.getSelectedIndex() == 0) {
+//				System.out.println("Solid");
+//			} else if (source.getSelectedIndex() == 1) {
+//				System.out.println("Mesh");
+//			} else if (source.getSelectedIndex() == 2) {
+//				System.out.println("Dot");
+//			}
 			
 			state.setSurfaceType(source.getSelectedIndex());
 			state.updateState();

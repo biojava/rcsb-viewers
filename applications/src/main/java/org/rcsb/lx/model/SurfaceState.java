@@ -48,7 +48,7 @@ public class SurfaceState {
 	
 	public SurfaceState(Structure structure) {
 		this.structure = structure;
-		System.out.println("New surface state for: " + structure.getUrlString());
+//		System.out.println("New surface state for: " + structure.getUrlString());
 	}
 
 	/**

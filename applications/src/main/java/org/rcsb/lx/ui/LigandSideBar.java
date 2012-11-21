@@ -78,13 +78,12 @@ import javax.swing.tree.TreeSelectionModel;
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.model.InteractionConstants;
 import org.rcsb.mbt.model.Chain;
-import org.rcsb.mbt.model.StructureComponent;
-import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
+import org.rcsb.mbt.model.StructureComponent;
+import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.util.Status;
 import org.rcsb.uiApp.controllers.app.AppBase;
-import org.rcsb.uiApp.controllers.update.UpdateEvent;
 
 public class LigandSideBar extends JPanel
 {
@@ -280,7 +279,7 @@ public class LigandSideBar extends JPanel
 				
 				// remove current surfaces from display list and add them again to ensure
 				// transparent surfaces are drawn on top of the interactions
-				System.out.println("LigandSideBar: redraw surfaces");
+//			System.out.println("LigandSideBar: redraw surfaces");
 				LigandExplorer.sgetGlGeometryViewer().surfaceRemoved(structure);
 				LigandExplorer.sgetGlGeometryViewer().surfaceAdded(structure);	
 			}
@@ -399,7 +398,7 @@ public class LigandSideBar extends JPanel
 
 				String chainId = "";
 				DefaultMutableTreeNode chainNode = null;
-				
+		
 				for (Chain chain : ligandList)
 				{
 					// create new node only if chain id is different from previous chain id
@@ -494,7 +493,7 @@ public class LigandSideBar extends JPanel
 			distanceBox.setSelected(true);
 			this.add(distanceBox);
 			
-			System.out.println("Adding BindingSiteSurfacePanel");
+//			System.out.println("Adding BindingSiteSurfacePanel");
 			final JPanel surfacePanel = new BindingSiteSurfacePanel();
 			surfacePanel.setBackground(LXDocumentFrame.sidebarColor);
 			this.add(surfacePanel);
@@ -623,6 +622,9 @@ public class LigandSideBar extends JPanel
 								curY += surfacePanelPreferred.height + visualBuffer;
 								maxWidth = Math.max(maxWidth, surfacePanelPreferred.width);
 								
+	//							this.layoutSize.width = maxWidth + parentInsets.left + parentInsets.right + visualBuffer * 2;
+								
+								// TODO check width on Mac OSX
 								this.layoutSize.width = maxWidth + parentInsets.left + parentInsets.right + visualBuffer * 2;
 							}
 						}
@@ -699,6 +701,7 @@ public class LigandSideBar extends JPanel
 		return ligandList;
 	}
 
+
 	/**
 	 * This will select the intial ligand in the tree and trigger an update
 	 */
@@ -763,6 +766,7 @@ public class LigandSideBar extends JPanel
 			// set the first residue in the first chain as selected
 			// (jeez, this is a lot of work to do something this simple, I might add...)
 		}
+
 	}
 	
 	/**

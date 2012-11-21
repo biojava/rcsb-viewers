@@ -691,12 +691,13 @@ public class LXSceneNode extends JoglSceneNode
 
 						gl2.glCallList(list);
 					}
+					gl2.glPopMatrix();
 				} catch (Exception e)
 				{
 					if (DebugState.isDebug())
 						e.printStackTrace();
 				}
-				gl2.glPopMatrix();
+		//		gl2.glPopMatrix();
 			}
 		}
 

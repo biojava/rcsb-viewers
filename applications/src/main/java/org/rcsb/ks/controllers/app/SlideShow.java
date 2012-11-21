@@ -306,11 +306,11 @@ public class SlideShow extends Thread
 
 					// {{ if its not local... get it }}
 					if (!isLocal) {
-						String url = "http://www.pdb.org/pdb/files/"
+						String url = "http://www.rcsb.org/pdb/files/"
 								+ pdbidvalue + ".xml.gz";
 						try {
 							URL fileurl = new URL(url);
-						 System.out.println(" loading from www.pdb.org: " + pdbidvalue);
+						 System.out.println(" loading from www.rcsb.org: " + pdbidvalue);
 							URLConnection connection = fileurl.openConnection();
 					        connection.addRequestProperty("User-agent", "Mozilla/4.0 (compatible; MSIE 6.0;Windows NT 5.1; SV1)");
 							InputStream stream = connection.getInputStream();

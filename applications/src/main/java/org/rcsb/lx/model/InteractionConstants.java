@@ -62,10 +62,12 @@ public class InteractionConstants {
 	public static Color metalInteractionColor = Color.LIGHT_GRAY;
 	public static Color waterMediatedColor = Color.BLUE;
 	public static Color neighborColor = Color.WHITE;
+	public static Color covalentColor = Color.YELLOW;
 	
 	public static final String hydrophobicType = "Hydrophobic";
 	public static final String hydrogenBondType = "Hydrogen Bond";
 	public static final String waterMediatedType = "Bridged H-Bond";
 	public static final String metalInteractionType = "Metal Interaction";
 	public static final String neighborInteractionType = "Neighbor Residues";
+	public static final String covalentType = "Covalent Bond";
 }

@@ -48,6 +48,9 @@ package org.rcsb.lx.controllers.scene;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
@@ -59,6 +62,7 @@ import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
 import org.rcsb.lx.glscene.jogl.LXSceneNode;
 import org.rcsb.lx.model.LXModel;
 import org.rcsb.lx.ui.LXDocumentFrame;
+import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.StructureModel;
 import org.rcsb.mbt.model.Structure;
@@ -186,7 +190,7 @@ public class LXSceneController extends SceneController
 		if (onePercent <= 0) {
 			onePercent = 1;
 		}
-
+				
 		// added for protein-ligand interaction. calculate interaction with H2O
 		// in the binding site
 		if (ligWaterProOn) {
@@ -206,6 +210,7 @@ public class LXSceneController extends SceneController
 			interactionsOut.close();
 		}
 		
+
 		LigandExplorer.sgetUpdateController().fireInteractionChanged();
 
 		// XXX Status.progress(1.0f, null);
@@ -276,9 +281,12 @@ public class LXSceneController extends SceneController
 		if (evt.action == UpdateEvent.Action.STRUCTURE_REMOVED)
 			clearStructure(transitory);
 		
-		if (evt.action == UpdateEvent.Action.STRUCTURE_ADDED)
+		if (evt.action == UpdateEvent.Action.STRUCTURE_ADDED) {
 			if (!transitory) newDocument = true;
+		}
 		
 		super.handleUpdateEvent(evt);
 	}
+	
+	
 }

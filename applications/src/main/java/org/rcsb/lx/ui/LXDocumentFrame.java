@@ -74,6 +74,7 @@ import javax.swing.event.PopupMenuListener;
 
 import org.rcsb.lx.controllers.app.LXVersionInformation;
 import org.rcsb.lx.controllers.app.LigandExplorer;
+import org.rcsb.lx.controllers.scene.InteractionCalculator;
 import org.rcsb.lx.controllers.scene.LXSceneController;
 import org.rcsb.lx.controllers.update.LXUpdateController;
 import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
