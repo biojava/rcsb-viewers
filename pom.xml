@@ -39,6 +39,13 @@
 			<url>scp://maven.rcsb.org/Website/</url>
 			<layout>default</layout>
 		</repository>
+		<snapshotRepository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>rcsb-pdb-maven-repo</id>
+			<name>RCSB PDB Maven Repository</name>
+			<url>scp://maven.rcsb.org/Website/</url>
+			<layout>default</layout>
+		</snapshotRepository>
 	</distributionManagement>
 
 	<properties>
