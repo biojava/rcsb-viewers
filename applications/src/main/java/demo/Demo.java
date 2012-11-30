@@ -18,8 +18,8 @@ public class Demo {
 			
 		//showSimpleViewer();
 	    // showProteinWorkshop();
-		  showLigandExplorer();
-		//showKiosk();
+		  //showLigandExplorer();
+		showKiosk();
 	}
 
 	
