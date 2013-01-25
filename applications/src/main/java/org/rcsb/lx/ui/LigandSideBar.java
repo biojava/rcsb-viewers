@@ -407,7 +407,7 @@ public class LigandSideBar extends JPanel
 						root.add(chainNode);
 						chainId = chain.getAuthorChainId();
 					}
-					if (chain.getClassification() == Residue.Classification.LIGAND)
+					if (chain.getClassification() == Residue.Classification.LIGAND || chain.getClassification() == Residue.Classification.BIRD)
 						for (Residue residue : chain.getResidues())
 							chainNode.add(new DefaultMutableTreeNode(residue));
 					// add all the residues.
@@ -694,6 +694,7 @@ public class LigandSideBar extends JPanel
 
 		for (Chain chain : structure.getStructureMap().getChains())
 			if (chain.getClassification() == Residue.Classification.LIGAND ||
+			chain.getClassification() == Residue.Classification.BIRD ||
 					chain.hasModifiedResidues())
 				ligandList.add(chain);
 
@@ -771,16 +772,20 @@ public class LigandSideBar extends JPanel
 	
 	/**
 	 * Returns true if ligand specified by either 3-letter ligand id (i.e. HEM) or
-	 * chain/residue number (i.e. A156) matches the passed in residue.
+	 * chain/residue number (i.e. A156)or PRD ID (i.e., PRD_000223) matches the passed in residue.
 	 * @param residue
 	 * @param initialLigand Specification of ligand to be highlighted in Ligand Explorer upon startup
 	 * @return
 	 */
 	private boolean isInitialLigandResidue(Residue residue, String initialLigand) {
-		if (residue.getCompoundCode().equals(initialLigand)) {
+		if (residue.getCompoundCode().equalsIgnoreCase(initialLigand)) {
 			return true;
 		}
 			
+		if (residue.getPrdId().equalsIgnoreCase(initialLigand)) {
+			return true;
+		}
+		
 		String chainId = initialLigand.substring(0,1);
 		int residueNumber;
 		

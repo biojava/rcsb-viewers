@@ -212,10 +212,11 @@ public class StructureElement_VisibilityMutator extends MutatorBase {
 				// iterate until the first protein chain is found.
 					for (Chain mbtChain : xc.getMbtChains())
 							if(mbtChain.getClassification() == Residue.Classification.AMINO_ACID ||
-									mbtChain.getClassification() == Residue.Classification.NUCLEIC_ACID	)
+									mbtChain.getClassification() == Residue.Classification.NUCLEIC_ACID) {
 							return ss.isVisible(mbtChain.getResidue(0)) ||
 								   (mbtChain.getResidueCount() > 1 && ss.isVisible(mbtChain.getResidue(1)));
-				}
+							}
+				} 
 				
 				else return ss.isVisible(xc.getResidue(0));
 			}

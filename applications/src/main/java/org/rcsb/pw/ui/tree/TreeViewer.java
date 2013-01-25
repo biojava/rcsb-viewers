@@ -197,13 +197,20 @@ TreeSelectionListener, IStructureStylesEventListener, MouseListener
 				final ExternChain xc = (ExternChain) value;
 				String entityName = xc.getEntityName();
 				String chainSpec = "Chain " + xc.getChainId();
-				if (entityName != null && entityName.length() > 1) {
-					chainSpec = chainSpec + ":" + entityName.toLowerCase();
-				}
+				
 
-				componentText = (xc.isBasicChain())? chainSpec :
-					(xc.isWaterChain())? "Water molecules" :
-						"Miscellaneous molecules";
+				if (xc.isBasicChain()) {
+					if (entityName != null && entityName.length() > 1) {
+						chainSpec = chainSpec + ":" + entityName.toLowerCase();
+					}
+					componentText = chainSpec;
+				} else if (xc.isBirdChain()) {
+					componentText = chainSpec + ":" + entityName;
+				} else if (xc.isWaterChain()) {
+					componentText = "Water molecules";
+				} else {
+					componentText = "Miscellaneous molecules";
+				}
 
 				imageIcon = this.chainIcon;
 			}
