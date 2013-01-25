@@ -161,6 +161,9 @@ public class StructureXMLHandler extends DefaultHandler implements
 	
 	protected Vector<Atom> atomVector = new Vector<Atom>();
 	protected Vector<Bond> bondVector = new Vector<Bond>();
+	
+	// contains a map of asym id and PRD IDs of biologically important molecules from the BIRD reference dictionary
+	private Map<String, String> asymIdPrdIdMap = new HashMap<String, String>(); 
 	private Map<Integer, String> entityNameMap = new HashMap<Integer, String>();
 
 	/**
@@ -171,7 +174,8 @@ public class StructureXMLHandler extends DefaultHandler implements
 	 * 
 	 */
 	protected enum eIsParsing {
-		NONE, CELL, ATOM_SITES, ATOM_SITE, DATABASE_PDB_MATRIX, ENTITY, STRUCT_BIOLGEN, STRUCT_ASSEMBLY, STRUCT_CONN, NON_CRYSTALLOGRAPHIC_OPERATIONS, LEGACY_BIOLOGIC_UNIT_OPERATIONS
+		NONE, CELL, ATOM_SITES, ATOM_SITE, DATABASE_PDB_MATRIX, ENTITY, STRUCT_BIOLGEN, STRUCT_ASSEMBLY, STRUCT_CONN, 
+		NON_CRYSTALLOGRAPHIC_OPERATIONS, LEGACY_BIOLOGIC_UNIT_OPERATIONS, MOLECULE
 	}
 
 	private Stack<eIsParsing> isParsingStack = new Stack<eIsParsing>();
@@ -343,6 +347,15 @@ public class StructureXMLHandler extends DefaultHandler implements
 				createXMLRunnable__vector2__End());
 		endElementNonCrystallographicRunnables.put(xmlPrefix + "vector3",
 				createXMLRunnable__vector3__End());
+		
+		// BEG pdbx_molecule (BIRD)
+				//
+
+		startElementRunnables.put(xmlPrefix + "pdbx_molecule",
+				createXMLRunnable__pdbx_molecule__Start());
+	//	startElementRunnables.put(xmlPrefix + "pdbx_moleculeCategory",
+	//			createXMLRunnable__pdbx_moleculeCategory__Start());
+
 		//
 		// end general translation
 		// END Non Crystallographic
@@ -491,6 +504,17 @@ public class StructureXMLHandler extends DefaultHandler implements
 		//
 		structure = new CustomStructure(componentsHash, urlString);
 
+		// set BIRD (Biologically interesting molecules) as non-polymers
+		for (Atom atom: atomVector) {
+			String chainId = atom.chain_id;
+			String prdId = asymIdPrdIdMap.get(chainId);
+			if (prdId != null) {
+	//			System.out.println(atom.toString() + ": " + prdId);
+				atom.prdId = prdId;
+	//			atom.nonpolymer = false;	// setting this make no difference		
+			}
+		}
+		
 		// create inverses of the fractional and original transforms...
 		if (this.fractionalTransformation != null) {
 			this.fractionalTransformationInverse = this.fractionalTransformation
@@ -548,7 +572,12 @@ public class StructureXMLHandler extends DefaultHandler implements
 			final Attributes attrs) throws SAXException {
 
 		final XMLRunnable runnable = startElementRunnables.get(qName);
+		
+		if (qName.equals("PDBx:pdbx_molecule")) {
+	      	System.out.println("Start element: " + qName);
+		}
 		if (runnable != null) {
+
 			runnable.attrs = attrs;
 			runnable.run();
 		}
@@ -618,7 +647,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 				else if (qName.endsWith("cell"))
 					clearParsingFlag(eIsParsing.CELL);
 				break;
-
+				
 			case ATOM_SITES:
 				// make sure not to parse atom sites for models 2 and above
 				if (currentModelNumber == 1 || currentModelNumber == -1) {
@@ -837,6 +866,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected class XMLRunnable__pdbx_struct_assembly_gen__Start extends
 	XMLRunnable {
 		public void run() {
+			System.out.println("XMLRunnable struct_assembly_gen: parsing: " + eIsParsing.STRUCT_ASSEMBLY);
 			StructAssemblyGenItem item = new StructAssemblyGenItem();
 			item.setAssemblyId(attrs.getValue("assembly_id"));
 			item.parseAsymIdString(attrs.getValue("asym_id_list"));
@@ -1068,6 +1098,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected XMLRunnable__auth_asym_id__End createXMLRunnable__auth_asym_id__End() {
 		return new XMLRunnable__auth_asym_id__End();
 	}
+	
 	protected class XMLRunnable__label_seq_id__End extends XMLRunnable {
 		public void run() {
 			    try {
@@ -1201,6 +1232,40 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	protected XMLRunnable__pdbx_description__End createXMLRunnable__pdbx_description__End() {
 		return new XMLRunnable__pdbx_description__End();
+	}
+	
+	
+	// TODO 
+	//BIRD related info
+	// 
+	
+	protected class XMLRunnable__pdbx_moleculeCategory__Start extends
+	XMLRunnable {
+		public void run() {
+			System.out.println("XMLRunnable moleculeCategory: parsing: " + eIsParsing.MOLECULE);
+			System.out.println("Setting eIsParsing.MOLECULE");
+			setParsingFlag(eIsParsing.MOLECULE);
+		}
+	}
+
+	protected XMLRunnable__pdbx_struct_oper_listCategory__Start createXMLRunnable__pdbx_moleculeCategory__Start() {
+		return new XMLRunnable__pdbx_struct_oper_listCategory__Start();
+	}
+	
+	protected class XMLRunnable__pdbx_molecule__Start extends
+	XMLRunnable {
+		public void run() {
+			System.out.println(attrs.getLength());
+			String prdId = attrs.getValue("prd_id");
+			String asymId = attrs.getValue("asym_id");
+			System.out.println("BIRD: " + asymId + ": " + prdId);
+			asymIdPrdIdMap.put(asymId, prdId);
+		}
+	}
+
+	protected XMLRunnable__pdbx_molecule__Start createXMLRunnable__pdbx_molecule__Start() {
+		System.out.println("createXMLRunnable__pdbx_molecule__Start");
+		return new XMLRunnable__pdbx_molecule__Start();
 	}
 	
 	/** 

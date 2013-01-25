@@ -228,7 +228,8 @@ public class StructureStyles
 			boolean multiComponentResidue = ChemicalComponentInfo.isMultiComponentModifiedResidue(residue.getCompoundCode());
 			
 			// Set default visibility 
-			if ( !(residue.getClassification().equals(Residue.Classification.LIGAND) || multiComponentResidue))  {
+//			if ( !(residue.getClassification().equals(Residue.Classification.LIGAND) || multiComponentResidue))  {
+			if ( !(residue.getClassification() == Residue.Classification.LIGAND || residue.getClassification() == Residue.Classification.BIRD) || multiComponentResidue)  {
 				continue;
 			}
 			final int atomCount = residue.getAtomCount();
@@ -276,7 +277,7 @@ public class StructureStyles
 				continue;
 			}
 			
-			if (chain.getClassification() == Residue.Classification.LIGAND) {
+			if (chain.getClassification() == Residue.Classification.LIGAND || chain.getClassification() == Residue.Classification.BIRD) {
 				continue;
 			}
 

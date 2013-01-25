@@ -71,7 +71,7 @@ public class Residue
 extends StructureComponent
 implements java.lang.Cloneable
 {
-	public enum Classification { AMINO_ACID, NUCLEIC_ACID, LIGAND, WATER }
+	public enum Classification { AMINO_ACID, NUCLEIC_ACID, LIGAND, WATER, BIRD }
 
 
 	// The Atom index for the alpha (backbone) atom
@@ -235,8 +235,13 @@ implements java.lang.Cloneable
 	 */
 	public void setClassification(Atom atom)
 	{
+		System.out.println("setClassification");
 		ChemicalComponentType type = ChemicalComponentInfo.getChemicalComponentType(atom.compound);
 
+		if (atom.prdId.length() > 0) {
+			classification = Classification.BIRD;
+			return;
+		}
 		if (atom.nonpolymer != null && atom.nonpolymer) {
 			if (type.isWater()) {
 				classification = Classification.WATER;
@@ -355,7 +360,7 @@ implements java.lang.Cloneable
 
 		// Set the alphaAtomIndex, or the polymer head or tail atoms.
 
-		if ( classification == Classification.AMINO_ACID )
+		if ( classification == Classification.AMINO_ACID || classification == Classification.BIRD)
 		{
 			if ( atom.name.equals( Residue.aaAlphaAtomName ) && (alphaAtomIndex < 0) ) {
 				alphaAtomIndex = mid;
@@ -421,7 +426,7 @@ implements java.lang.Cloneable
 			removeAllAtoms( );
 		}
 
-		if ( classification == Classification.AMINO_ACID )
+		if ( classification == Classification.AMINO_ACID || classification == Classification.BIRD)
 		{
 			if ( atom.name.equals( Residue.aaHeadAtomName ) ) {
 				polymerHeadAtom = null;
@@ -644,6 +649,22 @@ implements java.lang.Cloneable
 			return "";
 		}
 		return atom.insertionCode;
+	}
+	
+	/**
+	 * Get the prd id (BIRD reference dictionary) (as it is assigned in the first Atom record).
+	 * Return null if there are no atom records.
+	 */
+	public String getPrdId( )
+	{
+		if ( atoms == null ) {
+			return null;
+		}
+		final Atom atom = atoms.elementAt( 0 );
+		if ( atom == null ) {
+			return null;
+		}
+		return atom.prdId;
 	}
 
 	/**

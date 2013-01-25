@@ -51,6 +51,7 @@ package org.rcsb.mbt.model;
 // Core
 import java.util.*;
 
+import org.rcsb.mbt.model.Residue.Classification;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.*;
 import org.rcsb.mbt.model.geometry.ModelTransformationList;
@@ -474,6 +475,7 @@ public class StructureMap
 				// set entity name
 				if (first && entityNameMap != null) {
 					int entityId = residue.getEntityId();
+					// TODO add prd id here if available
 					String entityName = entityNameMap.get(entityId);
 					if (entityName != null) {
 						chain.setEntityName(entityName);
@@ -1037,13 +1039,17 @@ public class StructureMap
 	protected void extractLigands( )
 	{
 		for ( Residue residue : residues) {
-			if ( residue.getClassification() == Residue.Classification.LIGAND ) {
-				ligands.add( residue );
-			}
-			// tread single residue chains as ligands
-			if (this.getChain(residue.getChainId()).getResidueCount() == 1) {
-				ligands.add(residue);
-			}
+			// treat PRD molecules not as individual ligand residues
+	//		System.out.println(residue.getCompoundCode() + " prdid: " + residue.getPrdId());
+	//		if (residue.getPrdId().length() == 0) {
+				if ( residue.getClassification() == Residue.Classification.LIGAND || residue.getClassification() == Residue.Classification.BIRD) {
+					ligands.add( residue );
+				}
+				// tread single residue chains as ligands
+				if (this.getChain(residue.getChainId()).getResidueCount() == 1) {
+					ligands.add(residue);
+				}
+	//		}
 		}
 	}
 
@@ -2226,7 +2232,7 @@ public class StructureMap
 
 		for(int i = this.getResidueCount() - 1; i >= 0; i--) {
 			final Residue r = this.getResidue(i);
-
+		
 			final String pdbChainId = r.getAuthorChainId();
 
 			if (r.getClassification() == Residue.Classification.WATER) {
@@ -2240,7 +2246,7 @@ public class StructureMap
 				nonProteinResidues.add(r);
 				continue;
 			}
-			
+
 			
 			// Add multicomponent modified residues to the nonProteinResidue list to make them
 			// more prominent to the user. Note, these residues are also listed with the protein chains.
@@ -2282,19 +2288,22 @@ public class StructureMap
 			Collections.sort(residues, residueComparator);
 			if (pdbId != null && pdbId.length() != 0)
 			{ 
-				residues.trimToSize();
-
-				// set author chain id for display purposes
-				String chainId = "";
-				String entityName = "";
+				residues.trimToSize();	
 				if (residues.size() > 0) {
-                    chainId = residues.get(0).getAuthorChainId();
-                    int entityId = residues.get(0).getEntityId();
-                    entityName = entityNameMap.get(entityId);
+					Residue r = residues.get(0);
+					String chainId = r.getAuthorChainId(); // set author chain id for display purposes
+					int entityId = r.getEntityId();
+
+					ExternChain c = null;
+					if (r.getClassification() == Classification.BIRD) {
+						String name = entityNameMap.get(entityId) + " (" + r.getPrdId() + ")";
+						System.out.println("Creating BIRD chain: " + name);
+						c = ExternChain.createBasicChain(chainId, name, residues);     
+					} else {
+						c = ExternChain.createBasicChain(chainId, entityNameMap.get(entityId), residues);         
+					}
+					this.pdbTopLevelElements.add(c);
 				}
-				
-				ExternChain c = ExternChain.createBasicChain(chainId, entityName, residues);               
-				this.pdbTopLevelElements.add(c);
 			}
 
 			else

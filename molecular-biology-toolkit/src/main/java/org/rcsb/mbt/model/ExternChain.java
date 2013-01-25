@@ -75,7 +75,8 @@ import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
  */
 public class ExternChain extends StructureComponent
 {
-	public enum ExternChainType { BASIC, WATER, MISCELLANEOUS }
+	// BIRD: Biologically interesting molecules from BIRD reference dictionary
+	public enum ExternChainType { BASIC, WATER, MISCELLANEOUS, BIRD }
 	
     private Set<Residue> residuesSet = null;
     private Vector<Residue> residuesVec = null;	// equivalent to Chain residues
@@ -88,6 +89,7 @@ public class ExternChain extends StructureComponent
     public boolean isWaterChain() { return chainType == ExternChainType.WATER; }
     public boolean isBasicChain() { return chainType == ExternChainType.BASIC; }
     public boolean isMiscellaneousChain() { return chainType == ExternChainType.MISCELLANEOUS; }
+    public boolean isBirdChain() { return chainType == ExternChainType.BIRD; }
     
     /*
      * public factory methods - insures creation of type requested.
@@ -106,6 +108,11 @@ public class ExternChain extends StructureComponent
     static public ExternChain createMiscellaneousMoleculeChain(final Vector<Residue> residues)
     {
     	return new ExternChain(ExternChainType.MISCELLANEOUS, "_", "", residues);
+    }
+    
+    static public ExternChain createBirdChain(final String pdbChainId, final String entityName, final Vector<Residue> residues)
+    {
+    	return new ExternChain(ExternChainType.BIRD, pdbChainId, entityName, residues);
     }
     
     /*
