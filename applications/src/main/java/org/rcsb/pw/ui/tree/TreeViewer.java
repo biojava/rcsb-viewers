@@ -205,7 +205,7 @@ TreeSelectionListener, IStructureStylesEventListener, MouseListener
 					}
 					componentText = chainSpec;
 				} else if (xc.isBirdChain()) {
-					componentText = chainSpec + ":" + entityName;
+					componentText = chainSpec + ":" + entityName; // contains PRD_ID, don't make it lower case
 				} else if (xc.isWaterChain()) {
 					componentText = "Water molecules";
 				} else {
