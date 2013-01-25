@@ -1890,6 +1890,7 @@ WindowListener, IStructureStylesEventListener {
 			final Chain c = structureMap.getChain(i);
 
 			// set the default style...
+			System.out.println("setting chain style: " + c.getAuthorChainId());
 			structureStyles.setStyle(c, defaultChainStyle);
 
 			// ignore invisible chains...
