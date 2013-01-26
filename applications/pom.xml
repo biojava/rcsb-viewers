@@ -91,21 +91,21 @@
 		<dependency>
 			<groupId>org.rcsb</groupId>
 			<artifactId>molecular-biology-toolkit</artifactId>
-			<version>4.0.1-SNAPSHOT</version>
+			<version>4.0.3-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.rcsb</groupId>
 			<artifactId>framework</artifactId>
-			<version>4.0.1-SNAPSHOT</version>
+			<version>4.0.3-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.rcsb</groupId>
 			<artifactId>colorbrewer</artifactId>
-			<version>4.0.1-SNAPSHOT</version>
+			<version>4.0.3-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	
