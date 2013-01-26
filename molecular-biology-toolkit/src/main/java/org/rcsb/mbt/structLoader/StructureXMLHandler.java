@@ -866,7 +866,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected class XMLRunnable__pdbx_struct_assembly_gen__Start extends
 	XMLRunnable {
 		public void run() {
-			System.out.println("XMLRunnable struct_assembly_gen: parsing: " + eIsParsing.STRUCT_ASSEMBLY);
 			StructAssemblyGenItem item = new StructAssemblyGenItem();
 			item.setAssemblyId(attrs.getValue("assembly_id"));
 			item.parseAsymIdString(attrs.getValue("asym_id_list"));
@@ -1242,8 +1241,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected class XMLRunnable__pdbx_moleculeCategory__Start extends
 	XMLRunnable {
 		public void run() {
-			System.out.println("XMLRunnable moleculeCategory: parsing: " + eIsParsing.MOLECULE);
-			System.out.println("Setting eIsParsing.MOLECULE");
 			setParsingFlag(eIsParsing.MOLECULE);
 		}
 	}
@@ -1255,10 +1252,8 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected class XMLRunnable__pdbx_molecule__Start extends
 	XMLRunnable {
 		public void run() {
-			System.out.println(attrs.getLength());
 			String prdId = attrs.getValue("prd_id");
 			String asymId = attrs.getValue("asym_id");
-			System.out.println("BIRD: " + asymId + ": " + prdId);
 			asymIdPrdIdMap.put(asymId, prdId);
 		}
 	}

@@ -235,7 +235,6 @@ implements java.lang.Cloneable
 	 */
 	public void setClassification(Atom atom)
 	{
-		System.out.println("setClassification");
 		ChemicalComponentType type = ChemicalComponentInfo.getChemicalComponentType(atom.compound);
 
 		if (atom.prdId.length() > 0) {

@@ -2297,8 +2297,7 @@ public class StructureMap
 					ExternChain c = null;
 					if (r.getClassification() == Classification.BIRD) {
 						String name = entityNameMap.get(entityId) + " (" + r.getPrdId() + ")";
-						System.out.println("Creating BIRD chain: " + name);
-						c = ExternChain.createBasicChain(chainId, name, residues);     
+						c = ExternChain.createBirdChain(chainId, name, residues);     
 					} else {
 						c = ExternChain.createBasicChain(chainId, entityNameMap.get(entityId), residues);         
 					}

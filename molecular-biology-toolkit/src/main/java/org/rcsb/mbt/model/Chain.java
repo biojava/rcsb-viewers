@@ -712,7 +712,11 @@ public class Chain
 	@Override
 	public String toString()
 	{
-		return getAuthorChainId();
+		String extraInfo = "";
+		if (chainClassification == Residue.Classification.BIRD) {
+			extraInfo = "(" + getResidue(0).getPrdId() +")";
+		}
+		return getAuthorChainId() + extraInfo;
 	}
 	
 	public void trimToSize() {
