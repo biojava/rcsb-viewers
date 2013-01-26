@@ -573,9 +573,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 		final XMLRunnable runnable = startElementRunnables.get(qName);
 		
-		if (qName.equals("PDBx:pdbx_molecule")) {
-	      	System.out.println("Start element: " + qName);
-		}
 		if (runnable != null) {
 
 			runnable.attrs = attrs;
@@ -1259,7 +1256,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 	}
 
 	protected XMLRunnable__pdbx_molecule__Start createXMLRunnable__pdbx_molecule__Start() {
-		System.out.println("createXMLRunnable__pdbx_molecule__Start");
 		return new XMLRunnable__pdbx_molecule__Start();
 	}
 	

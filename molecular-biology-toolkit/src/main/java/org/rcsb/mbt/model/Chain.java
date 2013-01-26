@@ -714,7 +714,7 @@ public class Chain
 	{
 		String extraInfo = "";
 		if (chainClassification == Residue.Classification.BIRD) {
-			extraInfo = "(" + getResidue(0).getPrdId() +")";
+			extraInfo = " (" + getResidue(0).getPrdId() +")";
 		}
 		return getAuthorChainId() + extraInfo;
 	}
