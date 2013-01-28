@@ -218,11 +218,12 @@ public class LigandSideBar extends JPanel
 						assert(treeSelection.length == 1);
 						Chain chain = (Chain) nodeValue;
 						residues = new Residue[chain.getResidueCount()];
-						for (int ix = 0; ix < chain.getResidueCount(); ix++)
+						for (int ix = 0; ix < chain.getResidueCount(); ix++) {
 							residues[ix] = chain.getResidue(ix);
+						}
 					}
 
-					else 
+					else if (nodeValue instanceof Residue)
 					{
 						int ix = 0;
 						residues = new Residue[treeSelection.length];
@@ -233,8 +234,10 @@ public class LigandSideBar extends JPanel
 							nodeValue = (StructureComponent)node.getUserObject();
 							assert(nodeValue instanceof Residue);
 							residues[ix] = (Residue)nodeValue;
+							ix++;
 						}
-
+					}
+					if (residues != null) {
 						LigandExplorer.sgetSceneController().setLigandResidues(residues);
 					}
 				}
@@ -396,25 +399,34 @@ public class LigandSideBar extends JPanel
 				ligandJList.setRootVisible(false);
 				ligandJList.setShowsRootHandles(true);
 
+
 				String chainId = "";
 				DefaultMutableTreeNode chainNode = null;
-		
+
 				for (Chain chain : ligandList)
 				{
 					// create new node only if chain id is different from previous chain id
 					if (! chain.getAuthorChainId().equals(chainId)) {
-						chainNode = new DefaultMutableTreeNode(chain);
+						//		chainNode = new DefaultMutableTreeNode(chain);
+						chainNode = new DefaultMutableTreeNode(chain.getAuthorChainId());
 						root.add(chainNode);
 						chainId = chain.getAuthorChainId();
 					}
-					if (chain.getClassification() == Residue.Classification.LIGAND || chain.getClassification() == Residue.Classification.BIRD)
-						for (Residue residue : chain.getResidues())
+					if (chain.getClassification() == Residue.Classification.LIGAND) {
+						for (Residue residue : chain.getResidues()) {
 							chainNode.add(new DefaultMutableTreeNode(residue));
-					// add all the residues.
-
-					else if (chain.hasModifiedResidues())
-						for (Residue residue : chain.getModifiedResidues())
+						}
+					} else if (chain.getClassification() == Residue.Classification.BIRD) {
+						DefaultMutableTreeNode residueNode = new DefaultMutableTreeNode(chain);
+						chainNode.add(residueNode);
+						for (Residue residue : chain.getResidues()) {
+							residueNode.add(new DefaultMutableTreeNode(residue));
+						}
+					} else if (chain.hasModifiedResidues()) {
+						for (Residue residue : chain.getModifiedResidues()) {
 							chainNode.add(new DefaultMutableTreeNode(residue));
+						}
+					}
 				}
 
 				ligandJList.getSelectionModel().addTreeSelectionListener(
