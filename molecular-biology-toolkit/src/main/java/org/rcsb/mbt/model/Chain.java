@@ -712,11 +712,11 @@ public class Chain
 	@Override
 	public String toString()
 	{
-		String extraInfo = "";
 		if (chainClassification == Residue.Classification.BIRD) {
-			extraInfo = " (" + getResidue(0).getPrdId() +")";
+			return getResidue(0).getPrdId();
+		} else {
+			return getAuthorChainId();
 		}
-		return getAuthorChainId() + extraInfo;
 	}
 	
 	public void trimToSize() {
