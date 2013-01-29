@@ -826,10 +826,16 @@ public class LigandSideBar extends JPanel
 			Residue r = chain.getResidue(0);
 			if (r != null) {
 				if (initialLigand.toUpperCase().startsWith("PRD_")) {
+					System.out.println("PrdID: " + initialLigand);
 					return r.getPrdId().equalsIgnoreCase(initialLigand);
 				} else {
 					String chainId = initialLigand.substring(0, 1);
 					String prdId = initialLigand.substring(2, initialLigand.length());
+					
+					if (chain.getAuthorChainId().equalsIgnoreCase(chainId) && r.getPrdId().equalsIgnoreCase(prdId)) {
+						System.out.println("ChainID + PrdId: " + initialLigand);
+					}
+					
 					return chain.getAuthorChainId().equalsIgnoreCase(chainId) && r.getPrdId().equalsIgnoreCase(prdId);
 				}
 			}
