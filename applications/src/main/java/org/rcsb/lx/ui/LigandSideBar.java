@@ -79,6 +79,7 @@ import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.model.InteractionConstants;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
+import org.rcsb.mbt.model.Residue.Classification;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.StructureModel;
@@ -721,6 +722,7 @@ public class LigandSideBar extends JPanel
 	public void selectInitialLigand()
 	{
 		String initialLigand = LigandExplorer.sgetModel().getInitialLigand();
+		initialLigand = "FMT";
 		DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode)ligandJList.getModel().getRoot();
 		TreePath paths[] = null;
 
@@ -732,25 +734,18 @@ public class LigandSideBar extends JPanel
 			{
 				for (int lx = 0; lx < chainNode.getChildCount(); lx++)
 				{
+
+			   
 					DefaultMutableTreeNode residueNode = (DefaultMutableTreeNode)chainNode.getChildAt(lx);
-					Residue residue = (Residue)residueNode.getUserObject();
+					if (residueNode.getUserObject() instanceof Chain) {
+					Chain chain = (Chain)residueNode.getUserObject();
+					if (isInitialBirdChain(chain, initialLigand)) {
+						System.out.println("Bird chain: " + initialLigand);
 					
-					if (isInitialLigandResidue(residue, initialLigand))
-					{
 						Residue[] ligs = new Residue[1];
-		                ligs[0] = residue;
-		                LigandExplorer.sgetSceneController().setLigandResidues(ligs);
+		            //    ligs[0] = residue;
+		            //   LigandExplorer.sgetSceneController().setLigandResidues(ligs);
 		                
-						// The following code generates an exception in the swing libs 
-						// (see bug PDBWW-1917 PDB ID 1OLN, ligand XBB), most likely because
-						// the path has null entries, i.e. for the case above.
-//						if (paths == null) {
-//							paths = new TreePath[chainNode.getChildCount()];
-//						}
-//						paths[lx] = new TreePath(residueNode.getPath());
-						
-						// Since we are only selecting a single entry, there is no need to pass in an array with
-						// null entries.
 						if (paths == null) {
 							paths = new TreePath[1];
 							paths[0] = new TreePath(residueNode.getPath());
@@ -758,6 +753,47 @@ public class LigandSideBar extends JPanel
 							break;
 						}
 						
+					}
+					}
+				}
+			}
+		}
+		
+		for (int ix = 0; ix < rootNode.getChildCount(); ix++)
+		{
+			DefaultMutableTreeNode chainNode = (DefaultMutableTreeNode)rootNode.getChildAt(ix);
+			if (initialLigand != null)
+			{
+				for (int lx = 0; lx < chainNode.getChildCount(); lx++)
+				{
+					DefaultMutableTreeNode residueNode = (DefaultMutableTreeNode)chainNode.getChildAt(lx);
+					if (residueNode.getUserObject() instanceof Residue) {
+						Residue residue = (Residue)residueNode.getUserObject();
+
+						if (isInitialLigandResidue(residue, initialLigand))
+						{
+							Residue[] ligs = new Residue[1];
+							ligs[0] = residue;
+							LigandExplorer.sgetSceneController().setLigandResidues(ligs);
+
+							// The following code generates an exception in the swing libs 
+							// (see bug PDBWW-1917 PDB ID 1OLN, ligand XBB), most likely because
+							// the path has null entries, i.e. for the case above.
+							//						if (paths == null) {
+							//							paths = new TreePath[chainNode.getChildCount()];
+							//						}
+							//						paths[lx] = new TreePath(residueNode.getPath());
+
+							// Since we are only selecting a single entry, there is no need to pass in an array with
+							// null entries.
+							if (paths == null) {
+								paths = new TreePath[1];
+								paths[0] = new TreePath(residueNode.getPath());
+							} else {
+								break;
+							}
+
+						}
 					}
 				}
 			}
@@ -783,18 +819,36 @@ public class LigandSideBar extends JPanel
 	}
 	
 	/**
+	 * Returns true if the initialLigand matches a PRD ID (i.e., PRD_000223)
+	 * @param residue
+	 * @param initialLigand Specification of PRD molecule to be highlighted in Ligand Explorer upon startup
+	 * @return
+	 */
+	private boolean isInitialBirdChain(Chain chain, String initialLigand) {
+		if (chain.getClassification() == Classification.BIRD) {
+			Residue r = chain.getResidue(0);
+			if (r != null) {
+				if (initialLigand.toUpperCase().startsWith("PRD_")) {
+					return r.getPrdId().equalsIgnoreCase(initialLigand);
+				} else {
+					String chainId = initialLigand.substring(0, 1);
+					String prdId = initialLigand.substring(2, initialLigand.length());
+					return chain.getAuthorChainId().equalsIgnoreCase(chainId) && r.getPrdId().equalsIgnoreCase(prdId);
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
 	 * Returns true if ligand specified by either 3-letter ligand id (i.e. HEM) or
-	 * chain/residue number (i.e. A156) or PRD ID (i.e., PRD_000223) matches the passed in residue.
+	 * chain/residue number (i.e. A156) matches the passed in residue.
 	 * @param residue
 	 * @param initialLigand Specification of ligand to be highlighted in Ligand Explorer upon startup
 	 * @return
 	 */
 	private boolean isInitialLigandResidue(Residue residue, String initialLigand) {
 		if (residue.getCompoundCode().equalsIgnoreCase(initialLigand)) {
-			return true;
-		}
-			
-		if (residue.getPrdId().equalsIgnoreCase(initialLigand)) {
 			return true;
 		}
 		
