@@ -713,7 +713,7 @@ public class Chain
 	public String toString()
 	{
 		if (chainClassification == Residue.Classification.BIRD) {
-			return getResidue(0).getPrdId();
+			return getResidue(0).getPrdId() + " " + entityName;
 		} else {
 			return getAuthorChainId();
 		}

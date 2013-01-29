@@ -342,7 +342,8 @@ public class BondFactory
 			final String compoundCode = residue.getCompoundCode( );
 			final Residue.Classification classification = residue.getClassification( );
 			if ( (classification == Residue.Classification.AMINO_ACID) ||
-				(classification == Residue.Classification.NUCLEIC_ACID) )
+				(classification == Residue.Classification.NUCLEIC_ACID) ||
+				classification == Residue.Classification.BIRD)
 			{
 				// Check for disulphide bonds.
 				/*
