@@ -318,9 +318,12 @@ public class LigandSideBar extends JPanel
 
 			ImageIcon imageIcon = null;
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
+			
+			if (node.getUserObject() instanceof String)
+				imageIcon = chainIcon; // top level are strings
 
-			if (node.getUserObject() instanceof Chain)
-				imageIcon = chainIcon;
+			else if (node.getUserObject() instanceof Chain)
+				imageIcon = residueIcon; // for BIRD chains, use residue icon. 
 
 			else if (node.getUserObject() instanceof Residue)
 				imageIcon = residueIcon;
@@ -726,6 +729,7 @@ public class LigandSideBar extends JPanel
 		TreePath paths[] = null;
 
 
+		// select initial BIRD molecules
 		for (int ix = 0; ix < rootNode.getChildCount(); ix++)
 		{
 			DefaultMutableTreeNode chainNode = (DefaultMutableTreeNode)rootNode.getChildAt(ix);
@@ -733,9 +737,9 @@ public class LigandSideBar extends JPanel
 			{
 				for (int lx = 0; lx < chainNode.getChildCount(); lx++)
 				{
-					DefaultMutableTreeNode residueNode = (DefaultMutableTreeNode)chainNode.getChildAt(lx);
-					if (residueNode.getUserObject() instanceof Chain) {
-						Chain chain = (Chain)residueNode.getUserObject();
+					DefaultMutableTreeNode subNode = (DefaultMutableTreeNode)chainNode.getChildAt(lx);
+					if (subNode.getUserObject() instanceof Chain) {
+						Chain chain = (Chain)subNode.getUserObject();
 						if (isInitialBirdChain(chain, initialLigand)) {
 				//			System.out.println("Bird chain: " + initialLigand);
 
@@ -745,7 +749,7 @@ public class LigandSideBar extends JPanel
 
 							if (paths == null) {
 								paths = new TreePath[1];
-								paths[0] = new TreePath(residueNode.getPath());
+								paths[0] = new TreePath(subNode.getPath());
 							} else {
 								break;
 							}
@@ -756,6 +760,7 @@ public class LigandSideBar extends JPanel
 			}
 		}
 		
+		// select initial chemical components
 		for (int ix = 0; ix < rootNode.getChildCount(); ix++)
 		{
 			DefaultMutableTreeNode chainNode = (DefaultMutableTreeNode)rootNode.getChildAt(ix);
