@@ -722,7 +722,6 @@ public class LigandSideBar extends JPanel
 	public void selectInitialLigand()
 	{
 		String initialLigand = LigandExplorer.sgetModel().getInitialLigand();
-		initialLigand = "FMT";
 		DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode)ligandJList.getModel().getRoot();
 		TreePath paths[] = null;
 
@@ -734,26 +733,24 @@ public class LigandSideBar extends JPanel
 			{
 				for (int lx = 0; lx < chainNode.getChildCount(); lx++)
 				{
-
-			   
 					DefaultMutableTreeNode residueNode = (DefaultMutableTreeNode)chainNode.getChildAt(lx);
 					if (residueNode.getUserObject() instanceof Chain) {
-					Chain chain = (Chain)residueNode.getUserObject();
-					if (isInitialBirdChain(chain, initialLigand)) {
-						System.out.println("Bird chain: " + initialLigand);
-					
-						Residue[] ligs = new Residue[1];
-		            //    ligs[0] = residue;
-		            //   LigandExplorer.sgetSceneController().setLigandResidues(ligs);
-		                
-						if (paths == null) {
-							paths = new TreePath[1];
-							paths[0] = new TreePath(residueNode.getPath());
-						} else {
-							break;
+						Chain chain = (Chain)residueNode.getUserObject();
+						if (isInitialBirdChain(chain, initialLigand)) {
+				//			System.out.println("Bird chain: " + initialLigand);
+
+							// Residue[] ligs = new Residue[1];
+							//    ligs[0] = residue;
+							//   LigandExplorer.sgetSceneController().setLigandResidues(ligs);
+
+							if (paths == null) {
+								paths = new TreePath[1];
+								paths[0] = new TreePath(residueNode.getPath());
+							} else {
+								break;
+							}
+
 						}
-						
-					}
 					}
 				}
 			}
