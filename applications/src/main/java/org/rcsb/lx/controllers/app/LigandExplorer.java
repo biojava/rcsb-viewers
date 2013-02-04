@@ -148,10 +148,8 @@ public class LigandExplorer extends VFAppBase
 		final LigandExplorer app = new LigandExplorer(args);
 		
 		for (int argIX = 0; argIX < args.length; argIX++)
-		if (args[argIX].equals("-ligand")) {
-			System.out.println("Setting ligand: " + args[argIX]);
+		if (args[argIX].equals("-ligand"))
 			app.properties.setProperty("ligand", args[++argIX]);
-		}
 						// field args for app-specific args
 
 		app.initialize(true);
