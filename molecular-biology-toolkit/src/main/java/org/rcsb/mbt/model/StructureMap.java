@@ -1044,9 +1044,7 @@ public class StructureMap
 	//		if (residue.getPrdId().length() == 0) {
 				if ( residue.getClassification() == Residue.Classification.LIGAND || residue.getClassification() == Residue.Classification.BIRD) {
 					ligands.add( residue );
-				}
-				// tread single residue chains as ligands
-				if (this.getChain(residue.getChainId()).getResidueCount() == 1) {
+				} else if (this.getChain(residue.getChainId()).getResidueCount() == 1) { // tread single residue chains as ligands
 					ligands.add(residue);
 				}
 	//		}
@@ -2085,7 +2083,9 @@ public class StructureMap
 			parents = new Vector<Object>( );
 			parents.add( structure );
 			break;
-	
+			
+	    default:
+	    	break;
 		}
 
 		return parents;
@@ -2242,7 +2242,7 @@ public class StructureMap
 				nonProteinResidues.add(r);
 				continue;
 				// handle chains with one residue as a non-protein residue
-			} else if (this.getChain(r.getChainId()).getResidueCount() == 1) {
+			} else if (r.getClassification() != Residue.Classification.BIRD && this.getChain(r.getChainId()).getResidueCount() == 1) {
 				nonProteinResidues.add(r);
 				continue;
 			}
@@ -2282,6 +2282,7 @@ public class StructureMap
 			}
 		};
 
+		// TODO example: 4HP0, if BIRD mol. is in same chain as ligand, need to break up chain
 		for (String pdbId : byPdbId.keySet())
 		{
 			Vector<Residue> residues = byPdbId.get(pdbId);
@@ -2289,19 +2290,48 @@ public class StructureMap
 			if (pdbId != null && pdbId.length() != 0)
 			{ 
 				residues.trimToSize();	
+				Vector<Residue> birdResidues = new Vector<Residue>();
+				Vector<Residue> basicResidues = new Vector<Residue>();
 				if (residues.size() > 0) {
-					Residue r = residues.get(0);
-					String chainId = r.getAuthorChainId(); // set author chain id for display purposes
-					int entityId = r.getEntityId();
+					for (Residue r: residues) {
+						if (r.getClassification() == Classification.BIRD) {
+							birdResidues.add(r);
+						} else {
+							basicResidues.add(r);
+						}
+					}
+				
 
 					ExternChain c = null;
-					if (r.getClassification() == Classification.BIRD) {
-						String name = entityNameMap.get(entityId) + " (" + r.getPrdId() + ")";
-						c = ExternChain.createBirdChain(chainId, name, residues);     
-					} else {
-						c = ExternChain.createBasicChain(chainId, entityNameMap.get(entityId), residues);         
+					if (birdResidues.size() > 0) {
+						Residue r = birdResidues.get(0);
+						int entityId = r.getEntityId();
+						String chainId = r.getAuthorChainId();
+					    String name = entityNameMap.get(entityId) + " (" + r.getPrdId() + ")";
+					    c = ExternChain.createBirdChain(chainId, name, birdResidues); 
+					    this.pdbTopLevelElements.add(c);
+					} 
+					if (basicResidues.size() > 0) {
+						Residue r = basicResidues.get(0);
+						String chainId = r.getAuthorChainId();
+						int entityId = r.getEntityId();
+						c = ExternChain.createBasicChain(chainId, entityNameMap.get(entityId), basicResidues);
+						this.pdbTopLevelElements.add(c);
 					}
-					this.pdbTopLevelElements.add(c);
+//					Residue r = residues.get(0);
+//					String chainId = r.getAuthorChainId(); // set author chain id for display purposes
+//					int entityId = r.getEntityId();
+//
+//					ExternChain c = null;
+//					if (r.getClassification() == Classification.BIRD) {
+//						String name = entityNameMap.get(entityId) + " (" + r.getPrdId() + ")";
+//		//				String name = entityNameMap.get(entityId);
+//						System.out.println("Creating BIRD chain: " + name);
+//						c = ExternChain.createBirdChain(chainId, name, residues);     
+//					} else {
+//						c = ExternChain.createBasicChain(chainId, entityNameMap.get(entityId), residues);         
+//					}
+//					this.pdbTopLevelElements.add(c);
 				}
 			}
 

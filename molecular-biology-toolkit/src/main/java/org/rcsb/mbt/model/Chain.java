@@ -200,7 +200,8 @@ public class Chain
 			if (residues.get(0).getClassification() == Residue.Classification.WATER) {
 				return Residue.Classification.WATER;
 			} else {
-				return Residue.Classification.LIGAND;
+				if (residues.get(0).getClassification() != Residue.Classification.BIRD)
+					return Residue.Classification.LIGAND;
 			}
 		}
 		
@@ -253,7 +254,7 @@ public class Chain
 			residues.get(0).reClassifyAsLigand();
 		} else {
 			for (Residue residue : residues) {
-				if (residue.getClassification() == Residue.Classification.LIGAND) {
+				if (residue.getClassification() == Residue.Classification.LIGAND || residue.getClassification() == Residue.Classification.BIRD) {
 					return;
 					// shortcut - we're presuming if one is correct,
 					// they're all correct.

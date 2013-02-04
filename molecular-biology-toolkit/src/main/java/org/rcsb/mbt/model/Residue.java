@@ -225,7 +225,7 @@ implements java.lang.Cloneable
 	 */
 	public void reClassifyAsLigand()
 	{
-		if (classification != Classification.WATER)
+		if (classification != Classification.WATER && classification != Classification.BIRD)
 			classification = Classification.LIGAND;
 	}
 
