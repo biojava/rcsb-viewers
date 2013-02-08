@@ -101,9 +101,11 @@ import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.StructureModel.StructureList;
+import org.rcsb.mbt.model.attributes.AtomColorRegistry;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
 import org.rcsb.mbt.model.attributes.ChainStyle;
+import org.rcsb.mbt.model.attributes.IAtomColor;
 import org.rcsb.mbt.model.attributes.IStructureStylesEventListener;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
@@ -1933,22 +1935,32 @@ WindowListener, IStructureStylesEventListener {
 		if (doAtoms)
 			// atoms will be handled by derived func, if at all.
 		{
-			final int atomCount = structureMap.getAtomCount();
-			for (int i = 0; i < atomCount; i++)
-			{
-				final Atom a = structureMap.getAtom(i);
+			// new atom style for ligand atoms
+			AtomStyle grayDefault = new AtomStyle();
+			grayDefault.setAtomRadius(defaultAtomStyle.getAtomRadius());
+			grayDefault.setAtomLabel(defaultAtomStyle.getAtomLabel());
+			IAtomColor iatomColor = AtomColorRegistry.get("By Element Carbon Gray");
+			grayDefault.setAtomColor(iatomColor);
+			
+			Vector<Residue> ligands = structureMap.getResidues();
+			for (Residue r: ligands) {
+				for (Atom a: r.getAtoms()) {
+					AtomStyle as = defaultAtomStyle;
+					
+					if (r.getClassification() == Residue.Classification.LIGAND || r.getClassification() == Residue.Classification.BIRD) {
+						as = grayDefault;
+					}
+					structureStyles.setStyle(a, as);
 
-				// set the default style
-				structureStyles.setStyle(a, defaultAtomStyle);
+					// ignore invisible atoms...
+					if (!structureStyles.isVisible(a))
+						continue;
 
-				// ignore invisible atoms...
-				if (!structureStyles.isVisible(a))
-					continue;
-
-				synchronized (sn.renderables)
-				{
-					sn.renderables.put(a, new DisplayListRenderable(a,
-							defaultAtomStyle, defaultAtomGeometry));
+					synchronized (sn.renderables)
+					{
+						sn.renderables.put(a, new DisplayListRenderable(a,
+								as, defaultAtomGeometry));
+					}
 				}
 			}
 			// should this go after the end of the if-statement ??
