@@ -1892,7 +1892,6 @@ WindowListener, IStructureStylesEventListener {
 			final Chain c = structureMap.getChain(i);
 
 			// set the default style...
-			System.out.println("setting chain style: " + c.getAuthorChainId());
 			structureStyles.setStyle(c, defaultChainStyle);
 
 			// ignore invisible chains...
@@ -1964,8 +1963,9 @@ WindowListener, IStructureStylesEventListener {
 				}
 			}
 			// should this go after the end of the if-statement ??
-			this.requestRepaint();
+	//		this.requestRepaint();
 		}
+		this.requestRepaint();
 	}
 	
 	/**
