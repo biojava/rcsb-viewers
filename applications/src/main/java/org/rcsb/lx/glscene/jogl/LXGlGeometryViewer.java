@@ -50,6 +50,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -543,9 +544,6 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 	@Override
 	public void structureAdded(final Structure str)
 	{
-	
-        
-        
 		final StructureMap structureMap = str.getStructureMap();
 		final StructureStyles structureStyles = structureMap
 		.getStructureStyles();
@@ -633,7 +631,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 			}
 		}
 
-		// new atom style for non-ligand atoms
+		// new atom style for ligand atoms
 		AtomStyle grayDefault = new AtomStyle();
 		grayDefault.setAtomRadius(defaultAtomStyle.getAtomRadius());
 		grayDefault.setAtomLabel(defaultAtomStyle.getAtomLabel());
@@ -650,28 +648,17 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 			final Atom a = atoms.get(i);
 			
 			// set the default style
-	//		structureStyles.setStyle(a, defaultAtomStyle);
-			
-			AtomStyle as = null;
-			if (ligandAtoms.contains(a)) {
-				as = defaultAtomStyle;
-//				System.out.println("default style: " + a.compound);
-			} else {
-				as = grayDefault;
-//			    System.out.println("gray style: " + a.compound);
-			}
-			structureStyles.setStyle(a, as);
+			structureStyles.setStyle(a, grayDefault);
 
 			// ignore invisible atoms...
 			if (!structureStyles.isVisible(a)) {
 				continue;
 			}
 			
-
 			synchronized (renderables)
 			{
 				renderables.put(a, new DisplayListRenderable(a,
-						as, defaultAtomGeometry));
+						grayDefault, defaultAtomGeometry));
 			}
 		}
 
@@ -947,7 +934,6 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		for (int i = 0; i < atoms.size(); i++) {
 			final Atom a = atoms.get(i);
 			if (!node.isRendered(a)) {
-	//			System.out.println("render residue: " + r.getCompoundCode() + " style: " + as.getAtomColor());
 				final DisplayListRenderable renderable = new DisplayListRenderable(a,
 						as, ag);
 				node.addRenderable(renderable);
@@ -1141,15 +1127,6 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		AtomStyle as = (AtomStyle) structure.getStructureMap()
 				.getStructureStyles().getDefaultStyle(
 						ComponentType.ATOM);
-		
-		// change residue color - this has no effect????
-		AtomStyle grayDefault = new AtomStyle();
-		grayDefault.setAtomRadius(as.getAtomRadius());
-		grayDefault.setAtomLabel(as.getAtomLabel());
-		IAtomColor iatomColor = AtomColorRegistry.get("By Element Carbon Gray");
-		grayDefault.setAtomColor(iatomColor);
-		as = grayDefault;
-		//
 				
 		final BondGeometry bg = (BondGeometry) GlGeometryViewer.defaultGeometry
 				.get(ComponentType.BOND);
