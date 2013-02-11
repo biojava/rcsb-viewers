@@ -2282,7 +2282,7 @@ public class StructureMap
 			}
 		};
 
-		// TODO example: 4HP0, if BIRD mol. is in same chain as ligand, need to break up chain
+		// 4HP0, if BIRD mol. is in same chain as ligand, need to break up chain
 		for (String pdbId : byPdbId.keySet())
 		{
 			Vector<Residue> residues = byPdbId.get(pdbId);
@@ -2318,20 +2318,6 @@ public class StructureMap
 						c = ExternChain.createBasicChain(chainId, entityNameMap.get(entityId), basicResidues);
 						this.pdbTopLevelElements.add(c);
 					}
-//					Residue r = residues.get(0);
-//					String chainId = r.getAuthorChainId(); // set author chain id for display purposes
-//					int entityId = r.getEntityId();
-//
-//					ExternChain c = null;
-//					if (r.getClassification() == Classification.BIRD) {
-//						String name = entityNameMap.get(entityId) + " (" + r.getPrdId() + ")";
-//		//				String name = entityNameMap.get(entityId);
-//						System.out.println("Creating BIRD chain: " + name);
-//						c = ExternChain.createBirdChain(chainId, name, residues);     
-//					} else {
-//						c = ExternChain.createBasicChain(chainId, entityNameMap.get(entityId), residues);         
-//					}
-//					this.pdbTopLevelElements.add(c);
 				}
 			}
 

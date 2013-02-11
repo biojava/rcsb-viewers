@@ -196,8 +196,16 @@ public class ChemicalComponentInfo
 		return getChemicalComponentParentCount(code) > 1;
 	}
 	
+	public static boolean isStandardAminoAcid(String code) {
+		return aminoAcids.containsKey(code);
+	}
+	
 	public static boolean isNonstandardAminoAcid(String code) {
 		return !aminoAcids.containsKey(code) && getChemicalComponentType(code).isPeptide();
+	}
+	
+	public static boolean isStandardNucleicAcid(String code) {
+		return nucleicAcids.contains(code);
 	}
 	
 	public static boolean isNonstandardNucleicAcid(String code) {

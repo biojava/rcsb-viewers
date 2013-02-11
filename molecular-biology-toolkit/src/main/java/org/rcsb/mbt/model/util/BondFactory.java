@@ -340,10 +340,12 @@ public class BondFactory
 		{
 			final Residue residue = structureMap.getResidue( r );
 			final String compoundCode = residue.getCompoundCode( );
+			boolean stdAminoAcid = ChemicalComponentInfo.isStandardAminoAcid(compoundCode);
+			boolean stdNucleicAcid = ChemicalComponentInfo.isStandardNucleicAcid(compoundCode);
 			final Residue.Classification classification = residue.getClassification( );
-			if ( (classification == Residue.Classification.AMINO_ACID) ||
-				(classification == Residue.Classification.NUCLEIC_ACID) ||
-				classification == Residue.Classification.BIRD)
+			if ( (classification == Residue.Classification.AMINO_ACID ||
+				classification == Residue.Classification.NUCLEIC_ACID ||
+				classification == Residue.Classification.BIRD) && (stdAminoAcid || stdNucleicAcid) )
 			{
 				// Check for disulphide bonds.
 				/*
@@ -370,7 +372,10 @@ public class BondFactory
 					// Only care about residues in the same chain.
 					final String resChainId = residue.getChainId( );
 					final String nextResChainId = nextResidue.getChainId( );
-					if ( resChainId.equals( nextResChainId ) )
+					boolean nextStdAminoAcid = ChemicalComponentInfo.isStandardAminoAcid(nextResidue.getCompoundCode());
+					boolean nextStdNucleicAcid = ChemicalComponentInfo.isStandardNucleicAcid(nextResidue.getCompoundCode());
+					if ( resChainId.equals( nextResChainId ) && 
+							((stdAminoAcid && nextStdAminoAcid) || (stdNucleicAcid && nextStdNucleicAcid)))
 					{
 						// Try to get the "tail" and "head" atoms.
 						final Atom tailAtom = residue.getPolymerTailAtom( );
