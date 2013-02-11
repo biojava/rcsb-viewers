@@ -79,8 +79,6 @@ import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
  */
 public class InteractionCalculator
 {
-	
-
 	public Residue[] currentLigandResidues = null;
 	
 	public void calculateInteractions(final Structure structure, boolean hbondflag,
@@ -113,22 +111,12 @@ public class InteractionCalculator
 		
 		final AtomGeometry ag = (AtomGeometry) GlGeometryViewer.defaultGeometry
 				.get(ComponentType.ATOM);
-		AtomStyle as = (AtomStyle) structure.getStructureMap()
+		final AtomStyle as = (AtomStyle) structure.getStructureMap()
 				.getStructureStyles().getDefaultStyle(
 						ComponentType.ATOM);
-		
-		// ---
-		// change residue color
-		AtomStyle grayDefault = new AtomStyle();
-		grayDefault.setAtomRadius(as.getAtomRadius());
-		grayDefault.setAtomLabel(as.getAtomLabel());
-		IAtomColor iatomColor = AtomColorRegistry.get("By Element Carbon Gray");
-		grayDefault.setAtomColor(iatomColor);
-		as = grayDefault;
-		// ---
 		final BondGeometry bg = (BondGeometry) GlGeometryViewer.defaultGeometry
 				.get(ComponentType.BOND);
-		final BondStyle bs = (BondStyle) structure.getStructureMap()
+		BondStyle bs = (BondStyle) structure.getStructureMap()
 				.getStructureStyles().getDefaultStyle(
 						ComponentType.BOND);
 
@@ -316,6 +304,7 @@ public class InteractionCalculator
 		final AtomStyle as = (AtomStyle) structure.getStructureMap()
 				.getStructureStyles().getDefaultStyle(
 						ComponentType.ATOM);
+		
 		final BondGeometry bg = (BondGeometry) GlGeometryViewer.defaultGeometry
 				.get(ComponentType.BOND);
 		final BondStyle bs = (BondStyle) structure.getStructureMap()
@@ -505,14 +494,6 @@ public class InteractionCalculator
 		.getStructureStyles().getDefaultStyle(
 				ComponentType.BOND);
 		
-		// change residue color
-		AtomStyle grayDefault = new AtomStyle();
-		grayDefault.setAtomRadius(as.getAtomRadius());
-		grayDefault.setAtomLabel(as.getAtomLabel());
-		IAtomColor iatomColor = AtomColorRegistry.get("By Element Carbon Gray");
-		grayDefault.setAtomColor(iatomColor);
-		as = grayDefault;
-		
 		LXGlGeometryViewer glViewer = LigandExplorer.sgetGlGeometryViewer();
 		StructureMap structureMap = structure.getStructureMap();
 		
@@ -539,11 +520,7 @@ public class InteractionCalculator
 					}
 			}
 		}
-	//	System.out.println("hide chains");
 		glViewer.hideChains();
-	//	System.out.println("render chains");
-	//	glViewer.renderChains();;
-		// reset atom color to default
 	}
 	
 	/**
