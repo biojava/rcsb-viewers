@@ -125,7 +125,9 @@ public class StylesMutator extends MutatorBase {
             final DisplayListRenderable renderable = ((JoglSceneNode)sm.getUData()).getRenderable(a);
         	if(renderable != null)
         	{
+        	
         		final AtomStyle oldStyle = (AtomStyle)ss.getStyle(a);
+        		System.out.println("StylesMutator: changeStyle(atom): "+ oldStyle.getAtomColor());
         		final AtomStyle newStyle = new AtomStyle();
         		if(oldStyle != null) {
 	        		newStyle.setAtomColor(oldStyle.getAtomColor());
@@ -213,6 +215,7 @@ public class StylesMutator extends MutatorBase {
         	}*/
         	
         	// delegate to atoms...
+        	System.out.println("StylesMutator: changeStyle(bond): " + b.getAtom(0).compound);
         	this.changeStyle(b.getAtom(0));
         	this.changeStyle(b.getAtom(1));
         	break;
