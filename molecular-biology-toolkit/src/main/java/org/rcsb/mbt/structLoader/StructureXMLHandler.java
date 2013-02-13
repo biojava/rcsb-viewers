@@ -1112,7 +1112,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 			    try {
 			    	curAtom.altLoc =  buf.trim();
 				} catch (Exception e) {
-					// mark this residue id as undefined.
 					curAtom.altLoc = "";
 				}     
 		}
