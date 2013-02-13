@@ -50,7 +50,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,14 +57,10 @@ import java.util.Vector;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Matrix4d;
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
 import org.rcsb.lx.controllers.app.LigandExplorer;
-import org.rcsb.lx.controllers.scene.InteractionCalculator;
 import org.rcsb.lx.controllers.scene.LXViewMovementThread;
 import org.rcsb.lx.controllers.update.LXUpdateEvent;
 import org.rcsb.lx.model.Interaction;
@@ -77,9 +72,9 @@ import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
+import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.Surface;
-import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.AtomColorRegistry;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
@@ -90,9 +85,7 @@ import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.surface.BindingSiteSurfaceOrienter;
-import org.rcsb.mbt.surface.datastructure.IcosahedralSampler;
 import org.rcsb.mbt.surface.datastructure.TriangulatedSurface;
-import org.rcsb.mbt.surface.datastructure.VertInfo;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.IUpdateListener;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
@@ -100,11 +93,11 @@ import org.rcsb.vf.controllers.scene.ViewMovementThread;
 import org.rcsb.vf.glscene.jogl.AtomGeometry;
 import org.rcsb.vf.glscene.jogl.BondGeometry;
 import org.rcsb.vf.glscene.jogl.ChainGeometry;
+import org.rcsb.vf.glscene.jogl.ChainGeometry.RibbonForm;
 import org.rcsb.vf.glscene.jogl.Constants;
 import org.rcsb.vf.glscene.jogl.DisplayListRenderable;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 import org.rcsb.vf.glscene.jogl.JoglSceneNode;
-import org.rcsb.vf.glscene.jogl.ChainGeometry.RibbonForm;
 
 
 public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListener

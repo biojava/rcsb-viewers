@@ -127,7 +127,6 @@ public class StylesMutator extends MutatorBase {
         	{
         	
         		final AtomStyle oldStyle = (AtomStyle)ss.getStyle(a);
-        		System.out.println("StylesMutator: changeStyle(atom): "+ oldStyle.getAtomColor());
         		final AtomStyle newStyle = new AtomStyle();
         		if(oldStyle != null) {
 	        		newStyle.setAtomColor(oldStyle.getAtomColor());
@@ -200,22 +199,8 @@ public class StylesMutator extends MutatorBase {
 		
 		ActivationType pickLevel = getActivationType();
         switch(pickLevel) {
-        case ATOMS_AND_BONDS:
-        	/*GlGeometryViewer viewer = Model.getSingleton().getViewer();
-            DisplayListRenderable renderable = viewer.getRenderable(b);
-        	if(renderable != null) {
-        		BondGeometry oldGeometry = (BondGeometry)renderable.geometry; // if this is renderable, the geometry will not be null.
-        		BondGeometry newGeometry = new BondGeometry();
-        		newGeometry.setForm(this.options.getCurrentBondForm());
-        		newGeometry.setQuality(oldGeometry.getQuality());
-        		newGeometry.setShowOrder(this.options.isBondOrderShown());
-        		renderable.geometry = newGeometry;
-        		
-        		renderable.setDirty();
-        	}*/
-        	
+        case ATOMS_AND_BONDS:      	
         	// delegate to atoms...
-        	System.out.println("StylesMutator: changeStyle(bond): " + b.getAtom(0).compound);
         	this.changeStyle(b.getAtom(0));
         	this.changeStyle(b.getAtom(1));
         	break;

@@ -56,8 +56,10 @@ import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
@@ -77,6 +79,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.model.InteractionConstants;
+import org.rcsb.mbt.model.Bird;
 import org.rcsb.mbt.model.Chain;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Residue.Classification;
@@ -218,9 +221,13 @@ public class LigandSideBar extends JPanel
 					{
 						assert(treeSelection.length == 1);
 						Chain chain = (Chain) nodeValue;
-						residues = new Residue[chain.getResidueCount()];
-						for (int ix = 0; ix < chain.getResidueCount(); ix++) {
-							residues[ix] = chain.getResidue(ix);
+						if (chain.getBird() != null) {
+							residues = getBirdResidues(structure, chain);
+						} else {
+							residues = new Residue[chain.getResidueCount()];
+							for (int ix = 0; ix < chain.getResidueCount(); ix++) {
+								residues[ix] = chain.getResidue(ix);
+							}
 						}
 					}
 
@@ -283,7 +290,6 @@ public class LigandSideBar extends JPanel
 				
 				// remove current surfaces from display list and add them again to ensure
 				// transparent surfaces are drawn on top of the interactions
-//			System.out.println("LigandSideBar: redraw surfaces");
 				LigandExplorer.sgetGlGeometryViewer().surfaceRemoved(structure);
 				LigandExplorer.sgetGlGeometryViewer().surfaceAdded(structure);	
 			}
@@ -294,6 +300,27 @@ public class LigandSideBar extends JPanel
 				// structure, do this later
 			}
 		}
+	}
+	
+	/**
+	 * Returns all residues relate to a BIRD molecule. Since BIRD
+	 * molecules can span multiple internal chains, we need to search
+	 * all chains with a particular BIRD instance
+	 * @param structure
+	 * @param chain
+	 * @return
+	 */
+	private Residue[] getBirdResidues(Structure structure, Chain chain) {
+		List<Residue> residues = new ArrayList<Residue>();
+		Bird bird = chain.getBird();
+		
+		for (Chain c: structure.getStructureMap().getChains()) {
+			Bird b = c.getBird();
+		    if (b != null && b.isSameInstance(bird)) {
+		    	residues.addAll(c.getResidues());
+		    }
+		}
+		return residues.toArray(new Residue[residues.size()]);
 	}
 
 	private class LigandTreeCellRenderer extends DefaultTreeCellRenderer
@@ -406,6 +433,8 @@ public class LigandSideBar extends JPanel
 
 				String chainId = "";
 				DefaultMutableTreeNode chainNode = null;
+				DefaultMutableTreeNode birdNode = null;
+				Bird prevBird = null;
 
 				for (Chain chain : ligandList)
 				{
@@ -421,10 +450,18 @@ public class LigandSideBar extends JPanel
 							chainNode.add(new DefaultMutableTreeNode(residue));
 						}
 					} else if (chain.getClassification() == Residue.Classification.BIRD) {
-						DefaultMutableTreeNode residueNode = new DefaultMutableTreeNode(chain);
-						chainNode.add(residueNode);
+						Bird currBird = chain.getBird();
+						if (prevBird == null && currBird != null) {
+							birdNode = new DefaultMutableTreeNode(chain);
+							chainNode.add(birdNode);
+							prevBird = currBird;
+						} else if (!prevBird.isSameInstance(currBird)) {
+						    birdNode = new DefaultMutableTreeNode(chain);
+					   	    chainNode.add(birdNode);
+					   	    prevBird = currBird;
+				    	}
 						for (Residue residue : chain.getResidues()) {
-							residueNode.add(new DefaultMutableTreeNode(residue));
+							birdNode.add(new DefaultMutableTreeNode(residue));
 						}
 					} else if (chain.hasModifiedResidues()) {
 						for (Residue residue : chain.getModifiedResidues()) {
@@ -741,19 +778,12 @@ public class LigandSideBar extends JPanel
 					if (subNode.getUserObject() instanceof Chain) {
 						Chain chain = (Chain)subNode.getUserObject();
 						if (isInitialBirdChain(chain, initialLigand)) {
-				//			System.out.println("Bird chain: " + initialLigand);
-
-							// Residue[] ligs = new Residue[1];
-							//    ligs[0] = residue;
-							//   LigandExplorer.sgetSceneController().setLigandResidues(ligs);
-
 							if (paths == null) {
 								paths = new TreePath[1];
 								paths[0] = new TreePath(subNode.getPath());
 							} else {
 								break;
 							}
-
 						}
 					}
 				}
@@ -830,18 +860,16 @@ public class LigandSideBar extends JPanel
 		if (chain.getClassification() == Classification.BIRD) {
 			Residue r = chain.getResidue(0);
 			if (r != null) {
+				Bird bird = r.getBird();
+				if (bird == null) {
+					return false;
+				}
 				if (initialLigand.toUpperCase().startsWith("PRD_")) {
-					System.out.println("PrdID: " + initialLigand);
-					return r.getPrdId().equalsIgnoreCase(initialLigand);
+					return bird.getPrdId().equalsIgnoreCase(initialLigand);
 				} else {
 					String chainId = initialLigand.substring(0, 1);
-					String prdId = initialLigand.substring(2, initialLigand.length());
-					
-					if (chain.getAuthorChainId().equalsIgnoreCase(chainId) && r.getPrdId().equalsIgnoreCase(prdId)) {
-						System.out.println("ChainID + PrdId: " + initialLigand);
-					}
-					
-					return chain.getAuthorChainId().equalsIgnoreCase(chainId) && r.getPrdId().equalsIgnoreCase(prdId);
+					String prdId = initialLigand.substring(2, initialLigand.length());	
+					return chain.getAuthorChainId().equalsIgnoreCase(chainId) && bird.getPrdId().equalsIgnoreCase(prdId);
 				}
 			}
 		}

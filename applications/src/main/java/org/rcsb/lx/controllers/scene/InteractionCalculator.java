@@ -47,6 +47,7 @@ package org.rcsb.lx.controllers.scene;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
@@ -62,10 +63,8 @@ import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.attributes.AtomColorRegistry;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
-import org.rcsb.mbt.model.attributes.IAtomColor;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
 import org.rcsb.mbt.model.util.Element;
 import org.rcsb.mbt.model.util.PeriodicTable;
@@ -88,11 +87,8 @@ public class InteractionCalculator
 			final PrintWriter interactionsOut) {
 		
 		final StructureMap structureMap = structure.getStructureMap();
-		Vector<Atom> ligandAtoms = new Vector<Atom>();
-		for (Residue residue : currentLigandResidues)
-			if (residue != null)
-				ligandAtoms.addAll(residue.getAtoms());
-		
+
+		List<Atom> ligandAtoms = getCurrentLigandAtoms();		
 		final Vector<Atom> proteinAtoms = new Vector<Atom>();
 
 		String interactionType = null;
