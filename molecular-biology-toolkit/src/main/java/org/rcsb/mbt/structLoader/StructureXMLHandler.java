@@ -54,6 +54,7 @@ import javax.vecmath.Matrix3f;
 import javax.vecmath.Vector3f;
 
 import org.rcsb.mbt.model.Atom;
+import org.rcsb.mbt.model.Bird;
 import org.rcsb.mbt.model.Bond;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
@@ -162,8 +163,8 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected Vector<Atom> atomVector = new Vector<Atom>();
 	protected Vector<Bond> bondVector = new Vector<Bond>();
 	
-	// contains a map of asym id and PRD IDs of biologically important molecules from the BIRD reference dictionary
-	private Map<String, String> asymIdPrdIdMap = new HashMap<String, String>(); 
+	// contains a map of asym id and BIRD reference dictionary info
+	private Map<String, Bird> asymIdBirdMap = new HashMap<String, Bird>(); 
 	private Map<Integer, String> entityNameMap = new HashMap<Integer, String>();
 
 	/**
@@ -220,8 +221,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	UnitCell unitCell = null;
 
-	// TODO need generic hashtable for multiple component types
-//	private Hashtable<ComponentType, Vector<Atom>> componentsHash = new Hashtable<ComponentType, Vector<Atom>>();
 	private Hashtable<ComponentType, Vector<?>> componentsHash = new Hashtable<ComponentType, Vector<?>>();
 	protected Structure structure = null;
 
@@ -349,13 +348,9 @@ public class StructureXMLHandler extends DefaultHandler implements
 				createXMLRunnable__vector3__End());
 		
 		// BEG pdbx_molecule (BIRD)
-				//
-
 		startElementRunnables.put(xmlPrefix + "pdbx_molecule",
 				createXMLRunnable__pdbx_molecule__Start());
-	//	startElementRunnables.put(xmlPrefix + "pdbx_moleculeCategory",
-	//			createXMLRunnable__pdbx_moleculeCategory__Start());
-
+	
 		//
 		// end general translation
 		// END Non Crystallographic
@@ -377,6 +372,8 @@ public class StructureXMLHandler extends DefaultHandler implements
 				createXMLRunnable__auth_asym_id__End());
 		endElementAtomRunnables.put(xmlPrefix + "label_seq_id",
 				createXMLRunnable__label_seq_id__End());
+		endElementAtomRunnables.put(xmlPrefix + "label_alt_id",
+				createXMLRunnable__label_alt_id__End());
 		endElementAtomRunnables.put(xmlPrefix + "auth_seq_id",
 				createXMLRunnable__auth_seq_id__End());
 		endElementAtomRunnables.put(xmlPrefix + "pdbx_PDB_ins_code",
@@ -496,7 +493,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 	public void endDocument() throws SAXException {
 		atomVector.trimToSize();
 		componentsHash.put(ComponentType.ATOM, atomVector);
-		// TODO can we add ComponentType.BOND here ...
 		componentsHash.put(ComponentType.BOND, bondVector);
 
 		//
@@ -506,13 +502,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 		// set BIRD (Biologically interesting molecules) as non-polymers
 		for (Atom atom: atomVector) {
-			String chainId = atom.chain_id;
-			String prdId = asymIdPrdIdMap.get(chainId);
-			if (prdId != null) {
-	//			System.out.println(atom.toString() + ": " + prdId);
-				atom.prdId = prdId;
-	//			atom.nonpolymer = false;	// setting this make no difference		
-			}
+			atom.bird = asymIdBirdMap.get(atom.chain_id);
 		}
 		
 		// create inverses of the fractional and original transforms...
@@ -1116,7 +1106,22 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected XMLRunnable__label_seq_id__End createXMLRunnable__label_seq_id__End() {
 		return new XMLRunnable__label_seq_id__End();
 	}
+	
+	protected class XMLRunnable__label_alt_id__End extends XMLRunnable {
+		public void run() {
+			    try {
+			    	curAtom.altLoc =  buf.trim();
+				} catch (Exception e) {
+					// mark this residue id as undefined.
+					curAtom.altLoc = "";
+				}     
+		}
+	}
 
+	protected XMLRunnable__label_alt_id__End createXMLRunnable__label_alt_id__End() {
+		return new XMLRunnable__label_alt_id__End();
+	}
+	
 	protected class XMLRunnable__auth_seq_id__End extends XMLRunnable {
 		public void run() {
 			    curAtom.authorResidue_id = Integer.parseInt(buf.trim());
@@ -1230,11 +1235,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 		return new XMLRunnable__pdbx_description__End();
 	}
 	
-	
-	// TODO 
-	//BIRD related info
-	// 
-	
 	protected class XMLRunnable__pdbx_moleculeCategory__Start extends
 	XMLRunnable {
 		public void run() {
@@ -1249,9 +1249,11 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected class XMLRunnable__pdbx_molecule__Start extends
 	XMLRunnable {
 		public void run() {
+			String instanceId = attrs.getValue("instance_id");
 			String prdId = attrs.getValue("prd_id");
 			String asymId = attrs.getValue("asym_id");
-			asymIdPrdIdMap.put(asymId, prdId);
+			Bird bird = new Bird(prdId, asymId, instanceId);
+			asymIdBirdMap.put(asymId, bird);
 		}
 	}
 
@@ -1425,9 +1427,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected XMLRunnable__entities__End createXMLRunnable__entities__End() {
 		return new XMLRunnable__entities__End();
 	}
-	
-	
-	// TODO struct conn
 	
 	protected XMLRunnable__struct_conn__Start createXMLRunnable__struct_conn__Start() {
 		return new XMLRunnable__struct_conn__Start();
@@ -1697,9 +1696,6 @@ class CustomStructure extends Structure {
 	// A hashtable of vectors where
 	// each hash KEY is the StructureComponent type String.
 	// each hash VALUE is a Vector of StructureComponent objects.
-	
-	// TODO make generic to accomodate bonds
-//	protected Hashtable<ComponentType, Vector<Atom>> structureComponents = null;
 	protected Hashtable<ComponentType, Vector<?>> structureComponents = null;
 
 	// To free up the global state for another load call.
@@ -1707,16 +1703,10 @@ class CustomStructure extends Structure {
 
 	// public Structure() Anonymous inner class constructor.
 	public CustomStructure(	
-			// TODO extend to bonds
-//			final Hashtable<ComponentType, Vector<Atom>> structureComponents,
 			final Hashtable<ComponentType, Vector<?>> structureComponents,
 			final String localUrlString) {
 		super();
 		this.structureComponents = structureComponents;
-		
-		// TODO need to set structure pointer for bonds
-	//	StructureComponent bonds = getStructureComponentByIndex(ComponentType.BOND, 0);
-
 		this.localUrlString = localUrlString;
 	}
 

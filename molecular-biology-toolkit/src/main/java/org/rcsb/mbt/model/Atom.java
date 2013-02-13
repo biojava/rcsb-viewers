@@ -111,7 +111,7 @@ public class Atom
 		this.coordinate[2] = atom.coordinate[2];
 		this.occupancy     = atom.occupancy;
 		this.bfactor       = atom.bfactor;
-		this.prdId         = atom.prdId;
+		this.bird          = atom.bird;
 		this.nonpolymer    = atom.nonpolymer;
 	}
 
@@ -262,9 +262,9 @@ public class Atom
 	public float partialCharge = 0.0f; // _atom_site.???
 	
 	/**
-	 * PRD ID, id of biologically interesting molecule from BIRD reference dictionary
+	 * Bird, information about biologically interesting molecule from BIRD reference dictionary
 	 */
-	public String prdId = "";
+	public Bird bird = null;
 	
 	/**
 	 *  Non-polymer indicator. Atom is part of a residue that

@@ -2305,9 +2305,10 @@ public class StructureMap
 					ExternChain c = null;
 					if (birdResidues.size() > 0) {
 						Residue r = birdResidues.get(0);
+						Bird bird = r.getBird();
 						int entityId = r.getEntityId();
 						String chainId = r.getAuthorChainId();
-					    String name = entityNameMap.get(entityId) + " (" + r.getPrdId() + ")";
+					    String name = bird.getPrdId() + " " + entityNameMap.get(entityId);
 					    c = ExternChain.createBirdChain(chainId, name, birdResidues); 
 					    this.pdbTopLevelElements.add(c);
 					} 

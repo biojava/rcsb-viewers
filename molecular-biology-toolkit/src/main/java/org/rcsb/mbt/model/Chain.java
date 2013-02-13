@@ -710,11 +710,23 @@ public class Chain
 		return frags;
 	}
 
+	/**
+	 * Returns information about Biologically Interesting Molecule Reference Dictionary (BIRD)
+	 * @return
+	 */
+	public Bird getBird() {
+		if (residues.size() > 0) {
+			return getResidue(0).getBird();
+		}
+		return null;
+	}
+	
 	@Override
 	public String toString()
 	{
-		if (chainClassification == Residue.Classification.BIRD) {
-			return getResidue(0).getPrdId() + " " + entityName;
+		Bird bird = getResidue(0).getBird();
+		if (bird != null) {
+			return bird.getPrdId() + " " + entityName;
 		} else {
 			return getAuthorChainId();
 		}

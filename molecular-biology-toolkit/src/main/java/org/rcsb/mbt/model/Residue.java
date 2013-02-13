@@ -237,7 +237,7 @@ implements java.lang.Cloneable
 	{
 		ChemicalComponentType type = ChemicalComponentInfo.getChemicalComponentType(atom.compound);
 
-		if (atom.prdId.length() > 0) {
+		if (atom.bird != null) {
 			classification = Classification.BIRD;
 			return;
 		}
@@ -650,11 +650,12 @@ implements java.lang.Cloneable
 		return atom.insertionCode;
 	}
 	
+	
 	/**
-	 * Get the prd id (BIRD reference dictionary) (as it is assigned in the first Atom record).
-	 * Return null if there are no atom records.
+	 * Returns information about Biologically interesting molecule reference dictionary (BIRD) (as it is assigned in the first Atom record).
+	 * Returns null if there are no atom records or no Bird object.
 	 */
-	public String getPrdId( )
+	public Bird getBird( )
 	{
 		if ( atoms == null ) {
 			return null;
@@ -663,7 +664,7 @@ implements java.lang.Cloneable
 		if ( atom == null ) {
 			return null;
 		}
-		return atom.prdId;
+		return atom.bird;
 	}
 
 	/**
