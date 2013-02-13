@@ -837,7 +837,7 @@ public class LigandSideBar extends JPanel
 
 		if (paths != null)
 			ligandJList.setSelectionPaths(paths);
-		// set the discovered intial ligand path(s) as selected
+		    // set the discovered intial ligand path(s) as selected
 		else
 		{
 			DefaultMutableTreeNode firstChainNode = (DefaultMutableTreeNode)rootNode.getFirstChild();
