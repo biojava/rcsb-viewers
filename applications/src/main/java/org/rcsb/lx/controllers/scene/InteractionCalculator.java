@@ -532,7 +532,7 @@ public class InteractionCalculator
 
 			for (Atom atom: residue.getAtoms()) {
 				Element element = PeriodicTable.getElement(atom.element);
-				if (PeriodicTable.isMetal(element.atomic_number)) {
+				if (element != null && PeriodicTable.isMetal(element.atomic_number)) {
 					metalAtoms.add(atom);
 				}
 			}
