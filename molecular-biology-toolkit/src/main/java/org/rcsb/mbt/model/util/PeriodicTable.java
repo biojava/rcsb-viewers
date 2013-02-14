@@ -75,6 +75,7 @@ public class PeriodicTable
 		new Element( "xxx", "xxx", 0, 0.0, 0, "x", 0, "x" ),
 
 		new Element( "Hydrogen", "H", 1, 1.00794, 1, "-", 1, PeriodicTable.SBLOCK ),
+		new Element( "Deuterium", "D", 1, 2.01410178, 1, "-", 1, PeriodicTable.SBLOCK ),
 		new Element( "Helium", "He", 2, 4.002602, 18, "Noble gas", 1, PeriodicTable.PBLOCK ),
 		new Element( "Lithium", "Li", 3, 6.941, 1, "Alkali metal", 2, PeriodicTable.SBLOCK ),
 		new Element( "Beryllium", "Be", 4, 9.012182, 2, "Alkaline earth metal", 2, PeriodicTable.SBLOCK ),
