@@ -113,10 +113,11 @@ public class BindingSiteSurfacePanel extends JPanel implements IUpdateListener
 	private JPanel firstPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 	private JPanel secondPanel = new JPanel();
 
-	public BindingSiteSurfacePanel() {
+	public BindingSiteSurfacePanel(boolean show) {
 		super(false);
 		setLayout(new BorderLayout());
 		
+		if (! show) return;
 		// create border around surface panel
 		Border border = BorderFactory.createLineBorder(Color.BLACK);
 		border = BorderFactory.createTitledBorder(border, "Surfaces", 0, 0, null, Color.BLACK);

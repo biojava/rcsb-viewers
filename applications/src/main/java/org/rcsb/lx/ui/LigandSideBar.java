@@ -322,6 +322,18 @@ public class LigandSideBar extends JPanel
 		}
 		return residues.toArray(new Residue[residues.size()]);
 	}
+	
+	private boolean hasMacromoleculeChain() {
+		final StructureModel model = LigandExplorer.sgetModel();
+		final Structure structure = model.getStructures().get(0);
+		for (Chain chain : structure.getStructureMap().getChains()) {
+			if (chain.getClassification() == Residue.Classification.AMINO_ACID ||
+					chain.getClassification() == Residue.Classification.NUCLEIC_ACID ) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	private class LigandTreeCellRenderer extends DefaultTreeCellRenderer
 	{
@@ -420,6 +432,7 @@ public class LigandSideBar extends JPanel
 					Font.BOLD + Font.ITALIC));
 			this.add(centerView);
 
+			
 			if (this.ligandList.size() > 0)
 			{
 				DefaultMutableTreeNode root = new DefaultMutableTreeNode("Ligands:");
@@ -547,7 +560,7 @@ public class LigandSideBar extends JPanel
 			this.add(distanceBox);
 			
 //			System.out.println("Adding BindingSiteSurfacePanel");
-			final JPanel surfacePanel = new BindingSiteSurfacePanel();
+			final JPanel surfacePanel = new BindingSiteSurfacePanel(hasMacromoleculeChain());
 			surfacePanel.setBackground(LXDocumentFrame.sidebarColor);
 			this.add(surfacePanel);
 			
@@ -593,6 +606,7 @@ public class LigandSideBar extends JPanel
 								Dimension neighborFLF1Preferred = neighborFLF1.getPreferredSize();
 								Dimension separatorPreferred = separator.getPreferredSize();
 								Dimension surfacePanelPreferred = surfacePanel.getPreferredSize();
+							
 
 								int parentHeight = parent.getHeight();
 								int parentWidth = parent.getWidth();
