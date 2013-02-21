@@ -91,7 +91,7 @@
 		
         			  <certs>true</certs>
         
-					<keystore>../RCSB-PDB-Code.jks</keystore>
+					<keystore>../keys/RCSB-PDB-Code.jks</keystore>
 					<alias>RCSB PDB</alias>
 					<storepass>rcsbpdb</storepass>					
 					<!--  <signedjar>${project.build.directory}/signed/${project.build.finalName}.jar</signedjar>-->
