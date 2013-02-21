@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>viewers</artifactId>
 		<groupId>org.rcsb</groupId>
-		<version>4.0.4-SNAPSHOT</version>
+		<version>4.1.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>framework</artifactId>
@@ -50,9 +50,9 @@
 					</execution>
 				--></executions>
 				<configuration>
-					<keystore>../pdbkeys</keystore>
-					<alias>RCSB-PDB</alias>
-					<storepass>pdb0922</storepass>					
+					<keystore>../keys/RCSB-PDB-Code.jks</keystore>
+					<alias>RCSB PDB</alias>
+					<storepass>rcsbpdb</storepass>					
 					<verify>true</verify>
 					<verbose>true</verbose>
 					<goal>sign</goal>
@@ -83,7 +83,7 @@
 		<dependency>
 			<groupId>org.rcsb</groupId>
 			<artifactId>molecular-biology-toolkit</artifactId>
-			<version>4.0.4-SNAPSHOT</version>
+			<version>4.1.0-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
@@ -99,7 +99,7 @@
 		<dependency>
 			<groupId>org.rcsb</groupId>
 			<artifactId>colorbrewer</artifactId>
-			<version>4.0.4-SNAPSHOT</version>
+			<version>4.1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>
