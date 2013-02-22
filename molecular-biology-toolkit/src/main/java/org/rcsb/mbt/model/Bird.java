@@ -72,6 +72,11 @@ public class Bird {
 	 * The instanceId differentiates different instances of the same BIRD molecule
 	 */
 	String instanceId;
+	
+	/**
+	 * The name of the BIRD molecule
+	 */
+	String name;
 
 	
 	public Bird(String prdId, String asymId, String instanceId) {
@@ -120,6 +125,14 @@ public class Bird {
 	 */
 	public void setInstanceId(String instanceId) {
 		this.instanceId = instanceId;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**

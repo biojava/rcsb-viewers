@@ -726,7 +726,8 @@ public class Chain
 	{
 		Bird bird = getResidue(0).getBird();
 		if (bird != null) {
-			return bird.getPrdId() + " " + entityName;
+//			return bird.getPrdId() + " " + entityName;
+			return bird.getPrdId() + " " + bird.getName();
 		} else {
 			return getAuthorChainId();
 		}

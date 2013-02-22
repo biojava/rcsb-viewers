@@ -47,6 +47,7 @@ package org.rcsb.mbt.structLoader;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -56,6 +57,7 @@ import javax.vecmath.Vector3f;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Bird;
 import org.rcsb.mbt.model.Bond;
+import org.rcsb.mbt.model.MoleculeFeatures;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
 import org.rcsb.mbt.model.UnitCell;
@@ -159,12 +161,14 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected String curCompId2 = null;
 	protected String curAltId1 = null;
 	protected String curAltId2 = null;
-	
+	protected String currentName = null;
+	protected MoleculeFeatures moleculeFeatures = null;
 	protected Vector<Atom> atomVector = new Vector<Atom>();
 	protected Vector<Bond> bondVector = new Vector<Bond>();
 	
 	// contains a map of asym id and BIRD reference dictionary info
 	private Map<String, Bird> asymIdBirdMap = new HashMap<String, Bird>(); 
+	private Map<String, MoleculeFeatures> prdMolFeaturesMap = new HashMap<String, MoleculeFeatures>();
 	private Map<Integer, String> entityNameMap = new HashMap<Integer, String>();
 
 	/**
@@ -176,7 +180,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 	 */
 	protected enum eIsParsing {
 		NONE, CELL, ATOM_SITES, ATOM_SITE, DATABASE_PDB_MATRIX, ENTITY, STRUCT_BIOLGEN, STRUCT_ASSEMBLY, STRUCT_CONN, 
-		NON_CRYSTALLOGRAPHIC_OPERATIONS, LEGACY_BIOLOGIC_UNIT_OPERATIONS, MOLECULE
+		NON_CRYSTALLOGRAPHIC_OPERATIONS, LEGACY_BIOLOGIC_UNIT_OPERATIONS, MOLECULE, MOLECULE_FEATURES
 	}
 
 	private Stack<eIsParsing> isParsingStack = new Stack<eIsParsing>();
@@ -232,6 +236,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected HashMap<String, XMLRunnable> endElementDatabasePDBMatrixRunnables = new HashMap<String, XMLRunnable>(); 
 	protected HashMap<String, XMLRunnable> endElementAtomSitesRunnables = new HashMap<String, XMLRunnable>(); 
 	protected HashMap<String, XMLRunnable> endElementStructConnRunnables = new HashMap<String, XMLRunnable>(); 
+	protected HashMap<String, XMLRunnable> endElementMoleculeFeaturesRunnables = new HashMap<String, XMLRunnable>(); 
 
 	protected static final String xmlPrefix = "PDBx:";
 
@@ -350,7 +355,12 @@ public class StructureXMLHandler extends DefaultHandler implements
 		// BEG pdbx_molecule (BIRD)
 		startElementRunnables.put(xmlPrefix + "pdbx_molecule",
 				createXMLRunnable__pdbx_molecule__Start());
+		
+		startElementRunnables.put(xmlPrefix + "pdbx_molecule_features",
+				createXMLRunnable__pdbx_molecule_features__Start());
 	
+		endElementMoleculeFeaturesRunnables.put(xmlPrefix + "name",
+				createXMLRunnable__name_End());
 		//
 		// end general translation
 		// END Non Crystallographic
@@ -495,15 +505,23 @@ public class StructureXMLHandler extends DefaultHandler implements
 		componentsHash.put(ComponentType.ATOM, atomVector);
 		componentsHash.put(ComponentType.BOND, bondVector);
 
+		// set BIRD (Biologically interesting molecules) as non-polymers and
+		// set names for BIRD molecules
+		for (Atom atom: atomVector) {
+			atom.bird = asymIdBirdMap.get(atom.chain_id);
+			if (atom.bird != null) {
+				String prdId = atom.bird.getPrdId();
+				atom.bird.setName(getPrdName(prdId));
+			}
+		}
+
 		//
 		// Create the Structure object
 		//
 		structure = new CustomStructure(componentsHash, urlString);
-
-		// set BIRD (Biologically interesting molecules) as non-polymers
-		for (Atom atom: atomVector) {
-			atom.bird = asymIdBirdMap.get(atom.chain_id);
-		}
+		
+		
+		
 		
 		// create inverses of the fractional and original transforms...
 		if (this.fractionalTransformation != null) {
@@ -536,6 +554,21 @@ public class StructureXMLHandler extends DefaultHandler implements
 			bioUnitTransformationsStructLegacy.trimToSize();
 		
 		bioUnitTransformationsStructAssembly = bioUnitsStructAssembly.getBioUnitTransformationList(initialBioId);
+	}
+	
+	
+	/**
+	 * Returns the PRD name given a PRD ID
+	 */
+	private String getPrdName(String prdId) {
+//		System.out.println("getPrdName: " + prdId);
+		for (Entry<String, MoleculeFeatures> feature: prdMolFeaturesMap.entrySet()) {
+			if (feature.getValue().getPrdId().equals(prdId)) {
+//				System.out.println("Name: " + feature.getValue().getName());
+				return feature.getValue().getName();
+			}
+		}
+		return "";
 	}
 
 	protected static final String emptyString = "";
@@ -652,6 +685,9 @@ public class StructureXMLHandler extends DefaultHandler implements
 				
 			case STRUCT_CONN:
 				runnable = endElementStructConnRunnables.get(qName);
+				
+			case MOLECULE_FEATURES:
+				runnable = endElementMoleculeFeaturesRunnables.get(qName);
 				
 			default:
 				break;
@@ -1260,6 +1296,35 @@ public class StructureXMLHandler extends DefaultHandler implements
 		return new XMLRunnable__pdbx_molecule__Start();
 	}
 	
+	protected class XMLRunnable__pdbx_molecule_features__Start extends
+	XMLRunnable {
+		public void run() {
+			setParsingFlag(eIsParsing.MOLECULE_FEATURES);
+			moleculeFeatures = new MoleculeFeatures();
+			String prdId = attrs.getValue("prd_id");
+			moleculeFeatures.setPrdId(prdId);
+			prdMolFeaturesMap.put(prdId, moleculeFeatures);
+		}
+	}
+	
+	protected class XMLRunnable__name_End extends XMLRunnable {
+		public void run() {
+			if (getCurrentParsingFlag() == eIsParsing.MOLECULE_FEATURES) {
+				currentName = buf.trim();
+				moleculeFeatures.setName(currentName);
+				clearParsingFlag(eIsParsing.MOLECULE_FEATURES);
+			}
+		}
+	}
+
+	protected XMLRunnable__name_End createXMLRunnable__name_End() {
+		return new XMLRunnable__name_End();
+	}
+
+	protected XMLRunnable__pdbx_molecule_features__Start createXMLRunnable__pdbx_molecule_features__Start() {
+		return new XMLRunnable__pdbx_molecule_features__Start();
+	}
+	
 	/** 
 	 * Heterogen residues (ligands, waters, etc.) don't have a label_seq_id.
 	 * Assign the auth_seq_id as a placeholder and assign it as a non-polymer atom.
@@ -1412,7 +1477,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected class XMLRunnable__entities__Start extends XMLRunnable {
 		public void run() { 
 			currentEntityId++;
-			setParsingFlag(eIsParsing.ENTITY);;
+			setParsingFlag(eIsParsing.ENTITY);
 		}
 	}
 

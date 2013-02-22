@@ -473,12 +473,16 @@ public class StructureMap
 				residue.trimToSize();
 				residues.add( residue );
 				// set entity name
-				if (first && entityNameMap != null) {
-					int entityId = residue.getEntityId();
-					// TODO add prd id here if available
-					String entityName = entityNameMap.get(entityId);
-					if (entityName != null) {
-						chain.setEntityName(entityName);
+				if (first) {
+					if (residue.getBird() != null) { // BIRD name overwrite other entity names
+						String name = residue.getBird().getName();
+						chain.setEntityName(name);
+					} else if (entityNameMap != null) {
+						int entityId = residue.getEntityId();
+						String entityName = entityNameMap.get(entityId);
+						if (entityName != null) {
+							chain.setEntityName(entityName);
+						}
 					}
 					first = false;
 				}
@@ -2308,7 +2312,7 @@ public class StructureMap
 						Bird bird = r.getBird();
 						int entityId = r.getEntityId();
 						String chainId = r.getAuthorChainId();
-					    String name = bird.getPrdId() + " " + entityNameMap.get(entityId);
+					    String name = bird.getPrdId() + " " + bird.getName();
 					    c = ExternChain.createBirdChain(chainId, name, birdResidues); 
 					    this.pdbTopLevelElements.add(c);
 					} 
