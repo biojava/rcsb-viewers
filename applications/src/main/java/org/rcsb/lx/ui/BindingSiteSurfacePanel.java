@@ -67,6 +67,7 @@ import javax.swing.event.ChangeListener;
 import org.jcolorbrewer.ColorBrewer;
 import org.jcolorbrewer.ui.ColorPaletteChooserDialog;
 import org.rcsb.lx.controllers.app.LigandExplorer;
+import org.rcsb.lx.controllers.update.LXUpdateEvent;
 import org.rcsb.lx.model.SurfaceState;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
@@ -93,7 +94,6 @@ public class BindingSiteSurfacePanel extends JPanel implements IUpdateListener
 	private static final int TRANSPARENCY_MAX = 100;
 	private static final int TRANSPARENCY_INIT = 0;
 	private static final float DISTANCE_THRESHOLD = 6.5f;
-	private static final float MIN_DISTANCE_THRESHOLD = 3.0f;
 
 	private final JSlider transparencySlider = new JSlider(JSlider.HORIZONTAL,
 			TRANSPARENCY_MIN, TRANSPARENCY_MAX, TRANSPARENCY_INIT);
@@ -157,8 +157,17 @@ public class BindingSiteSurfacePanel extends JPanel implements IUpdateListener
 	 * @see edu.sdsc.mbt.views_controller.IViewUpdateListener#handleModelChangedEvent(edu.sdsc.mbt.views_controller.ViewUpdateEvent)
 	 */
 	public void handleUpdateEvent(UpdateEvent evt)
-	{			
-		if (evt.action.equals(UpdateEvent.Action.EXTENDED)) {	
+	{		
+		// check if this is an interaction change event
+		boolean interactionChanged = false;
+		if (evt instanceof LXUpdateEvent) {
+			LXUpdateEvent lxEvt = (LXUpdateEvent) evt;
+			if (lxEvt.lxAction != null) {
+				interactionChanged = lxEvt.lxAction.equals(LXUpdateEvent.LXAction.INTERACTIONS_CHANGED);
+			}
+		}
+		// interaction change events should not trigger a surface update.
+		if (evt.action.equals(UpdateEvent.Action.EXTENDED) && !interactionChanged) {	
 			// user has selected a new ligand, create surface for new ligand
 			// using the current surface options from the "state" object
 			Residue[] ligands = LigandExplorer.sgetSceneController().getLigandResidues();
@@ -336,14 +345,6 @@ public class BindingSiteSurfacePanel extends JPanel implements IUpdateListener
 		public void actionPerformed(ActionEvent e) {
 			final JComboBox source = (JComboBox)e.getSource();
 			source.hidePopup();	
-			
-//			if (source.getSelectedIndex() == 0) {
-//				System.out.println("Solid");
-//			} else if (source.getSelectedIndex() == 1) {
-//				System.out.println("Mesh");
-//			} else if (source.getSelectedIndex() == 2) {
-//				System.out.println("Dot");
-//			}
 			
 			state.setSurfaceType(source.getSelectedIndex());
 			state.updateState();

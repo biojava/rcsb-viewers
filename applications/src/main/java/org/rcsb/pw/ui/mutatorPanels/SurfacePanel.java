@@ -171,6 +171,7 @@ public class SurfacePanel extends JPanel implements IUpdateListener
 			if (!source.getValueIsAdjusting() && AppBase.sgetModel().hasStructures()) {
 				Structure structure = AppBase.sgetModel().getStructures().get(0);
 
+				System.out.println("Slider is adjusting");
 				// lazy initialization of the surface
 				boolean newSurface = false;
 				if (structure.getStructureMap().getSurfaceCount() == 0) {

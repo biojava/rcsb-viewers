@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.plaf.ColorUIResource;
 import javax.vecmath.Color4f;
 
 import org.jcolorbrewer.ColorBrewer;
@@ -13,7 +12,6 @@ import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.attributes.SurfaceColorUpdater;
-import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.doc.SurfaceThread;
 
 public class SurfaceState {
@@ -23,10 +21,10 @@ public class SurfaceState {
 	private boolean structureModified = true;
 	
 	private Residue[] ligands = null;
-	boolean ligandsModified = true;
+	private boolean ligandsModified = true;
 	
     private float transparency = 0.0f;  
-    boolean transparencyModified = true;
+    private boolean transparencyModified = true;
     
     private int colorType = 0;
     private boolean colorTypeModified = true;
@@ -38,7 +36,7 @@ public class SurfaceState {
 	private boolean colorBrewerModified = true;
 	
 	private boolean useDistanceCutoff = false;
-	private boolean useDistanceCutoffModified = true;
+//	private boolean useDistanceCutoffModified = true;
 	
 	private float distance = 6.5f;
 	private boolean distanceModified = true;
@@ -153,7 +151,7 @@ public class SurfaceState {
 	 */
 	public void setUseDistanceCutoff(boolean useDistanceCutoff) {
 		this.useDistanceCutoff = useDistanceCutoff;
-		useDistanceCutoffModified = true;
+//		useDistanceCutoffModified = true;
 	}
 
 	/**
@@ -215,7 +213,7 @@ public class SurfaceState {
 	    colorTypeModified = value;
 		colorModified = value;
 		colorBrewerModified = value;
-		useDistanceCutoffModified = value;
+//		useDistanceCutoffModified = value;
 		distanceModified = value;
 		surfaceTypeModified = value;
 	}
