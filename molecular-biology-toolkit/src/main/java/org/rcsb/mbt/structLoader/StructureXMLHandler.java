@@ -44,8 +44,12 @@
  */
 package org.rcsb.mbt.structLoader;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Stack;
@@ -515,6 +519,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 			}
 		}
 
+		trimEntities();
 		//
 		// Create the Structure object
 		//
@@ -569,6 +574,38 @@ public class StructureXMLHandler extends DefaultHandler implements
 			}
 		}
 		return "";
+	}
+	
+	/**
+	 * Get list of chain ids required for the specific bioassemly (initialBioId)
+	 * @return
+	 */
+	private List getActiveEntities() {
+		List<String> chainIds = new ArrayList<String>();
+		bioUnitTransformationsStructAssembly = bioUnitsStructAssembly.getBioUnitTransformationList(initialBioId);
+		if (bioUnitTransformationsStructAssembly != null) {
+			for (ModelTransformationMatrix trans: bioUnitTransformationsStructAssembly) {
+				chainIds.add(trans.ndbChainId);
+			}
+		}
+	    return chainIds;
+	}
+	
+	/**
+	 * Remove atom belonging to entities that are not part of the specified bioassembly
+	 * Example: 1HV4 contains 8 chains, 4 belong to bioassembly 1, and 4 belong to bioassembly 2.
+	 * Atoms that are not required will be removed.
+	 */
+	private void trimEntities() {
+		List<String> chainIds = getActiveEntities();
+		if (chainIds.size() > 0) {
+			for (Iterator<Atom> iter = atomVector.iterator();iter.hasNext();) {
+				Atom atom = iter.next();
+				if (!chainIds.contains(atom.chain_id)) {
+					iter.remove();
+				}
+			}
+		}
 	}
 
 	protected static final String emptyString = "";
