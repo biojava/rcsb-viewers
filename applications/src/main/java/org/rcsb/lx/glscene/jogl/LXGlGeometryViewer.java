@@ -900,21 +900,11 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 	 * 
 	 * @param distance
 	 *            the input distance
-	 * @return dist a distance in string format with two digits after the
+	 * @return dist a distance in string format with one digits after the
 	 *         decimal point
 	 */
 	public static String getDistString(final double distance) {
-		final String distString = new Double(distance).toString();
-		final int index = distString.indexOf('.');
-
-		String dist = null;
-		try {
-			dist = distString.substring(0, index + 3);
-		} catch (final Exception ex) {
-			// only one digit after the decimal to begin with
-			dist = distString.substring(0, index + 2);
-		}
-		return dist;
+		return String.format("%.1f", distance);
 	}
 
 	public void renderResidue(final Residue r, final AtomStyle as, final AtomGeometry ag,
