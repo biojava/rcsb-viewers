@@ -137,12 +137,14 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	private String urlString; // for status reporting purposes.
 	private String initialBioId = "1"; // default first biological unit
+	protected boolean bioUnitSet = false; 
 
 	public void setInitialBiologicalUnitId(final String id) {
 		if (id == null) {
 			initialBioId = "1";
 		} else {
 			initialBioId = id;
+			bioUnitSet = true;
 		}
 	}
 
@@ -150,6 +152,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected Atom prevAtom = null;
 	protected String currentEntityName = "";
 	protected int currentEntityId = 0;
+	
 	
 	// temp fields for struc_conn records
 	protected String curConnType = null;
@@ -519,7 +522,10 @@ public class StructureXMLHandler extends DefaultHandler implements
 			}
 		}
 
-		trimEntities();
+		// trim enties that are not in the specified biological assembly
+		if (bioUnitSet) {
+			trimEntities();
+		}
 		//
 		// Create the Structure object
 		//
