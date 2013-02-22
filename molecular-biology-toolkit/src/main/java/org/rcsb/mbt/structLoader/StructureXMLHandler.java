@@ -685,9 +685,11 @@ public class StructureXMLHandler extends DefaultHandler implements
 				
 			case STRUCT_CONN:
 				runnable = endElementStructConnRunnables.get(qName);
+				break;
 				
 			case MOLECULE_FEATURES:
 				runnable = endElementMoleculeFeaturesRunnables.get(qName);
+				break;
 				
 			default:
 				break;
@@ -1557,6 +1559,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 				System.err.println("_struct_conn.pdbx_ptnr2_PDB_ins_code  : " + curInsertionCode2);
 				System.err.println("_struct_conn.pdbx_ptnr2_label_alt_id  : " + curAltId2);
 			}
+			
 		    // ignore bonds to metals. They will be handled separately in the MBT viewers
 			if (isMetal(atom1) || isMetal(atom2)) {
 				return;
