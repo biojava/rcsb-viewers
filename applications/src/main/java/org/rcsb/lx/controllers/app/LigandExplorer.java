@@ -146,21 +146,25 @@ public class LigandExplorer extends VFAppBase
 	
 	public static boolean saveInteractionsFlag = false;
 
-	public static void main(final String[] args)
-	{
-		SwingUtilities.invokeLater(new Runnable() { public void run() {
-			final LigandExplorer app = new LigandExplorer(args);
-
-			for (int argIX = 0; argIX < args.length; argIX++)
-				if (args[argIX].equals("-ligand"))
-					app.properties.setProperty("ligand", args[++argIX]);
-			// field args for app-specific args
-
-			app.initialize(true);
-		}});
-	}
+//	public static void mainNew(final String[] args)
+//	{
+// this doesn't work:
+//	Exception in thread "AWT-EventQueue-0" java.lang.Error: Cannot call invokeAndWait from the event dispatcher thread
+//	at java.awt.EventQueue.invokeAndWait(Unknown Source)
+//
+//		SwingUtilities.invokeLater(new Runnable() { public void run() {
+//			final LigandExplorer app = new LigandExplorer(args);
+//
+//			for (int argIX = 0; argIX < args.length; argIX++)
+//				if (args[argIX].equals("-ligand"))
+//					app.properties.setProperty("ligand", args[++argIX]);
+//			// field args for app-specific args
+//
+//			app.initialize(true);
+//		}});
+//	}
 	
-	public static void mainOld(final String[] args)
+	public static void main(final String[] args)
 	{
 		final LigandExplorer app = new LigandExplorer(args);
 		
