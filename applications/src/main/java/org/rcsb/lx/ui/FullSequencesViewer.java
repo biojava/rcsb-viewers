@@ -115,8 +115,12 @@ public class FullSequencesViewer extends JScrollPane implements IUpdateListener
 //    		}
 //    	}
 //    			);
-    	System.out.println("FullSequencesView: removeAll() commented out!");
     //    contentPane.removeAll();
+    	if (contentPane.getComponentCount() > 0) {
+    		System.out.println("FullSequencesView: removeAll()");
+    		contentPane.removeAll();
+    		contentPane.validate();
+    	}
         sequencePanels.clear();
         StructureModel model = AppBase.sgetModel();
         if (model.getStructures() == null)
