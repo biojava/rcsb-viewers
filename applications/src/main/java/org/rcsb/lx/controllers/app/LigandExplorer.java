@@ -50,6 +50,7 @@ package org.rcsb.lx.controllers.app;
 
 // CORE JAVA
 
+import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 
@@ -145,6 +146,20 @@ public class LigandExplorer extends VFAppBase
 
 	public static void main(final String[] args)
 	{
+		EventQueue.invokeLater(new Runnable() { public void run() {
+			final LigandExplorer app = new LigandExplorer(args);
+
+			for (int argIX = 0; argIX < args.length; argIX++)
+				if (args[argIX].equals("-ligand"))
+					app.properties.setProperty("ligand", args[++argIX]);
+			// field args for app-specific args
+
+			app.initialize(true);
+		}});
+	}
+	
+	public static void mainOld(final String[] args)
+	{
 		final LigandExplorer app = new LigandExplorer(args);
 		
 		for (int argIX = 0; argIX < args.length; argIX++)
@@ -162,7 +177,7 @@ public class LigandExplorer extends VFAppBase
 	 * Constructor
 	 * 
 	 * @param args - argument list from the main() caller.
-	 */
+	 */	
 	public LigandExplorer(final String[] args)
 	{
 		super(args);
