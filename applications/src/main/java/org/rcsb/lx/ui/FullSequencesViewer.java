@@ -103,7 +103,20 @@ public class FullSequencesViewer extends JScrollPane implements IUpdateListener
     
     public void createViewersForCurrentEpitope()
     {
-        contentPane.removeAll();
+    	// use invokeLater causes:
+    	// Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException
+    	//at org.rcsb.lx.ui.SequenceStructureTitlePanel.heightForWidth(SequenceStructureTitlePanel.java:111)
+//    	javax.swing.SwingUtilities.invokeLater(new Runnable()
+//    	{
+//    		public void run()
+//    		{
+//    			System.out.println("FullSequencesView: removeAll()");
+//    			contentPane.removeAll();                            
+//    		}
+//    	}
+//    			);
+    	System.out.println("FullSequencesView: removeAll() commented out!");
+    //    contentPane.removeAll();
         sequencePanels.clear();
         StructureModel model = AppBase.sgetModel();
         if (model.getStructures() == null)
