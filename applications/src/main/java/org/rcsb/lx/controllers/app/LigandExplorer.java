@@ -54,6 +54,8 @@ import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 
+import javax.swing.SwingUtilities;
+
 import org.rcsb.lx.controllers.scene.LXSceneController;
 import org.rcsb.lx.controllers.update.LXUpdateController;
 import org.rcsb.lx.glscene.jogl.LXGlGeometryViewer;
@@ -146,7 +148,7 @@ public class LigandExplorer extends VFAppBase
 
 	public static void main(final String[] args)
 	{
-		EventQueue.invokeLater(new Runnable() { public void run() {
+		SwingUtilities.invokeLater(new Runnable() { public void run() {
 			final LigandExplorer app = new LigandExplorer(args);
 
 			for (int argIX = 0; argIX < args.length; argIX++)
