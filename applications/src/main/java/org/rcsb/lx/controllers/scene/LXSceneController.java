@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
 import org.rcsb.lx.controllers.app.LigandExplorer;
@@ -69,6 +70,7 @@ import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.attributes.ChainStyle;
 import org.rcsb.mbt.model.attributes.StructureStyles;
+import org.rcsb.mbt.model.util.DebugState;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.vf.controllers.scene.SceneController;
 
@@ -211,7 +213,14 @@ public class LXSceneController extends SceneController
 		}
 		
 
-		LigandExplorer.sgetUpdateController().fireInteractionChanged();
+		SwingUtilities.invokeLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				LigandExplorer.sgetUpdateController().fireInteractionChanged();
+			}
+		});
+		
 
 		// XXX Status.progress(1.0f, null);
 	}
@@ -275,6 +284,10 @@ public class LXSceneController extends SceneController
 	@Override
 	public void handleUpdateEvent(UpdateEvent evt)
 	{
+		if ( DebugState.isDebug()){
+			System.err.println("LXSceneController. handleUpdateEvent");
+		}
+		
 		boolean transitory = (evt instanceof LXUpdateEvent)?
 			transitory = ((LXUpdateEvent)evt).transitory : false;
 			
