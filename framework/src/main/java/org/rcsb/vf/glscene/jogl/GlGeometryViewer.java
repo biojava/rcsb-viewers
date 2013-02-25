@@ -777,6 +777,11 @@ WindowListener, IStructureStylesEventListener {
 	//long prevRepaint = System.currentTimeMillis();
 	
 	public void requestRepaint() {
+		
+		if ( DebugState.isDebug()){
+			System.err.println("GlGeometryViewer requestRepaint");
+		}
+		
 		this.needsRepaint = true;
 		if (this.drawable != null && !AppBase.backgroundScreenshotOnly) {
 			//this.drawable.;
