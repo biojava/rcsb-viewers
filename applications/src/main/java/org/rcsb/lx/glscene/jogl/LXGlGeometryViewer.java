@@ -841,8 +841,10 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		final double[] currentPosition = node.getCenter();
 		final double[] currentUp = node.getUp();
 
-		LXViewMovementThread.createMovementThread(
-				currentOrientation, eye, currentPosition, center, currentUp, up, 0, 0, 0, 0).start();
+		Runnable r = LXViewMovementThread.createMovementThread(
+				currentOrientation, eye, currentPosition, center, currentUp, up, 0, 0, 0, 0);
+		
+		SwingUtilities.invokeLater(r);
 
 		requestRepaint();
 	}
