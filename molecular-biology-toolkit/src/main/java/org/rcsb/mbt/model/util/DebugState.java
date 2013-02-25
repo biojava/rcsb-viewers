@@ -61,7 +61,7 @@ package org.rcsb.mbt.model.util;
  */
 public class DebugState
 {
-  static private boolean debugState = false;
+  static private boolean debugState = true;
   static private boolean traceState = false;
   
   static public void setDebugState(boolean state) { debugState = state; }
