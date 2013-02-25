@@ -55,6 +55,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 
@@ -136,7 +137,10 @@ public class UIBuilder implements Runnable
 							
 							if (dialog.showOpenDialog(AppBase.sgetActiveFrame()) == JFileChooser.APPROVE_OPTION)
 							{
-								LoadThread loadIt = new LoadThread(dialog.getSelectedFiles());										
+								
+								LoadThread loadIt = new LoadThread(dialog.getSelectedFiles());
+								SwingUtilities.invokeLater(loadIt);
+																		
 								loadIt.start();
 							}
 						}
@@ -168,7 +172,7 @@ public class UIBuilder implements Runnable
 								}
 							}
 							LoadThread loadIt = new LoadThread(pdbIds);
-							loadIt.start();
+							SwingUtilities.invokeLater(loadIt);
 
 						}
 
@@ -194,7 +198,7 @@ public class UIBuilder implements Runnable
 								{
 									String pdbspec = url.substring(url.lastIndexOf('/') + 1);										
 									LoadThread loadIt = new LoadThread(url, pdbspec.substring(0, pdbspec.indexOf('.')));										
-									loadIt.start();
+									SwingUtilities.invokeLater(loadIt);
 								}
 								
 								else
