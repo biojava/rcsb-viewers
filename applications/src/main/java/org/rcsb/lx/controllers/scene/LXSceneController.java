@@ -143,40 +143,7 @@ public class LXSceneController extends SceneController
 
 		if (!saveInteractionsToFile)
 		{
-			LXModel model = LigandExplorer.sgetModel();
-			model.getInteractionMap().clear();
-
-			final StructureMap structureMap = structure.getStructureMap();
-			final StructureStyles structureStyles = structureMap.getStructureStyles();
-
-			structureStyles.clearSelections();
-			
-			//
-			// Notify the viewers that structures have been removed and added.
-			// We don't want to remove the model, so we just use the update
-			// controller to send a 'remove all' signal and then an 'add all'
-			// signal.
-			//
-			// This is really pretty wanky - should look this over and fix.
-			//
-			LXDocumentFrame activeFrame = LigandExplorer.sgetActiveFrame();
-			LXUpdateController update = LigandExplorer.sgetActiveFrame().getUpdateController();
-			update.blockListener(activeFrame);
-			update.removeStructure(true);
-			update.fireStructureAdded(structure, false, true);
-			update.unblockListener(activeFrame);
-			
-			LXGlGeometryViewer glViewer = LigandExplorer.sgetGlGeometryViewer();
-			if (newDocument)
-			{
-				glViewer.resetView(true, false);
-				newDocument = false;
-			}
-
-			final ChainStyle cs = (ChainStyle) structureStyles.getStyle(structureMap
-					.getChain(0)); // **JB assume that all chain styles are the
-			// same.
-			cs.resetBinding(structure);
+			wankyCode(structure);
 		}
 
 		final StructureMap structureMap = structure.getStructureMap();
@@ -221,8 +188,55 @@ public class LXSceneController extends SceneController
 			}
 		});
 		
-
+		
 		// XXX Status.progress(1.0f, null);
+	}
+
+	/**
+	 * @param structure
+	 */
+	private void wankyCode(final Structure structure) {
+		
+		if ( DebugState.isDebug()){
+			System.err.println("LXSceneController.wankyCode() " + structure.toString());
+		}
+		
+		LXModel model = LigandExplorer.sgetModel();
+		model.getInteractionMap().clear();
+
+		final StructureMap structureMap = structure.getStructureMap();
+		final StructureStyles structureStyles = structureMap.getStructureStyles();
+
+		structureStyles.clearSelections();
+		
+		//
+		// Notify the viewers that structures have been removed and added.
+		// We don't want to remove the model, so we just use the update
+		// controller to send a 'remove all' signal and then an 'add all'
+		// signal.
+		//
+		// This is really pretty wanky - should look this over and fix.
+		//
+		LXDocumentFrame activeFrame = LigandExplorer.sgetActiveFrame();
+		LXUpdateController update = LigandExplorer.sgetActiveFrame().getUpdateController();
+		update.blockListener(activeFrame);
+		
+		// do we need to remove? 
+		update.removeStructure(true);
+		update.fireStructureAdded(structure, false, true);
+		update.unblockListener(activeFrame);
+		
+		LXGlGeometryViewer glViewer = LigandExplorer.sgetGlGeometryViewer();
+		if (newDocument)
+		{
+			glViewer.resetView(true, false);
+			newDocument = false;
+		}
+
+		final ChainStyle cs = (ChainStyle) structureStyles.getStyle(structureMap
+				.getChain(0)); // **JB assume that all chain styles are the
+		// same.
+		cs.resetBinding(structure);
 	}
 	
 	public void setLigandResidues(final Residue[] residues)
