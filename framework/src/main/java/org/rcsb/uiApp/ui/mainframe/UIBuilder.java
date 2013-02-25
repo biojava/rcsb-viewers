@@ -141,7 +141,7 @@ public class UIBuilder implements Runnable
 								LoadThread loadIt = new LoadThread(dialog.getSelectedFiles());
 								SwingUtilities.invokeLater(loadIt);
 																		
-								loadIt.start();
+								//loadIt.start();
 							}
 						}
 					});
