@@ -222,21 +222,33 @@ public class LXSceneController extends SceneController
 		update.blockListener(activeFrame);
 		
 		// do we need to remove? 
-		//update.removeStructure(true);
-		update.fireStructureAdded(structure, false, true);
-		update.unblockListener(activeFrame);
-		
-		LXGlGeometryViewer glViewer = LigandExplorer.sgetGlGeometryViewer();
-		if (newDocument)
-		{
-			glViewer.resetView(true, false);
-			newDocument = false;
-		}
+		update.removeStructure(true);
+	
+		SwingUtilities.invokeLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				LXUpdateController update = LigandExplorer.sgetActiveFrame().getUpdateController();
+				LXDocumentFrame activeFrame = LigandExplorer.sgetActiveFrame();
+				update.fireStructureAdded(structure, false, true);
+				update.unblockListener(activeFrame);
+				
+				LXGlGeometryViewer glViewer = LigandExplorer.sgetGlGeometryViewer();
+				if (newDocument)
+				{
+					glViewer.resetView(true, false);
+					newDocument = false;
+				}
 
-		final ChainStyle cs = (ChainStyle) structureStyles.getStyle(structureMap
-				.getChain(0)); // **JB assume that all chain styles are the
-		// same.
-		cs.resetBinding(structure);
+				final ChainStyle cs = (ChainStyle) structureStyles.getStyle(structureMap
+						.getChain(0)); // **JB assume that all chain styles are the
+				// same.
+				cs.resetBinding(structure);
+	
+			}
+		}
+		);
 	}
 	
 	public void setLigandResidues(final Residue[] residues)
