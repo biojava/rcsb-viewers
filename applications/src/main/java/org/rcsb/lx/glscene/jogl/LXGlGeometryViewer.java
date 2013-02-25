@@ -57,6 +57,7 @@ import java.util.Vector;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
+import javax.swing.SwingUtilities;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
@@ -84,6 +85,7 @@ import org.rcsb.mbt.model.attributes.LineStyle;
 import org.rcsb.mbt.model.attributes.StructureStyles;
 import org.rcsb.mbt.model.attributes.StructureStylesEvent;
 import org.rcsb.mbt.model.geometry.ArrayLinearAlgebra;
+import org.rcsb.mbt.model.util.DebugState;
 import org.rcsb.mbt.surface.BindingSiteSurfaceOrienter;
 import org.rcsb.mbt.surface.datastructure.TriangulatedSurface;
 import org.rcsb.uiApp.controllers.app.AppBase;
@@ -737,9 +739,30 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		final double[] currentPosition = node.getCenter();
 		final double[] currentUp = node.getUp();
 
-		LXViewMovementThread.createMovementThread(
-				currentOrientation, eye, currentPosition, center, currentUp, up, 0, 0, 0, 0).start();
+		if ( DebugState.isDebug()){
+			System.err.println("LXGIGeometryViewer creating Movement Thread");
+		}
+		
+		SwingUtilities.invokeLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				if ( DebugState.isDebug()){
+					System.err.println("LXGIGeometryViewer movement thread in background");
+				}
 
+				
+				// TODO Auto-generated method stub
+				LXViewMovementThread.createMovementThread(
+						currentOrientation, eye, currentPosition, center, currentUp, up, 0, 0, 0, 0).start();
+		
+			}
+		});
+		
+		if ( DebugState.isDebug()){
+			System.err.println("LXGIGeometryViewer requesting repaint");
+		}
 		requestRepaint();
 	}
 
