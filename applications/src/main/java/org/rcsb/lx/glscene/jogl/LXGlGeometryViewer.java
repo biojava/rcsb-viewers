@@ -112,6 +112,9 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 	public LXGlGeometryViewer()
 	{
 		this.do_glFinishInShaders = true;
+		if ( DebugState.isDebug()){
+			System.err.println("Init LXGlGeometryViewer");
+		}
 	}
 
 	/**
@@ -131,6 +134,11 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 	@Override
 	public void display(final GLAutoDrawable drawable)
 	{
+		if ( DebugState.isDebug()){
+			System.err.println("LXGlGeometryViewer.display()");
+		}
+		
+		
 		final LXModel model = LigandExplorer.sgetModel();
 
 		final GL gl = drawable.getGL();
@@ -531,6 +539,11 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 	@Override
 	public void resetView(boolean forceRecalculation, boolean repaint)
 	{
+		
+		if ( DebugState.isDebug()){
+			System.err.println("LXGlGeometryViewer.resetView");
+		}
+		
 		LigandExplorer.sgetActiveFrame().getSceneController().resetView(forceRecalculation);
 		if (repaint)
 			requestRepaint();
@@ -539,6 +552,11 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 	@Override
 	public void structureAdded(final Structure str)
 	{
+		
+		if ( DebugState.isDebug()){
+			System.err.println("LXGlGeometryViewer.structureAdded");
+		}
+		
 		final StructureMap structureMap = str.getStructureMap();
 		final StructureStyles structureStyles = structureMap
 		.getStructureStyles();
@@ -665,11 +683,24 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 	public void clearStructure(boolean transitory)
 	{
 		super.clearStructure();
+		
+
+		if ( DebugState.isDebug()){
+			System.err.println("LXGlGeometryViewer.clearStructure");
+		}
+		
 	}
 
 	@Override
 	public void handleUpdateEvent(UpdateEvent evt)
 	{
+		
+
+		if ( DebugState.isDebug()){
+			System.err.println("LXGlGeometryViewer.handleUpdateEvent");
+		}
+		
+		
 		boolean transitory = (evt instanceof LXUpdateEvent)?
 				transitory = ((LXUpdateEvent)evt).transitory : false;
 
@@ -702,6 +733,12 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 	// added for protein-ligand interactions
 	public void ligandView(final Structure structure)
 	{
+		
+
+		if ( DebugState.isDebug()){
+			System.err.println("LXGlGeometryViewer.ligandView");
+		}
+		
 //		System.out.println("ligandView: Adjust surface view");
 		final double[][] ligandBounds =
 			getLigandBounds(structure, LigandExplorer.sgetSceneController().getLigandResidues());
@@ -1033,6 +1070,12 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 			final String interactionType, final boolean displayDisLabel, final String distString, final double distDouble,
 			final PrintWriter interactionsOut) {
 
+		
+
+		if ( DebugState.isDebug()){
+			System.err.println("LXGlGeometryViewer.drawInteraction");
+		}
+		
 		if (interactionsOut != null) {
 			interactionsOut.println(a.authorChain_id + ":" + a.authorResidue_id + ":" + a.compound
 					+ ":" + a.name + "\t" + b.authorChain_id + ":" + b.authorResidue_id + ":"
