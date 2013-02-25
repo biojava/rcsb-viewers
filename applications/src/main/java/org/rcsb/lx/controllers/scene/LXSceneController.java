@@ -222,7 +222,7 @@ public class LXSceneController extends SceneController
 		update.blockListener(activeFrame);
 		
 		// do we need to remove? 
-		update.removeStructure(true);
+		//update.removeStructure(true);
 		update.fireStructureAdded(structure, false, true);
 		update.unblockListener(activeFrame);
 		
