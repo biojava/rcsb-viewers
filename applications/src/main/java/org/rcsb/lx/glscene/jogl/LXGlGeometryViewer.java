@@ -841,6 +841,9 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		final double[] currentPosition = node.getCenter();
 		final double[] currentUp = node.getUp();
 
+		if ( DebugState.isDebug()){
+			System.err.println("creating movement thread with Surface");
+		}
 		Runnable r = LXViewMovementThread.createMovementThread(
 				currentOrientation, eye, currentPosition, center, currentUp, up, 0, 0, 0, 0);
 		
