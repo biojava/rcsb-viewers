@@ -697,7 +697,7 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		
 
 		if ( DebugState.isDebug()){
-			System.err.println("LXGlGeometryViewer.handleUpdateEvent");
+			System.err.println("LXGlGeometryViewer.handleUpdateEvent " + evt.action.name());
 		}
 		
 		
