@@ -780,10 +780,9 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 			System.err.println("LXGIGeometryViewer creating Movement Thread");
 		}
 		
-		Runnable r = LXViewMovementThread.createMovementThread(
-				currentOrientation, eye, currentPosition, center, currentUp, up, 0, 0, 0, 0);
-		
-		SwingUtilities.invokeLater(r);
+		LXViewMovementThread.createMovementThread(
+				currentOrientation, eye, currentPosition, center, currentUp, up, 0, 0, 0, 0).start();
+
 		
 		if ( DebugState.isDebug()){
 			System.err.println("LXGIGeometryViewer requesting repaint");
@@ -881,10 +880,9 @@ public class LXGlGeometryViewer extends GlGeometryViewer implements IUpdateListe
 		if ( DebugState.isDebug()){
 			System.err.println("creating movement thread with Surface");
 		}
-		Runnable r = LXViewMovementThread.createMovementThread(
-				currentOrientation, eye, currentPosition, center, currentUp, up, 0, 0, 0, 0);
-		
-		SwingUtilities.invokeLater(r);
+		LXViewMovementThread.createMovementThread(
+				currentOrientation, eye, currentPosition, center, currentUp, up, 0, 0, 0, 0).start();
+
 
 		requestRepaint();
 	}
