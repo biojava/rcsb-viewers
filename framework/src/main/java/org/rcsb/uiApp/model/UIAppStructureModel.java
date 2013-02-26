@@ -45,6 +45,8 @@
  */ 
 package org.rcsb.uiApp.model;
 
+import javax.swing.SwingUtilities;
+
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.UpdateController;
@@ -83,21 +85,21 @@ public class UIAppStructureModel extends org.rcsb.mbt.model.StructureModel
 	 */
 	@Override
 	public synchronized void removeStructure( final Structure structure )
-	throws IllegalArgumentException
-	{
+			throws IllegalArgumentException
+			{
 		if ( structure == null ) {
 			throw new IllegalArgumentException( "null structure" );
 		}
 		if ( ! this.structures.contains( structure ) ) {
 			throw new IllegalArgumentException( "structure not found" );
 		}
-		
+
 		UpdateController update = AppBase.sgetUpdateController();
 		update.fireUpdateViewEvent(UpdateEvent.Action.STRUCTURE_REMOVED, structure);
-	
+
 		this.structures.remove( structure );
-	}
-	
+			}
+
 	/**
 	 * Set an array of structures (happens on load.)
 	 */
@@ -106,15 +108,23 @@ public class UIAppStructureModel extends org.rcsb.mbt.model.StructureModel
 	{
 		if (structure_array != null)
 		{
-			UpdateController update = AppBase.sgetUpdateController();
-			
-			for (Structure struc : structure_array)
+			for (final Structure struc : structure_array)
 			{
-			   structures.add(struc);
-			   update.fireUpdateViewEvent(UpdateEvent.Action.STRUCTURE_ADDED, struc);
+				structures.add(struc);
+				SwingUtilities.invokeLater(new Runnable() {
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						UpdateController update = AppBase.sgetUpdateController();
+						update.fireUpdateViewEvent(UpdateEvent.Action.STRUCTURE_ADDED, struc);
+						update.fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE);
+
+					}
+				});
 			}
-			
-			update.fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE);
+	//		UpdateController update = AppBase.sgetUpdateController();
+	//		update.fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE);
 		}
 	}
 }
