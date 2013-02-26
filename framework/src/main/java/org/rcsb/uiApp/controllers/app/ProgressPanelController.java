@@ -50,6 +50,7 @@ import java.lang.reflect.InvocationTargetException;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import org.rcsb.mbt.model.util.DebugState;
 import org.rcsb.mbt.model.util.Status;
 import org.rcsb.uiApp.ui.dialogs.ProgressPanel;
 
@@ -83,7 +84,12 @@ public class ProgressPanelController
 	/**
 	 * Call to start progress - optionally without a parent JFrame
 	 */
-	public static void StartProgress() { StartProgress(null); }
+	public static void StartProgress() { 
+		
+		if (DebugState.isDebug()){
+			System.err.println("ProgressPanelController.StartProgress");
+		}
+		StartProgress(null); }
 
 	/**
 	 * Call to start progress - with parent JFrame.
@@ -96,6 +102,11 @@ public class ProgressPanelController
 	public static void StartProgress(JFrame in_parent)
 	{
 		parent = in_parent;
+	
+		if (DebugState.isDebug()){
+			System.err.println("ProgressPanelController.StartProgress(jframe)");
+		}
+		
 		
 		/**
 		 * Set up the threading
@@ -104,16 +115,14 @@ public class ProgressPanelController
 		else
 			try
 			{
-				SwingUtilities.invokeAndWait(
+				SwingUtilities.invokeLater(
 					new Runnable()
 					{
 						public void run() { InternalStart(); }
 					});
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			}				
+			}			
 	}
 	
 	/*
@@ -134,6 +143,12 @@ public class ProgressPanelController
 	 */
 	public static void EndProgress()
 	{
+		
+		if (DebugState.isDebug()){
+			System.err.println("ProgressPanelController.EndProgress");
+		}
+		
+		
 		/**
 		 * set up the threads
 		 */
@@ -141,14 +156,13 @@ public class ProgressPanelController
 		else
 			try
 			{
-				SwingUtilities.invokeAndWait(
+				SwingUtilities.invokeLater(
 					new Runnable()
 					{
 						public void run() { InternalEnd(); }
 					});
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
+			
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 	}
@@ -158,6 +172,10 @@ public class ProgressPanelController
 	 */
 	public static void InternalEnd()
 	{
+		if (DebugState.isDebug()){
+			System.err.println("ProgressPanelController.InternalEnd");
+		}
+		
 		Status.removeStatusListener(progressDlg);
 		if (progressDlg != null)
 		{
