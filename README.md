@@ -21,17 +21,18 @@ The current set of viewers that are based on the framework are as follows:
 #### RCSB Simple Viewer
 
 A basic viewer with no UI, except a menubar that allows for loading of files and saving the current image to a file.
-::[[Image:SimpleViewerOverview.png]]
+![RCSB Simple Viewer image](http://biojava.org/w/images/a/a9/SimpleViewerOverview.png "A screenshot of the RCSB Simple Viewer")
+
 
 #### RCSB Protein Workshop
 
 A viewer that provides tools to manipulate and examine parts of the structure, as well as change the rendering styles.
-::[[Image:ProteinWorkshopOverview.png]]
+![RCSB Protein Workshop image](http://biojava.org/w/images/d/d7/ProteinWorkshopOverview.png "A screenshot of the RCSB Protein Workshop")
 
 #### RCSB Ligand Explorer
 
 This viewer explores relationships between ligands (or other non-protein chains/residues) and the containing protein.
-::[[Image:LigandExplorerOverview.png]]
+![RCSB Ligand Explorer image](http://biojava.org/w/images/c/cb/LigandExplorerOverview.png "A screenshot of the RCSB Ligand Explorer")
 
 #### RCSB PDB Kiosk
 
