@@ -38,9 +38,6 @@ This viewer explores relationships between ligands (or other non-protein chains/
 
 The ''Kiosk'' viewer is a full screen viewer that provides a slide show of a set of structures, smoothly animating the camera for each structure shown to view it from different angles and perspectives.  It can also focus on non-protein chains/residues, if present in the molecule.
 
-## Build Status
-[![Build Status](https://travis-ci.org/biojava/rcsb-viewers.png?branch=master)](https://travis-ci.org/biojava/rcsb-viewers)
-
 ## Current Projects
 
 The current primary projects defined for the ''RCSB Viewers'' are:
