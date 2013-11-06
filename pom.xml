@@ -7,6 +7,7 @@
 	<packaging>pom</packaging>
 	<name>rcsbviewers</name>
 	<description>The RCSB PDB 3D viewers as a maven project.</description>
+	
 	<repositories>
 		<repository>
 			<id>rcsb-pdb-maven-repo</id>
@@ -25,9 +26,6 @@
 			<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/external</url>
 		</repository>
-
-
-
 	</repositories>
 
 	<!--############################################################################ -->
@@ -55,11 +53,9 @@
 		<project.build.targetEncoding>UTF-8</project.build.targetEncoding>
 		<maxmem>500M</maxmem>
 	</properties>
+
 	<dependencies>
 
-
-		<!-- <dependency> <groupId>net.java.dev.jogl</groupId> <artifactId>jogl</artifactId> 
-			<version>1.1.1-rc6</version> </dependency> -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -80,10 +76,6 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<!-- <dependency> <groupId>org.testng</groupId> <artifactId>testng</artifactId> 
-			<version>6.1.1</version> <scope>test</scope> </dependency> -->
-
-
 		<dependency>
 			<groupId>javax.media.jai</groupId>
 			<artifactId>com.springsource.javax.media.jai.core</artifactId>
@@ -94,7 +86,6 @@
 			<artifactId>com.springsource.javax.media.jai.codec</artifactId>
 			<version>1.1.3</version>
 		</dependency>
-
 
 		<dependency>
 			<groupId>org.jogamp.gluegen</groupId>
@@ -149,9 +140,6 @@
 					<argLine>-Xms512m -Xmx512m</argLine>
 				</configuration>
 			</plugin>
-
-
-
 
 		</plugins>
 
