@@ -135,6 +135,7 @@
 							<Trusted-Library>true</Trusted-Library>
 							<Permissions>all-permissions</Permissions>
 							<Codebase>*</Codebase>
+							<Application-Name>RCSB Viewers</Application-Name>
 						</manifestEntries>
 					</archive>
 				</configuration>
