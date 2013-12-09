@@ -7,7 +7,7 @@
 	<packaging>pom</packaging>
 	<name>rcsbviewers</name>
 	<description>The RCSB PDB 3D viewers as a maven project.</description>
-	
+
 	<repositories>
 		<repository>
 			<id>rcsb-pdb-maven-repo</id>
@@ -31,20 +31,20 @@
 	<!--############################################################################ -->
 	<!-- where Maven deploy will deploy project jars/wars -->
 	<!--############################################################################ -->
-  	
+
 	<distributionManagement>
 		<downloadUrl>http://nexus.rcsb.org/nexus/content/repositories/releases/</downloadUrl>
-		<repository>			
+		<repository>
 			<id>releases</id>
-			<name>RCSB PDB Maven Repository</name>			
+			<name>RCSB PDB Maven Repository</name>
 			<url>http://nexus.rcsb.org/nexus/content/repositories/releases</url>
 
 		</repository>
-		 <snapshotRepository>
-    		<id>snapshots</id>
-    		<url>http://nexus.rcsb.org/nexus/content/repositories/snapshots</url>
-    		<uniqueVersion>false</uniqueVersion>
-  		</snapshotRepository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<url>http://nexus.rcsb.org/nexus/content/repositories/snapshots</url>
+			<uniqueVersion>false</uniqueVersion>
+		</snapshotRepository>
 	</distributionManagement>
 
 	<properties>
@@ -123,7 +123,21 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.4</version>
-
+				<configuration>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+						<manifest>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							
+						</manifest>
+						<manifestEntries>
+							<Trusted-Library>true</Trusted-Library>
+							<Permissions>all-permissions</Permissions>
+							<Codebase>*</Codebase>
+						</manifestEntries>
+					</archive>
+				</configuration>
 
 			</plugin>
 
