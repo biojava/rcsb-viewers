@@ -213,14 +213,16 @@ public class KSDocumentFrame extends VFDocumentFrameBase implements IUpdateListe
 				
 				System.out.println("Operating System: " + os + " java version " + version);
 				
+				
+				/*
 				if (os.equals("Mac OS X") && 
 						(version.startsWith("1.6"))) {
 					gDevice.setFullScreenWindow(KSDocumentFrame.this);
 				} else
-				{
+				{*/
 					setLocation(0, 0);
 					setSize(size.width, size.height);
-				}
+				//}
 				
 				
 
