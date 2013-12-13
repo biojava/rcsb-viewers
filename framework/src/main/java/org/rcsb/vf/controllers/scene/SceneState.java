@@ -79,6 +79,7 @@ import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.AtomColorByBFactor;
 import org.rcsb.mbt.model.attributes.AtomColorByElement;
+import org.rcsb.mbt.model.attributes.AtomColorByElementCarbonGray;
 import org.rcsb.mbt.model.attributes.AtomColorByRandom;
 import org.rcsb.mbt.model.attributes.AtomColorByResidueColor;
 import org.rcsb.mbt.model.attributes.AtomColorByRgb;
@@ -1486,8 +1487,13 @@ public class SceneState
 								color = AtomColorByElement.create();
 							} else if(valueAttribute.equals(AtomColorByResidueColor.class.getName())) {
 								color = AtomColorByResidueColor.create();
+							} else if ( valueAttribute.equals(AtomColorByElementCarbonGray.class.getName())){
+								color = AtomColorByElementCarbonGray.create();
 							}
 							
+							if ( color == null) {
+								System.err.println("Unknown Color attribute:" + valueAttribute);
+							}
 							atomStyle.setAtomColor(color);
 						} else if(typeAttribute.endsWith("AtomRadius")) {
 							IAtomRadius radius = null;
