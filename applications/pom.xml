@@ -53,6 +53,10 @@
 					<verify>true</verify>
 					<verbose>true</verbose>
 					<goal>sign</goal>
+					<arguments>
+								<argument>-tsa</argument>
+								<argument>https://timestamp.geotrust.com/tsa</argument>
+							</arguments>
 				</configuration>
 			</plugin>
 			
