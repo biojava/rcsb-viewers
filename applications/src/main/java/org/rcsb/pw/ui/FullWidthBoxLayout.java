@@ -54,6 +54,8 @@ import java.util.Vector;
 
 import javax.swing.JSeparator;
 
+import org.rcsb.pw.ui.coloringDescriptions.backbone.ByCompoundPanel;
+
 public class FullWidthBoxLayout implements LayoutManager {
     private final Dimension preferredSize = new Dimension(-1,-1);
     private final Dimension minimumSize = new Dimension(-1,-1);
@@ -77,14 +79,7 @@ public class FullWidthBoxLayout implements LayoutManager {
         this.setSize(parent);
     }
     
-    private void setSize(final Container container) {
-        // if the component has not been resized, this is not necessary...
-//        Dimension newSize = container.getSize();
-//        if(this.lastSize != null && this.lastSize.equals(newSize)) {
-//            return;
-//        }
-//        this.lastSize = newSize;
-        
+    private void setSize(final Container container) {       
         final Insets insets = container.getInsets();
         
         if(this.axis == LayoutAxis.AXIS_Y) {
@@ -97,7 +92,7 @@ public class FullWidthBoxLayout implements LayoutManager {
 	        	if(firstColumn[i].isVisible()) {
 		        	if(firstColumn[i] instanceof JSeparator) {
 		        		final int parentWidth = container.getWidth() - insets.left - insets.right;
-		        		final int twentyPercentHalfWidth = (int)((parentWidth / 2) * .2);
+		        	    final int twentyPercentHalfWidth = (int)((parentWidth / 2) * .2);
 		        		final int startX = insets.left + twentyPercentHalfWidth;
 		        		final int width = parentWidth - twentyPercentHalfWidth * 2;
 		        		final int height = firstColumn[i].getPreferredSize().height;
@@ -115,20 +110,15 @@ public class FullWidthBoxLayout implements LayoutManager {
 	        }
 	        
 	        final int xBuffer = 5;
-
-	        // TODO -pr panel too wide
-//	        for (Component comp : descriptionPanels)
-//	        	comp.setBounds(insets.left + firstColumnMaxWidth + xBuffer,
-//	        				   insets.top, 170, curY - insets.top);
 	        
 	        for (Component comp : descriptionPanels)
 	        	comp.setBounds(insets.left + firstColumnMaxWidth + xBuffer,
-	        				   insets.top, 120, curY - insets.top);
+	        				   insets.top, 200, curY - insets.top);
 	        
 	        curY += insets.bottom;
 	        
 	        this.preferredSize.height = curY;
-	        this.preferredSize.width = 0;//parent.getWidth();
+	        this.preferredSize.width = 0;
 	        this.minimumSize.height = curY;
 	        this.minimumSize.width = 0;
         } else if(this.axis == LayoutAxis.AXIS_X) {
