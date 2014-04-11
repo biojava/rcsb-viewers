@@ -108,7 +108,7 @@ public class Sidebar extends JPanel implements ChangeListener
 //        System.out.println("Sidebar: GlobalOptionsPanel" + tools.getPreferredSize().width);
 //        System.out.println("Sidebar: ColoringOptions" + coloring.getPreferredSize().width);
 //        System.out.println("Sidebar: CreditsPanel" + credits.getPreferredSize().width);
-//        System.out.println("Sidebar: width" + this.getPreferredSize().width);
+
     }
 
 

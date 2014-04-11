@@ -86,6 +86,8 @@ public class ByCompoundPanel extends DescriptionPanel implements MouseListener
 		//g.clearRect(0, 0, super.getWidth(), super.getHeight());
 		super.paintComponent(g);
 		
+		// TO DO pr inital treemap was empty, initialize here?
+		ResidueColorByResidueCompound.create();
 		final TreeMap map = ResidueColorByResidueCompound.colorByCompound;	// use an instance to make sure the static constructor is used.
 		final int mapSize = map.size();
 		final int columnLength = mapSize / ByCompoundPanel.columnCount + 1;
@@ -127,6 +129,7 @@ public class ByCompoundPanel extends DescriptionPanel implements MouseListener
 			
 			// draw the color boxes
 			curY = 0;
+
 			for(int j = 0; j < columnLength && valIt.hasNext(); j++) {
 				final Color color = (Color)valIt.next();
 				final Point point = ByCompoundPanel.boxTopLeftPoints[i * columnLength + j];
