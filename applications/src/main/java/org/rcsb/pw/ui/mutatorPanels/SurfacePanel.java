@@ -67,7 +67,6 @@ import org.jcolorbrewer.ColorBrewer;
 import org.jcolorbrewer.ui.ColorPaletteChooserDialog;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.Surface;
-
 import org.rcsb.mbt.model.attributes.SurfaceColorUpdater;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.uiApp.controllers.app.AppBase;
@@ -179,12 +178,15 @@ public class SurfacePanel extends JPanel implements IUpdateListener
 					// can't run this as a thread since transparency needs to be updated
 					// and surfaceRemoved/Added needs to be called.
 					// thread.start();
-					thread.createSurface();
+					//thread.createSurface();
+					thread.createCAlphaSurface();
 					newSurface = true;
 				}
 
+				boolean x = false;
 				float currentTransparency = 1.0f;
 				float transparency = ((int)source.getValue()) * 1.0f/TRANSPARENCY_MAX;
+				float testTrans = (float) (((int)source.getValue() + .2) * 1.0f/TRANSPARENCY_MAX);
 				for (Surface s: structure.getStructureMap().getSurfaces()) {
 					Color4f[] colors = s.getColors();
 					if (colors != null && colors.length > 0) {
@@ -192,7 +194,6 @@ public class SurfacePanel extends JPanel implements IUpdateListener
 						SurfaceColorUpdater.setSurfaceTransparency(s, transparency);
 					}
 				}
-
 				if (currentTransparency > 0.05f && transparency <= 0.05) {
 					ProteinWorkshop.sgetGlGeometryViewer().surfaceRemoved(structure);
 				} else if (newSurface || currentTransparency <= 0.05f && transparency > 0.05f) {

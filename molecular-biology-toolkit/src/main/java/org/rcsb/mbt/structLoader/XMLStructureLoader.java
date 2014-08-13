@@ -157,6 +157,16 @@ public class XMLStructureLoader implements IFileStructureLoader
 		handler = in_handler;
 	}
 	
+	public XMLStructureLoader(StructureXMLHandler in_handler, String cAlphaFlag) {
+		handler = in_handler;
+		if(cAlphaFlag != null && cAlphaFlag.equals("true")){
+			handler.cAlphaFlag = true;
+		}
+		else {
+			handler.cAlphaFlag = false;
+		}
+	}
+
 	private void parseXMLFile(String dataset, InputStream inputStream)
 	{
 		try 

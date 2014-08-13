@@ -75,9 +75,20 @@ public class EdtMolecularSurface implements SurfaceCalculator {
     private static boolean bcolor = true; // not sure what this is used for, it's always true in EDTSurf
     private static int stype = 4;//
     private TriangulatedSurface surface = new TriangulatedSurface();
-
+    
     public EdtMolecularSurface(List<Sphere> spheres, float probeRadius, float resolution) {
         EdtSurfaceCalculator c = new EdtSurfaceCalculator(spheres, probeRadius, resolution);
+        c.initparam();
+        c.boundingatom();
+        c.fillvoxels(bcolor);
+        c.buildbounary();
+        c.fastdistancemap();
+        c.marchingcube(stype);
+
+        surface = c.getSurface();
+    }
+    public EdtMolecularSurface(List<Sphere> spheres, float probeRadius, float resolution, float atomRadius) {
+        EdtSurfaceCalculator c = new EdtSurfaceCalculator(spheres, probeRadius, resolution, atomRadius);
         c.initparam();
         c.boundingatom();
         c.fillvoxels(bcolor);
@@ -98,7 +109,7 @@ public class EdtMolecularSurface implements SurfaceCalculator {
         if (surrounding.size() == 0) {
         	return;
         }
-        EdtMolecularSurface ems = new EdtMolecularSurface(surrounding, probeRadius, resolution);
+        EdtMolecularSurface ems = new EdtMolecularSurface(surrounding, probeRadius, resolution, 0.0f);
         surface = ems.getSurface();
 
         SurfacePatchCalculator sp = new SurfacePatchCalculator(surface, context, distanceThreshold);

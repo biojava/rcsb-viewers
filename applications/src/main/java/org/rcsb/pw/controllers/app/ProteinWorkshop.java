@@ -132,9 +132,11 @@ public class ProteinWorkshop extends VFAppBase
 		MutatorBase.setActivationType(MutatorBase.ActivationType.ATOMS_AND_BONDS);
 		
 		String structureUrlParam = this.properties.getProperty("structure_url");
-
-		if (structureUrlParam != null)
+		
+		
+		if (structureUrlParam != null) {
 			((VFDocumentFrameBase)activeFrame).loadURL(structureUrlParam);
+		}
 		
 		String structureIdList = this.properties.getProperty("structure_id_list");
 
