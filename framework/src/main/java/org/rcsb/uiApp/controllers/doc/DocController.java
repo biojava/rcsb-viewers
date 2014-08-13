@@ -63,6 +63,7 @@ import org.rcsb.mbt.structLoader.PdbStructureLoader;
 import org.rcsb.mbt.structLoader.XMLStructureLoader;
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.update.UpdateEvent;
+import org.rcsb.vf.controllers.app.VFAppBase;
 
 public class DocController
 {
@@ -124,6 +125,8 @@ public class DocController
 		Structure structureTmp = null;
 
 		final String[] datasets = structureUrlParam.split(",");
+		long t0 = System.nanoTime();
+		
 		for (int i = 0; i < datasets.length; i++)
 		{
 			try
@@ -134,11 +137,12 @@ public class DocController
 
 				if (dataset.endsWith(".xml.gz") || dataset.endsWith(".xml"))
 				{
-					// long time = System.currentTimeMillis();
+					//long time = System.currentTimeMillis();
 					Status.progress(-1, "Reading XML file: " + dataset);
 
 					loader =
-						new XMLStructureLoader(AppBase.sgetAppModuleFactory().createStructureXMLHandler(dataset));
+						new XMLStructureLoader(AppBase.sgetAppModuleFactory().createStructureXMLHandler(dataset),
+										(String) AppBase.getApp().properties.get("cAlphaFlag"));
 					((XMLStructureLoader)loader).setInitialBiologicalUnitId(initialBiologicalUnitId);
 
 					structureTmp = loader.load(dataset);
@@ -203,10 +207,14 @@ public class DocController
 			structures[i].getStructureMap().setPdbId(parsePdbId(datasets[i]));
 			structures[i].getStructureMap().setImmutable();
 		}
-
+		long t5 = System.nanoTime();
+		System.out.println("XML Read: " + (t5-t0)/1000000 + " ms");
+		
 		if (DebugState.isDebug())
 			System.err.println("--> DocController: Memory used: " +
 					(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
+		
+
 
 		return structures;
 	}

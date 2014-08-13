@@ -142,6 +142,9 @@ public abstract class VFAppBase extends AppBase
 					properties.setProperty("global_rotation_matrices", args[++i]);
 				} else if (args[i].equals("-global_translation_vectors")) {
 					properties.setProperty("global_translation_vectors", args[++i]);
+				} else if (args[i].equals("cAlphaFlag")) {
+					System.out.println("true");
+					properties.setProperty("cAlphaFlag", "true");
 				}
 			}
 		}

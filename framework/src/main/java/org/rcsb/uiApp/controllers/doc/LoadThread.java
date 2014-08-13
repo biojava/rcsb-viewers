@@ -64,6 +64,7 @@ import org.rcsb.uiApp.controllers.app.ProgressPanelController;
 public class LoadThread extends Thread
 {
 	private String _url, _pdbid;
+	private boolean calpha;
 	
 	/**
 	 * This can be either a file spec or a url.  It is what comes in from the commandline
@@ -114,12 +115,18 @@ public class LoadThread extends Thread
 	public LoadThread(String url, String pdbid)
 	{ _url = url; _pdbid = pdbid; }
 	
-
+	public LoadThread(String url, boolean calphaFlag)
+	{
+		_url = url;		
+		_pdbid = url.replaceFirst("^.*[/\\\\]([A-Za-z0-9]{4})\\.(xml|pdb[0-9]*)(.gz)*$", "$1");
+						// extract the id from the url specification
+		this.calpha = calphaFlag;
+	}
 
 	public void run()
 	{
 		ProgressPanelController.StartProgress();
-		AppBase.sgetDocController().loadStructure(_url, _pdbid);
+			AppBase.sgetDocController().loadStructure(_url, _pdbid);
 
 		if (AppBase.sgetModel().hasStructures())
 			AppBase.sgetActiveFrame().setTitle(_pdbid);

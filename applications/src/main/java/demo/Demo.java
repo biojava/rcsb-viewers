@@ -33,8 +33,8 @@ public class Demo {
 	public static void showProteinWorkshop(){
 		
 	//	String[] pdbIds = new String[]{"-structure_url","http://www.rcsb.org/pdb/files/1CDG.xml.gz","-unit_id","1","-standalone"};
-		String[] pdbIds = new String[]{"-structure_url","http://www.rcsb.org/pdb/files/1CDG.xml.gz","-standalone"};
-	//	String[] pdbIds = new String[]{"-structure_url","http://www.rcsb.org/pdb/files/1STP.xml.gz","-standalone"};
+	//	String[] pdbIds = new String[]{"-structure_url","http://www.rcsb.org/pdb/files/1CDG.xml.gz","-standalone"};
+		String[] pdbIds = new String[]{"-structure_url","http://www.rcsb.org/pdb/files/1STP.xml.gz","-standalone", "cAlphaFlag"};
 		final ProteinWorkshop app = new ProteinWorkshop(pdbIds);	
 		app.initialize(true, true);
 	}
