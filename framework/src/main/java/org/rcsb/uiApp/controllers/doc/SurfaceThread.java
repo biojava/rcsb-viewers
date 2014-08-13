@@ -216,12 +216,9 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 		/*
 		 * Needs a file, with the mean and median data
 		 */
-		try {
-			 scanner = new Scanner(new File("CAlphaRadiusMed.txt"));
-		} catch (FileNotFoundException e3) {
-			// TODO Auto-generated catch block
-			e3.printStackTrace();
-		}
+		
+		scanner = new Scanner(SurfaceThread.class.getResourceAsStream("/CAlphaRadiusMed.txt"));
+		
 		while(scanner.hasNext()){
 			atomName = scanner.next();
 			
