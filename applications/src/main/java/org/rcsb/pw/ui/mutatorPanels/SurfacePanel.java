@@ -179,7 +179,14 @@ public class SurfacePanel extends JPanel implements IUpdateListener
 					// and surfaceRemoved/Added needs to be called.
 					// thread.start();
 					//thread.createSurface();
-					thread.createCAlphaSurface();
+					if(AppBase.getApp().properties.getProperty("cAlphaFlag") != null){
+						thread.createCAlphaSurface();
+					}
+					else
+					{
+						thread.createSurface();	
+					}
+					
 					newSurface = true;
 				}
 
