@@ -138,17 +138,25 @@ public class MutatorActivationPanel extends JPanel implements ActionListener, IU
                 BorderFactory.createTitledBorder("2)  Choose what you want the tool to affect."),
                 BorderFactory.createEmptyBorder(-1,1,1,1)));
 
-		this.group.add(this.atomsBondsButton);
-		this.group.add(this.ribbonsButton);
+
+		if (! AppBase.getApp().isMultiScaleMode()) {
+			this.group.add(this.atomsBondsButton);
+			this.group.add(this.ribbonsButton);
+		}	
 		this.group.add(this.surfaceButton);
 		
-		super.add(this.atomsBondsButton);
-		super.add(this.ribbonsButton);
+		
+		if (! AppBase.getApp().isMultiScaleMode()) {
+			super.add(this.atomsBondsButton);	
+			super.add(this.ribbonsButton);
+		}
 		super.add(this.surfaceButton);
 		validate();
 		
-		this.atomsBondsButton.addActionListener(this);
-		this.ribbonsButton.addActionListener(this);
+		if (! AppBase.getApp().isMultiScaleMode()) {
+			this.atomsBondsButton.addActionListener(this);
+			this.ribbonsButton.addActionListener(this);
+		}
 		this.surfaceButton.addActionListener(this);
 		
 		AppBase.sgetUpdateController().registerListener(this);

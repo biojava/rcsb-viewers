@@ -90,17 +90,19 @@ public class SurfacePanel extends JPanel implements IUpdateListener
 	private static final int TRANSPARENCY_MAX = 100;
 	private static final int TRANSPARENCY_INIT = 0;
 
-	private final JSlider transparencySlider = new JSlider(JSlider.HORIZONTAL,
-			TRANSPARENCY_MIN, TRANSPARENCY_MAX, TRANSPARENCY_INIT);
+	private  JSlider transparencySlider;
 	
 	private final JLabel colorLabel = new JLabel("Color by");
 	private final String[] surfaceOptions = {"Chain", "Entity", "Single color", "Hydrophobicity"};
 	private JComboBox surfaceColorType;
 	
+	private boolean calphaFlag = false;
+	
 	JPanel firstPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-	public SurfacePanel() {
+	public SurfacePanel(boolean calphaFlag) {
 		super(false);
+		this.calphaFlag = calphaFlag;
 		setLayout(new BorderLayout());
 		setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Surfaces"),
@@ -112,6 +114,13 @@ public class SurfacePanel extends JPanel implements IUpdateListener
 		ruler.put(TRANSPARENCY_MAX/2, new JLabel("Transparent") );
 		ruler.put(TRANSPARENCY_MAX, new JLabel("Opaque") );
 		
+		if (calphaFlag) {
+			transparencySlider = new JSlider(JSlider.HORIZONTAL,
+					TRANSPARENCY_MIN, TRANSPARENCY_MAX, TRANSPARENCY_MAX);
+		} else {
+			transparencySlider = new JSlider(JSlider.HORIZONTAL,
+					TRANSPARENCY_MIN, TRANSPARENCY_MAX, TRANSPARENCY_INIT);
+		}
 		transparencySlider.setLabelTable(ruler);
 		transparencySlider.setMajorTickSpacing(TRANSPARENCY_MAX/2);
 		transparencySlider.setMinorTickSpacing(TRANSPARENCY_MAX/10);
@@ -143,7 +152,11 @@ public class SurfacePanel extends JPanel implements IUpdateListener
 	}
 	
 	private void reset() {
+		if (calphaFlag) {
+			transparencySlider.setValue(TRANSPARENCY_MAX);
+		} else {
 		transparencySlider.setValue(TRANSPARENCY_INIT);
+		}
 		removeComboBox();
 	}
 	

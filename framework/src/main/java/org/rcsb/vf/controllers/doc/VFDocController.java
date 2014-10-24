@@ -198,6 +198,7 @@ public class VFDocController extends DocController
 		private final class ImageSaverThread extends Thread
 		{
 			private static final int DURATION_BETWEEN_SCREENSHOT_CHECKS_IN_MILLISECONDS = 1000;
+	//		private static final int DURATION_BETWEEN_SCREENSHOT_CHECKS_IN_MILLISECONDS = 100;
 
 			private class SaverRunnable implements Runnable {
 				private int width;
@@ -279,15 +280,60 @@ public class VFDocController extends DocController
 		 * Save the image (to where???)
 		 */
 		public void saveImage() {
-//			Runnable runnable = new Runnable() {
-//				public void run() {
+//			saveImageNew();
+			Runnable runnable = new Runnable() {
+				public void run() {
 					final ImageSaverThread screenshotWaiter = new ImageSaverThread();
 					// wait until the image is obtained or the timeout occurs
 					screenshotWaiter.start();
-//				}
-//			};
-//			
-//			SwingUtilities.invokeLater(runnable);
+				}
+			};
+			
+		SwingUtilities.invokeLater(runnable);
+		}
+		
+		public void saveImageNew() {
+			System.out.println("Saving new image");
+			final GlGeometryViewer viewer = VFAppBase.sgetGlGeometryViewer();
+
+			int width = viewer.getWidth();
+			int height = viewer.getHeight();
+
+			// Ask the user for file name, image file format, and image size.
+			final ImageFileChooser imageFileManager = new ImageFileChooser(
+					AppBase.sgetActiveFrame());
+			final File file = imageFileManager.save(width, height);
+			if (file == null)
+			{
+				return; // User canceled the save.
+			}
+			width = imageFileManager.getImageWidth();
+			height = imageFileManager.getImageHeight();
+			int dpi = imageFileManager.getDpi();
+
+			viewer.requestScreenShot(width, height);
+			BufferedImage screenshot = null;
+			while (screenshot == null && !viewer.hasScreenshotFailed()) {
+				try {
+					Thread.sleep(ImageSaverThread.DURATION_BETWEEN_SCREENSHOT_CHECKS_IN_MILLISECONDS);
+				} catch (final InterruptedException e) {
+				}
+				screenshot = viewer.getScreenshot();
+				if (screenshot == null) System.out.println("VFDocControler: screenshot null");
+			}
+
+			if (screenshot != null) {
+				try {
+					ImageFileSaver.save(screenshot, dpi, file);
+				} catch (IOException e) {
+					Status.output(Status.LEVEL_REMARK, "Error saving the image file.");
+				}
+				viewer.clearScreenshot();
+				Status.output(Status.LEVEL_REMARK, "Image saved as " + file.getAbsoluteFile());
+			} else {
+				Status.output(Status.LEVEL_REMARK, "Error saving the image.");
+			}
+			
 		}
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	//

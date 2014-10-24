@@ -52,8 +52,10 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
 import org.rcsb.mbt.model.*;
+import org.rcsb.mbt.model.Residue.Classification;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.attributes.*;
+import org.rcsb.uiApp.controllers.app.AppBase;
 
 import com.jogamp.opengl.util.gl2.GLUT;
 
@@ -135,15 +137,29 @@ public class DisplayListRenderable
 		{
 			synchronized(this.lockObject) {
 				this.dirty = false;
-				this.displayLists = this.geometry.getDisplayLists(this.structureComponent, this.style, gl, glu, glut );
+				// creates geometric objects
+				if (AppBase.getApp().isMultiScaleMode()) {
+//					System.out.println("DisplayListRenderable: multiScale mode");
+					if (this.structureComponent.getStructureComponentType() == ComponentType.CHAIN) {
+						if (((Chain)this.structureComponent).getClassification() != Classification.AMINO_ACID) {
+							this.displayLists = this.geometry.getDisplayLists(this.structureComponent, this.style, gl, glu, glut );
+						} 
+					} else if (this.structureComponent.getStructureComponentType() != ComponentType.CHAIN) {
+						this.displayLists = this.geometry.getDisplayLists(this.structureComponent, this.style, gl, glu, glut );
+					}
+				} else {
+					this.displayLists = this.geometry.getDisplayLists(this.structureComponent, this.style, gl, glu, glut );
+				}
 			}
 		}
 		
+		if (this.displayLists != null) {
 		for(int i = 0; i < this.displayLists.length; i++) {
 			if(this.displayLists[i] != null) {
 //				this.displayLists[i].structureComponent.structure = Model.getSingleton().getStructure();	// quick fix.
 				this.displayLists[i].draw(gl, glu, glut, isPickMode);
 			}
+		}
 		}
 	}
 	

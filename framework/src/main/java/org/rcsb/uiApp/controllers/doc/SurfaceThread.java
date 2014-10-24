@@ -104,15 +104,15 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 	private static float PROBE_RADIUS = 1.0f;
 	private static float TEST_PROBE_RADIUS = 1.5f;
 	private static float DISTANCE_THRESHOLD = 6.5f;
-	private SurfaceScorer scorer;
-	private ArrayList<SurfaceScorer> multiScorer;
+//	private SurfaceScorer scorer;
+//	private ArrayList<SurfaceScorer> multiScorer;
 	private boolean drawLines = false;
 	private boolean drawDots = false;
 	
 	public void createSurface() {
 		Runtime runtime = Runtime.getRuntime();
-		System.out.println("allocated memory: " + runtime.totalMemory() / 1024); 
-		System.out.println("free memory: " + runtime.freeMemory() / 1024); 
+//		System.out.println("allocated memory: " + runtime.totalMemory() / 1024); 
+//		System.out.println("free memory: " + runtime.freeMemory() / 1024); 
 		IAtomRadius registry = AtomRadiusRegistry.get("By CPK");
 		
 		int numOfTriangles = 0;
@@ -125,7 +125,7 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 		}
 		long t0 = System.nanoTime();
 		// create progress bar
-		multiScorer = new ArrayList<SurfaceScorer>();
+//		multiScorer = new ArrayList<SurfaceScorer>();
 		ProgressPanelController.StartProgress(AppBase.sgetActiveFrame());
 		Status.progress(0, "Creating surfaces");
 		int numSpheres = 0;
@@ -153,25 +153,19 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 			if (spheres.size() == 0) {
 				continue;
 			};
-			// calculate molecular surface
-//			System.out.println("Resolution: " + resolution);
-			 
 			
+			// calculate molecular surface
 			SurfaceCalculator s = new EdtMolecularSurface(spheres, PROBE_RADIUS, resolution, 2.4f);
 
 			TriangulatedSurface ts = s.getSurface();
-			System.out.println("used memory: " +  (Runtime.getRuntime().totalMemory() - runtime.freeMemory()));
+//			System.out.println("used memory: " +  (Runtime.getRuntime().totalMemory() - runtime.freeMemory()));
 			s = null; // this is a very large object that should be garbage collected ASAP
-			//System.out.println("gcused memory: " +  (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/ 1024);
+			//System.out.println("used memory: " +  (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/ 1024);
 			//System.out.println("allocated memory: " + runtime.totalMemory() / 1024); 
 			//System.out.println("free memory2: " + runtime.freeMemory() / 1024);
 			//
 			// smooth surface
-//			System.out.println("Surface area before smoothing: " + ts.getSurfaceArea());
 			ts.laplaciansmooth(1);
-		//	ts.laplacianEdgeSmooth(1, resolution*4);
-//			System.out.println("Surface area after smoothing:  " + ts.getSurfaceArea());
-		//	ImproveMesh.Coarse(ts, 1);
 			Surface surface = new Surface(c, structure);
 			surface.setTriangulatedSurface(ts);
 
@@ -189,8 +183,7 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 			Status.progress(((int)(100* smap.getSurfaceCount()/(float)polymerChains.size())), "Creating surfaces");
 			
 			AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.SURFACE_ADDED, surface); // has no effect
-			multiScorer.add( new SurfaceScorer(ts));
-	//		AppBase.sgetUpdateController().fireUpdateViewEvent(UpdateEvent.Action.VIEW_UPDATE); 
+	//		multiScorer.add( new SurfaceScorer(ts));
 		}
 		ProgressPanelController.EndProgress();
 		long t5 = System.nanoTime();
@@ -202,22 +195,21 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 	
 	//test create Surface for C Alpha molecules
 	public void createCAlphaSurface() {
-		Runtime runtime = Runtime.getRuntime();
+//		Runtime runtime = Runtime.getRuntime();
 		int i = 0;
 		Map<String, Float> scanMap = new HashMap<String, Float>();
 		String atomName;
-		Float aRadius = 0.0f;
-		Float largestRadius = 0.0f;
+		float aRadius = 0.0f;
+		float largestRadius = 0.0f;
 		double currNorm = 0.0f;
 		double currSq = 0.0f;
 		double totalNorm = 0.0f;
 		double totalSq = 0.0f;
-		Scanner scanner = null;
-		/*
-		 * Needs a file, with the mean and median data
-		 */
 		
-		scanner = new Scanner(SurfaceThread.class.getResourceAsStream("/CAlphaRadiusMed.txt"));
+		/*
+		 * Read residue radius for multiscale representation
+		 */		
+		Scanner scanner = new Scanner(SurfaceThread.class.getResourceAsStream("/CAlphaRadiusMed.txt"));
 		
 		while(scanner.hasNext()){
 			atomName = scanner.next();
@@ -233,12 +225,11 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 			scanMap.put(atomName, aRadius);
 		}
 		scanner.close();
-		//IAtomRadius registry = AtomRadiusRegistry.get("By CPK");
 		
 		Structure structure = AppBase.sgetModel().getStructures().get(0);
 		StructureMap smap = structure.getStructureMap();	
 		List<Chain> polymerChains = getPolymerChains();
-		float resolution = calcResolution(polymerChains);	
+		float resolution = calcResolutionCAlpha(polymerChains);	
 		if (drawLines) {
 			resolution *= 0.75f;
 		}
@@ -249,6 +240,7 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 		Status.progress(0, "Creating surfaces");
 		
 		for (Chain c: polymerChains) {
+			largestRadius = 0.0f;
 			List<Sphere> spheres = new ArrayList<Sphere>();
 			Vector<Residue> residues = c.getResidues();
 			
@@ -259,6 +251,9 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 					double[] coord = cAlphaAtom.coordinate;
 					Float cAlphaRadius  = 0.0f;
 					cAlphaRadius = scanMap.get(r.getCompoundCode());
+					if (cAlphaRadius == null) {
+						cAlphaRadius = 5.0f;
+					} 
 					if(cAlphaRadius > largestRadius) {
 						largestRadius = cAlphaRadius;
 					}
@@ -273,15 +268,13 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 			};
 	
 			// calculate molecular surface
-//			System.out.println("Resolution: " + resolution);
-			
-			
-			SurfaceCalculator s = new EdtMolecularSurface(spheres, TEST_PROBE_RADIUS, resolution*.7f, largestRadius-0.1f); 
-			MemoryUsage heapMemoryUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
-			System.out.println("heap memory used: " + heapMemoryUsage.getUsed()/(1000*1000));
-			System.out.println("used memory: " +  (Runtime.getRuntime().totalMemory() - runtime.freeMemory())/(1000*1000));
+			SurfaceCalculator s = new EdtMolecularSurface(spheres, TEST_PROBE_RADIUS, resolution, largestRadius+1.5f); 
+//			MemoryUsage heapMemoryUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+//			System.out.println("heap memory used: " + heapMemoryUsage.getUsed()/(1000*1000));
+//			System.out.println("used memory: " +  (Runtime.getRuntime().totalMemory() - runtime.freeMemory())/(1000*1000));
 			TriangulatedSurface ts = s.getSurface();
-			System.out.println("used memory: " +  (Runtime.getRuntime().totalMemory() - runtime.freeMemory()));
+//			System.out.println("used memory: " +  (Runtime.getRuntime().totalMemory() - runtime.freeMemory()));
+//			System.out.println("Triangles: " + ts.getFaces().size());
 			
 			s = null; // this is a very large object that should be garbage collected ASAP
 
@@ -289,9 +282,6 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 			// smooth surface
 //			System.out.println("Surface area before smoothing: " + ts.getSurfaceArea());
 			ts.laplaciansmooth(1);
-		//	ts.laplacianEdgeSmooth(1, resolution*4);
-//			System.out.println("Surface area after smoothing:  " + ts.getSurfaceArea());
-		//	ImproveMesh.Coarse(ts, 1);
 			Surface surface = new Surface(c, structure);
 			surface.setTriangulatedSurface(ts);
 			surface.setMeshSurface(drawLines);
@@ -319,8 +309,8 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 			totalSq += currSq;
 			i++;
 		}
-		System.out.println("Total Surface Score Reg: " + totalNorm/i);
-		System.out.println("Total Surface Score Sq: " + totalSq/i);
+//		System.out.println("Total Surface Score Reg: " + totalNorm/i);
+//		System.out.println("Total Surface Score Sq: " + totalSq/i);
 		ProgressPanelController.EndProgress();
 		long t5 = System.nanoTime();
 		System.out.println("Surface calculation: " + (t5-t0)/1000000 + " ms");
@@ -409,7 +399,7 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 		}
 		ProgressPanelController.EndProgress();
 		long t5 = System.nanoTime();
-//		System.out.println("Surface calculation: " + (t5-t0)/1000000 + " ms");
+		System.out.println("Surface calculation: " + (t5-t0)/1000000 + " ms");
 	}
 
 	/**
@@ -434,9 +424,20 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 		int residueCount = getResidueCount(polymerChains);
 		int symOps = getSymmetryOperationCount(polymerChains);
 		float resolution = 0.4f - 0.00005f * residueCount - 0.000005f * residueCount*symOps;
-//		System.out.println("resolution: " + resolution + ", residues: " + residueCount + ", symmetry operations: " + symOps);
+		System.out.println("Surface resolution: " + resolution + ", residues: " + residueCount + ", symmetry operations: " + symOps);
 		// clamp lowest resolution
 		resolution = Math.max(resolution, 0.1f);
+		return resolution;
+	}
+	
+	private float calcResolutionCAlpha(List<Chain> polymerChains) {		
+		int residueCount = getResidueCount(polymerChains);
+		int symOps = getSymmetryOperationCount(polymerChains);
+		// empirical formula to adjust surface resolution based on size of the biological assembly
+		float resolution = (float) (0.3 - 0.15*Math.log10(residueCount*symOps/60000.0));
+		// clamp lowest resolution
+		resolution = Math.max(resolution, 0.05f);
+		System.out.println("Surface resolution: " + resolution + ", residues: " + residueCount + ", symmetry operations: " + symOps);
 		return resolution;
 	}
 

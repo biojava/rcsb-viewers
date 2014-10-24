@@ -242,7 +242,7 @@ public class PeriodicTable
 	 */
 	public static Element getElement( final String symbol )
 	{
-		return (Element) PeriodicTable.symbolToElementHash.get( symbol );
+		return PeriodicTable.symbolToElementHash.get( symbol );
 	}
 
 	//

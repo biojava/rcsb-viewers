@@ -50,6 +50,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Robot;
@@ -62,6 +63,7 @@ import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
@@ -75,17 +77,15 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.Map.Entry;
 
-
 import javax.media.opengl.DebugGL2;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLException;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.TraceGL2;
-
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
-
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
 import javax.swing.JPanel;
@@ -123,9 +123,10 @@ import org.rcsb.vf.glscene.jogl.ChainGeometry.RibbonForm;
 import org.rcsb.vf.glscene.jogl.tiles.TileRenderer;
 import org.rcsb.vf.glscene.surfaces.SurfaceGeometry;
 
-
 import com.jogamp.common.nio.Buffers;
+import com.jogamp.opengl.util.GLReadBufferUtil;
 import com.jogamp.opengl.util.awt.ImageUtil;
+import com.jogamp.opengl.util.awt.Screenshot;
 import com.jogamp.opengl.util.gl2.GLUT;
 
 
@@ -787,7 +788,11 @@ WindowListener, IStructureStylesEventListener {
 			//this.repaint();
 			if ( drawableViewer != null) {
 				//long timeS = System.currentTimeMillis();
+				System.out.println("GLGeometryViewer: drawableViewer.repaint");
 				drawableViewer.repaint();
+				System.out.println("screenshot: " + isScreenshotRequested);
+				System.out.println("width: " + drawableViewer.getWidth());
+				System.out.println("height: " + drawableViewer.getHeight());
 				//long timeE = System.currentTimeMillis();
 				//System.out.println("repaint took " + (timeE- timeS) + " ms. Previous repaint was called " + (timeS - prevRepaint) + "ms ago." );
 				//prevRepaint = timeE;
@@ -819,6 +824,7 @@ WindowListener, IStructureStylesEventListener {
 		if (this.drawable != null && !AppBase.backgroundScreenshotOnly) {
 			//this.drawable.display();
 			//this.repaint();
+
 			if ( drawableViewer != null)
 				drawableViewer.repaint();
 		}
@@ -907,43 +913,64 @@ WindowListener, IStructureStylesEventListener {
 			final boolean canModifyProjectionMatrix,
 			final boolean canClearModelviewMatrix, final boolean isPick)
 	{
+
 		if (this.isScreenshotRequested)
 		{
+			System.out.println("GLGeometryViewer: reshaping image for screenshot: " + this.isScreenshotRequested);
 			final int oldViewportWidth = this.viewportWidth;
 			final int oldViewportHeight = this.viewportHeight;
 			this.reshape(drawable, 0, 0, this.screenshotWidth,
 					this.screenshotHeight);
 
-			final int bufImgType = BufferedImage.TYPE_3BYTE_BGR;
+	
+			// - pr 20141410
+		// the following code seems to work the same
+		//	http://stackoverflow.com/questions/22839899/how-to-save-am-image-of-a-screen-using-jogl
+		// see source at:	http://libjogl-java.sourcearchive.com/documentation/1.1.1plus-pdak1-3/Screenshot_8java-source.html#l00184
+			this.requestRepaint();
+			gl.glFinish();
+			BufferedImage image = Screenshot.readToBufferedImage(this.screenshotWidth, this.screenshotHeight);
+			image.flush();
+		//	writeToFile();
+			
+			// http://stackoverflow.com/questions/8586798/jogl-taking-a-screenshot-of-a-glcanvas-in-a-jframe-using-component-printall-d
+			// creates black image
+//		 BufferedImage image = new BufferedImage(this.screenshotWidth, this.screenshotHeight, BufferedImage.TYPE_INT_RGB);         
+//			Graphics2D g = image.createGraphics();        
+//	        this.printAll(g);        
+//	        image.flush();
+	        
+			// original code ...
 
-			final BufferedImage image = new BufferedImage(this.screenshotWidth,
-					this.screenshotHeight, bufImgType);
-			final ByteBuffer imageBuffer = ByteBuffer
-			.wrap(((DataBufferByte) image.getRaster().getDataBuffer())
-					.getData());
-
-			final TileRenderer tr = new TileRenderer();
-			if (this.tileHeight > 0 && this.tileWidth > 0) {
-				tr.setTileSize(this.tileWidth, this.tileHeight, 0);
-			} else {
-				tr.setTileSize(super.getWidth(), super.getHeight(), 0);
-			}
-			tr.setImageSize(this.screenshotWidth, this.screenshotHeight);
-			tr.setImageBuffer(GL2.GL_BGR, GL.GL_UNSIGNED_BYTE, imageBuffer);
-			tr.trPerspective(fovy, 1.0 / this.aspect,
-					zNear, zFar);
-
-			do
-			{
-				tr.beginTile(gl);
-
-				gl.glFlush();
-				this.drawScene(gl, glu, glut, false, canClearModelviewMatrix,
-						null, null, false);
-				gl.glFlush();
-			} while (tr.endTile(gl));
-
-			ImageUtil.flipImageVertically(image);
+//			final int bufImgType = BufferedImage.TYPE_3BYTE_BGR;
+//			final BufferedImage image = new BufferedImage(this.screenshotWidth,
+//					this.screenshotHeight, bufImgType);
+//			final ByteBuffer imageBuffer = ByteBuffer
+//			.wrap(((DataBufferByte) image.getRaster().getDataBuffer())
+//					.getData());
+//
+//			final TileRenderer tr = new TileRenderer();
+//			if (this.tileHeight > 0 && this.tileWidth > 0) {
+//				tr.setTileSize(this.tileWidth, this.tileHeight, 0);
+//			} else {
+//				tr.setTileSize(super.getWidth(), super.getHeight(), 0);
+//			}
+//			tr.setImageSize(this.screenshotWidth, this.screenshotHeight);
+//			tr.setImageBuffer(GL2.GL_BGR, GL.GL_UNSIGNED_BYTE, imageBuffer);
+//			tr.trPerspective(fovy, 1.0 / this.aspect,
+//					zNear, zFar);
+//
+//			do
+//			{
+//				tr.beginTile(gl);
+//
+//				gl.glFlush();
+//				this.drawScene(gl, glu, glut, false, canClearModelviewMatrix,
+//						null, null, false);
+//				gl.glFlush();
+//			} while (tr.endTile(gl));
+//
+//			ImageUtil.flipImageVertically(image);
 
 			this.reshape(drawable, 0, 0, oldViewportWidth, oldViewportHeight);
 
@@ -982,6 +1009,22 @@ WindowListener, IStructureStylesEventListener {
 			this.mouseLocationInPanel = null;
 			this.pickMouseEvent = null;
 
+		}
+	}
+	
+	private void writeToFile() {
+		this.requestRepaint();
+		this.requestRepaint();
+		this.requestRepaint();
+		File file = new File("/Users/peter/test.png");
+		try {
+			Screenshot.writeToFile(file, this.screenshotWidth, this.screenshotHeight);
+		} catch (GLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 

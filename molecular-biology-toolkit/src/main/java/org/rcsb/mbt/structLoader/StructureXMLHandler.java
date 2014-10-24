@@ -1297,7 +1297,7 @@ public class StructureXMLHandler extends DefaultHandler implements
 			}
 
 			if(cAlphaFlag) {
-				if(curAtom.name.equals("CA")) {
+				if (curAtom.name.equals("CA") || curAtom.name.equals("P")) {
 					atomVector.add(createFinalAtom(curAtom));
 					assignMissingResidueIds();
 					prevAtom = curAtom;
@@ -1613,6 +1613,10 @@ public class StructureXMLHandler extends DefaultHandler implements
 				System.err.println("_struct_conn.pdbx_ptnr2_label_alt_id  : " + curAltId2);
 			}
 			
+			if (atom1 == null || atom2 == null) {
+				return;
+			}
+			
 		    // ignore bonds to metals. They will be handled separately in the MBT viewers
 			if (isMetal(atom1) || isMetal(atom2)) {
 				return;
@@ -1628,6 +1632,9 @@ public class StructureXMLHandler extends DefaultHandler implements
 		 */
 		private boolean isMetal(Atom a1) {
 			Element e = PeriodicTable.getElement(a1.element);
+			if (e == null) {
+				return false;
+			}
 			return PeriodicTable.isMetal(e.atomic_number);
 		}
 	}
