@@ -119,9 +119,9 @@ public class ImageFileChooser extends JFileChooser
 		super(new File(System.getProperty("user.dir")));
 		this.parentComponent = parentComponent;
 		this.setAcceptAllFileFilterUsed(false);
-		this.addChoosableFileFilter(new ImageFileFilter(ImageFileFormat.TIFF));
+	//	this.addChoosableFileFilter(new ImageFileFilter(ImageFileFormat.TIFF));
 		this.addChoosableFileFilter(new ImageFileFilter(ImageFileFormat.PNG));
-		this.addChoosableFileFilter(new ImageFileFilter(ImageFileFormat.JPEG));
+	//	this.addChoosableFileFilter(new ImageFileFilter(ImageFileFormat.JPEG));
 	}
 	
 	/**

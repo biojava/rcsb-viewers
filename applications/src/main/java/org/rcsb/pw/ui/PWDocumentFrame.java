@@ -95,8 +95,7 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 {
 	private static final long serialVersionUID = -2377835483763485353L;
 	private final String helpURL = "http://www.pdb.org/pdb/staticHelp.do?p=help/viewers/proteinWorkshop_viewer.html";
-//	private static int SIDEBAR_WIDTH = 375;
-//	private static int SIDEBAR_WIDTH = 265;
+
 	@Override
 	public PWGlGeometryViewer getGlGeometryViewer() { return (PWGlGeometryViewer)super.getGlGeometryViewer(); }
 	@Override
@@ -219,6 +218,7 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 				
 				// Create the sidebar
 				PWDocumentFrame.this.sidebar = new Sidebar();
+				
 				PWDocumentFrame.this.horizontalSplitPane
 						.setBottomComponent(PWDocumentFrame.this.sidebar);
 
@@ -317,9 +317,10 @@ public class PWDocumentFrame extends VFDocumentFrameBase
 
 			JLabel sample = new JLabel("   2) Choose what you want the tool to affect.     ");
 				
-			int sWidth = sample.getPreferredSize().width + 60;
+//			int sWidth = sample.getPreferredSize().width + 60;
+			int sWidth = sample.getPreferredSize().width + 100; // this sets the width of the side bar
 	//		System.out.println("PWDocumentFrame: " + sWidth);
-	//		sWidth = SIDEBAR_WIDTH;
+
 			horizontalSplitPane.addAncestorListener(PWDocumentFrame.this.new HorizontalSplitPaneListener(PWDocumentFrame.this));
 
 			horizontalSplitPane.setDividerLocation(PWDocumentFrame.this.horizontalSplitPane.getWidth() - sWidth);

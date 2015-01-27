@@ -56,6 +56,7 @@ import javax.swing.JPanel;
 import org.rcsb.pw.controllers.app.ProteinWorkshop;
 import org.rcsb.pw.controllers.scene.mutators.MutatorEnum;
 import org.rcsb.pw.ui.tree.TreeViewer;
+import org.rcsb.uiApp.controllers.app.AppBase;
 
 public class MutatorBasePanel extends JPanel
 {
@@ -157,8 +158,8 @@ public class MutatorBasePanel extends JPanel
         this.linesPanel = new LinesOptionsPanel();
 //        this.selectionPanel = new SelectionOptionsPanel();
         this.pickLevelPanel = new MutatorActivationPanel();
-        this.surfacePanel = new SurfacePanel();
         
+        this.surfacePanel = new SurfacePanel(AppBase.getApp().isMultiScaleMode());
       
         super.add(this.mutatorPanel);
         super.add(this.pickLevelPanel);

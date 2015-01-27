@@ -112,7 +112,8 @@ public final class ImageFileSaver {
 		if (extension.equals(ImageFileFormat.JPEG.getExtension())) {
 			saveJPEG(image, dpi, filename);
 		} else if (extension.equals(ImageFileFormat.PNG.getExtension())) {
-			savePNG(image, dpi, filename);
+		//	savePNG(image, dpi, filename);
+			savePNGNew(image, dpi, filename);
 		} else if (extension.equals(ImageFileFormat.TIFF.getExtension())) {
 			saveTIFF(image, dpi, filename);
 		} else {
@@ -186,6 +187,26 @@ public final class ImageFileSaver {
 		ImageEncoder encoder = ImageCodec.createImageEncoder(ImageFileFormat.PNG.toString(), fout, pngEncodeParam);
 		encoder.encode(image);
 		fout.close();
+	}
+	
+	/**
+	 * Saves image as a PNG file at the specified resolution.
+	 * 
+	 * @param image image to be saved
+	 * @param dpi resolution in dots per inch
+	 * @param file filename name of the PNG file
+     * @throws IOException
+     */
+	private static void savePNGNew(final BufferedImage image, final int dpi, final String filename) throws IOException
+	{
+		try {
+		    // retrieve image
+		    File outputfile = new File(filename);
+		    ImageIO.write(image, "png", outputfile);
+		} catch (IOException e) {
+	
+		}
+		
 	}
 
 	/**

@@ -67,6 +67,7 @@ import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
 import org.rcsb.mbt.model.util.ChemicalComponentInfo;
 import org.rcsb.mbt.model.util.Status;
 
+
 /**
  * This class stores and retrieves styles associated with visible
  * representations of objects provided by a StructureMap. A StructureStyles

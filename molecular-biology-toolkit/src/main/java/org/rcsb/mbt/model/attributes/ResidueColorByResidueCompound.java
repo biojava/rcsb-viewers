@@ -77,7 +77,7 @@ public class ResidueColorByResidueCompound
 			"phe" , new Color(153, 255, 153),
 			"val" , new Color(0, 204, 0),
 			"ala" , new Color(0, 153, 0),
-			"ili" , new Color(51, 255, 51),
+			"ile" , new Color(51, 255, 51),
 			"leu" , new Color(51, 255, 51),
 			"pro" , new Color(204, 204, 0),
 			"met" , new Color(51, 255, 51),

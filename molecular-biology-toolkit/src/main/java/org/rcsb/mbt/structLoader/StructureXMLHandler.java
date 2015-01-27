@@ -73,7 +73,6 @@ import org.rcsb.mbt.model.util.PeriodicTable;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
 /**
  * Invoked by the SAX while parsing the XML file.
  * 
@@ -115,7 +114,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * 
  * <h3>Non-Protein Chains (ligands/waters/ions)</h3>
  * <p>
- * Non protein chains are accumulated into their own chains.
+ * Non protein chains are accumulated into their own chains.-
  * </p>
  * 
  * 
@@ -135,6 +134,8 @@ public class StructureXMLHandler extends DefaultHandler implements
 		public Attributes attrs = null;
 	}
 
+	protected boolean cAlphaFlag;
+	
 	private String urlString; // for status reporting purposes.
 	private String initialBioId = "1"; // default first biological unit
 	protected boolean bioUnitSet = false; 
@@ -152,7 +153,6 @@ public class StructureXMLHandler extends DefaultHandler implements
 	protected Atom prevAtom = null;
 	protected String currentEntityName = "";
 	protected int currentEntityId = 0;
-	
 	
 	// temp fields for struc_conn records
 	protected String curConnType = null;
@@ -264,7 +264,8 @@ public class StructureXMLHandler extends DefaultHandler implements
 
 	public StructureXMLHandler(final String urlString) {
 		this.urlString = urlString;
-
+		
+		//if(AppBase.getApp().properties.getProperty("calphaFlag"))
 		//
 		// BEG General
 		//
@@ -1295,11 +1296,20 @@ public class StructureXMLHandler extends DefaultHandler implements
 				return;
 			}
 
-			atomVector.add(createFinalAtom(curAtom));
-			assignMissingResidueIds();
-			prevAtom = curAtom;
-			curAtom = null;
-
+			if(cAlphaFlag) {
+				if (curAtom.name.equals("CA") || curAtom.name.equals("P")) {
+					atomVector.add(createFinalAtom(curAtom));
+					assignMissingResidueIds();
+					prevAtom = curAtom;
+					curAtom = null;
+				}
+			}
+			else {
+				atomVector.add(createFinalAtom(curAtom));
+				assignMissingResidueIds();
+				prevAtom = curAtom;
+				curAtom = null;
+			}
 			clearParsingFlag(eIsParsing.ATOM_SITE);
 		}
 	}
@@ -1603,6 +1613,10 @@ public class StructureXMLHandler extends DefaultHandler implements
 				System.err.println("_struct_conn.pdbx_ptnr2_label_alt_id  : " + curAltId2);
 			}
 			
+			if (atom1 == null || atom2 == null) {
+				return;
+			}
+			
 		    // ignore bonds to metals. They will be handled separately in the MBT viewers
 			if (isMetal(atom1) || isMetal(atom2)) {
 				return;
@@ -1618,6 +1632,9 @@ public class StructureXMLHandler extends DefaultHandler implements
 		 */
 		private boolean isMetal(Atom a1) {
 			Element e = PeriodicTable.getElement(a1.element);
+			if (e == null) {
+				return false;
+			}
 			return PeriodicTable.isMetal(e.atomic_number);
 		}
 	}

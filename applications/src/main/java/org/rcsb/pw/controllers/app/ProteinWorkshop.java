@@ -48,9 +48,13 @@ package org.rcsb.pw.controllers.app;
 
 import java.net.URL;
 
+import org.rcsb.mbt.model.Structure;
+import org.rcsb.mbt.model.StructureModel.StructureList;
 import org.rcsb.pw.controllers.scene.PWSceneController;
 import org.rcsb.pw.glscene.jogl.PWGlGeometryViewer;
 import org.rcsb.pw.ui.PWDocumentFrame;
+import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.uiApp.controllers.doc.SurfaceThread;
 import org.rcsb.uiApp.ui.mainframe.DocumentFrameBase;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.controllers.scene.SceneController;
@@ -132,13 +136,33 @@ public class ProteinWorkshop extends VFAppBase
 		MutatorBase.setActivationType(MutatorBase.ActivationType.ATOMS_AND_BONDS);
 		
 		String structureUrlParam = this.properties.getProperty("structure_url");
-
-		if (structureUrlParam != null)
+		
+		
+		if (structureUrlParam != null) {
 			((VFDocumentFrameBase)activeFrame).loadURL(structureUrlParam);
+		}
 		
 		String structureIdList = this.properties.getProperty("structure_id_list");
 
 		if (structureIdList != null)
 			((VFDocumentFrameBase)activeFrame).loadURL(structureIdList.split(","));
+		
+		// PR adding surface
+		boolean cAlphaFlag = AppBase.getApp().properties.get("cAlphaFlag") != null;
+		System.out.println("SimpleViewer: " + cAlphaFlag);
+		if (cAlphaFlag) {
+			initializeSurface();
+		}
+	}
+
+	/**
+	 * Draws multi-scale surface
+	 */
+	private void initializeSurface() {
+		StructureList s = AppBase.sgetModel().getStructures();
+		Structure str = s.get(0);
+		SurfaceThread st = new SurfaceThread();
+		st.createCAlphaSurface();
+		((VFDocumentFrameBase)activeFrame).getGlGeometryViewer().surfaceAdded(str);
 	}
 }

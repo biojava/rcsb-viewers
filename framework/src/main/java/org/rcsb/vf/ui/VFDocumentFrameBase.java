@@ -53,6 +53,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
+import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.doc.LoadThread;
 import org.rcsb.uiApp.ui.mainframe.DocumentFrameBase;
 import org.rcsb.vf.controllers.app.VFAppBase;
@@ -132,6 +133,10 @@ public abstract class VFDocumentFrameBase extends DocumentFrameBase
 	
 	public void loadURL(String url)
 	{
+//		LoadThread loader = new LoadThread(url); // PR
+		System.out.println("VFDocumentFrame: calphaFlag: " + AppBase.getApp().properties.get("cAlphaFlag"));
+//		boolean calphaFlag = true;
+//		LoadThread loader = new LoadThread(url, calphaFlag);
 		LoadThread loader = new LoadThread(url);
 		loader.run();
 	}

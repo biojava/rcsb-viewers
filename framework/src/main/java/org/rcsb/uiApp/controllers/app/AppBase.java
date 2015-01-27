@@ -157,6 +157,9 @@ public abstract class AppBase
 	// Runtime properties (options or parameters)
 	public Properties properties = new Properties();
 	
+	
+
+	
 	/**
 	 * The singleton app
 	 */
@@ -212,5 +215,9 @@ public abstract class AppBase
 		if (DebugState.isDebug())
 			System.err.println("-->AppBase - Free memory: " +
 					Runtime.getRuntime().freeMemory());
+	}
+	
+	public boolean isMultiScaleMode() {
+	     return this.properties.get("cAlphaFlag") != null;
 	}
 }

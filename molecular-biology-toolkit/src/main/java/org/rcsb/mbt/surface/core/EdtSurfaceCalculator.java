@@ -78,7 +78,8 @@ import org.rcsb.mbt.surface.datastructure.VolumePixel;
  */
 public class EdtSurfaceCalculator {
     private float probeRadius = 0.0f;
-    private static float fmargin = 2.5f;
+    private static float fmargin = 5.0f;
+    private float testMargin = 5.0f;
     private int boxlength=128;
     private float fixsf=4;
     private float threshbox=300;
@@ -108,7 +109,15 @@ public class EdtSurfaceCalculator {
 
 // public void initpara(int seqinit,int seqterm,atom* proseq,bool atomtype,bool btype) {
     // btype: false for VDW solid, true for SA solid
+    
     public EdtSurfaceCalculator(List<Sphere> spheres, float probeRadius, float resolution) {
+        this.spheres = spheres;
+        this.probeRadius = probeRadius;
+        this.fixsf = resolution * this.fixsf;
+    }
+    
+    public EdtSurfaceCalculator(List<Sphere> spheres, float probeRadius, float resolution, float atomRadius) {
+    	this.testMargin = atomRadius + 0.1f;
         this.spheres = spheres;
         this.probeRadius = probeRadius;
         this.fixsf = resolution * this.fixsf;
@@ -137,7 +146,8 @@ public class EdtSurfaceCalculator {
         Point3f pMax = new Point3f();
         boundbox(pMin, pMax);
  //       System.out.println(pMin + " " + pMax);
-        Point3f offset = new Point3f(probeRadius + fmargin, probeRadius + fmargin, probeRadius + fmargin);
+        Point3f offset = new Point3f(probeRadius + testMargin, probeRadius + testMargin, probeRadius + testMargin);
+ //       Point3f offset = new Point3f(probeRadius + fmargin, probeRadius + fmargin, probeRadius + fmargin);
 //        pMin.x -= probeRadius + fmargin;
 //        pMin.y -= probeRadius + fmargin;
 //        pMin.z -= probeRadius + fmargin;

@@ -47,7 +47,11 @@ package org.rcsb.sv.controllers.app;
 
 import java.net.URL;
 
+import org.rcsb.mbt.model.Structure;
+import org.rcsb.mbt.model.StructureModel.StructureList;
 import org.rcsb.sv.ui.SVDocumentFrame;
+import org.rcsb.uiApp.controllers.app.AppBase;
+import org.rcsb.uiApp.controllers.doc.SurfaceThread;
 import org.rcsb.uiApp.ui.mainframe.DocumentFrameBase;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
@@ -126,5 +130,23 @@ public class SimpleViewer extends VFAppBase
 
 		if (structureIdList != null)
 			((VFDocumentFrameBase)activeFrame).loadURL(structureIdList.split(","));
+		
+		// PR adding surface
+		boolean cAlphaFlag = AppBase.getApp().properties.get("cAlphaFlag") != null;
+		System.out.println("SimpleViewer: " + cAlphaFlag);
+		if (cAlphaFlag) {
+			initializeSurface();
+		}
+	}
+	
+	/**
+	 * Draws multi-scale surface
+	 */
+	private void initializeSurface() {
+		StructureList s = AppBase.sgetModel().getStructures();
+		Structure str = s.get(0);
+		SurfaceThread st = new SurfaceThread();
+		st.createCAlphaSurface();
+		((VFDocumentFrameBase)activeFrame).getGlGeometryViewer().surfaceAdded(str);
 	}
 }
