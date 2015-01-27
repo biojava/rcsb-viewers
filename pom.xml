@@ -173,7 +173,6 @@
 		<module>molecular-biology-toolkit</module>
 		<module>applications</module>
 		<module>framework</module>
-		<module>colorbrewer</module>
 	</modules>
 
 

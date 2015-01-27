@@ -91,9 +91,9 @@
 
 
 		<dependency>
-			<groupId>org.rcsb</groupId>
-			<artifactId>colorbrewer</artifactId>
-			<version>4.1.1-SNAPSHOT</version>
+			<groupId>org.biojava</groupId>
+			<artifactId>jcolorbrewer</artifactId>
+			<version>5.2</version>
 		</dependency>
 	</dependencies>
 </project>
