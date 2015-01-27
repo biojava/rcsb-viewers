@@ -260,7 +260,6 @@ public class SurfaceState {
 	}
 	
 	/**
-	 * @param structure
 	 * @return
 	 */
 	private void createEntitySet() {
