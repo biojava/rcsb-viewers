@@ -1,105 +1,89 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<artifactId>viewers</artifactId>
-		<groupId>org.rcsb</groupId>
-		<version>4.2-SNAPSHOT</version>
-	</parent>	
-	<artifactId>molecular-biology-toolkit</artifactId>
-	<name>molecular-biology-toolkit</name>
-	<packaging>jar</packaging>
-	
-	<build>
-		<plugins>
-			<!-- call mvn exec:java to trigger build of this this -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.2.1</version>
-				<executions>
-					<execution>
-						<id>BondCreator</id>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-
-							<mainClass>org.rcsb.ex.tools.ChemicalComponentBondsCreator</mainClass>
-
-						</configuration>
-					</execution>
-					
-					<execution>
-						<id>TypesCreator</id>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-						
-						<mainClass>org.rcsb.ex.tools.ChemicalComponentTypesCreator</mainClass>
-				
-						</configuration>
-					</execution>
-				</executions>
-				
-			</plugin>
-
-			
-
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.1</version>
-			</plugin>
-			
-
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>install</phase>
-						<goals>
-						<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<tasks>
-						<echo message="Installing MBT file: ${project.build.finalName} in PDB web project " />
-						<copy file="${project.build.directory}/${project.build.finalName}.jar" tofile="${basedir}/../../../pdbweb/webapp/Viewers/RCSBViewers/mbt.jar"></copy>
-
-					</tasks>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.7</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-			<version>6.1.1</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
-			<version>2.4.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.biojava</groupId>
-			<artifactId>jcolorbrewer</artifactId>
-			<version>5.2</version>
-		</dependency>
-	</dependencies>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>viewers</artifactId>
+        <groupId>org.rcsb</groupId>
+        <version>4.3-SNAPSHOT</version>
+    </parent>
+    <artifactId>molecular-biology-toolkit</artifactId>
+    <name>molecular-biology-toolkit</name>
+    <packaging>jar</packaging>
+    <build>
+        <plugins>
+            <!-- call mvn exec:java to trigger build of this this -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <execution>
+                        <id>BondCreator</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.rcsb.ex.tools.ChemicalComponentBondsCreator</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>TypesCreator</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.rcsb.ex.tools.ChemicalComponentTypesCreator</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <tasks>
+                        <echo message="Installing MBT file: ${project.build.finalName} in PDB web project "/>
+                        <copy file="${project.build.directory}/${project.build.finalName}.jar"
+                              tofile="${basedir}/../../../pdbweb/webapp/Viewers/RCSBViewers/mbt.jar"></copy>
+                    </tasks>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.7</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.1.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.biojava</groupId>
+            <artifactId>jcolorbrewer</artifactId>
+            <version>5.2</version>
+        </dependency>
+    </dependencies>
 </project>
