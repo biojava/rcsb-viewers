@@ -5,7 +5,7 @@
     <parent>
         <artifactId>Viewers</artifactId>
         <groupId>org.rcsb</groupId>
-        <version>4.3-SNAPSHOT</version>
+        <version>4.3.1-SNAPSHOT</version>
     </parent>
     <artifactId>assembly</artifactId>
     <packaging>jar</packaging>
