@@ -85,11 +85,6 @@
             <artifactId>jogl-all-main</artifactId>
             <version>2.0-rc11</version>
         </dependency>
-        <dependency>
-            <groupId>org.biojava</groupId>
-            <artifactId>jcolorbrewer</artifactId>
-            <version>5.2</version>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -170,7 +165,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jarsigner-plugin</artifactId>
-                        <version>1.2</version>
+                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>sign</id>
@@ -188,8 +183,6 @@
                             <alias>${keystore.alias}</alias>
                             <storepass>${keystore.store.password}</storepass>
                             <keypass>${keystore.key.password}</keypass>
-                            <signedjar>${project.build.directory}/${project.build.finalName}.jar</signedjar>
-                            <verify>true</verify>
                             <verbose>true</verbose>
                             <goal>sign</goal>
                             <arguments>
