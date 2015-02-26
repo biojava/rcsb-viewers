@@ -4,7 +4,7 @@
     <parent>
         <artifactId>viewers</artifactId>
         <groupId>org.rcsb</groupId>
-        <version>4.4.0-SNAPSHOT</version>
+        <version>4.4.1-SNAPSHOT</version>
     </parent>
     <artifactId>applications</artifactId>
     <name>applications</name>
@@ -16,6 +16,14 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.4</version>
             </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
@@ -23,7 +31,7 @@
             <groupId>org.rcsb</groupId>
             <artifactId>molecular-biology-toolkit</artifactId>
             <!-- BE SURE TO UPDATE THE VERSION NUMBER HERE -->
-            <version>4.4.0-SNAPSHOT</version>
+            <version>4.4.1-SNAPSHOT</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
@@ -31,7 +39,7 @@
             <groupId>org.rcsb</groupId>
             <artifactId>framework</artifactId>
             <!-- BE SURE TO UPDATE THE VERSION NUMBER HERE -->
-            <version>4.4.0-SNAPSHOT</version>
+            <version>4.4.1-SNAPSHOT</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
