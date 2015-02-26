@@ -54,7 +54,7 @@
         <dependency>
             <groupId>org.rcsb</groupId>
             <artifactId>signedColorbrewer</artifactId>
-            <version>5.2</version>
+            <version>5.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <profiles>
