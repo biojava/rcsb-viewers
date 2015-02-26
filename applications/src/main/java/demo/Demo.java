@@ -15,9 +15,9 @@ public class Demo {
 
 	public static void main(String[] args){
 
-					showSimpleViewer();
+					//showSimpleViewer();
 	    // showProteinWorkshop();
-		//  showLigandExplorer();
+		  showLigandExplorer();
 		//showKiosk();
 	}
 

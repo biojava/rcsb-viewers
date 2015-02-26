@@ -4,7 +4,7 @@
     <parent>
         <artifactId>viewers</artifactId>
         <groupId>org.rcsb</groupId>
-        <version>4.3.2-SNAPSHOT</version>
+        <version>4.4.0-SNAPSHOT</version>
     </parent>
     <artifactId>molecular-biology-toolkit</artifactId>
     <name>molecular-biology-toolkit</name>
@@ -22,43 +22,25 @@
                         <goals>
                             <goal>exec</goal>
                         </goals>
-                        <configuration>
-                            <mainClass>org.rcsb.ex.tools.ChemicalComponentBondsCreator</mainClass>
-                        </configuration>
+                        <!--<configuration>-->
+                            <!--<mainClass>org.rcsb.ex.tools.ChemicalComponentBondsCreator</mainClass>-->
+                        <!--</configuration>-->
                     </execution>
                     <execution>
                         <id>TypesCreator</id>
                         <goals>
                             <goal>exec</goal>
                         </goals>
-                        <configuration>
-                            <mainClass>org.rcsb.ex.tools.ChemicalComponentTypesCreator</mainClass>
-                        </configuration>
+                        <!--<configuration>-->
+                            <!--<mainClass>org.rcsb.ex.tools.ChemicalComponentTypesCreator</mainClass>-->
+                        <!--</configuration>-->
                     </execution>
                 </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <tasks>
-                        <echo message="Installing MBT file: ${project.build.finalName} in PDB web project "/>
-                        <copy file="${project.build.directory}/${project.build.finalName}.jar"
-                              tofile="${basedir}/../../../pdbweb/webapp/Viewers/RCSBViewers/mbt.jar"></copy>
-                    </tasks>
-                </configuration>
+                <version>2.4</version>
             </plugin>
         </plugins>
     </build>
@@ -67,13 +49,11 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.7</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>6.1.1</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>
@@ -81,53 +61,9 @@
             <version>2.4.0</version>
         </dependency>
         <dependency>
-            <groupId>org.rcsb</groupId>
-            <artifactId>signedColorbrewer</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <groupId>org.biojava</groupId>
+            <artifactId>jcolorbrewer</artifactId>
+            <version>5.2</version>
         </dependency>
     </dependencies>
-    <profiles>
-        <!-- Note: before you can use this build profile you need to set up an
-            environment that contains correctly signed keys. Configure the keystore properties
-            and the profile in ~/.m2/settings.xml -->
-        <profile>
-            <id>codesigning</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-jarsigner-plugin</artifactId>
-                        <version>1.4</version>
-                        <executions>
-                            <execution>
-                                <id>sign</id>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <removeExistingSignatures>true</removeExistingSignatures>
-                            <verbose>true</verbose>
-                            <certs>true</certs>
-                            <storetype>${keystore.type}</storetype>
-                            <keystore>${keystore.path}</keystore>
-                            <alias>${keystore.alias}</alias>
-                            <storepass>${keystore.store.password}</storepass>
-                            <keypass>${keystore.key.password}</keypass>
-                            <verbose>true</verbose>
-                            <goal>sign</goal>
-                            <arguments>
-                                <argument>-tsa</argument>
-                                <argument>https://timestamp.geotrust.com/tsa</argument>
-                            </arguments>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
