@@ -4,7 +4,7 @@
     <parent>
         <artifactId>viewers</artifactId>
         <groupId>org.rcsb</groupId>
-        <version>4.3.1-SNAPSHOT</version>
+        <version>4.3.2-SNAPSHOT</version>
     </parent>
     <artifactId>molecular-biology-toolkit</artifactId>
     <name>molecular-biology-toolkit</name>
@@ -81,8 +81,8 @@
             <version>2.4.0</version>
         </dependency>
         <dependency>
-            <groupId>org.biojava</groupId>
-            <artifactId>jcolorbrewer</artifactId>
+            <groupId>org.rcsb</groupId>
+            <artifactId>signedColorbrewer</artifactId>
             <version>5.2</version>
         </dependency>
     </dependencies>
