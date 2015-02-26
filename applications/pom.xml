@@ -4,7 +4,7 @@
     <parent>
         <artifactId>viewers</artifactId>
         <groupId>org.rcsb</groupId>
-        <version>4.4.1-SNAPSHOT</version>
+        <version>4.4.2-SNAPSHOT</version>
     </parent>
     <artifactId>applications</artifactId>
     <name>applications</name>
@@ -31,7 +31,7 @@
             <groupId>org.rcsb</groupId>
             <artifactId>molecular-biology-toolkit</artifactId>
             <!-- BE SURE TO UPDATE THE VERSION NUMBER HERE -->
-            <version>4.4.1-SNAPSHOT</version>
+            <version>4.4.2-SNAPSHOT</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
@@ -39,7 +39,7 @@
             <groupId>org.rcsb</groupId>
             <artifactId>framework</artifactId>
             <!-- BE SURE TO UPDATE THE VERSION NUMBER HERE -->
-            <version>4.4.1-SNAPSHOT</version>
+            <version>4.4.2-SNAPSHOT</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>

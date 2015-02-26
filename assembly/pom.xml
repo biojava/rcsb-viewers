@@ -5,7 +5,7 @@
     <parent>
         <artifactId>Viewers</artifactId>
         <groupId>org.rcsb</groupId>
-        <version>4.4.1-SNAPSHOT</version>
+        <version>4.4.2-SNAPSHOT</version>
     </parent>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -65,7 +65,7 @@
             <groupId>org.rcsb</groupId>
             <artifactId>molecular-biology-toolkit</artifactId>
             <!-- BE SURE TO UPDATE THE VERSION NUMBER HERE -->
-            <version>4.4.1-SNAPSHOT</version>
+            <version>4.4.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
