@@ -36,6 +36,28 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <!-- Build an executable JAR -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                        <manifest>
+                            <!--<addClasspath>true</addClasspath>-->
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Trusted-Library>true</Trusted-Library>
+                            <Permissions>all-permissions</Permissions>
+                            <Codebase>*</Codebase>
+                            <Application-Name>RCSB Viewers</Application-Name>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
             <!--  call mvn exec:java to trigger this -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
