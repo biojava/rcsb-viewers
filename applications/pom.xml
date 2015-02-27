@@ -41,6 +41,7 @@
             <artifactId>molecular-biology-toolkit</artifactId>
             <!-- BE SURE TO UPDATE THE VERSION NUMBER HERE -->
             <version>4.4.3-SNAPSHOT</version>
+            <classifier>jar-with-dependencies</classifier>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
@@ -49,6 +50,7 @@
             <artifactId>framework</artifactId>
             <!-- BE SURE TO UPDATE THE VERSION NUMBER HERE -->
             <version>4.4.3-SNAPSHOT</version>
+            <classifier>jar-with-dependencies</classifier>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>

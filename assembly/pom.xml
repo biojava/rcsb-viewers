@@ -75,6 +75,7 @@
             <artifactId>molecular-biology-toolkit</artifactId>
             <!-- BE SURE TO UPDATE THE VERSION NUMBER HERE -->
             <version>4.4.3-SNAPSHOT</version>
+            <classifier>jar-with-dependencies</classifier>
         </dependency>
     </dependencies>
 </project>
