@@ -40,9 +40,16 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
+                    <finalName>RCSB-Viewers</finalName>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <!-- This sets a default main class (in the event one is not passed) and builds a manifest file -->
+                            <mainClass>org.rcsb.sv.controllers.app.SimpleViewer</mainClass>
+                        </manifest>
+                    </archive>
                 </configuration>
                 <executions>
                     <execution>
@@ -142,90 +149,6 @@
                                 <argument>-tsa</argument>
                                 <argument>https://timestamp.geotrust.com/tsa</argument>
                             </arguments>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>simpleViewer</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <configuration>
-                            <finalName>SimpleViewer</finalName>
-                            <archive>
-                                <manifest>
-                                    <mainClass>org.rcsb.sv.controllers.app.SimpleViewer</mainClass>
-                                </manifest>
-                            </archive>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>proteinWorkshop</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <configuration>
-                            <finalName>ProteinWorkshop</finalName>
-                            <archive>
-                                <manifest>
-                                    <mainClass>org.rcsb.pw.controllers.app.ProteinWorkshop</mainClass>
-                                </manifest>
-                            </archive>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>ligandExplorer</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <configuration>
-                            <finalName>LigandExplorer</finalName>
-                            <archive>
-                                <manifest>
-                                    <mainClass>org.rcsb.lx.controllers.app.LigandExplorer</mainClass>
-                                </manifest>
-                            </archive>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>kioskViewer</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <configuration>
-                            <finalName>KioskViewer</finalName>
-                            <archive>
-                                <manifest>
-                                    <mainClass>org.rcsb.ks.controllers.app.KioskViewer</mainClass>
-                                </manifest>
-                            </archive>
                         </configuration>
                     </plugin>
                 </plugins>
