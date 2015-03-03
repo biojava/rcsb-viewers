@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.rcsb</groupId>
     <artifactId>viewers</artifactId>
-    <version>4.4.5-SNAPSHOT</version>
+    <version>4.4.6-SNAPSHOT</version>
     <properties>
         <jdk.version>1.7</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

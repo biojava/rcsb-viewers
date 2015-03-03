@@ -4,18 +4,17 @@
     <parent>
         <artifactId>viewers</artifactId>
         <groupId>org.rcsb</groupId>
-        <version>4.4.5-SNAPSHOT</version>
+        <version>4.4.6-SNAPSHOT</version>
     </parent>
     <artifactId>applications</artifactId>
     <name>applications</name>
     <packaging>jar</packaging>
+    <properties>
+        <!-- Set in one place -->
+        <projectVersionNumber>4.4.6-SNAPSHOT</projectVersionNumber>
+    </properties>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -32,7 +31,7 @@
                             <Trusted-Library>true</Trusted-Library>
                             <Permissions>all-permissions</Permissions>
                             <Codebase>*</Codebase>
-                            <Application-Name>RCSB Viewers</Application-Name>
+                            <Application-Name>RCSB-Viewers</Application-Name>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -40,7 +39,6 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <finalName>RCSB-Viewers</finalName>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
@@ -67,16 +65,16 @@
         <dependency>
             <groupId>org.rcsb</groupId>
             <artifactId>molecular-biology-toolkit</artifactId>
-            <!-- BE SURE TO UPDATE THE VERSION NUMBER HERE -->
-            <version>4.4.5-SNAPSHOT</version>
+            <!-- BE SURE THIS VERSION NUMBER MATCHES THE GLOBAL VERSION NUMBER -->
+            <version>${projectVersionNumber}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.rcsb</groupId>
             <artifactId>framework</artifactId>
-            <!-- BE SURE TO UPDATE THE VERSION NUMBER HERE -->
-            <version>4.4.5-SNAPSHOT</version>
+            <!-- BE SURE THIS VERSION NUMBER MATCHES THE GLOBAL VERSION NUMBER -->
+            <version>${projectVersionNumber}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
@@ -118,7 +116,7 @@
         <profile>
             <id>codesigning</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <build>
                 <plugins>
