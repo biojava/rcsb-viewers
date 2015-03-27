@@ -51,7 +51,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
-import jogamp.opengl.GLPbufferImpl;
 
 import org.rcsb.uiApp.controllers.app.AppBase;
 import org.rcsb.uiApp.controllers.doc.DocController;
@@ -221,9 +220,6 @@ public abstract class VFAppBase extends AppBase
 		else
 			sceneController.setDebugEnabled(false);
 	}
-
-
-	public GLPbufferImpl offscreenPBuffer = null;
 
 	public boolean offscreenDisplayfinished = false;
 

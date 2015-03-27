@@ -401,11 +401,21 @@ public class ImageFileChooser extends JFileChooser
 	
 	private File addExtension(File file, ImageFileFilter filter) {
 		String filename = file.getAbsolutePath();
-		if (filename.endsWith("." + filter.getExtension())) {
+//		String extension = ImageFileFormat.PNG.name();
+		String extension = "png";
+		if (filter != null) {
+			extension = filter.getExtension();
+		}
+		if (filename.endsWith("." + extension)) {
 			return file;
 		} else {
-			return new File(filename + "." + filter.getExtension());
+			return new File(filename + "." + extension);
 		}
+//		if (filename.endsWith("." + filter.getExtension())) {
+//			return file;
+//		} else {
+//			return new File(filename + "." + filter.getExtension());
+//		}
 	}
 }
 
