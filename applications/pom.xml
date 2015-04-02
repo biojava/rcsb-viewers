@@ -78,12 +78,12 @@
             <artifactId>gluegen-rt</artifactId>
             <version>${GluegenJoglVersion}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.jogamp.gluegen</groupId>-->
-            <!--<artifactId>gluegen-rt</artifactId>-->
-            <!--<version>${GluegenJoglVersion}</version>-->
-            <!--<classifier>natives-linux-amd64</classifier>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt</artifactId>
+            <version>${GluegenJoglVersion}</version>
+            <classifier>natives-linux-amd64</classifier>
+        </dependency>
         <!--<dependency>-->
             <!--<groupId>org.jogamp.gluegen</groupId>-->
             <!--<artifactId>gluegen-rt</artifactId>-->
@@ -96,42 +96,42 @@
             <!--<version>${GluegenJoglVersion}</version>-->
             <!--<classifier>natives-linux-armv6hf</classifier>-->
         <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.jogamp.gluegen</groupId>-->
+            <!--<artifactId>gluegen-rt</artifactId>-->
+            <!--<version>${GluegenJoglVersion}</version>-->
+            <!--<classifier>natives-linux-i586</classifier>-->
+        <!--</dependency>-->
         <dependency>
-            <groupId>org.jogamp.gluegen</groupId>
-            <artifactId>gluegen-rt</artifactId>
-            <version>${GluegenJoglVersion}</version>
-            <classifier>natives-linux-i586</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.jogamp.gluegen</groupId>
+        <groupId>org.jogamp.gluegen</groupId>
             <artifactId>gluegen-rt</artifactId>
             <version>${GluegenJoglVersion}</version>
             <classifier>natives-macosx-universal</classifier>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.jogamp.gluegen</groupId>-->
-            <!--<artifactId>gluegen-rt</artifactId>-->
-            <!--<version>${GluegenJoglVersion}</version>-->
-            <!--<classifier>natives-solaris-amd64</classifier>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.jogamp.gluegen</groupId>
             <artifactId>gluegen-rt</artifactId>
             <version>${GluegenJoglVersion}</version>
-            <classifier>natives-solaris-i586</classifier>
+            <classifier>natives-solaris-amd64</classifier>
         </dependency>
         <!--<dependency>-->
             <!--<groupId>org.jogamp.gluegen</groupId>-->
             <!--<artifactId>gluegen-rt</artifactId>-->
             <!--<version>${GluegenJoglVersion}</version>-->
-            <!--<classifier>natives-windows-amd64</classifier>-->
+            <!--<classifier>natives-solaris-i586</classifier>-->
         <!--</dependency>-->
         <dependency>
             <groupId>org.jogamp.gluegen</groupId>
             <artifactId>gluegen-rt</artifactId>
             <version>${GluegenJoglVersion}</version>
-            <classifier>natives-windows-i586</classifier>
+            <classifier>natives-windows-amd64</classifier>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.jogamp.gluegen</groupId>-->
+            <!--<artifactId>gluegen-rt</artifactId>-->
+            <!--<version>${GluegenJoglVersion}</version>-->
+            <!--<classifier>natives-windows-i586</classifier>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.jogamp.jogl</groupId>
             <artifactId>jogl-all-main</artifactId>
