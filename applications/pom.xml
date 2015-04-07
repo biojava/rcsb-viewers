@@ -74,6 +74,7 @@
             <artifactId>jcolorbrewer</artifactId>
             <version>5.2</version>
         </dependency>
+
         <!-- Included via architecture specific build profiles below -->
         <!--<dependency>-->
             <!--<groupId>org.jogamp.gluegen</groupId>-->
@@ -85,32 +86,23 @@
             <!--<artifactId>jogl-all-main</artifactId>-->
             <!--<version>${jogl.version}</version>-->
         <!--</dependency>-->
-        <!-- Non-architecture specific WebGL code -->
-        <!--<dependency>-->
-            <!--<groupId>org.jogamp.gluegen</groupId>-->
-            <!--<artifactId>gluegen-rt</artifactId>-->
-            <!--<version>${jogl.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.jogamp.jogl</groupId>-->
-            <!--<artifactId>jogl-all</artifactId>-->
-            <!--<version>${jogl.version}</version>-->
-        <!--</dependency>-->
+
+        <!-- Non-architecture specific WebGL code-->
+        <dependency>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jogamp.jogl</groupId>
+            <artifactId>jogl-all</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
         <dependency>
             <groupId>java3d</groupId>
             <artifactId>vecmath</artifactId>
             <version>1.3.1</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>javax.media</groupId>-->
-            <!--<artifactId>jai_core</artifactId>-->
-            <!--<version>1.1.3</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>javax.media</groupId>-->
-            <!--<artifactId>jai_codec</artifactId>-->
-            <!--<version>1.1.3</version>-->
-        <!--</dependency>-->
     </dependencies>
     <profiles>
         <!-- Note: before you can use this build profile you need to set up an
