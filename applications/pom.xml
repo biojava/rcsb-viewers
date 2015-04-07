@@ -4,16 +4,14 @@
     <parent>
         <artifactId>viewers</artifactId>
         <groupId>org.rcsb</groupId>
-        <version>4.6.1-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
-    <artifactId>applications-${envClassifier}</artifactId>
+    <artifactId>applications</artifactId>
     <name>applications</name>
     <packaging>jar</packaging>
     <properties>
         <!-- Set in one place -->
         <projectVersionNumber>${project.version}</projectVersionNumber>
-        <jogl.version>2.0.2</jogl.version>
-        <envClassifier>mac</envClassifier>
     </properties>
     <build>
         <plugins>
@@ -74,30 +72,6 @@
             <artifactId>jcolorbrewer</artifactId>
             <version>5.2</version>
         </dependency>
-
-        <!-- Included via architecture specific build profiles below -->
-        <!--<dependency>-->
-            <!--<groupId>org.jogamp.gluegen</groupId>-->
-            <!--<artifactId>gluegen-rt-main</artifactId>-->
-            <!--<version>${jogl.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.jogamp.jogl</groupId>-->
-            <!--<artifactId>jogl-all-main</artifactId>-->
-            <!--<version>${jogl.version}</version>-->
-        <!--</dependency>-->
-
-        <!-- Non-architecture specific WebGL code-->
-        <dependency>
-            <groupId>org.jogamp.gluegen</groupId>
-            <artifactId>gluegen-rt</artifactId>
-            <version>${jogl.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jogamp.jogl</groupId>
-            <artifactId>jogl-all</artifactId>
-            <version>${jogl.version}</version>
-        </dependency>
         <dependency>
             <groupId>java3d</groupId>
             <artifactId>vecmath</artifactId>
@@ -146,109 +120,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>mac</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jogamp.gluegen</groupId>
-                    <artifactId>gluegen-rt</artifactId>
-                    <version>${jogl.version}</version>
-                    <classifier>natives-macosx-universal</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>org.jogamp.jogl</groupId>
-                    <artifactId>jogl-all</artifactId>
-                    <version>${jogl.version}</version>
-                    <classifier>natives-macosx-universal</classifier>
-                </dependency>
-            </dependencies>
-            <properties>
-                <envClassifier>mac</envClassifier>
-            </properties>
-        </profile>
-        <profile>
-            <id>linux-32</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jogamp.gluegen</groupId>
-                    <artifactId>gluegen-rt</artifactId>
-                    <version>${jogl.version}</version>
-                    <classifier>natives-linux-i586</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>org.jogamp.jogl</groupId>
-                    <artifactId>jogl-all</artifactId>
-                    <version>${jogl.version}</version>
-                    <classifier>natives-linux-i586</classifier>
-                </dependency>
-            </dependencies>
-            <properties>
-                <envClassifier>linux-32</envClassifier>
-            </properties>
-        </profile>
-        <profile>
-            <id>linux-64</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jogamp.gluegen</groupId>
-                    <artifactId>gluegen-rt</artifactId>
-                    <version>${jogl.version}</version>
-                    <classifier>natives-linux-amd64</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>org.jogamp.jogl</groupId>
-                    <artifactId>jogl-all</artifactId>
-                    <version>${jogl.version}</version>
-                    <classifier>natives-linux-amd64</classifier>
-                </dependency>
-            </dependencies>
-            <properties>
-                <envClassifier>linux-64</envClassifier>
-            </properties>
-        </profile>
-        <profile>
-            <id>windows-32</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jogamp.gluegen</groupId>
-                    <artifactId>gluegen-rt</artifactId>
-                    <version>${jogl.version}</version>
-                    <classifier>natives-windows-i586</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>org.jogamp.jogl</groupId>
-                    <artifactId>jogl-all</artifactId>
-                    <version>${jogl.version}</version>
-                    <classifier>natives-windows-i586</classifier>
-                </dependency>
-            </dependencies>
-            <properties>
-                <envClassifier>windows-32</envClassifier>
-            </properties>
-        </profile>
-        <profile>
-            <id>windows-64</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jogamp.gluegen</groupId>
-                    <artifactId>gluegen-rt</artifactId>
-                    <version>${jogl.version}</version>
-                    <classifier>natives-windows-amd64</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>org.jogamp.jogl</groupId>
-                    <artifactId>jogl-all</artifactId>
-                    <version>${jogl.version}</version>
-                    <classifier>natives-windows-amd64</classifier>
-                </dependency>
-            </dependencies>
-            <properties>
-                <envClassifier>windows-64</envClassifier>
-            </properties>
         </profile>
     </profiles>
 </project>

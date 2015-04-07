@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.rcsb</groupId>
     <artifactId>viewers</artifactId>
-    <version>4.6.1-SNAPSHOT</version>
+    <version>4.7.0-SNAPSHOT</version>
     <properties>
         <jogl.version>2.0.2</jogl.version>
         <jdk.version>1.7</jdk.version>
