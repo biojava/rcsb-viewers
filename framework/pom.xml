@@ -4,13 +4,13 @@
     <parent>
         <artifactId>viewers</artifactId>
         <groupId>org.rcsb</groupId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.6.1-SNAPSHOT</version>
     </parent>
     <artifactId>framework</artifactId>
     <name>framework</name>
     <packaging>jar</packaging>
     <properties>
-        <projectVersionNumber>${version}</projectVersionNumber>
+        <projectVersionNumber>${project.version}</projectVersionNumber>
     </properties>
     <build>
         <plugins>

@@ -4,14 +4,14 @@
     <parent>
         <artifactId>viewers</artifactId>
         <groupId>org.rcsb</groupId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.6.1-SNAPSHOT</version>
     </parent>
     <artifactId>applications-${envClassifier}</artifactId>
     <name>applications</name>
     <packaging>jar</packaging>
     <properties>
         <!-- Set in one place -->
-        <projectVersionNumber>${version}</projectVersionNumber>
+        <projectVersionNumber>${project.version}</projectVersionNumber>
         <jogl.version>2.2.4</jogl.version>
         <envClassifier>mac</envClassifier>
     </properties>
