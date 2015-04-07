@@ -12,7 +12,7 @@
     <properties>
         <!-- Set in one place -->
         <projectVersionNumber>${project.version}</projectVersionNumber>
-        <jogl.version>2.2.4</jogl.version>
+        <jogl.version>2.0.2</jogl.version>
         <envClassifier>mac</envClassifier>
     </properties>
     <build>

@@ -5,7 +5,7 @@
     <artifactId>viewers</artifactId>
     <version>4.6.1-SNAPSHOT</version>
     <properties>
-        <jogl.version>2.2.4</jogl.version>
+        <jogl.version>2.0.2</jogl.version>
         <jdk.version>1.7</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.targetEncoding>UTF-8</project.build.targetEncoding>
