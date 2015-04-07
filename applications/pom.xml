@@ -85,6 +85,17 @@
             <!--<artifactId>jogl-all-main</artifactId>-->
             <!--<version>${jogl.version}</version>-->
         <!--</dependency>-->
+        <!-- Non-architecture specific WebGL code -->
+        <!--<dependency>-->
+            <!--<groupId>org.jogamp.gluegen</groupId>-->
+            <!--<artifactId>gluegen-rt</artifactId>-->
+            <!--<version>${jogl.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.jogamp.jogl</groupId>-->
+            <!--<artifactId>jogl-all</artifactId>-->
+            <!--<version>${jogl.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>java3d</groupId>
             <artifactId>vecmath</artifactId>

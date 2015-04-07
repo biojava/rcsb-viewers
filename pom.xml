@@ -5,6 +5,7 @@
     <artifactId>viewers</artifactId>
     <version>4.6.1-SNAPSHOT</version>
     <properties>
+        <jogl.version>2.2.4</jogl.version>
         <jdk.version>1.7</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.targetEncoding>UTF-8</project.build.targetEncoding>
@@ -14,10 +15,6 @@
     <name>rcsbviewers</name>
     <description>The RCSB PDB 3D viewers as a maven project.</description>
     <repositories>
-        <repository>
-            <id>rcsb-pdb-maven-repo</id>
-            <url>http://maven.rcsb.org</url>
-        </repository>
         <repository>
             <id>maven2-repository.dev.java.net</id>
             <name>Java.net Repository for Maven</name>
@@ -78,12 +75,12 @@
         <dependency>
             <groupId>org.jogamp.gluegen</groupId>
             <artifactId>gluegen-rt</artifactId>
-            <version>2.2.4</version>
+            <version>${jogl.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jogamp.jogl</groupId>
             <artifactId>jogl-all</artifactId>
-            <version>2.2.4</version>
+            <version>${jogl.version}</version>
         </dependency>
         <dependency>
             <groupId>org.biojava</groupId>
