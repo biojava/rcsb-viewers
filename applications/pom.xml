@@ -101,16 +101,16 @@
             <artifactId>vecmath</artifactId>
             <version>1.3.1</version>
         </dependency>
-        <dependency>
-            <groupId>javax.media</groupId>
-            <artifactId>jai_core</artifactId>
-            <version>1.1.3</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.media</groupId>
-            <artifactId>jai_codec</artifactId>
-            <version>1.1.3</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>javax.media</groupId>-->
+            <!--<artifactId>jai_core</artifactId>-->
+            <!--<version>1.1.3</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>javax.media</groupId>-->
+            <!--<artifactId>jai_codec</artifactId>-->
+            <!--<version>1.1.3</version>-->
+        <!--</dependency>-->
     </dependencies>
     <profiles>
         <!-- Note: before you can use this build profile you need to set up an
