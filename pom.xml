@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.rcsb</groupId>
     <artifactId>viewers</artifactId>
-    <version>4.7.1-SNAPSHOT</version>
+    <version>4.7.2-SNAPSHOT</version>
     <properties>
         <jogl.version>2.2.4</jogl.version>
         <jdk.version>1.7</jdk.version>
@@ -76,11 +76,13 @@
             <groupId>org.jogamp.gluegen</groupId>
             <artifactId>gluegen-rt-main</artifactId>
             <version>${jogl.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jogamp.jogl</groupId>
             <artifactId>jogl-all-main</artifactId>
             <version>${jogl.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.biojava</groupId>
