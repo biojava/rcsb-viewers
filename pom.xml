@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.rcsb</groupId>
     <artifactId>viewers</artifactId>
-    <version>4.7.3-SNAPSHOT</version>
+    <version>4.7.4-SNAPSHOT</version>
     <properties>
         <jogl.version>2.2.4</jogl.version>
         <jdk.version>1.7</jdk.version>
@@ -78,30 +78,40 @@
             <version>5.2</version>
         </dependency>
         <!-- JOGL & Glugen -->
-        <!--  Full (for development) -->
         <dependency>
             <groupId>org.jogamp.gluegen</groupId>
             <artifactId>gluegen-rt-main</artifactId>
             <version>${jogl.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jogamp.jogl</groupId>
             <artifactId>jogl-all-main</artifactId>
             <version>${jogl.version}</version>
-            <scope>provided</scope>
         </dependency>
-        <!--  Common core only (for production)-->
-        <dependency>
-            <groupId>org.jogamp.gluegen</groupId>
-            <artifactId>gluegen-rt</artifactId>
-            <version>${jogl.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jogamp.jogl</groupId>
-            <artifactId>jogl-all</artifactId>
-            <version>${jogl.version}</version>
-        </dependency>
+        <!--&lt;!&ndash;  Full (for development) &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>org.jogamp.gluegen</groupId>-->
+            <!--<artifactId>gluegen-rt-main</artifactId>-->
+            <!--<version>${jogl.version}</version>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.jogamp.jogl</groupId>-->
+            <!--<artifactId>jogl-all-main</artifactId>-->
+            <!--<version>${jogl.version}</version>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
+        <!--&lt;!&ndash;  Common core only (for production)&ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>org.jogamp.gluegen</groupId>-->
+            <!--<artifactId>gluegen-rt</artifactId>-->
+            <!--<version>${jogl.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.jogamp.jogl</groupId>-->
+            <!--<artifactId>jogl-all</artifactId>-->
+            <!--<version>${jogl.version}</version>-->
+        <!--</dependency>-->
     </dependencies>
     <build>
         <plugins>
