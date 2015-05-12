@@ -4,7 +4,7 @@
     <parent>
         <artifactId>viewers</artifactId>
         <groupId>org.rcsb</groupId>
-        <version>4.7.5-SNAPSHOT</version>
+        <version>4.7.6-SNAPSHOT</version>
     </parent>
     <artifactId>framework</artifactId>
     <name>framework</name>
@@ -24,6 +24,13 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
+                        <manifest>
+                            <!-- This sets a default main class (in the event one is not passed) and builds a manifest file -->
+                            <mainClass>org.rcsb.sv.controllers.app.SimpleViewer</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
                         <manifestEntries>
                             <Trusted-Library>true</Trusted-Library>
                             <Permissions>all-permissions</Permissions>
@@ -54,6 +61,17 @@
             <groupId>org.biojava</groupId>
             <artifactId>jcolorbrewer</artifactId>
             <version>5.2</version>
+        </dependency>
+        <!-- JOGL & Glugen -->
+        <dependency>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt-main</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jogamp.jogl</groupId>
+            <artifactId>jogl-all-main</artifactId>
+            <version>${jogl.version}</version>
         </dependency>
     </dependencies>
     <profiles>
