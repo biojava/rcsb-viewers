@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.rcsb</groupId>
     <artifactId>viewers</artifactId>
-    <version>4.7.6-SNAPSHOT</version>
+    <version>4.7.7-SNAPSHOT</version>
     <properties>
         <jogl.version>2.2.4</jogl.version>
         <jdk.version>1.6</jdk.version>
@@ -59,8 +59,6 @@
             <groupId>java3d</groupId>
             <artifactId>vecmath</artifactId>
             <version>1.5.2</version>
-            <type>jar</type>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>javax.media</groupId>
