@@ -3,10 +3,10 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.rcsb</groupId>
     <artifactId>viewers</artifactId>
-    <version>4.7.0-SNAPSHOT</version>
+    <version>4.7.7-SNAPSHOT</version>
     <properties>
-        <jogl.version>2.0.2</jogl.version>
-        <jdk.version>1.7</jdk.version>
+        <jogl.version>2.2.4</jogl.version>
+        <jdk.version>1.6</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.targetEncoding>UTF-8</project.build.targetEncoding>
         <maxmem>500M</maxmem>
@@ -58,13 +58,11 @@
         <dependency>
             <groupId>java3d</groupId>
             <artifactId>vecmath</artifactId>
-            <version>1.3.1</version>
-            <type>jar</type>
-            <scope>compile</scope>
+            <version>1.5.2</version>
         </dependency>
         <dependency>
-            <groupId>javax.media.jai</groupId>
-            <artifactId>com.springsource.javax.media.jai.core</artifactId>
+            <groupId>javax.media</groupId>
+            <artifactId>jai_core</artifactId>
             <version>1.1.3</version>
         </dependency>
         <dependency>
@@ -73,19 +71,20 @@
             <version>1.1.3</version>
         </dependency>
         <dependency>
+            <groupId>org.biojava</groupId>
+            <artifactId>jcolorbrewer</artifactId>
+            <version>5.2</version>
+        </dependency>
+        <!-- JOGL & Glugen -->
+        <dependency>
             <groupId>org.jogamp.gluegen</groupId>
-            <artifactId>gluegen-rt</artifactId>
+            <artifactId>gluegen-rt-main</artifactId>
             <version>${jogl.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jogamp.jogl</groupId>
-            <artifactId>jogl-all</artifactId>
+            <artifactId>jogl-all-main</artifactId>
             <version>${jogl.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.biojava</groupId>
-            <artifactId>jcolorbrewer</artifactId>
-            <version>5.2</version>
         </dependency>
     </dependencies>
     <build>
@@ -118,4 +117,48 @@
         <module>applications</module>
         <module>framework</module>
     </modules>
+    <profiles>
+        <!-- Note: before you can use this build profile you need to set up an
+            environment that contains correctly signed keys. Configure the keystore properties
+            and the profile in ~/.m2/settings.xml -->
+        <profile>
+            <id>codesigning</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jarsigner-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>sign</id>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <removeExistingSignatures>true</removeExistingSignatures>
+                            <verbose>true</verbose>
+                            <certs>true</certs>
+                            <storetype>${keystore.type}</storetype>
+                            <keystore>${keystore.path}</keystore>
+                            <alias>${keystore.alias}</alias>
+                            <storepass>${keystore.store.password}</storepass>
+                            <keypass>${keystore.key.password}</keypass>
+                            <verbose>true</verbose>
+                            <goal>sign</goal>
+                            <arguments>
+                                <argument>-tsa</argument>
+                                <argument>https://timestamp.geotrust.com/tsa</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
