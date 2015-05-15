@@ -4,7 +4,7 @@
     <parent>
         <artifactId>viewers</artifactId>
         <groupId>org.rcsb</groupId>
-        <version>4.7.7-SNAPSHOT</version>
+        <version>4.7.8-SNAPSHOT</version>
     </parent>
     <artifactId>applications</artifactId>
     <name>applications</name>

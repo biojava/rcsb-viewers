@@ -45,7 +45,7 @@
  */ 
 package org.rcsb.ks.glscene.jogl;
 
-import javax.media.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLAutoDrawable;
 
 import org.rcsb.vf.glscene.jogl.GlGeometryViewer;
 
