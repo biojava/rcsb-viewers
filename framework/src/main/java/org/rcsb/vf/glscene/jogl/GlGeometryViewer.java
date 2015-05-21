@@ -754,7 +754,7 @@ WindowListener, IStructureStylesEventListener {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-		drawableViewer.reshape(x, y, width, height);
+// -pr		drawableViewer.reshape(x, y, width, height);
 
 		this.requestRepaint();
 	}
@@ -892,24 +892,26 @@ WindowListener, IStructureStylesEventListener {
 
 		if (this.isScreenshotRequested)
 		{
-			System.out.println("GLGeometryViewer: reshaping image for screenshot: " + this.isScreenshotRequested);
-			final int oldViewportWidth = this.viewportWidth;
-			final int oldViewportHeight = this.viewportHeight;
-			this.reshape(drawable, 0, 0, this.screenshotWidth,
-					this.screenshotHeight);
+// reshaping doesn't work anymore with latest Java/Jogl library versions
+//			System.out.println("GLGeometryViewer: reshaping image for screenshot: " + this.isScreenshotRequested);
+//			final int oldViewportWidth = this.viewportWidth;
+//			final int oldViewportHeight = this.viewportHeight;
+
+//			this.reshape(drawable, 0, 0, this.screenshotWidth,
+//					this.screenshotHeight);
 
 			AWTGLReadBufferUtil glReadBufferUtil = new AWTGLReadBufferUtil(gl.getGL2().getGLProfile(), false);
 
 			BufferedImage image = glReadBufferUtil.readPixelsToBufferedImage(gl.getGL2(), true);
 			image.flush();
 
-			this.reshape(drawable, 0, 0, oldViewportWidth, oldViewportHeight);
+//			this.reshape(drawable, 0, 0, oldViewportWidth, oldViewportHeight);
 
 			this.screenshot = image;
 			this.isScreenshotRequested = false;
-			this.requestRepaint(); // allow the image to be repainted with the old aspects.
+//			this.requestRepaint(); // allow the image to be repainted with the old aspects.
 
-			System.gc();
+//			System.gc();
 		}
 
 		else
