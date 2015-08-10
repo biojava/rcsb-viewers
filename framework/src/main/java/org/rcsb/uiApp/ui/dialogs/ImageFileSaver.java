@@ -61,16 +61,17 @@ import javax.imageio.stream.ImageOutputStream;
 import org.w3c.dom.Element;
 
 
-import com.sun.media.jai.codec.ImageCodec;
-import com.sun.media.jai.codec.ImageEncoder;
-import com.sun.media.jai.codec.PNGEncodeParam;
-import com.sun.media.jai.codec.TIFFEncodeParam;
-import com.sun.media.jai.codec.TIFFField;
-import com.sun.media.jai.codecimpl.TIFFImageEncoder;
+//import com.sun.media.jai.codec.ImageCodec;
+//import com.sun.media.jai.codec.ImageEncoder;
+//import com.sun.media.jai.codec.PNGEncodeParam;
+//import com.sun.media.jai.codec.TIFFEncodeParam;
+//import com.sun.media.jai.codec.TIFFField;
+//import com.sun.media.jai.codecimpl.TIFFImageEncoder;
 
 /**
  * ImageFileSaver saves BufferedImages in a specified resolution to standard image file formats.
  * This class supports the file formats specified in {@link ImageFileFormat}.
+ * Commented out all classes that refer to com.sun.media. These classes cannot be found when using latest version of Java. Is this a new security measure?
  * 
  * @author Peter W. Rose
  *
@@ -110,13 +111,16 @@ public final class ImageFileSaver {
 
 		// save image in the requested format
 		if (extension.equals(ImageFileFormat.JPEG.getExtension())) {
-			saveJPEG(image, dpi, filename);
+//			saveJPEG(image, dpi, filename);
+			savePNGNew(image, dpi, filename);
 		} else if (extension.equals(ImageFileFormat.PNG.getExtension())) {
 		//	savePNG(image, dpi, filename);
 			savePNGNew(image, dpi, filename);
-		} else if (extension.equals(ImageFileFormat.TIFF.getExtension())) {
-			saveTIFF(image, dpi, filename);
-		} else {
+		} 
+//		else if (extension.equals(ImageFileFormat.TIFF.getExtension())) {
+//			saveTIFF(image, dpi, filename);
+//		} 
+		else {
 			throw new IOException("Nonsupported file extension.");
 		}
 	}
@@ -171,23 +175,23 @@ public final class ImageFileSaver {
 	 * @param file filename name of the PNG file
      * @throws IOException
      */
-	private static void savePNG(final BufferedImage image, final int dpi, final String filename) throws IOException
-	{
-		final FileOutputStream fout = new FileOutputStream( new File(filename) );
-
-		PNGEncodeParam pngEncodeParam = PNGEncodeParam.getDefaultEncodeParam(image);
-		// Sets the physical dimension information to be stored with this image. 
-		// The physicalDimension parameter should be the number of pixels per unit 
-		// in the X direction, the number of pixels per unit in the Y direction, 
-		// and the unit specifier (0 = unknown, 1 = meters). 
-		float metersToInches = 39.3700787f;
-		int dpm = (int) Math.ceil(dpi * metersToInches);
-		pngEncodeParam.setPhysicalDimension(dpm, dpm , 1);
-		
-		ImageEncoder encoder = ImageCodec.createImageEncoder(ImageFileFormat.PNG.toString(), fout, pngEncodeParam);
-		encoder.encode(image);
-		fout.close();
-	}
+//	private static void savePNG(final BufferedImage image, final int dpi, final String filename) throws IOException
+//	{
+//		final FileOutputStream fout = new FileOutputStream( new File(filename) );
+//
+//		PNGEncodeParam pngEncodeParam = PNGEncodeParam.getDefaultEncodeParam(image);
+//		// Sets the physical dimension information to be stored with this image. 
+//		// The physicalDimension parameter should be the number of pixels per unit 
+//		// in the X direction, the number of pixels per unit in the Y direction, 
+//		// and the unit specifier (0 = unknown, 1 = meters). 
+//		float metersToInches = 39.3700787f;
+//		int dpm = (int) Math.ceil(dpi * metersToInches);
+//		pngEncodeParam.setPhysicalDimension(dpm, dpm , 1);
+//		
+//		ImageEncoder encoder = ImageCodec.createImageEncoder(ImageFileFormat.PNG.toString(), fout, pngEncodeParam);
+//		encoder.encode(image);
+//		fout.close();
+//	}
 	
 	/**
 	 * Saves image as a PNG file at the specified resolution.
@@ -208,6 +212,26 @@ public final class ImageFileSaver {
 		}
 		
 	}
+	
+	/**
+	 * Saves image as a PNG file at the specified resolution.
+	 * 
+	 * @param image image to be saved
+	 * @param dpi resolution in dots per inch
+	 * @param file filename name of the PNG file
+     * @throws IOException
+     */
+	private static void saveJPGNew(final BufferedImage image, final int dpi, final String filename) throws IOException
+	{
+		try {
+		    // retrieve image
+		    File outputfile = new File(filename);
+		    ImageIO.write(image, "jpg", outputfile);
+		} catch (IOException e) {
+	
+		}
+		
+	}
 
 	/**
 	 * Saves image as a TIFF file at the specified resolution. Also sets the software metadata tag.
@@ -217,33 +241,33 @@ public final class ImageFileSaver {
 	 * @param file filename name of the TIFF file
      * @throws IOException
      */
-	private static void saveTIFF(final BufferedImage image, final int dpi, final String filename) throws IOException 
-	{
-		FileOutputStream fout = new FileOutputStream(new File(filename));
-			
-		// set no compression		
-		TIFFEncodeParam param = new TIFFEncodeParam();
-		param.setCompression(TIFFEncodeParam.COMPRESSION_NONE);
-		
-		// set the TIFF image resolution and other meta tags
-		// http://forums.sun.com/thread.jspa?threadID=5372459
-		// http://partners.adobe.com/public/developer/en/tiff/TIFF6.pdf
-		TIFFField[] extras = new TIFFField[4];
-        // TIFF RATIONAL type is represented by two LONGs: the first represents the numerator of a
-        // fraction; the second, the denominator.
-		// XResolution  in pixels per ResolutionUnit (is inches by default)
-		extras[0] = new TIFFField(282, TIFFField.TIFF_RATIONAL, 1, (Object)new long[][] {{(long)dpi, (long)1},{(long)0 ,(long)0}});
-		// YResolution in pixels per ResolutionUnit
-		extras[1] = new TIFFField(283, TIFFField.TIFF_RATIONAL, 1, (Object)new long[][] {{(long)dpi, (long)1},{(long)0 ,(long)0}});
-		// Software
-		extras[2] = new TIFFField(305, TIFFField.TIFF_ASCII, 1, (Object)new String[] {"RCSB MBT Viewer"});
-		// Artist, this does not seem to work.
-		extras[3] = new TIFFField(315, TIFFField.TIFF_ASCII, 1, (Object)new String[] {"RCSB PDB"});
-		param.setExtraFields(extras);
-
-		TIFFImageEncoder encoder = new TIFFImageEncoder (fout, param);
-		encoder.encode(image);
-		fout.close();
-	}
+//	private static void saveTIFF(final BufferedImage image, final int dpi, final String filename) throws IOException 
+//	{
+//		FileOutputStream fout = new FileOutputStream(new File(filename));
+//			
+//		// set no compression		
+//		TIFFEncodeParam param = new TIFFEncodeParam();
+//		param.setCompression(TIFFEncodeParam.COMPRESSION_NONE);
+//		
+//		// set the TIFF image resolution and other meta tags
+//		// http://forums.sun.com/thread.jspa?threadID=5372459
+//		// http://partners.adobe.com/public/developer/en/tiff/TIFF6.pdf
+//		TIFFField[] extras = new TIFFField[4];
+//        // TIFF RATIONAL type is represented by two LONGs: the first represents the numerator of a
+//        // fraction; the second, the denominator.
+//		// XResolution  in pixels per ResolutionUnit (is inches by default)
+//		extras[0] = new TIFFField(282, TIFFField.TIFF_RATIONAL, 1, (Object)new long[][] {{(long)dpi, (long)1},{(long)0 ,(long)0}});
+//		// YResolution in pixels per ResolutionUnit
+//		extras[1] = new TIFFField(283, TIFFField.TIFF_RATIONAL, 1, (Object)new long[][] {{(long)dpi, (long)1},{(long)0 ,(long)0}});
+//		// Software
+//		extras[2] = new TIFFField(305, TIFFField.TIFF_ASCII, 1, (Object)new String[] {"RCSB MBT Viewer"});
+//		// Artist, this does not seem to work.
+//		extras[3] = new TIFFField(315, TIFFField.TIFF_ASCII, 1, (Object)new String[] {"RCSB PDB"});
+//		param.setExtraFields(extras);
+//
+//		TIFFImageEncoder encoder = new TIFFImageEncoder (fout, param);
+//		encoder.encode(image);
+//		fout.close();
+//	}
 
 }
