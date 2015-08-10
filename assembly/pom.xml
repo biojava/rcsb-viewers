@@ -1,75 +1,32 @@
 <?xml version="1.0"?>
-<project
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<artifactId>Viewers</artifactId>
-		<groupId>org.rcsb</groupId>
-		<version>4.1.1-SNAPSHOT</version>
-	</parent>
-
-	<artifactId>assembly</artifactId>
-	<packaging>jar</packaging>
-		
-	
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.1</version>
-
-			</plugin>
-
-<!--  call mvn exec:java to trigger this -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.2.1</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-
-					<mainClass>org.rcsb.ex.tools.ChemicalComponentBondsCreator</mainClass>
-
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.2.1</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-
-
-					<mainClass>org.rcsb.ex.tools.ChemicalComponentTypesCreator</mainClass>
-				</configuration>
-			</plugin>
-
-		</plugins>
-	</build>
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>org.rcsb</groupId>
-			<artifactId>molecular-biology-toolkit</artifactId>
-			<version>4.1.1-SNAPSHOT</version>
-		</dependency>
-	</dependencies>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>Viewers</artifactId>
+        <groupId>org.rcsb</groupId>
+        <version>4.7.8-SNAPSHOT</version>
+    </parent>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <artifactId>assembly</artifactId>
+    <packaging>jar</packaging>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.rcsb</groupId>
+            <artifactId>molecular-biology-toolkit</artifactId>
+            <!-- BE SURE TO UPDATE THE VERSION NUMBER HERE -->
+            <version>4.7.8-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 </project>

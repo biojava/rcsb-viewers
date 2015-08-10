@@ -121,7 +121,7 @@ public class ImageFileChooser extends JFileChooser
 		this.setAcceptAllFileFilterUsed(false);
 	//	this.addChoosableFileFilter(new ImageFileFilter(ImageFileFormat.TIFF));
 		this.addChoosableFileFilter(new ImageFileFilter(ImageFileFormat.PNG));
-	//	this.addChoosableFileFilter(new ImageFileFilter(ImageFileFormat.JPEG));
+		this.addChoosableFileFilter(new ImageFileFilter(ImageFileFormat.JPEG));
 	}
 	
 	/**
@@ -135,9 +135,12 @@ public class ImageFileChooser extends JFileChooser
 	 */
 	public File save(final int defaultWidth, final int defaultHeight)
 	{
-		addAccessoryPanel();
-		setDialogTitle("Save Image");
 		initialize(defaultWidth, defaultHeight);
+		// TODO saving image in different sizes stopped working with the latest Java/JOGL versions
+		// this needs to be investigated. For now let's remove this functionality.
+		// addAccessoryPanel();
+		setDialogTitle("Save Image");
+
 
 		final int ret = showSaveDialog(parentComponent);
 		if (ret == JFileChooser.APPROVE_OPTION)
@@ -208,6 +211,7 @@ public class ImageFileChooser extends JFileChooser
 	private JPanel createImageSettingsPanel() {
 		final JPanel imageSettings = new JPanel( );
 		imageSettings.setLayout( new GridLayout(2, 2, 0, 5) );
+//		imageSettings.setLayout( new GridLayout(2, 2, 0, -2) ); // need this setting when we add AccessoryPanel
 		JLabel width = new JLabel("Width:");
 		width.setToolTipText("Width of image in pixels");
 		imageSettings.add(width);
@@ -235,6 +239,7 @@ public class ImageFileChooser extends JFileChooser
 		
 		final JPanel imagePanel = new JPanel( );
 		imagePanel.setLayout(new BorderLayout(10, 10));
+//		imagePanel.setLayout(new BorderLayout(10, -5)); // need this setting when we add AccessoryPanel
 		imagePanel.add(imageSettings, BorderLayout.NORTH );
 		imagePanel.setBorder( BorderFactory.createTitledBorder("Image Dimensions (pixels)") );
 		
@@ -243,8 +248,8 @@ public class ImageFileChooser extends JFileChooser
 	
 	private JPanel createPrintSettingsPanel() {
 		final JPanel printSettings = new JPanel( );
-//		printSettings.setLayout(new GridLayout(4, 2, 0, 5) );
 		printSettings.setLayout(new GridLayout(6, 2, 0, 10) );
+//		printSettings.setLayout(new GridLayout(4, 2, 0, -2) ); // need this setting when we add AccessoryPanel
 		JLabel unit = new JLabel("Unit:");
 		unit.setToolTipText("Unit for print dimensions");
 		printSettings.add(new JLabel("Unit:"));
@@ -296,6 +301,7 @@ public class ImageFileChooser extends JFileChooser
 
 		final JPanel printPanel = new JPanel();
 		printPanel.setLayout(new BorderLayout(10, 10));
+//		printPanel.setLayout(new BorderLayout(10, -5)); // need this setting when we add AccessoryPanel
 		printPanel.add(printSettings, BorderLayout.NORTH);
 		printPanel.setBorder( BorderFactory.createTitledBorder("Physical Dimensions") );
 		
@@ -395,11 +401,21 @@ public class ImageFileChooser extends JFileChooser
 	
 	private File addExtension(File file, ImageFileFilter filter) {
 		String filename = file.getAbsolutePath();
-		if (filename.endsWith("." + filter.getExtension())) {
+//		String extension = ImageFileFormat.PNG.name();
+		String extension = "png";
+		if (filter != null) {
+			extension = filter.getExtension();
+		}
+		if (filename.endsWith("." + extension)) {
 			return file;
 		} else {
-			return new File(filename + "." + filter.getExtension());
+			return new File(filename + "." + extension);
 		}
+//		if (filename.endsWith("." + filter.getExtension())) {
+//			return file;
+//		} else {
+//			return new File(filename + "." + filter.getExtension());
+//		}
 	}
 }
 

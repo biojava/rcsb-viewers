@@ -45,9 +45,9 @@
  */ 
 package org.rcsb.vf.glscene.jogl;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.glu.GLU;
 
 import javax.vecmath.Point3d;
 import org.rcsb.mbt.model.LineSegment;

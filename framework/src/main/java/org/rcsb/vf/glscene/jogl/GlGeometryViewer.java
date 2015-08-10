@@ -50,7 +50,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Robot;
@@ -61,9 +60,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
@@ -73,21 +70,20 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
-import java.util.Map.Entry;
 
-import javax.media.opengl.DebugGL2;
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLException;
-import javax.media.opengl.GLProfile;
-import javax.media.opengl.TraceGL2;
-import javax.media.opengl.GLCapabilities;
-import javax.media.opengl.GLEventListener;
-import javax.media.opengl.awt.GLCanvas;
-import javax.media.opengl.glu.GLU;
+import com.jogamp.opengl.DebugGL2;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.TraceGL2;
+import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.glu.GLU;
 import javax.swing.JPanel;
 
 import org.rcsb.mbt.model.Atom;
@@ -97,10 +93,10 @@ import org.rcsb.mbt.model.Fragment;
 import org.rcsb.mbt.model.Residue;
 import org.rcsb.mbt.model.Structure;
 import org.rcsb.mbt.model.StructureComponent;
-import org.rcsb.mbt.model.StructureMap;
-import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.StructureComponentRegistry.ComponentType;
+import org.rcsb.mbt.model.StructureMap;
 import org.rcsb.mbt.model.StructureModel.StructureList;
+import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.attributes.AtomColorRegistry;
 import org.rcsb.mbt.model.attributes.AtomStyle;
 import org.rcsb.mbt.model.attributes.BondStyle;
@@ -120,13 +116,10 @@ import org.rcsb.uiApp.controllers.update.UpdateEvent;
 import org.rcsb.vf.controllers.app.VFAppBase;
 import org.rcsb.vf.controllers.scene.SceneController;
 import org.rcsb.vf.glscene.jogl.ChainGeometry.RibbonForm;
-import org.rcsb.vf.glscene.jogl.tiles.TileRenderer;
 import org.rcsb.vf.glscene.surfaces.SurfaceGeometry;
 
 import com.jogamp.common.nio.Buffers;
-import com.jogamp.opengl.util.GLReadBufferUtil;
-import com.jogamp.opengl.util.awt.ImageUtil;
-import com.jogamp.opengl.util.awt.Screenshot;
+import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 import com.jogamp.opengl.util.gl2.GLUT;
 
 
@@ -642,22 +635,15 @@ WindowListener, IStructureStylesEventListener {
 	 */
 	public void init(final GLAutoDrawable drawable)
 	{
-		
-//		System.err.println("IN GlGeometryViewer - init " + drawable.getClass().getSimpleName());
-		
 		this.drawable = drawable;
-		
-		Class c = drawable.getClass();
-			
-		if ( GLCanvas.class.isAssignableFrom(c)) {				
+				
+		if ( GLCanvas.class.isAssignableFrom(drawable.getClass())) {				
 			drawableViewer = (GLCanvas) drawable;
-//			System.err.println("we got a drawable viewer!");
 		} else {
 			System.err.println("??? not a GlGeometryViewer, but " + drawable.getClass().getName());
 		}
 		
-		if (DebugState.isDebug())
-			
+		if (DebugState.isDebug())		
 			drawable.setGL(new DebugGL2(drawable.getGL().getGL2()));
 
 		if (DebugState.isTrace())
@@ -768,6 +754,7 @@ WindowListener, IStructureStylesEventListener {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
+// -pr		drawableViewer.reshape(x, y, width, height);
 
 		this.requestRepaint();
 	}
@@ -778,19 +765,10 @@ WindowListener, IStructureStylesEventListener {
 	//long prevRepaint = System.currentTimeMillis();
 	
 	public void requestRepaint() {
-		
-
 		this.needsRepaint = true;
 		if (this.drawable != null && !AppBase.backgroundScreenshotOnly) {
-			//this.drawable.;
-			//this.repaint();
-			
-			//this.repaint();
 			if ( drawableViewer != null) {
-				//long timeS = System.currentTimeMillis();
-				System.out.println("GLGeometryViewer: drawableViewer.repaint");
 				drawableViewer.repaint();
-				System.out.println("screenshot: " + isScreenshotRequested);
 				System.out.println("width: " + drawableViewer.getWidth());
 				System.out.println("height: " + drawableViewer.getHeight());
 				//long timeE = System.currentTimeMillis();
@@ -810,8 +788,7 @@ WindowListener, IStructureStylesEventListener {
 	public void requestPick() {
 		this.needsPick = true;
 		if (this.drawable != null && !AppBase.backgroundScreenshotOnly) {
-			//this.drawable.display();
-			//this.repaint();
+			this.drawable.display();
 			
 			if ( drawableViewer != null)
 				drawableViewer.repaint();
@@ -822,8 +799,7 @@ WindowListener, IStructureStylesEventListener {
 		this.needsPick = true;
 		this.needsRepaint = true;
 		if (this.drawable != null && !AppBase.backgroundScreenshotOnly) {
-			//this.drawable.display();
-			//this.repaint();
+			this.drawable.display();
 
 			if ( drawableViewer != null)
 				drawableViewer.repaint();
@@ -916,72 +892,26 @@ WindowListener, IStructureStylesEventListener {
 
 		if (this.isScreenshotRequested)
 		{
-			System.out.println("GLGeometryViewer: reshaping image for screenshot: " + this.isScreenshotRequested);
-			final int oldViewportWidth = this.viewportWidth;
-			final int oldViewportHeight = this.viewportHeight;
-			this.reshape(drawable, 0, 0, this.screenshotWidth,
-					this.screenshotHeight);
+// reshaping doesn't work anymore with latest Java/Jogl library versions
+//			System.out.println("GLGeometryViewer: reshaping image for screenshot: " + this.isScreenshotRequested);
+//			final int oldViewportWidth = this.viewportWidth;
+//			final int oldViewportHeight = this.viewportHeight;
 
-	
-			// - pr 20141410
-		// the following code seems to work the same
-		//	http://stackoverflow.com/questions/22839899/how-to-save-am-image-of-a-screen-using-jogl
-		// see source at:	http://libjogl-java.sourcearchive.com/documentation/1.1.1plus-pdak1-3/Screenshot_8java-source.html#l00184
-			this.requestRepaint();
-			gl.glFinish();
-			BufferedImage image = Screenshot.readToBufferedImage(this.screenshotWidth, this.screenshotHeight);
+//			this.reshape(drawable, 0, 0, this.screenshotWidth,
+//					this.screenshotHeight);
+
+			AWTGLReadBufferUtil glReadBufferUtil = new AWTGLReadBufferUtil(gl.getGL2().getGLProfile(), false);
+
+			BufferedImage image = glReadBufferUtil.readPixelsToBufferedImage(gl.getGL2(), true);
 			image.flush();
-		//	writeToFile();
-			
-			// http://stackoverflow.com/questions/8586798/jogl-taking-a-screenshot-of-a-glcanvas-in-a-jframe-using-component-printall-d
-			// creates black image
-//		 BufferedImage image = new BufferedImage(this.screenshotWidth, this.screenshotHeight, BufferedImage.TYPE_INT_RGB);         
-//			Graphics2D g = image.createGraphics();        
-//	        this.printAll(g);        
-//	        image.flush();
-	        
-			// original code ...
 
-//			final int bufImgType = BufferedImage.TYPE_3BYTE_BGR;
-//			final BufferedImage image = new BufferedImage(this.screenshotWidth,
-//					this.screenshotHeight, bufImgType);
-//			final ByteBuffer imageBuffer = ByteBuffer
-//			.wrap(((DataBufferByte) image.getRaster().getDataBuffer())
-//					.getData());
-//
-//			final TileRenderer tr = new TileRenderer();
-//			if (this.tileHeight > 0 && this.tileWidth > 0) {
-//				tr.setTileSize(this.tileWidth, this.tileHeight, 0);
-//			} else {
-//				tr.setTileSize(super.getWidth(), super.getHeight(), 0);
-//			}
-//			tr.setImageSize(this.screenshotWidth, this.screenshotHeight);
-//			tr.setImageBuffer(GL2.GL_BGR, GL.GL_UNSIGNED_BYTE, imageBuffer);
-//			tr.trPerspective(fovy, 1.0 / this.aspect,
-//					zNear, zFar);
-//
-//			do
-//			{
-//				tr.beginTile(gl);
-//
-//				gl.glFlush();
-//				this.drawScene(gl, glu, glut, false, canClearModelviewMatrix,
-//						null, null, false);
-//				gl.glFlush();
-//			} while (tr.endTile(gl));
-//
-//			ImageUtil.flipImageVertically(image);
-
-			this.reshape(drawable, 0, 0, oldViewportWidth, oldViewportHeight);
+//			this.reshape(drawable, 0, 0, oldViewportWidth, oldViewportHeight);
 
 			this.screenshot = image;
 			this.isScreenshotRequested = false;
-			this.requestRepaint(); // allow the image to be repainted with
-			// the old aspects.
+//			this.requestRepaint(); // allow the image to be repainted with the old aspects.
 
-			System.gc();
-			System.gc();
-			System.gc();
+//			System.gc();
 		}
 
 		else
@@ -1009,22 +939,6 @@ WindowListener, IStructureStylesEventListener {
 			this.mouseLocationInPanel = null;
 			this.pickMouseEvent = null;
 
-		}
-	}
-	
-	private void writeToFile() {
-		this.requestRepaint();
-		this.requestRepaint();
-		this.requestRepaint();
-		File file = new File("/Users/peter/test.png");
-		try {
-			Screenshot.writeToFile(file, this.screenshotWidth, this.screenshotHeight);
-		} catch (GLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 
@@ -2382,6 +2296,8 @@ WindowListener, IStructureStylesEventListener {
 
 		case CLEAR_ALL:
 			clearStructure();
+			break;
+		default:
 			break;
 		}
 	}

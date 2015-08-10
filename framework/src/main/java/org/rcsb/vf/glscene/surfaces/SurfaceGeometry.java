@@ -48,9 +48,9 @@ package org.rcsb.vf.glscene.surfaces;
 import java.awt.Color;
 import java.util.List;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.glu.GLU;
 import javax.vecmath.Color4f;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;

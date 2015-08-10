@@ -46,6 +46,7 @@
 
 package org.rcsb.mbt.model.attributes;
 
+import java.awt.*;
 import java.util.List;
 
 /**
@@ -60,6 +61,7 @@ import org.jcolorbrewer.ColorBrewer;
 import org.rcsb.mbt.model.Atom;
 import org.rcsb.mbt.model.Surface;
 import org.rcsb.mbt.model.util.ChemicalComponentInfo;
+import org.rcsb.mbt.model.util.ColorConverter;
 import org.rcsb.mbt.surface.datastructure.VertInfo;
 
 public final class SurfaceColorUpdater {
@@ -103,7 +105,9 @@ public final class SurfaceColorUpdater {
 			colors = new Color4f[vertexCount];
 			surface.setColors(colors);
 		}
-		Color4f[] palette = brewer.getColor4fPalette(colorCount);
+
+		Color[] col = brewer.getColorPalette(colorCount);
+		Color4f[] palette = ColorConverter.convertColor4f(col);
 		Color4f color = palette[colorIndex];
 		Color4f newColor = (Color4f) color.clone();
 		

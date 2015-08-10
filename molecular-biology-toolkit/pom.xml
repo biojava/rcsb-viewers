@@ -1,105 +1,124 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<artifactId>viewers</artifactId>
-		<groupId>org.rcsb</groupId>
-		<version>4.1.1-SNAPSHOT</version>		
-	</parent>	
-	<artifactId>molecular-biology-toolkit</artifactId>
-	<name>molecular-biology-toolkit</name>
-	<packaging>jar</packaging>
-	
-	<build>
-		<plugins>
-			<!-- call mvn exec:java to trigger build of this this -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.2.1</version>
-				<executions>
-					<execution>
-						<id>BondCreator</id>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-
-							<mainClass>org.rcsb.ex.tools.ChemicalComponentBondsCreator</mainClass>
-
-						</configuration>
-					</execution>
-					
-					<execution>
-						<id>TypesCreator</id>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-						
-						<mainClass>org.rcsb.ex.tools.ChemicalComponentTypesCreator</mainClass>
-				
-						</configuration>
-					</execution>
-				</executions>
-				
-			</plugin>
-
-			
-
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.1</version>
-			</plugin>
-			
-
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>install</phase>
-						<goals>
-						<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<tasks>
-						<echo message="Installing MBT file: ${project.build.finalName} in PDB web project " />
-						<copy file="${project.build.directory}/${project.build.finalName}.jar" tofile="${basedir}/../../../pdbweb/webapp/Viewers/RCSBViewers/mbt.jar"></copy>
-
-					</tasks>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.7</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-			<version>6.1.1</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
-			<version>2.4.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.rcsb</groupId>
-			<artifactId>colorbrewer</artifactId>
-			<version>4.1.1-SNAPSHOT</version>
-		</dependency>
-	</dependencies>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>viewers</artifactId>
+        <groupId>org.rcsb</groupId>
+        <version>4.7.8-SNAPSHOT</version>
+    </parent>
+    <artifactId>molecular-biology-toolkit</artifactId>
+    <name>molecular-biology-toolkit</name>
+    <packaging>jar</packaging>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <!-- This sets a default main class (in the event one is not passed) and builds a manifest file -->
+                            <mainClass>org.rcsb.sv.controllers.app.SimpleViewer</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Trusted-Library>true</Trusted-Library>
+                            <Permissions>all-permissions</Permissions>
+                            <Codebase>*</Codebase>
+                            <Application-Name>RCSB-Viewers</Application-Name>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.biojava</groupId>
+            <artifactId>jcolorbrewer</artifactId>
+            <version>5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>java3d</groupId>
+            <artifactId>vecmath</artifactId>
+            <version>1.3.1</version>
+        </dependency>
+        <!-- JOGL & Glugen -->
+        <dependency>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt-main</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jogamp.jogl</groupId>
+            <artifactId>jogl-all-main</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+    </dependencies>
+    <profiles>
+        <!-- Note: before you can use this build profile you need to set up an
+            environment that contains correctly signed keys. Configure the keystore properties
+            and the profile in ~/.m2/settings.xml -->
+        <profile>
+            <id>codesigning</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jarsigner-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>sign</id>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <removeExistingSignatures>true</removeExistingSignatures>
+                            <verbose>true</verbose>
+                            <certs>true</certs>
+                            <storetype>${keystore.type}</storetype>
+                            <keystore>${keystore.path}</keystore>
+                            <alias>${keystore.alias}</alias>
+                            <storepass>${keystore.store.password}</storepass>
+                            <keypass>${keystore.key.password}</keypass>
+                            <verbose>true</verbose>
+                            <goal>sign</goal>
+                            <arguments>
+                                <argument>-tsa</argument>
+                                <argument>https://timestamp.geotrust.com/tsa</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

@@ -1,70 +1,140 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<artifactId>viewers</artifactId>
-		<groupId>org.rcsb</groupId>
-		<version>4.1.1-SNAPSHOT</version>
-	</parent>
-	
-	<artifactId>applications</artifactId>
-	
-	<name>applications</name>
-	<packaging>jar</packaging>
-		
-	
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.1</version>
-
-			</plugin>
-			
-			
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>install</phase>
-						<goals>
-						<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<tasks>
-						<echo message="Installing viewer applications file: ${project.build.finalName} in PDB web project " />
-						<copy file="${project.build.directory}/${project.build.finalName}.jar" tofile="${basedir}/../../../pdbweb/webapp/Viewers/RCSBViewers/app.jar"></copy>
-
-					</tasks>
-				</configuration>
-			</plugin>
-			
-		</plugins>
-	</build>
-	<dependencies>
-		<dependency>
-			<groupId>org.rcsb</groupId>
-			<artifactId>molecular-biology-toolkit</artifactId>
-			<version>4.1.1-SNAPSHOT</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.rcsb</groupId>
-			<artifactId>framework</artifactId>
-			<version>4.1.1-SNAPSHOT</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.rcsb</groupId>
-			<artifactId>colorbrewer</artifactId>
-			<version>4.1.1-SNAPSHOT</version>
-		</dependency>
-	</dependencies>
-	
-	
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>viewers</artifactId>
+        <groupId>org.rcsb</groupId>
+        <version>4.7.8-SNAPSHOT</version>
+    </parent>
+    <artifactId>applications</artifactId>
+    <name>applications</name>
+    <packaging>jar</packaging>
+    <properties>
+        <!-- Set in one place -->
+        <projectVersionNumber>${project.version}</projectVersionNumber>
+    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <!-- This sets a default main class (in the event one is not passed) and builds a manifest file -->
+                            <mainClass>org.rcsb.sv.controllers.app.SimpleViewer</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Trusted-Library>true</Trusted-Library>
+                            <Permissions>all-permissions</Permissions>
+                            <Codebase>*</Codebase>
+                            <Application-Name>RCSB-Viewers</Application-Name>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.rcsb</groupId>
+            <artifactId>molecular-biology-toolkit</artifactId>
+            <!-- BE SURE THIS VERSION NUMBER MATCHES THE GLOBAL VERSION NUMBER -->
+            <version>${projectVersionNumber}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.rcsb</groupId>
+            <artifactId>framework</artifactId>
+            <!-- BE SURE THIS VERSION NUMBER MATCHES THE GLOBAL VERSION NUMBER -->
+            <version>${projectVersionNumber}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>java3d</groupId>
+            <artifactId>vecmath</artifactId>
+            <version>1.3.1</version>
+        </dependency>
+   <!--      <dependency>
+            <groupId>javax.media</groupId>
+            <artifactId>jai_core</artifactId>
+            <version>1.1.3</version>
+       </dependency>
+        -->
+         <dependency>
+            <groupId>com.github.jai-imageio</groupId>
+            <artifactId>jai-imageio-core</artifactId>
+            <version>1.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.media.jai</groupId>
+            <artifactId>com.springsource.javax.media.jai.codec</artifactId>
+            <version>1.1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.biojava</groupId>
+            <artifactId>jcolorbrewer</artifactId>
+            <version>5.2</version>
+        </dependency>
+        <!-- JOGL & Glugen -->
+        <dependency>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt-main</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jogamp.jogl</groupId>
+            <artifactId>jogl-all-main</artifactId>
+            <version>${jogl.version}</version>
+        </dependency>
+    </dependencies>
+    <profiles>
+        <!-- Note: before you can use this build profile you need to set up an
+            environment that contains correctly signed keys. Configure the keystore properties
+            and the profile in ~/.m2/settings.xml -->
+        <profile>
+            <id>codesigning</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jarsigner-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>sign</id>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <removeExistingSignatures>true</removeExistingSignatures>
+                            <verbose>true</verbose>
+                            <certs>true</certs>
+                            <storetype>${keystore.type}</storetype>
+                            <keystore>${keystore.path}</keystore>
+                            <alias>${keystore.alias}</alias>
+                            <storepass>${keystore.store.password}</storepass>
+                            <keypass>${keystore.key.password}</keypass>
+                            <verbose>true</verbose>
+                            <goal>sign</goal>
+                            <arguments>
+                                <argument>-tsa</argument>
+                                <argument>https://timestamp.geotrust.com/tsa</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

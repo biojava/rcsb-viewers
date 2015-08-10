@@ -55,8 +55,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GLAutoDrawable;
 import javax.swing.SwingUtilities;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;

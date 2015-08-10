@@ -1,5 +1,5 @@
 # RCSB-Viewers
-
+[![Build Status](https://travis-ci.org/rcsb/rcsb-viewers.svg?branch=master)](https://travis-ci.org/rcsb/rcsb-viewers)  [![Version](http://img.shields.io/badge/version-4.2-blue.svg?style=flat)](https://github.com/rcsb/rcsb-viewers) [![License](http://img.shields.io/badge/license-LGPL_2.1-blue.svg?style=flat)](https://github.com/rcsb/rcsb-viewers/blob/master/LICENSE)
 
 BioJava based RCSB Viewers.
 

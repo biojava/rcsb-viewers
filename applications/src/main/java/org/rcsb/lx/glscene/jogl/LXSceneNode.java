@@ -49,9 +49,9 @@ import java.nio.FloatBuffer;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.glu.GLU;
 
 import org.rcsb.lx.controllers.app.LigandExplorer;
 import org.rcsb.lx.model.Interaction;
@@ -656,7 +656,7 @@ public class LXSceneNode extends JoglSceneNode
 	}
 
 	/**
-	 * @see org.rcsb.vf.glscene.jogl.JoglSceneNode#drawTypeLabels(javax.media.opengl.GL, java.lang.Object, java.lang.Integer)
+	 * @see org.rcsb.vf.glscene.jogl.JoglSceneNode#drawTypeLabels(com.jogamp.opengl.GL, java.lang.Object, java.lang.Integer)
 	 */
 	@Override
 	protected void drawTypeLabels(GL gl, Object key, Integer label)
