@@ -3,6 +3,9 @@
 
 BioJava based RCSB Viewers.
 
+> [!NOTE]
+> Note that this repository has been archived because it is not actively maintained anymore.
+
 ## About RCSB Viewers
 
 
